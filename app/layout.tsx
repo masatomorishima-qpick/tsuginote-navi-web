@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 export const metadata: Metadata = {
   title: "つぎの手ナビ｜相続・手続き・相談先の案内",
@@ -22,6 +23,7 @@ export default function RootLayout({
       <body className="bg-slate-50 text-slate-900 antialiased">
         {children}
       </body>
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
     </html>
   );
 }

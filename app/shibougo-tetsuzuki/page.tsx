@@ -104,145 +104,118 @@ export default function ShibougoTetsuzukiPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-<AffiliateCtaBox
-  title="まず何から進めるべきか、相談先を確認できます"
-  description="ご家族が亡くなった直後は、葬儀、連絡、必要書類の確認など、短時間で決めることが重なります。今の状況に近い相談先や手配先を先に確認しておくと、次の一手が取りやすくなります。"
-  buttonText="相談先を確認する"
-  href="A8の実リンク"
-  lpName="death_procedures"
-  position="firstview"
-  programName="anshin_sougi"
-/>
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          こんなお悩みはありませんか
+        </h2>
+
+        <ul className="mt-6 space-y-4 text-base leading-8 text-slate-600 sm:text-lg">
+          {concerns.map((item) => (
+            <li key={item}>・{item}</li>
+          ))}
+        </ul>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 pb-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            こんなお悩みはありませんか
-          </h2>
-          <ul className="mt-6 space-y-4 text-sm leading-7 text-slate-600 sm:text-base">
-            {concerns.map((item) => (
-              <li key={item}>・{item}</li>
-            ))}
-          </ul>
-        </div>
-      </section>
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          まず確認したい流れ
+        </h2>
 
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            まず確認したい流れ
-          </h2>
-
-          <div className="mt-6 grid gap-4">
-            {immediateSteps.map((step) => (
-              <div
-                key={step.title}
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
-              >
-                <h3 className="text-lg font-semibold text-slate-900">
-                  {step.title}
-                </h3>
-                <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
-                  {step.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            期限や見落としに注意したいポイント
-          </h2>
-
-          <ul className="mt-6 space-y-4 text-sm leading-7 text-slate-600 sm:text-base">
-            {deadlineItems.map((item) => (
-              <li key={item}>・{item}</li>
-            ))}
-          </ul>
-
-          <div className="mt-8 rounded-2xl bg-slate-50 px-5 py-4 text-sm leading-7 text-slate-600 sm:text-base">
-            死亡後手続きのあとに、相続放棄や相続手続きの検討が必要になる場合があります。
-            今の段階では全てを決めきれなくても、次に確認すべきテーマを把握しておくことが大切です。
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            慌てて進める前に気をつけたいこと
-          </h2>
-
-          <ul className="mt-6 space-y-4 text-sm leading-7 text-slate-600 sm:text-base">
-            {avoidMistakes.map((item) => (
-              <li key={item}>・{item}</li>
-            ))}
-          </ul>
-
-          <p className="mt-6 text-sm leading-7 text-slate-600 sm:text-base">
-            まずは現時点で分かっている情報を整理し、期限がありそうなものから順に確認していくと、負担を減らしやすくなります。
-            迷う部分は、早めに相談先を確認しておくのもひとつの方法です。
-          </p>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            相談先とあわせて確認しておきたいこと
-          </h2>
-          <p className="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
-            まずは葬儀や直後の対応を整理し、そのうえで住まいや遺品整理まで見据えて確認しておくと、その後の負担を減らしやすくなります。
-          </p>
-
-          <div className="mt-6 grid gap-6">
-            <AffiliateCtaBox
-              title="まず何から進めるべきか、相談先を確認できます"
-              description="ご家族が亡くなった直後は、葬儀、連絡、必要書類の確認など、短時間で決めることが重なります。今の状況に近い相談先や手配先を先に確認しておくと、次の一手が取りやすくなります。"
-              buttonText="相談先を確認する"
-              href="A8_LINK_安心葬儀_または_よりそうお葬式"
-              lpName="death_procedures"
-              position="bottom"
-              programName="anshin_sougi"
-            />
-
-            <AffiliateCtaBox
-              title="手続きとあわせて、遺品整理の進め方も確認しておきたい方へ"
-              description="死亡後の対応は、葬儀だけで終わりません。住まいの片付けや遺品整理まで見据えて、無理のない進め方を考えておくと、その後の負担を減らしやすくなります。"
-              buttonText="遺品整理の相談先を見る"
-              href="A8_LINK_遺品整理110番_または_みんなの遺品整理"
-              lpName="death_procedures"
-              position="bottom"
-              programName="ihinseiri_110"
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            次に見たいテーマ
-          </h2>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/souzoku-tetsuzuki"
-              className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
+        <div className="mt-6 grid gap-4">
+          {immediateSteps.map((step) => (
+            <div
+              key={step.title}
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
             >
-              相続の手続きを確認する
-            </Link>
-            <Link
-              href="/souzoku-houki"
-              className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
-            >
-              相続放棄を確認する
-            </Link>
-          </div>
+              <h3 className="text-xl font-semibold leading-8 text-slate-900">
+                {step.title}
+              </h3>
+              <p className="mt-3 text-base leading-8 text-slate-600">
+                {step.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          期限や見落としに注意したいポイント
+        </h2>
+
+        <ul className="mt-6 space-y-4 text-base leading-8 text-slate-600">
+          {deadlineItems.map((item) => (
+            <li key={item}>・{item}</li>
+          ))}
+        </ul>
+
+        <div className="mt-8 rounded-2xl bg-slate-100 px-5 py-4 text-base leading-8 text-slate-600">
+          死亡後手続きのあとに、相続放棄や相続手続きの検討が必要になる場合があります。
+          今の段階では全てを決めきれなくても、次に確認すべきテーマを把握しておくことが大切です。
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          慌てて進める前に気をつけたいこと
+        </h2>
+
+        <ul className="mt-6 space-y-4 text-base leading-8 text-slate-600">
+          {avoidMistakes.map((item) => (
+            <li key={item}>・{item}</li>
+          ))}
+        </ul>
+
+        <p className="mt-6 text-base leading-8 text-slate-600">
+          まずは現時点で分かっている情報を整理し、期限がありそうなものから順に確認していくと、負担を減らしやすくなります。
+          迷う部分は、早めに相談先を確認しておくのもひとつの方法です。
+        </p>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+        <div className="border-t border-slate-200 pt-8">
+          <AffiliateCtaBox
+            title="手続きとあわせて、遺品整理の相談先も確認しておきたい方へ"
+            serviceLead='全国対応の遺品整理サービス「遺品整理110番」'
+            description="死亡後の対応は、葬儀だけで終わりません。住まいの片付けや遺品整理まで見据えて、無理のない進め方を考えておくと、その後の負担を減らしやすくなります。自分たちだけで進めるのが難しい場合は、「遺品整理110番」の内容を先に確認しておく方法もあります。"
+            buttonText="詳細を見る"
+            href="https://px.a8.net/svt/ejp?a8mat=4AZNCN+786GWQ+39GM+5MFLEA"
+            lpName="death_procedures"
+            position="bottom"
+            programName="ihinseiri_110"
+            summaryItems={[
+              {
+                label: "サービス名",
+                value: "遺品整理110番",
+              },
+              {
+                label: "対応エリア",
+                value: "全国対応です。",
+              },
+            ]}
+            operatorName="シェアリングテクノロジー株式会社"
+          />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          次に見たいテーマ
+        </h2>
+
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/souzoku-tetsuzuki"
+            className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
+          >
+            相続の手続きを確認する
+          </Link>
+          <Link
+            href="/souzoku-houki"
+            className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
+          >
+            相続放棄を確認する
+          </Link>
         </div>
       </section>
 

@@ -104,145 +104,116 @@ export default function SouzokuTetsuzukiPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <AffiliateCtaBox
-          title="相続手続きをどこから始めるべきか、相談先を確認できます"
-          description="名義変更、必要書類、相続人の確認など、相続手続きはやることが多く、状況によって進め方も変わります。自分のケースで何を優先すべきか迷う場合は、相談先を先に整理しておくと進めやすくなります。"
-          buttonText="相続の相談先を確認する"
-          href="A8_LINK_相続ナビ_または_終活と相続のまどぐち"
-          lpName="inheritance_procedures"
-          position="firstview"
-          programName="souzoku_navi"
-        />
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          こんなお悩みはありませんか
+        </h2>
+
+        <ul className="mt-6 space-y-4 text-base leading-8 text-slate-600 sm:text-lg">
+          {concerns.map((item) => (
+            <li key={item}>・{item}</li>
+          ))}
+        </ul>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 pb-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            こんなお悩みはありませんか
-          </h2>
-          <ul className="mt-6 space-y-4 text-sm leading-7 text-slate-600 sm:text-base">
-            {concerns.map((item) => (
-              <li key={item}>・{item}</li>
-            ))}
-          </ul>
-        </div>
-      </section>
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          まず確認したいこと
+        </h2>
 
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            まず確認したいこと
-          </h2>
-
-          <div className="mt-6 grid gap-4">
-            {checks.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
-              >
-                <h3 className="text-lg font-semibold text-slate-900">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
-                  {item.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            不動産や税金が関わる場合に注意したいこと
-          </h2>
-
-          <ul className="mt-6 space-y-4 text-sm leading-7 text-slate-600 sm:text-base">
-            {cautionPoints.map((item) => (
-              <li key={item}>・{item}</li>
-            ))}
-          </ul>
-
-          <div className="mt-8 rounded-2xl bg-slate-50 px-5 py-4 text-sm leading-7 text-slate-600 sm:text-base">
-            相続手続きは、単に書類を集めれば終わるとは限りません。財産の内容や家族構成によって、
-            先に相談しておいた方が進めやすいケースもあります。
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            慌てて進める前に気をつけたいこと
-          </h2>
-
-          <ul className="mt-6 space-y-4 text-sm leading-7 text-slate-600 sm:text-base">
-            {avoidMistakes.map((item) => (
-              <li key={item}>・{item}</li>
-            ))}
-          </ul>
-
-          <p className="mt-6 text-sm leading-7 text-slate-600 sm:text-base">
-            相続人、財産、不動産、税金の論点を分けて整理していくと、何を先に進めるべきか見えやすくなります。
-            判断がつかない部分は、無理に進めず相談先を確認することも大切です。
-          </p>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            相談先とあわせて確認しておきたいこと
-          </h2>
-          <p className="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
-            まずは相続全体の進め方を整理し、そのうえで税金や空き家の扱いなど、状況に応じて必要な論点を確認していくと進めやすくなります。
-          </p>
-
-          <div className="mt-6 grid gap-6">
-            <AffiliateCtaBox
-              title="相続手続きをどこから始めるべきか、相談先を確認できます"
-              description="名義変更、必要書類、相続人の確認など、相続手続きはやることが多く、状況によって進め方も変わります。自分のケースで何を優先すべきか迷う場合は、相談先を先に整理しておくと進めやすくなります。"
-              buttonText="相続の相談先を確認する"
-              href="A8_LINK_相続ナビ_または_終活と相続のまどぐち"
-              lpName="inheritance_procedures"
-              position="bottom"
-              programName="souzoku_navi"
-            />
-
-            <AffiliateCtaBox
-              title="税金や不動産の扱いまで気になる方へ"
-              description="相続税の対象になるか分からない、実家や空き家をどうするか悩んでいるなど、相続手続きの後半で判断が必要になるテーマもあります。状況に応じた相談先を確認したい方向けの案内です。"
-              buttonText="税金・不動産の相談先を見る"
-              href="A8_LINK_税理士ドットコム_または_ラクウル_または_ワケガイ"
-              lpName="inheritance_procedures"
-              position="bottom"
-              programName="zeirishi_or_realestate"
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            関連して確認したいテーマ
-          </h2>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/shibougo-tetsuzuki"
-              className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
+        <div className="mt-6 grid gap-4">
+          {checks.map((item) => (
+            <div
+              key={item.title}
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
             >
-              死亡後の手続きを確認する
-            </Link>
-            <Link
-              href="/souzoku-houki"
-              className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
-            >
-              相続放棄を確認する
-            </Link>
-          </div>
+              <h3 className="text-xl font-semibold leading-8 text-slate-900">
+                {item.title}
+              </h3>
+              <p className="mt-3 text-base leading-8 text-slate-600">
+                {item.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          不動産や税金が関わる場合に注意したいこと
+        </h2>
+
+        <ul className="mt-6 space-y-4 text-base leading-8 text-slate-600">
+          {cautionPoints.map((item) => (
+            <li key={item}>・{item}</li>
+          ))}
+        </ul>
+
+        <div className="mt-8 rounded-2xl bg-slate-100 px-5 py-4 text-base leading-8 text-slate-600">
+          相続手続きは、単に書類を集めれば終わるとは限りません。財産の内容や家族構成によって、先に相談しておいた方が進めやすいケースもあります。
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          慌てて進める前に気をつけたいこと
+        </h2>
+
+        <ul className="mt-6 space-y-4 text-base leading-8 text-slate-600">
+          {avoidMistakes.map((item) => (
+            <li key={item}>・{item}</li>
+          ))}
+        </ul>
+
+        <p className="mt-6 text-base leading-8 text-slate-600">
+          相続人、財産、不動産、税金の論点を分けて整理していくと、何を先に進めるべきか見えやすくなります。判断がつかない部分は、無理に進めず相談先を確認することも大切です。
+        </p>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+        <div className="border-t border-slate-200 pt-8">
+          <AffiliateCtaBox
+            title="相続した不動産の扱いも確認しておきたい方へ"
+            serviceLead='借地権や訳あり不動産の相談ができる「訳あり物件買取センター」'
+            description="相続手続きが進むと、実家や空き家、売りにくい不動産をどうするかで悩むことがあります。自分たちだけで進めるのが難しい場合は、「訳あり物件買取センター」の内容を先に確認しておく方法もあります。"
+            buttonText="詳細を見る"
+            href="https://px.a8.net/svt/ejp?a8mat=4AZNCN+8D9DNE+5TF6+5YJRM"
+            lpName="inheritance_procedures"
+            position="bottom"
+            programName="wakeari_kaitori_center"
+            summaryItems={[
+              {
+                label: "サービス名",
+                value: "訳あり物件買取センター",
+              },
+              {
+                label: "主な相談内容",
+                value: "借地権や訳あり不動産の買取・売却について確認できます。",
+              },
+            ]}
+            operatorName="株式会社ブリリアント"
+          />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          関連して確認したいテーマ
+        </h2>
+
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/shibougo-tetsuzuki"
+            className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
+          >
+            死亡後の手続きを確認する
+          </Link>
+          <Link
+            href="/souzoku-houki"
+            className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
+          >
+            相続放棄を確認する
+          </Link>
         </div>
       </section>
 

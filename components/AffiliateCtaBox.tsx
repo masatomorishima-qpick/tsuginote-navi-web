@@ -2,6 +2,11 @@
 
 import { sendGAEvent } from '@next/third-parties/google';
 
+type SummaryItem = {
+  label: string;
+  value: string;
+};
+
 type AffiliateCtaBoxProps = {
   title: string;
   description: string;
@@ -10,6 +15,9 @@ type AffiliateCtaBoxProps = {
   lpName: string;
   position: 'firstview' | 'bottom';
   programName: string;
+  summaryItems?: SummaryItem[];
+  operatorName?: string;
+  serviceLead?: string;
 };
 
 export default function AffiliateCtaBox({
@@ -20,6 +28,9 @@ export default function AffiliateCtaBox({
   lpName,
   position,
   programName,
+  summaryItems = [],
+  operatorName,
+  serviceLead,
 }: AffiliateCtaBoxProps) {
   const handleClick = () => {
     sendGAEvent('event', 'affiliate_click', {
@@ -30,18 +41,52 @@ export default function AffiliateCtaBox({
   };
 
   return (
-    <section className="my-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <p className="mb-3 text-xs font-medium tracking-wide text-slate-500">
-        PR｜専門家・事業者の紹介を含みます
-      </p>
+    <section className="my-8 rounded-2xl border border-slate-300 bg-slate-50 p-6 shadow-sm">
+      <div className="mb-3">
+        <span className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">
+          PR｜専門家・事業者の紹介を含みます
+        </span>
+      </div>
 
       <h3 className="text-xl font-bold leading-snug text-slate-900">
         {title}
       </h3>
 
-      <p className="mt-3 text-sm leading-7 text-slate-700">
+      {serviceLead && (
+        <p className="mt-4 text-sm font-semibold leading-7 text-slate-700">
+          {serviceLead}
+        </p>
+      )}
+
+      <p className="mt-4 text-sm leading-8 text-slate-700">
         {description}
       </p>
+
+      {summaryItems.length > 0 && (
+        <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4">
+          <dl className="space-y-3">
+            {summaryItems.map((item) => (
+              <div
+                key={item.label}
+                className="grid gap-1 sm:grid-cols-[120px_1fr] sm:gap-3"
+              >
+                <dt className="text-sm font-semibold text-slate-900">
+                  {item.label}
+                </dt>
+                <dd className="text-sm leading-6 text-slate-600">
+                  {item.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
+
+      {operatorName && (
+        <p className="mt-4 text-sm leading-6 text-slate-600">
+          運営会社：{operatorName}
+        </p>
+      )}
 
       <div className="mt-5">
         <a
@@ -49,7 +94,7 @@ export default function AffiliateCtaBox({
           target="_blank"
           rel="sponsored noopener noreferrer"
           onClick={handleClick}
-          className="inline-flex min-h-[52px] w-full items-center justify-center rounded-xl bg-slate-900 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-700"
+          className="inline-flex min-h-[52px] w-full items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-800"
         >
           {buttonText}
         </a>

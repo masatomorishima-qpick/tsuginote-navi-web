@@ -74,8 +74,7 @@ export default function SouzokuHoukiPage() {
               </h1>
 
               <p className="mt-5 text-base leading-8 text-slate-600 sm:text-lg">
-                借金や負債の不安がある場合、相続放棄を急ぐべきか迷う方は少なくありません。
-                まずは期限や確認したいポイントを整理し、次に何をすべきかを見えやすくしていきましょう。
+                借金や負債の不安がある方に向けて、相続放棄の基本的な考え方と、まず確認したいポイントを整理します。
               </p>
 
               <div className="mt-6 lg:hidden">
@@ -106,155 +105,126 @@ export default function SouzokuHoukiPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <AffiliateCtaBox
-          title="相続放棄を急ぐべきか迷う場合は、相談先を確認できます"
-          description="相続放棄は、期限や必要書類の確認が重要です。借金があるか分からない、放棄すべきか判断できないという段階でも、まず状況を整理できる相談先を確認しておくと動きやすくなります。"
-          buttonText="相続放棄の相談先を見る"
-          href="A8_LINK_相続ナビ_または_終活と相続のまどぐち"
-          lpName="renunciation"
-          position="firstview"
-          programName="souzoku_navi"
-        />
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          こんなお悩みはありませんか
+        </h2>
+
+        <ul className="mt-6 space-y-4 text-base leading-8 text-slate-600 sm:text-lg">
+          {concerns.map((item) => (
+            <li key={item}>・{item}</li>
+          ))}
+        </ul>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 pb-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            こんなお悩みはありませんか
-          </h2>
-          <ul className="mt-6 space-y-4 text-sm leading-7 text-slate-600 sm:text-base">
-            {concerns.map((item) => (
-              <li key={item}>・{item}</li>
-            ))}
-          </ul>
-        </div>
-      </section>
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          まず確認したいこと
+        </h2>
 
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            まず確認したいこと
-          </h2>
-
-          <div className="mt-6 grid gap-4">
-            {checks.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
-              >
-                <h3 className="text-lg font-semibold text-slate-900">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
-                  {item.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            期限や判断で注意したいポイント
-          </h2>
-
-          <ul className="mt-6 space-y-4 text-sm leading-7 text-slate-600 sm:text-base">
-            {cautionPoints.map((item) => (
-              <li key={item}>・{item}</li>
-            ))}
-          </ul>
-
-          <div className="mt-8 rounded-2xl bg-slate-50 px-5 py-4 text-sm leading-7 text-slate-600 sm:text-base">
-            相続放棄は、借金が確定してから考えるものではなく、負債の可能性がある時点で早めに整理を始める方が安心です。
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            慌てて進める前に気をつけたいこと
-          </h2>
-
-          <ul className="mt-6 space-y-4 text-sm leading-7 text-slate-600 sm:text-base">
-            {avoidMistakes.map((item) => (
-              <li key={item}>・{item}</li>
-            ))}
-          </ul>
-
-          <p className="mt-6 text-sm leading-7 text-slate-600 sm:text-base">
-            相続放棄は、期限、財産、負債、すでに進めた手続きの有無を分けて整理すると、判断しやすくなります。
-            自分だけで決めきれない場合は、相続全体を含めて相談できる先を早めに確認することが大切です。
-          </p>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            相談先とあわせて確認しておきたいこと
-          </h2>
-          <p className="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
-            まずは相続放棄の判断や手続き全体を整理し、負債の対応まで不安がある場合は、状況に応じた法律相談も選択肢になります。
-          </p>
-
-          <div className="mt-6 grid gap-6">
-            <AffiliateCtaBox
-              title="相続放棄を急ぐべきか迷う場合は、相談先を確認できます"
-              description="相続放棄は、期限や必要書類の確認が重要です。借金があるか分からない、放棄すべきか判断できないという段階でも、まず状況を整理できる相談先を確認しておくと動きやすくなります。"
-              buttonText="相続放棄の相談先を見る"
-              href="A8_LINK_相続ナビ_または_終活と相続のまどぐち"
-              lpName="renunciation"
-              position="bottom"
-              programName="souzoku_navi"
-            />
-
-            <AffiliateCtaBox
-              title="負債の引き継ぎや借金対応まで不安がある方へ"
-              description="相続放棄の判断だけでなく、借金問題そのものへの対応が気になっている場合は、法律相談を検討する方法もあります。負債対応まで含めて確認したい方向けの相談先です。"
-              buttonText="借金問題の相談先を見る"
-              href="A8_LINK_債務整理系弁護士案件"
-              lpName="renunciation"
-              position="bottom"
-              programName="debt_lawyer"
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            関連して確認したいテーマ
-          </h2>
-
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/shibougo-tetsuzuki"
-              className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
+        <div className="mt-6 grid gap-4">
+          {checks.map((item) => (
+            <div
+              key={item.title}
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
             >
-              死亡後の手続きを確認する
-            </Link>
+              <h3 className="text-xl font-semibold leading-8 text-slate-900">
+                {item.title}
+              </h3>
+              <p className="mt-3 text-base leading-8 text-slate-600">
+                {item.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-            <Link
-              href="/souzoku-tetsuzuki"
-              className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
-            >
-              相続の手続きを確認する
-            </Link>
-          </div>
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          期限や判断で注意したいポイント
+        </h2>
 
-          <div className="mt-3">
-            <Link
-              href="/"
-              className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-            >
-              トップに戻る
-            </Link>
-          </div>
+        <ul className="mt-6 space-y-4 text-base leading-8 text-slate-600">
+          {cautionPoints.map((item) => (
+            <li key={item}>・{item}</li>
+          ))}
+        </ul>
+
+        <div className="mt-8 rounded-2xl bg-slate-100 px-5 py-4 text-base leading-8 text-slate-600">
+          相続放棄は、借金が確定してから考えるものではなく、負債の可能性がある時点で早めに整理を始める方が安心です。
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          慌てて進める前に気をつけたいこと
+        </h2>
+
+        <ul className="mt-6 space-y-4 text-base leading-8 text-slate-600">
+          {avoidMistakes.map((item) => (
+            <li key={item}>・{item}</li>
+          ))}
+        </ul>
+
+        <p className="mt-6 text-base leading-8 text-slate-600">
+          相続放棄は、期限、財産、負債、すでに進めた手続きの有無を分けて整理すると、判断しやすくなります。自分だけで決めきれない場合は、相続全体を含めて相談できる先を早めに確認することが大切です。
+        </p>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+        <div className="border-t border-slate-200 pt-8">
+          <AffiliateCtaBox
+            title="借金や負債対応まで不安がある方へ"
+            serviceLead='借金問題や債務整理の相談ができる「アース司法書士事務所」'
+            description="相続放棄の判断だけでなく、借金問題そのものへの対応が気になる場合は、法律・手続きの相談先を先に確認しておく方法もあります。自分だけで抱え込まず、「アース司法書士事務所」の内容を確認してみる選択肢もあります。"
+            buttonText="詳細を見る"
+            href="https://px.a8.net/svt/ejp?a8mat=4AZNCN+AQED5M+4LX2+5YZ77"
+            lpName="renunciation"
+            position="bottom"
+            programName="earth_shihoshoshi_debt"
+            summaryItems={[
+              {
+                label: "サービス名",
+                value: "アース司法書士事務所",
+              },
+              {
+                label: "主な相談内容",
+                value: "借金問題や債務整理について確認できます。",
+              },
+            ]}
+            operatorName="アース司法書士事務所"
+          />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+          関連して確認したいテーマ
+        </h2>
+
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/shibougo-tetsuzuki"
+            className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
+          >
+            死亡後の手続きを確認する
+          </Link>
+
+          <Link
+            href="/souzoku-tetsuzuki"
+            className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-900 transition hover:bg-slate-50"
+          >
+            相続の手続きを確認する
+          </Link>
+        </div>
+
+        <div className="mt-3">
+          <Link
+            href="/"
+            className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            トップに戻る
+          </Link>
         </div>
       </section>
 

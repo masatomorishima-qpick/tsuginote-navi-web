@@ -1,6 +1,7 @@
 'use client';
 
 import { sendGAEvent } from '@next/third-parties/google';
+import { trackEvent } from '@/lib/trackEvent';
 
 type SummaryItem = {
   label: string;
@@ -13,11 +14,17 @@ type AffiliateCtaBoxProps = {
   buttonText: string;
   href: string;
   lpName: string;
+  lpId: string;
   position: 'firstview' | 'bottom';
   programName: string;
   summaryItems?: SummaryItem[];
   operatorName?: string;
   serviceLead?: string;
+  ctaId?: string;
+  partnerCategory?: string;
+  sourceSection?: string;
+  selectedIntentId?: string;
+  gaEventName?: string;
 };
 
 export default function AffiliateCtaBox({
@@ -26,17 +33,49 @@ export default function AffiliateCtaBox({
   buttonText,
   href,
   lpName,
+  lpId,
   position,
   programName,
   summaryItems = [],
   operatorName,
   serviceLead,
+  ctaId,
+  partnerCategory,
+  sourceSection,
+  selectedIntentId,
+  gaEventName,
 }: AffiliateCtaBoxProps) {
   const handleClick = () => {
+    // 既存の集計用イベント（現在のGoogle広告CVを維持）
     sendGAEvent('event', 'affiliate_click', {
       lp_name: lpName,
       position,
       program_name: programName,
+    });
+
+    // LP別の切り分けイベント（指定がある場合のみ送信）
+    if (gaEventName) {
+      sendGAEvent('event', gaEventName, {
+        lp_name: lpName,
+        position,
+        program_name: programName,
+      });
+    }
+
+    void trackEvent({
+      lp_id: lpId,
+      event_name: 'cta_click',
+      cta_id: ctaId,
+      partner_category: partnerCategory,
+      source_section: sourceSection,
+      selected_intent_id: selectedIntentId,
+      metadata: {
+        href,
+        lp_name: lpName,
+        position,
+        program_name: programName,
+        ga_event_name: gaEventName,
+      },
     });
   };
 

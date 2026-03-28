@@ -65,6 +65,7 @@ export default function Home() {
                     alt="ご家族で手続きや相談先を整理している様子"
                     fill
                     priority
+                    sizes="100vw"
                     className="object-cover"
                   />
                 </div>
@@ -78,6 +79,7 @@ export default function Home() {
                   alt="ご家族で手続きや相談先を整理している様子"
                   fill
                   priority
+                  sizes="50vw"
                   className="object-cover"
                 />
               </div>

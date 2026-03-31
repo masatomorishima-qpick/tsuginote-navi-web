@@ -1,10 +1,14 @@
-'use client';
-
-import { useState } from "react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
 import AffiliateCtaBox from "@/components/AffiliateCtaBox";
+
+export const metadata: Metadata = {
+  title: "相続放棄の期限は3か月｜判断材料・相談先・注意点を整理",
+  description:
+    "相続放棄をするか迷っている方向けに、原則3か月の期限、借金や負債の確認ポイント、家庭裁判所での手続き、司法書士・弁護士への相談先を整理しています。",
+};
 
 const heroPoints = [
   {
@@ -126,12 +130,6 @@ const faqItems = [
 ];
 
 export default function SouzokuHoukiPage() {
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
-
-  const handleFaqToggle = (index: number) => {
-    setOpenFaqIndex((prev) => (prev === index ? null : index));
-  };
-
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
@@ -158,9 +156,7 @@ export default function SouzokuHoukiPage() {
               </p>
 
               <h1 className="mt-5 text-[2.2rem] font-bold leading-[1.15] tracking-tight text-slate-900 sm:text-5xl">
-                借金超過のおそれがあれば、
-                <br />
-                相続放棄するかを判断する
+                相続放棄するか迷ったときに確認したい期限・判断材料・相談先
               </h1>
 
               <div className="mt-6">
@@ -223,19 +219,13 @@ export default function SouzokuHoukiPage() {
 
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             {quickNavItems.map((item) => (
-              <button
+              <a
                 key={item.targetId}
-                type="button"
-                onClick={() => {
-                  const target = document.getElementById(item.targetId);
-                  if (target) {
-                    target.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }
-                }}
+                href={`#${item.targetId}`}
                 className="rounded-2xl border border-white bg-white px-5 py-4 text-left text-base font-semibold leading-7 text-slate-900 transition hover:-translate-y-0.5 hover:border-rose-300 hover:bg-rose-100"
               >
                 {item.label}
-              </button>
+              </a>
             ))}
           </div>
         </div>
@@ -258,7 +248,7 @@ export default function SouzokuHoukiPage() {
 
       <section
         id="flow_overview"
-        className="mx-auto max-w-5xl px-4 py-8 sm:px-6"
+        className="mx-auto max-w-5xl scroll-mt-24 px-4 py-8 sm:px-6"
       >
         <p className="text-sm font-semibold tracking-[0.08em] text-rose-700">
           最短の流れ
@@ -304,7 +294,7 @@ export default function SouzokuHoukiPage() {
 
       <section
         id="deadline_section"
-        className="mx-auto max-w-5xl px-4 py-8 sm:px-6"
+        className="mx-auto max-w-5xl scroll-mt-24 px-4 py-8 sm:px-6"
       >
         <p className="text-sm font-semibold tracking-[0.08em] text-rose-700">
           期限
@@ -349,7 +339,7 @@ export default function SouzokuHoukiPage() {
 
       <section
         id="checks_section"
-        className="mx-auto max-w-5xl px-4 py-8 sm:px-6"
+        className="mx-auto max-w-5xl scroll-mt-24 px-4 py-8 sm:px-6"
       >
         <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
           まず確認したいこと
@@ -394,7 +384,7 @@ export default function SouzokuHoukiPage() {
 
       <section
         id="cta_section"
-        className="mx-auto max-w-5xl px-4 py-10 sm:px-6"
+        className="mx-auto max-w-5xl scroll-mt-24 px-4 py-10 sm:px-6"
       >
         <p className="text-sm font-semibold tracking-[0.08em] text-rose-700">
           相談先のご案内
@@ -432,7 +422,7 @@ export default function SouzokuHoukiPage() {
         <div className="mt-6 grid gap-6">
           <AffiliateCtaBox
             title="借金や相続放棄の進め方を早めに整理したい方へ"
-            serviceLead='借金問題や相続まわりの相談ができる「アース司法書士事務所」'
+            serviceLead="借金問題や相続まわりの相談ができる「アース司法書士事務所」"
             description="借金や負債の不安があり、相続放棄も含めて早めに相談先を確保したい方向けの窓口です。迷って止まる前に、今の状況を整理したい方に向いています。"
             buttonText="まずは無料で状況を整理する"
             href="https://px.a8.net/svt/ejp?a8mat=4AZNCN+AQED5M+4LX2+5YZ77"
@@ -464,7 +454,7 @@ export default function SouzokuHoukiPage() {
           <div>
             <AffiliateCtaBox
               title="借金や返済不安が強く、弁護士に相談したい方へ"
-              serviceLead='債務整理や借金問題の相談ができる「弁護士法人イストワール法律事務所」'
+              serviceLead="債務整理や借金問題の相談ができる「弁護士法人イストワール法律事務所」"
               description="相続だけでなく借金や返済の不安も重なっている場合は、早めに弁護士へ相談した方が整理しやすくなります。期限が迫っている、または過ぎてしまって不安な方も、事情を含めて相談したいときに向いています。"
               buttonText="借金の不安を弁護士に無料相談する"
               href="https://px.a8.net/svt/ejp?a8mat=4AZPOQ+9X84II+4FR4+639IP"
@@ -525,7 +515,7 @@ export default function SouzokuHoukiPage() {
 
       <section
         id="faq_section"
-        className="mx-auto max-w-5xl px-4 py-8 sm:px-6"
+        className="mx-auto max-w-5xl scroll-mt-24 px-4 py-8 sm:px-6"
       >
         <p className="text-sm font-semibold tracking-[0.08em] text-rose-700">
           よくある疑問
@@ -535,38 +525,28 @@ export default function SouzokuHoukiPage() {
         </h2>
 
         <div className="mt-6 space-y-4">
-          {faqItems.map((item, index) => {
-            const isOpen = openFaqIndex === index;
-
-            return (
-              <div
-                key={item.question}
-                className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
-              >
-                <button
-                  type="button"
-                  onClick={() => handleFaqToggle(index)}
-                  aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left"
-                >
-                  <span className="text-lg font-semibold leading-8 text-slate-900">
-                    {item.question}
-                  </span>
-                  <span className="shrink-0 text-2xl font-semibold text-rose-700">
-                    {isOpen ? "−" : "+"}
-                  </span>
-                </button>
-
-                {isOpen && (
-                  <div className="border-t border-slate-200 px-5 py-4">
-                    <p className="text-base leading-8 text-slate-600">
-                      {item.answer}
-                    </p>
-                  </div>
-                )}
+          {faqItems.map((item, index) => (
+            <details
+              key={item.question}
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm group"
+              open={index === 0}
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 text-left">
+                <span className="text-lg font-semibold leading-8 text-slate-900">
+                  {item.question}
+                </span>
+                <span className="shrink-0 text-2xl font-semibold text-rose-700">
+                  <span className="group-open:hidden">+</span>
+                  <span className="hidden group-open:inline">−</span>
+                </span>
+              </summary>
+              <div className="border-t border-slate-200 px-5 py-4">
+                <p className="text-base leading-8 text-slate-600">
+                  {item.answer}
+                </p>
               </div>
-            );
-          })}
+            </details>
+          ))}
         </div>
       </section>
 

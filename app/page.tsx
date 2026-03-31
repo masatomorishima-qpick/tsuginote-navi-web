@@ -23,6 +23,15 @@ const categories = [
   },
 ];
 
+const usefulArticles = [
+  {
+    href: "https://www.tsuginotenavi.jp/guide/jikka-kataduke/nanikara-a001",
+    title: "親が亡くなった実家の片付けは何から？先に分けるもの・捨てないもの・進め方",
+    description:
+      "この記事では、最初にやること、捨ててはいけないもの、 自分でやるか業者に頼むかの判断を整理します。",
+  },
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -116,6 +125,48 @@ export default function Home() {
               </div>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 pb-10 pt-2 sm:px-6 sm:pb-14">
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold tracking-wide text-emerald-700">
+                お役立ち情報
+              </p>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                手続き前に知っておきたい情報
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
+                不安や疑問を整理しやすいように、よく読まれるテーマをまとめています。
+              </p>
+            </div>
+
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {usefulArticles.map((article) => (
+              <Link
+                key={article.href}
+                href={article.href}
+                className="group rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-white hover:shadow-md"
+              >
+                <p className="text-xs font-semibold tracking-wide text-emerald-700">
+                  お役立ち記事
+                </p>
+                <h3 className="mt-3 text-lg font-semibold leading-8 text-slate-900 group-hover:text-slate-800">
+                  {article.title}
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-slate-600">
+                  {article.description}
+                </p>
+                <div className="mt-5 text-sm font-semibold text-emerald-700">
+                  記事を読む →
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

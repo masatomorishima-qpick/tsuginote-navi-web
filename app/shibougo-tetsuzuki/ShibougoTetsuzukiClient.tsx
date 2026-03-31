@@ -7,8 +7,8 @@ import SiteFooter from "@/components/SiteFooter";
 import AffiliateCtaBox from "@/components/AffiliateCtaBox";
 import { trackEvent } from "@/lib/trackEvent";
 
-const FUNERAL_AFFILIATE_HREF = "REPLACE_WITH_FUNERAL_AFFILIATE_URL";
-const WILL_SUPPORT_AFFILIATE_HREF = "REPLACE_WITH_WILL_SUPPORT_AFFILIATE_URL";
+const FUNERAL_AFFILIATE_HREF = "#";
+const WILL_SUPPORT_AFFILIATE_HREF = "#";
 
 const prioritySteps = [
   "今日中に、連絡先と書類を整理する",

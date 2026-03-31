@@ -30,6 +30,18 @@ const usefulArticles = [
     description:
       "この記事では、最初にやること、捨ててはいけないもの、 自分でやるか業者に頼むかの判断を整理します。",
   },
+{
+  href: "/guide/ihinseiri/digitalihin-002",
+  title: "親のネット銀行がわからないときの相続対応",
+  description:
+    "通帳が少ない、スマホやアプリ中心で管理していた場合に、何を手がかりに確認すべきか整理した記事です。",
+},
+{
+  href: "/guide/ihinseiri/digitalihin-003",
+  title: "亡くなった人のサブスクを解約できないときは？",
+  description:
+    "継続課金が不安なときに、請求の整理方法や相続放棄も含めて考えたいポイントをまとめた記事です。",
+},
 ];
 
 export default function Home() {
@@ -166,6 +178,12 @@ export default function Home() {
                 </div>
               </Link>
             ))}
+    <Link
+      href="/guide"
+      className="inline-flex items-center text-sm font-semibold text-slate-700 transition hover:text-slate-900 hover:underline"
+    >
+      お役立ち情報一覧を見る →
+    </Link>
           </div>
         </div>
       </section>

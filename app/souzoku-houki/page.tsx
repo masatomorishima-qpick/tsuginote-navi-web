@@ -420,20 +420,25 @@ export default function SouzokuHoukiPage() {
         </div>
 
         <div className="mt-6 grid gap-6">
-<AffiliateCtaBox
-  title="相続税や相続全体の相談先も整理したい方へ"
-  description="相続放棄を含めて相続全体の流れを整理する中で、相続税申告や税理士への相談が必要になる場合があります。費用感や相談先の候補を把握したい方は、早めに比較しておくと安心です。"
-  buttonText="税理士ドットコムで無料相談する"
-  href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
-  lpName="zeirishi_dotcom_houki_lp"
-  position="bottom"
-  programName="税理士ドットコム"
-  summaryItems={[
-    { label: "相談内容", value: "相続税申告・税理士探しの相談" },
-    { label: "こんな方に", value: "相続全体の費用や税務も気になる方" },
-    { label: "タイミング", value: "手続きの全体像を整理したいとき" },
-  ]}
-/>
+          <AffiliateCtaBox
+            title="相続税や相続全体の相談先も整理したい方へ"
+            description="相続放棄を含めて相続全体の流れを整理する中で、相続税申告や税理士への相談が必要になる場合があります。費用感や相談先の候補を把握したい方は、早めに比較しておくと安心です。"
+            buttonText="税理士ドットコムで無料相談する"
+            href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
+            lpName="souzoku_houki"
+            lpId="lp_souzoku_houki"
+            position="bottom"
+            programName="zeirishi_dotcom"
+            ctaId="cta_souzoku_houki_zeirishi"
+            partnerCategory="tax_accountant_service"
+            sourceSection="consultation"
+            gaEventName="cta_click_souzoku_houki"
+            summaryItems={[
+              { label: "相談内容", value: "相続税申告・税理士探しの相談" },
+              { label: "こんな方に", value: "相続全体の費用や税務も気になる方" },
+              { label: "タイミング", value: "手続きの全体像を整理したいとき" },
+            ]}
+          />
         </div>
 
         <p className="mt-4 text-sm leading-7 text-slate-500">

@@ -521,14 +521,20 @@ export default function DigitalIhin001Page() {
               </div>
             </div>
           </div>
+
 <AffiliateCtaBox
   title="相続税や相続全体の相談先も整理したい方へ"
   description="相続放棄を含めて相続全体の流れを整理する中で、相続税申告や税理士への相談が必要になる場合があります。費用感や相談先の候補を把握したい方は、早めに比較しておくと安心です。"
   buttonText="税理士ドットコムで無料相談する"
   href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
-  lpName="zeirishi_dotcom_houki_lp"
+  lpName="digitalihin_001"
+  lpId="guide_ihinseiri_digitalihin_001"
   position="bottom"
-  programName="税理士ドットコム"
+  programName="zeirishi_dotcom"
+  ctaId="cta_digitalihin_001_zeirishi"
+  partnerCategory="tax_accountant_service"
+  sourceSection="debt_risk"
+  gaEventName="cta_click_digitalihin_001"
   summaryItems={[
     { label: "相談内容", value: "相続税申告・税理士探しの相談" },
     { label: "こんな方に", value: "相続全体の費用や税務も気になる方" },

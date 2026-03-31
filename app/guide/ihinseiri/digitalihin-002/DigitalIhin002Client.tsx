@@ -424,17 +424,22 @@ export default function DigitalIhin002Client() {
             <MicroCopy text="※複雑な照会手続きや確認も、専門家に相談すると漏れなく安全に進めやすくなります。" />
           </div>
 <AffiliateCtaBox
-  title="相続税申告や税理士探しを相談したい方へ"
-  description="相続税の申告が必要か分からない方や、どの税理士に相談すべきか迷っている方向けの相談先です。費用感や依頼範囲を整理しながら、状況に合う税理士を無料で探しやすくなります。"
+  title="相続税や相続全体の相談先も整理したい方へ"
+  description="サブスクの解約や毎月の請求を整理していく中で、相続税申告や税理士への相談が必要になる場合があります。相続全体の費用感や相談先の候補も早めに把握しておくと、あとから手続きが進めやすくなります。"
   buttonText="税理士ドットコムで無料相談する"
   href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
-  lpName="zeirishi_dotcom_inheritance_lp"
+  lpName="digitalihin_002"
+  lpId="guide_ihinseiri_digitalihin_002"
   position="bottom"
-  programName="税理士ドットコム"
+  programName="zeirishi_dotcom"
+  ctaId="cta_digitalihin_002_zeirishi"
+  partnerCategory="tax_accountant_service"
+  sourceSection="debt_risk"
+  gaEventName="cta_click_digitalihin_002"
   summaryItems={[
     { label: "相談内容", value: "相続税申告・税理士探しの相談" },
-    { label: "こんな方に", value: "税理士を比較して決めたい方" },
-    { label: "タイミング", value: "相続税や費用感が気になったとき" },
+    { label: "こんな方に", value: "相続全体の費用や税務も気になる方" },
+    { label: "タイミング", value: "手続きの全体像を整理したいとき" },
   ]}
 />
         </Section>

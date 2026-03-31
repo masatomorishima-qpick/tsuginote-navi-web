@@ -618,9 +618,15 @@ export default function ShibougoTetsuzukiClient() {
   description="ご家族が亡くなった後、相続税の申告が必要かどうか分からず不安な方や、税理士選びで迷っている方向けの相談先です。早めに相談先の候補を把握しておくと、その後の手続きを進めやすくなります。"
   buttonText="税理士ドットコムで無料相談する"
   href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
-  lpName="zeirishi_dotcom_after_death_lp"
+  lpName="death_procedures"
+  lpId="after_death_lp"
   position="bottom"
-  programName="税理士ドットコム"
+  programName="zeirishi_dotcom"
+  ctaId="cta_after_death_zeirishi"
+  partnerCategory="tax_accountant_service"
+  sourceSection="after_settlement_zeirishi"
+  selectedIntentId={selectedIntentId}
+  gaEventName="cta_click_shibougo"
   summaryItems={[
     { label: "相談内容", value: "相続税申告・税理士探しの相談" },
     { label: "こんな方に", value: "何を誰に相談すべきか整理したい方" },

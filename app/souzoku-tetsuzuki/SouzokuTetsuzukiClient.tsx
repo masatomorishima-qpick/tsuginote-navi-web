@@ -8,36 +8,21 @@ import { trackEvent } from "@/lib/trackEvent";
 import AffiliateCtaBox from "@/components/AffiliateCtaBox";
 
 const consultationAffiliateItems = [
-  {
-    id: "earth-judicial-scrivener",
-    title: "借金や相続の悩みを早めに相談したい方へ",
-    description:
-      "借金問題や相続まわりの不安を一人で抱え込まず、まずは無料相談で整理したい方向けの相談先です。状況が複雑になる前に、今の段階で相談できる窓口を確保しておくと動きやすくなります。",
-    buttonText: "アース司法書士事務所に無料相談する",
-    href: "https://px.a8.net/svt/ejp?a8mat=4AZNCN+AQED5M+4LX2+5YZ77",
-    lpName: "inheritance_consultation_lp",
-    programName: "アース司法書士事務所",
-    summaryItems: [
-      { label: "相談内容", value: "借金問題・相続まわりの悩み整理" },
-      { label: "こんな方に", value: "まず相談先を確保したい方" },
-      { label: "タイミング", value: "迷って止まる前の早期相談" },
-    ],
-  },
-  {
-    id: "histoire-law-office",
-    title: "債務整理も含めて弁護士に相談したい方へ",
-    description:
-      "相続だけでなく借金や返済の不安も重なっている場合は、早めに弁護士へ相談した方が整理しやすくなります。放置すると選択肢が狭まることもあるため、不安が大きい方は先に相談窓口を持っておくと安心です。",
-    buttonText: "弁護士法人イストワール法律事務所に相談する",
-    href: "https://px.a8.net/svt/ejp?a8mat=4AZPOQ+9X84II+4FR4+639IP",
-    lpName: "inheritance_consultation_lp",
-    programName: "弁護士法人イストワール法律事務所",
-    summaryItems: [
-      { label: "相談内容", value: "債務整理・借金問題の相談" },
-      { label: "こんな方に", value: "借金の悩みが強い方" },
-      { label: "タイミング", value: "返済不安や督促が気になるとき" },
-    ],
-  },
+{
+  id: "zeirishi-dotcom",
+  title: "相続税申告や税理士探しを早めに整理したい方へ",
+  description:
+    "ご家族が亡くなった後、相続税の申告が必要かどうか分からず不安な方や、税理士選びで迷っている方向けの相談先です。早めに相談先の候補を把握しておくと、その後の手続きを進めやすくなります。",
+  buttonText: "税理士ドットコムで無料相談する",
+  href: "https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p",
+  lpName: "zeirishi_dotcom_after_death_lp",
+  programName: "税理士ドットコム",
+  summaryItems: [
+    { label: "相談内容", value: "相続税申告・税理士探しの相談" },
+    { label: "こんな方に", value: "何を誰に相談すべきか整理したい方" },
+    { label: "タイミング", value: "必要な手続きを確認し始めたとき" },
+  ],
+},
 ];
 
 const cleanupAffiliateItem = {
@@ -822,23 +807,6 @@ export default function SouzokuTetsuzukiClient() {
             ctaId="cta_inheritance_consult_earth"
             partnerCategory="legal_service"
             sourceSection="advisor_consultation_earth"
-            selectedIntentId={selectedIntentId}
-            gaEventName="cta_click_souzoku"
-          />
-
-          <AffiliateCtaBox
-            title={consultationAffiliateItems[1].title}
-            description={consultationAffiliateItems[1].description}
-            buttonText={consultationAffiliateItems[1].buttonText}
-            href={consultationAffiliateItems[1].href}
-            lpName={consultationAffiliateItems[1].lpName}
-            lpId="inheritance_lp"
-            position="bottom"
-            programName={consultationAffiliateItems[1].programName}
-            summaryItems={consultationAffiliateItems[1].summaryItems}
-            ctaId="cta_inheritance_consult_histoire"
-            partnerCategory="legal_service"
-            sourceSection="advisor_consultation_histoire"
             selectedIntentId={selectedIntentId}
             gaEventName="cta_click_souzoku"
           />

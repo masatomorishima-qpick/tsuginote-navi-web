@@ -423,41 +423,20 @@ export default function DigitalIhin002Client() {
             />
             <MicroCopy text="※複雑な照会手続きや確認も、専門家に相談すると漏れなく安全に進めやすくなります。" />
           </div>
-
-          <AffiliateCtaBox
-            title="通帳が少なく、ネット銀行や口座の有無が不安な方へ"
-            serviceLead="自力で確認できる範囲に限界を感じる場合は、相続や財産確認の相談先を早めに確認しておくと安心です。"
-            description="親がスマホやアプリ中心でお金を管理していた場合、紙の手がかりだけでは全体像が見えにくいことがあります。金融機関名や引き落とし履歴など、分かる範囲の情報を整理したうえで、相続全体も含めた相談先を確認しておくと進めやすくなります。"
-            buttonText="アース司法書士事務所を確認する"
-            href="https://px.a8.net/svt/ejp?a8mat=4AZNCN+AQED5M+4LX2+5YZ77"
-            lpName="digitalihin_002"
-            lpId="guide_ihinseiri_digitalihin_002"
-            position="bottom"
-            programName="earth_shiho"
-            ctaId="cta_digitalihin_002_earth"
-            partnerCategory="legal_support"
-            sourceSection="consult"
-            gaEventName="cta_click_digitalihin_002_earth"
-            summaryItems={[
-              {
-                label: '相談先',
-                value: 'アース司法書士事務所',
-              },
-              {
-                label: '受付',
-                value: '24時間365日メール受付です。',
-              },
-              {
-                label: '向いている方',
-                value: '口座不明や相続全体の整理が不安な方です。',
-              },
-              {
-                label: '注意点',
-                value: '詳しい対応範囲はリンク先でご確認ください。',
-              },
-            ]}
-            operatorName="アース司法書士事務所"
-          />
+<AffiliateCtaBox
+  title="相続税申告や税理士探しを相談したい方へ"
+  description="相続税の申告が必要か分からない方や、どの税理士に相談すべきか迷っている方向けの相談先です。費用感や依頼範囲を整理しながら、状況に合う税理士を無料で探しやすくなります。"
+  buttonText="税理士ドットコムで無料相談する"
+  href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
+  lpName="zeirishi_dotcom_inheritance_lp"
+  position="bottom"
+  programName="税理士ドットコム"
+  summaryItems={[
+    { label: "相談内容", value: "相続税申告・税理士探しの相談" },
+    { label: "こんな方に", value: "税理士を比較して決めたい方" },
+    { label: "タイミング", value: "相続税や費用感が気になったとき" },
+  ]}
+/>
         </Section>
 
         <Section id="related" title="他の悩みともつながる理由">

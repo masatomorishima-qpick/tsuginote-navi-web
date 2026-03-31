@@ -420,72 +420,20 @@ export default function SouzokuHoukiPage() {
         </div>
 
         <div className="mt-6 grid gap-6">
-          <AffiliateCtaBox
-            title="借金や相続放棄の進め方を早めに整理したい方へ"
-            serviceLead="借金問題や相続まわりの相談ができる「アース司法書士事務所」"
-            description="借金や負債の不安があり、相続放棄も含めて早めに相談先を確保したい方向けの窓口です。迷って止まる前に、今の状況を整理したい方に向いています。"
-            buttonText="まずは無料で状況を整理する"
-            href="https://px.a8.net/svt/ejp?a8mat=4AZNCN+AQED5M+4LX2+5YZ77"
-            lpName="renunciation"
-            lpId="renunciation_lp"
-            position="bottom"
-            programName="earth_shihoshoshi_debt"
-            ctaId="cta_renunciation_earth"
-            partnerCategory="legal_service"
-            sourceSection="cta_section_earth"
-            gaEventName="cta_click_houki"
-            summaryItems={[
-              {
-                label: "サービス名",
-                value: "アース司法書士事務所",
-              },
-              {
-                label: "主な相談内容",
-                value: "借金問題や相続まわりの悩み整理",
-              },
-              {
-                label: "こんな方に",
-                value: "まず相談先を確保したい方",
-              },
-            ]}
-            operatorName="アース司法書士事務所"
-          />
-
-          <div>
-            <AffiliateCtaBox
-              title="借金や返済不安が強く、弁護士に相談したい方へ"
-              serviceLead="債務整理や借金問題の相談ができる「弁護士法人イストワール法律事務所」"
-              description="相続だけでなく借金や返済の不安も重なっている場合は、早めに弁護士へ相談した方が整理しやすくなります。期限が迫っている、または過ぎてしまって不安な方も、事情を含めて相談したいときに向いています。"
-              buttonText="借金の不安を弁護士に無料相談する"
-              href="https://px.a8.net/svt/ejp?a8mat=4AZPOQ+9X84II+4FR4+639IP"
-              lpName="renunciation"
-              lpId="renunciation_lp"
-              position="bottom"
-              programName="histoire_law_office_debt"
-              ctaId="cta_renunciation_histoire"
-              partnerCategory="legal_service"
-              sourceSection="cta_section_histoire"
-              gaEventName="cta_click_houki"
-              summaryItems={[
-                {
-                  label: "サービス名",
-                  value: "弁護士法人イストワール法律事務所",
-                },
-                {
-                  label: "主な相談内容",
-                  value: "債務整理・借金問題の相談",
-                },
-                {
-                  label: "こんな方に",
-                  value: "借金の悩みが強い方",
-                },
-              ]}
-              operatorName="弁護士法人イストワール法律事務所"
-            />
-            <p className="mt-3 text-sm leading-7 text-rose-700">
-              ※ 期限の3か月が迫っている方や、すでに督促状が届いている方は、手遅れになる前に今すぐご相談ください。
-            </p>
-          </div>
+<AffiliateCtaBox
+  title="相続税や相続全体の相談先も整理したい方へ"
+  description="相続放棄を含めて相続全体の流れを整理する中で、相続税申告や税理士への相談が必要になる場合があります。費用感や相談先の候補を把握したい方は、早めに比較しておくと安心です。"
+  buttonText="税理士ドットコムで無料相談する"
+  href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
+  lpName="zeirishi_dotcom_houki_lp"
+  position="bottom"
+  programName="税理士ドットコム"
+  summaryItems={[
+    { label: "相談内容", value: "相続税申告・税理士探しの相談" },
+    { label: "こんな方に", value: "相続全体の費用や税務も気になる方" },
+    { label: "タイミング", value: "手続きの全体像を整理したいとき" },
+  ]}
+/>
         </div>
 
         <p className="mt-4 text-sm leading-7 text-slate-500">

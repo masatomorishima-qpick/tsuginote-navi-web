@@ -596,6 +596,7 @@ export default function ShibougoTetsuzukiClient() {
           今の段階では全てを決めきれなくても、次に確認すべきテーマを把握しておくことが大切です。
         </div>
 
+
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link
             href="/souzoku-tetsuzuki"
@@ -610,6 +611,24 @@ export default function ShibougoTetsuzukiClient() {
             相続放棄を確認する
           </Link>
         </div>
+
+        <div className="mt-8 border-t border-slate-200 pt-8">
+<AffiliateCtaBox
+  title="相続税申告や税理士探しを早めに整理したい方へ"
+  description="ご家族が亡くなった後、相続税の申告が必要かどうか分からず不安な方や、税理士選びで迷っている方向けの相談先です。早めに相談先の候補を把握しておくと、その後の手続きを進めやすくなります。"
+  buttonText="税理士ドットコムで無料相談する"
+  href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
+  lpName="zeirishi_dotcom_after_death_lp"
+  position="bottom"
+  programName="税理士ドットコム"
+  summaryItems={[
+    { label: "相談内容", value: "相続税申告・税理士探しの相談" },
+    { label: "こんな方に", value: "何を誰に相談すべきか整理したい方" },
+    { label: "タイミング", value: "必要な手続きを確認し始めたとき" },
+  ]}
+/>
+        </div>
+
       </section>
 
       <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">

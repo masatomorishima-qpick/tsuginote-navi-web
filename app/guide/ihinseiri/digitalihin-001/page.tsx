@@ -521,41 +521,20 @@ export default function DigitalIhin001Page() {
               </div>
             </div>
           </div>
-
-          <AffiliateCtaBox
-            title="借金や未払いの不安がある場合は、相続放棄も含めて早めに整理したい方へ"
-            serviceLead="書類や請求の中に負債の可能性がある場合は、家族だけで判断せず、相談先を早めに確認しておくと安心です。"
-            description="スマホや書類を整理する中で、借入や督促の手がかりが見つかった場合は、片付けだけで進めず、相続や負債の確認も必要になることがあります。家族だけで急いで結論を出さず、まずは状況整理の相談先を確認しておくと安心です。"
-            buttonText="アース司法書士事務所を確認する"
-            href="https://px.a8.net/svt/ejp?a8mat=4AZNCN+AQED5M+4LX2+5YZ77"
-            lpName="digitalihin_001"
-            lpId="guide_ihinseiri_digitalihin_001"
-            position="bottom"
-            programName="earth_shiho"
-            ctaId="cta_digitalihin_001_earth"
-            partnerCategory="legal_support"
-            sourceSection="debt_risk"
-            gaEventName="cta_click_digitalihin_001_earth"
-            summaryItems={[
-              {
-                label: '相談先',
-                value: 'アース司法書士事務所',
-              },
-              {
-                label: '受付',
-                value: '24時間365日メール受付です。',
-              },
-              {
-                label: '向いている方',
-                value: '借金や未払いの不安が見つかった方です。',
-              },
-              {
-                label: '注意点',
-                value: '詳しい対応範囲はリンク先でご確認ください。',
-              },
-            ]}
-            operatorName="アース司法書士事務所"
-          />
+<AffiliateCtaBox
+  title="相続税や相続全体の相談先も整理したい方へ"
+  description="相続放棄を含めて相続全体の流れを整理する中で、相続税申告や税理士への相談が必要になる場合があります。費用感や相談先の候補を把握したい方は、早めに比較しておくと安心です。"
+  buttonText="税理士ドットコムで無料相談する"
+  href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
+  lpName="zeirishi_dotcom_houki_lp"
+  position="bottom"
+  programName="税理士ドットコム"
+  summaryItems={[
+    { label: "相談内容", value: "相続税申告・税理士探しの相談" },
+    { label: "こんな方に", value: "相続全体の費用や税務も気になる方" },
+    { label: "タイミング", value: "手続きの全体像を整理したいとき" },
+  ]}
+/>
         </Section>
 
         <Section id="ng" title="親のスマホのパスワードがわからないときにやってはいけないこと">

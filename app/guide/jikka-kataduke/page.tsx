@@ -4,7 +4,7 @@ import Link from 'next/link';
 import SiteFooter from '@/components/SiteFooter';
 
 export const metadata: Metadata = {
-  title: '実家片付け｜役立ち情報一覧',
+  title: '実家片付け｜役立ち情報一覧|つぎの手ナビ',
   description:
     '親が亡くなった後の実家片付けに関する役立ち情報の一覧ページです。何から始めるか、捨ててはいけないもの、進め方などを整理しています。',
 };

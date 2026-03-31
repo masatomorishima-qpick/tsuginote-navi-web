@@ -5,7 +5,7 @@ import AffiliateCtaBox from '@/components/AffiliateCtaBox';
 import SiteFooter from '@/components/SiteFooter';
 
 export const metadata: Metadata = {
-  title: '親が亡くなった実家の片付けは何から？先に分けるもの・捨てないもの・進め方',
+  title: '親が亡くなった実家の片付けは何から？先に分けるもの・捨てないもの・進め方|つぎの手ナビ',
   description:
     '親が亡くなった後の実家の片付けで、最初にやること、捨ててはいけないもの、自分でやるか業者に頼むかの判断基準を整理します。',
 };

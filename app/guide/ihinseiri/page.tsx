@@ -4,32 +4,46 @@ import Link from 'next/link';
 import SiteFooter from '@/components/SiteFooter';
 
 export const metadata: Metadata = {
-  title: '遺品整理・実家片付け｜役立ち情報一覧',
+  title: '遺品整理・実家片付け 役立ち情報一覧 | つぎの手ナビ',
   description:
     '遺品整理、実家片付け、デジタル遺品に関する役立ち情報の一覧ページです。家族が亡くなった後に、スマホ、ネット銀行、サブスク、片付けを何から進めるべきかを整理しています。',
 };
 
 const articles = [
   {
+    category: 'デジタル遺品',
     title: '親のスマホのパスワードがわからないときは？亡くなった後に最初に確認したいこと',
     description:
       'スマホが開けないときに、契約・支払い・書類・実家片付けまで含めて何を優先して進めるべきかを整理します。',
     href: '/guide/ihinseiri/digitalihin-001',
-    label: 'デジタル遺品',
   },
   {
-    title: '親のネット銀行がわからないときの相続対応｜口座不明で困ったときに最初に確認したいこと',
+    category: 'デジタル遺品',
+    title: '親のネット銀行がわからないときの相続対応',
     description:
-      '通帳が少ない、スマホやアプリ中心で管理していた場合に、どこから手がかりを探し、どこまで自力で進めるべきかを解説します。',
+      '通帳が少ない、スマホやアプリ中心で管理していた場合に、口座不明で困ったときの確認ポイントを整理します。',
     href: '/guide/ihinseiri/digitalihin-002',
-    label: 'デジタル遺品',
   },
   {
+    category: 'デジタル遺品',
     title: '亡くなった人のサブスクを解約できないときは？',
     description:
-      '継続課金や見えない固定費が不安なときに、何を確認し、どこまで整理すべきかを整理する記事です。',
+      '継続課金の請求が気になるときに、スマホや明細、書類から何を確認するかを整理します。',
     href: '/guide/ihinseiri/digitalihin-003',
-    label: 'デジタル遺品',
+  },
+  {
+    category: 'デジタル遺品',
+    title: '遺品のパソコンの捨て方と安全に処分する進め方',
+    description:
+      '遺品のパソコンをすぐ捨てず、確認したい情報や実家全体の片付けも踏まえて、処分前の進め方を整理します。',
+    href: '/guide/ihinseiri/digitalihin-004',
+  },
+  {
+    category: 'デジタル遺品',
+    title: '親が亡くなった後のスマホ解約の流れと解約前に確認したいこと',
+    description:
+      '親のスマホを解約する前に、承継か解約かの考え方や、確認したい契約・支払いの手がかりを整理します。',
+    href: '/guide/ihinseiri/digitalihin-005',
   },
 ];
 
@@ -105,7 +119,7 @@ export default function IhinseiriGuideIndexPage() {
                 className="rounded-3xl bg-white p-6 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:bg-slate-50"
               >
                 <div className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                  {article.label}
+                  {article.category}
                 </div>
                 <h3 className="mt-4 text-xl font-bold leading-tight text-slate-900">
                   {article.title}

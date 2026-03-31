@@ -4,7 +4,7 @@ import Link from 'next/link';
 import SiteFooter from '@/components/SiteFooter';
 
 export const metadata: Metadata = {
-  title: '役立ち情報｜相続・死亡後手続き・遺品整理のガイド一覧',
+  title: '役立ち情報｜相続・死亡後手続き・遺品整理のガイド一覧|つぎの手ナビ',
   description:
     'つぎの手ナビの役立ち情報ページです。相続、死亡後の手続き、遺品整理、実家片付け、デジタル遺品など、家族が亡くなった後に確認したい情報を整理しています。',
 };

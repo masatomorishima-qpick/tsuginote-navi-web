@@ -6,17 +6,18 @@ import SiteFooter from '@/components/SiteFooter';
 
 export const metadata: Metadata = {
   title:
-    '親のスマホのパスワードがわからないときは？亡くなった後に最初に確認したいこと|つぎの手ナビ',
+    '親のスマホのパスワードがわからないときは？亡くなった後に最初に確認したいこと | つぎの手ナビ',
   description:
-    '親が亡くなった後、スマホのパスワードがわからず困ったときに、最初に確認したいことを整理しました。契約・支払い・書類・実家片付けまで含めて、何を優先して進めるべきかをわかりやすく解説します。',
+    '親のスマホのパスワードがわからないときは、解除方法を探し続けるよりも先に、契約や支払いの手がかりを確認することが大切です。亡くなった後に何をどの順番で確認すべきかを整理します。',
 };
 
 const toc = [
-  { id: 'conclusion', label: 'まず結論｜最初にやること' },
-  { id: 'trouble', label: 'スマホが開けないと何に困るのか' },
-  { id: 'check-first', label: '無理に解除を試す前に確認したいこと' },
+  { id: 'conclusion', label: 'まず結論｜最初に確認したいこと' },
+  { id: 'unlock-clues', label: 'ロック解除を急ぐ前に手がかりを探す場所' },
+  { id: 'can-check', label: 'スマホが開かなくても確認できるもの' },
+  { id: 'carrier-support', label: 'キャリアショップやメーカーに相談するときの考え方' },
   { id: 'cases', label: 'ケース別｜次の一手' },
-  { id: 'digital-estate', label: 'デジタル遺品と実家片付けは一緒に考える' },
+  { id: 'digital-estate', label: 'スマホだけでなく実家全体で整理する' },
   { id: 'ihin-seiri', label: '家族だけで整理が難しいとき' },
   { id: 'debt-risk', label: '借金や未払いの不安があるとき' },
   { id: 'ng', label: 'やってはいけないこと' },
@@ -32,6 +33,10 @@ const faqs = [
   {
     q: 'スマホが開けないと、相続や片付けは進められませんか？',
     a: 'スマホが開けなくても進められることはあります。紙の書類、通帳、郵便物、他の端末から確認できることも多いため、まずは全体像を把握することが大切です。',
+  },
+  {
+    q: 'キャリアショップやメーカーに相談すれば、すぐに解決しますか？',
+    a: '相談先として確認する価値はありますが、状況によってすぐに希望どおりに進むとは限りません。まずは契約名義、端末の種類、手元の書類など、今ある情報を整理してから相談した方が話を進めやすくなります。',
   },
   {
     q: 'スマホ以外にもパソコンや書類が多い場合はどうすればいいですか？',
@@ -178,11 +183,27 @@ export default function DigitalIhin001Page() {
           </h1>
 
           <p className="mt-5 max-w-3xl text-base leading-8 text-slate-700">
-            親が亡くなった後、スマホのパスワードがわからず手が止まってしまう方は少なくありません。
-            けれど、本当に大切なのは今すぐスマホを開くことではなく、契約、支払い、書類、
-            パソコン、実家片付けまで含めて、何を優先して整理するかを決めることです。
-            この記事では、無理にロック解除を試し続ける前に確認したいことを順番に整理します。
+            親のスマホのパスワードがわからないときは、ロック解除の方法を探し続けるよりも先に、
+            何の契約や支払いがそのスマホにひもづいているかを確認することが大切です。特に亡くなった後は、
+            スマホの中だけでなく、他の端末、書類、郵便物、ご実家全体の片付けも含めて手がかりを集めた方が、
+            後の解約や相続手続きを進めやすくなります。この記事では、親のスマホのパスワードがわからないときに、
+            最初に確認したいことを順番に整理します。
           </p>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <a
+              href="#unlock-clues"
+              className="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+            >
+              手がかりを探す場所を見る
+            </a>
+            <a
+              href="#carrier-support"
+              className="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+            >
+              相談先の考え方を見る
+            </a>
+          </div>
         </header>
 
         <section className="mt-8 rounded-3xl bg-amber-50 p-6">
@@ -235,10 +256,11 @@ export default function DigitalIhin001Page() {
           </ul>
         </div>
 
-        <Section id="conclusion" title="親のスマホのパスワードがわからないときに最初にやること">
+        <Section id="conclusion" title="親のスマホのパスワードがわからないときに最初に確認したいこと">
           <p>
-            スマホのパスワードがわからないと、「まず開かないと何も進まないのでは」と焦りやすいです。
-            ただ、実際にはスマホが開かなくても進められることがあります。
+            親のスマホのパスワードがわからないと、「まず解除しないと何もできないのでは」と不安になりやすいです。
+            ですが、亡くなった後は、無理にロック解除を急ぐ前に、契約や支払いの手がかりを別の場所から確認する方が
+            先に進みやすいこともあります。
           </p>
 
           <div className="rounded-2xl bg-slate-50 p-5">
@@ -257,45 +279,15 @@ export default function DigitalIhin001Page() {
           </p>
         </Section>
 
-        <Section id="trouble" title="親のスマホのパスワードがわからないと、何に困るのか">
+        <Section id="unlock-clues" title="ロック解除を急ぐ前に手がかりを探す場所">
           <p>
-            スマホが開けないと困るのは、写真や連絡先だけではありません。相続や片付けの現場では、
-            もっと現実的な困りごとにつながりやすいです。
-          </p>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            <div className="rounded-2xl bg-slate-50 p-5">
-              <h3 className="text-base font-bold text-slate-900">契約や支払いが見えにくい</h3>
-              <p className="mt-3 text-sm leading-7 text-slate-700">
-                携帯料金、サブスク、クレジットカード利用通知などがスマホにまとまっていると、
-                契約中の内容が把握しにくくなります。
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-slate-50 p-5">
-              <h3 className="text-base font-bold text-slate-900">ネット銀行などの手がかりを見落としやすい</h3>
-              <p className="mt-3 text-sm leading-7 text-slate-700">
-                通帳をほとんど使わず、アプリでお金を管理していた場合、紙の資料だけでは全体像が見えにくいことがあります。
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-slate-50 p-5">
-              <h3 className="text-base font-bold text-slate-900">実家の片付け全体が止まりやすい</h3>
-              <p className="mt-3 text-sm leading-7 text-slate-700">
-                スマホのことで立ち止まると、パソコン、書類、通帳、家具など他の整理まで進みにくくなります。
-              </p>
-            </div>
-          </div>
-        </Section>
-
-        <Section id="check-first" title="無理にロック解除を試す前に、先に確認したいこと">
-          <p>
-            焦って解除を試し続ける前に、今ある手がかりを整理した方が結果として早く前に進めることがあります。
+            親のスマホのパスワードがわからないときは、解除方法を探し続けるよりも先に、
+            今ある情報から契約や支払いの手がかりを集めることが大切です。
           </p>
 
           <div className="grid gap-8 md:grid-cols-2">
             <div className="rounded-2xl bg-slate-50 p-5">
-              <h3 className="text-base font-bold text-slate-900">先に確認したいもの</h3>
+              <h3 className="text-base font-bold text-slate-900">先に確認したい場所</h3>
               <div className="mt-4">
                 <DotList
                   items={[
@@ -329,7 +321,86 @@ export default function DigitalIhin001Page() {
           </p>
         </Section>
 
-        <Section id="cases" title="ケース別｜親のスマホのパスワードがわからないときの進め方">
+        <Section id="can-check" title="親のスマホのパスワードがわからなくても確認できるもの">
+          <p>
+            スマホが開けないと困るのは、写真や連絡先だけではありません。相続や片付けの現場では、
+            次のような現実的な困りごとにつながりやすいです。
+          </p>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-2xl bg-slate-50 p-5">
+              <h3 className="text-base font-bold text-slate-900">契約や支払いの有無</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-700">
+                携帯料金、サブスク、クレジットカード利用通知などがスマホにまとまっていると、
+                契約中の内容が把握しにくくなります。
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-slate-50 p-5">
+              <h3 className="text-base font-bold text-slate-900">ネット銀行などの手がかり</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-700">
+                通帳をほとんど使わず、アプリでお金を管理していた場合、紙の資料だけでは全体像が見えにくいことがあります。
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-slate-50 p-5">
+              <h3 className="text-base font-bold text-slate-900">実家の片付け全体の優先順位</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-700">
+                スマホのことで立ち止まると、パソコン、書類、通帳、家具など他の整理まで進みにくくなります。
+              </p>
+            </div>
+          </div>
+
+          <p>
+            つまり、スマホが開かないときに本当に見るべきなのは「解除できるか」だけではなく、
+            「スマホが開かなくても今わかることは何か」です。
+          </p>
+        </Section>
+
+        <Section id="carrier-support" title="キャリアショップやメーカーに相談するときの考え方">
+          <p>
+            親のスマホのパスワードがわからないとき、キャリアショップやメーカーへの相談を考える方も多いです。
+            相談先として確認する価値はありますが、すぐに希望どおりに進むとは限りません。
+          </p>
+
+          <div className="grid gap-8 md:grid-cols-2">
+            <div className="rounded-2xl bg-slate-50 p-5">
+              <h3 className="text-base font-bold text-slate-900">先に整理しておきたい情報</h3>
+              <div className="mt-4">
+                <DotList
+                  items={[
+                    '契約していた通信会社がどこか',
+                    '端末の種類や機種が何か',
+                    '契約者名義が誰か',
+                    '手元にある契約書類や請求書',
+                    '家族として今どこまで把握しているか',
+                  ]}
+                />
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-slate-50 p-5">
+              <h3 className="text-base font-bold text-slate-900">相談前に意識したいこと</h3>
+              <div className="mt-4">
+                <DotList
+                  items={[
+                    '何を確認したいのかを先に絞る',
+                    '契約確認と端末解除は別の話になることがある',
+                    '必要書類や本人確認の考え方を事前に把握する',
+                    'すぐに解決しない前提で全体整理も並行する',
+                  ]}
+                />
+              </div>
+            </div>
+          </div>
+
+          <p>
+            大切なのは、相談先に丸投げすることではなく、「いま何が分かっていて、何が分からないのか」を整理してから
+            相談することです。その方が、スマホだけで止まらず全体を進めやすくなります。
+          </p>
+        </Section>
+
+        <Section id="cases" title="ケース別｜親のスマホのパスワードがわからないときの次の一手">
           <div className="space-y-5">
             <div className="rounded-2xl bg-slate-50 p-5">
               <h3 className="text-base font-bold text-slate-900">通信契約やスマホ料金が気になる場合</h3>
@@ -337,10 +408,7 @@ export default function DigitalIhin001Page() {
                 毎月の携帯料金が続いていそう、解約や名義変更の流れが気になる場合は、契約の整理から考えた方が進めやすいです。
               </p>
               <div className="mt-4">
-                <Link
-                  href="/shibougo-tetsuzuki"
-                  className={secondaryLinkClass}
-                >
+                <Link href="/shibougo-tetsuzuki" className={secondaryLinkClass}>
                   親が亡くなった後のスマホ解約の流れを確認する
                 </Link>
               </div>
@@ -352,10 +420,7 @@ export default function DigitalIhin001Page() {
                 明細を見て何の請求かわからないものがある場合は、支払い先を一覧にして確認した方が整理しやすくなります。
               </p>
               <div className="mt-4">
-                <Link
-                  href="/guide/ihinseiri/digitalihin-002"
-                  className={secondaryLinkClass}
-                >
+                <Link href="/guide/ihinseiri/digitalihin-002" className={secondaryLinkClass}>
                   亡くなった人のサブスクを解約できないときは？
                 </Link>
               </div>
@@ -367,19 +432,15 @@ export default function DigitalIhin001Page() {
                 通帳が少ない、紙の明細が見当たらない場合は、メールアドレスやパソコン、郵便物まで含めて確認範囲を広げる必要があります。
               </p>
               <div className="mt-4">
-                <Link
-                  href="/guide/ihinseiri/digitalihin-003"
-                  className={secondaryLinkClass}
-                >
+                <Link href="/guide/ihinseiri/digitalihin-003" className={secondaryLinkClass}>
                   親のネット銀行がわからないときの相続対応
                 </Link>
               </div>
             </div>
-
           </div>
         </Section>
 
-        <Section id="digital-estate" title="スマホだけの問題ではない｜デジタル遺品と実家片付けは一緒に考えた方が進めやすいです">
+        <Section id="digital-estate" title="スマホだけでなく、実家全体の片付けとして整理した方が進めやすいです">
           <p>
             親のスマホのパスワードがわからないと、どうしても「まずこの1台を何とかしないと」と思ってしまいます。
             けれど実際には、スマホのまわりには契約書類、パソコン、タブレット、外付け機器、銀行関係の書類、
@@ -522,25 +583,25 @@ export default function DigitalIhin001Page() {
             </div>
           </div>
 
-<AffiliateCtaBox
-  title="相続税や相続全体の相談先も整理したい方へ"
-  description="相続放棄を含めて相続全体の流れを整理する中で、相続税申告や税理士への相談が必要になる場合があります。費用感や相談先の候補を把握したい方は、早めに比較しておくと安心です。"
-  buttonText="税理士ドットコムで無料相談する"
-  href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
-  lpName="digitalihin_001"
-  lpId="guide_ihinseiri_digitalihin_001"
-  position="bottom"
-  programName="zeirishi_dotcom"
-  ctaId="cta_digitalihin_001_zeirishi"
-  partnerCategory="tax_accountant_service"
-  sourceSection="debt_risk"
-  gaEventName="cta_click_digitalihin_001"
-  summaryItems={[
-    { label: "相談内容", value: "相続税申告・税理士探しの相談" },
-    { label: "こんな方に", value: "相続全体の費用や税務も気になる方" },
-    { label: "タイミング", value: "手続きの全体像を整理したいとき" },
-  ]}
-/>
+          <AffiliateCtaBox
+            title="相続税や相続全体の相談先も整理したい方へ"
+            description="相続放棄を含めて相続全体の流れを整理する中で、相続税申告や税理士への相談が必要になる場合があります。費用感や相談先の候補を把握したい方は、早めに比較しておくと安心です。"
+            buttonText="税理士ドットコムで無料相談する"
+            href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
+            lpName="digitalihin_001"
+            lpId="guide_ihinseiri_digitalihin_001"
+            position="bottom"
+            programName="zeirishi_dotcom"
+            ctaId="cta_digitalihin_001_zeirishi"
+            partnerCategory="tax_accountant_service"
+            sourceSection="debt_risk"
+            gaEventName="cta_click_digitalihin_001"
+            summaryItems={[
+              { label: "相談内容", value: "相続税申告・税理士探しの相談" },
+              { label: "こんな方に", value: "相続全体の費用や税務も気になる方" },
+              { label: "タイミング", value: "手続きの全体像を整理したいとき" },
+            ]}
+          />
         </Section>
 
         <Section id="ng" title="親のスマホのパスワードがわからないときにやってはいけないこと">
@@ -577,28 +638,28 @@ export default function DigitalIhin001Page() {
           </div>
         </Section>
 
-<Section id="summary" title="まとめ｜親のスマホのパスワードがわからないときに最短で失敗しない動き方">
-  <p>
-    親のスマホのパスワードがわからないと、どうしてもその1台に意識が集中しがちです。
-    けれど、本当に大切なのは、スマホを無理に開くことよりも、契約、支払い、書類、
-    パソコン、実家片付けを含めて全体を整理することです。
-  </p>
+        <Section id="summary" title="まとめ｜親のスマホのパスワードがわからないときに最短で失敗しない動き方">
+          <p>
+            親のスマホのパスワードがわからないと、どうしてもその1台に意識が集中しがちです。
+            けれど、本当に大切なのは、スマホを無理に開くことよりも、契約、支払い、書類、
+            パソコン、実家片付けを含めて全体を整理することです。
+          </p>
 
-  <div className="rounded-2xl bg-amber-50 p-5">
-    <ul className="space-y-3 text-[15px] leading-8 text-slate-700">
-      <li>・まずは郵便物、通帳、契約書類から手がかりを集める</li>
-      <li>・スマホ以外の端末や遺品も一緒に確認する</li>
-      <li>・家族だけで難しい場合は、実家全体の遺品整理として進める</li>
-      <li>・借金や督促が見つかったら、片付けだけで進めない</li>
-    </ul>
-  </div>
+          <div className="rounded-2xl bg-amber-50 p-5">
+            <ul className="space-y-3 text-[15px] leading-8 text-slate-700">
+              <li>・まずは郵便物、通帳、契約書類から手がかりを集める</li>
+              <li>・スマホ以外の端末や遺品も一緒に確認する</li>
+              <li>・家族だけで難しい場合は、実家全体の遺品整理として進める</li>
+              <li>・借金や督促が見つかったら、片付けだけで進めない</li>
+            </ul>
+          </div>
 
-  <p>
-    スマホのことで立ち止まり続けるより、全体の整理を少しずつ進める方が、
-    結果として不安を減らしやすくなります。実家の片付けや遺品の量が多い場合は、
-    早めに外部の力を借りることも前向きな選択です。
-  </p>
-</Section>
+          <p>
+            スマホのことで立ち止まり続けるより、全体の整理を少しずつ進める方が、
+            結果として不安を減らしやすくなります。実家の片付けや遺品の量が多い場合は、
+            早めに外部の力を借りることも前向きな選択です。
+          </p>
+        </Section>
 
         <section className="mt-16 rounded-3xl bg-white p-6">
           <h2 className="text-xl font-bold text-slate-900">あわせて確認したい記事</h2>

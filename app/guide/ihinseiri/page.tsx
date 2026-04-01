@@ -45,6 +45,27 @@ const articles = [
       '親のスマホを解約する前に、承継か解約かの考え方や、確認したい契約・支払いの手がかりを整理します。',
     href: '/guide/ihinseiri/digitalihin-005',
   },
+  {
+    category: 'デジタル遺品',
+    title: '亡くなった親のスマホはどう処分する？データ消去できないときの考え方',
+    description:
+      '初期化やデータ消去ができないときに、すぐ処分せず、契約・写真・連絡先などをどう確認して判断するかを整理します。',
+    href: '/guide/ihinseiri/digitalihin-006',
+  },
+  {
+    category: 'デジタル遺品',
+    title: '親のスマホは売れる？初期化できないときに売却前に確認したいこと',
+    description:
+      '売却を急ぐ前に、初期化できない場合の注意点や、契約・データ・家族確認を踏まえた進め方をわかりやすくまとめます。',
+    href: '/guide/ihinseiri/digitalihin-007',
+  },
+  {
+    category: 'デジタル遺品',
+    title: '故人のスマホを見る方法は？無理に開こうとする前に確認したいこと',
+    description:
+      '無理にロック解除を急がず、何を確認したいのかを先に整理し、契約・課金・資産確認へつなげる考え方をまとめます。',
+    href: '/guide/ihinseiri/digitalihin-008',
+  },
 ];
 
 function BrandHeader() {

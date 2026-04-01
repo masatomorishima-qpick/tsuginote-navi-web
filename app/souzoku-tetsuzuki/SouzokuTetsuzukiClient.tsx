@@ -451,7 +451,6 @@ export default function SouzokuTetsuzukiClient() {
               alt="つぎの手ナビ"
               width={754}
               height={201}
-              priority
               className="h-12 w-auto sm:h-14"
             />
           </Link>
@@ -473,7 +472,7 @@ export default function SouzokuTetsuzukiClient() {
               <div className="mt-6">
                 <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200">
                   <Image
-                    src="/images/tsuginote-top-main2.png"
+                    src="/images/tsuginote-top-main2.webp"
                     alt="ご家族で手続きや相談先を整理している様子"
                     fill
                     priority

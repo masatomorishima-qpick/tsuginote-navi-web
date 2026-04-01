@@ -10,6 +10,7 @@ const toc = [
   { id: 'conclusion', label: 'まず結論｜最初にやること' },
   { id: 'why-hard', label: 'なぜネット銀行は見落としやすいのか' },
   { id: 'check-first', label: '最初に確認したい手がかり' },
+  { id: 'caution-login', label: '注意｜勝手にログイン・送金しない' },
   { id: 'self-limit', label: '自力で進めにくいケース' },
   { id: 'consult', label: '相談を考えたいケース' },
   { id: 'related', label: '他の悩みともつながる理由' },
@@ -30,6 +31,10 @@ const faqs = [
   {
     q: 'ネット銀行がありそうでも、スマホが開けないと確認できませんか？',
     a: 'スマホが開けなくても、郵便物、パソコン、通帳、引き落とし履歴などから確認できることがあります。スマホだけで答えを探そうとせず、家にある資料全体で考えることが大切です。',
+  },
+  {
+    q: '親のIDやパスワードが分かった場合、自分でログインして確認してもいいですか？',
+    a: '親のIDやパスワードで勝手にログインして送金や解約を進めるのは避けた方が安心です。後から相続人同士の認識違いや手続き上の問題につながるおそれがあるため、正式な相続手続きの流れで確認した方が安全です。',
   },
   {
     q: '負債もあるかもしれない場合はどうすればいいですか？',
@@ -193,7 +198,7 @@ export default function DigitalIhin002Client() {
               </Link>
             </li>
             <li>/</li>
-            <li className="text-slate-700">親のネット銀行がわからないときの相続対応</li>
+            <li className="text-slate-700">親のネット銀行がわからないときは？</li>
           </ol>
         </nav>
 
@@ -211,16 +216,39 @@ export default function DigitalIhin002Client() {
           </div>
 
           <h1 className="mt-8 text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
-            親のネット銀行がわからないときの相続対応
+            親のネット銀行がわからないときは？
             <br className="hidden sm:block" />
-            口座不明で困ったときに最初に確認したいこと
+            相続で口座不明・通帳なしの対応を整理
           </h1>
 
           <p className="mt-5 max-w-3xl text-base leading-8 text-slate-700">
-            通帳が少ない、紙の明細が見当たらない、スマホやアプリ中心でお金を管理していた。
-            こうした場合、親がネット銀行や証券口座を使っていたか分からず、不安になる方は少なくありません。
-            この記事では、どこから手がかりを探すか、自力でどこまで進めるか、相談を考えたいケースは何かを順番に整理します。
+            親のネット銀行がわからないときは、通帳がないからといってすぐに諦める必要はありません。
+            パスワードが分からなくても、郵便物、メールアドレス、口座引き落とし履歴、スマホやパソコンなどから
+            手がかりを集めて進められることがあります。この記事では、どこから確認を始めるか、
+            自力でどこまで進めるか、相談を考えたいケースは何かを順番に整理します。
           </p>
+
+          <div className="mt-6 rounded-2xl bg-amber-50 px-5 py-4 ring-1 ring-amber-200">
+            <p className="text-sm leading-7 text-slate-700">
+              ネット銀行はパスワードが分からなくても、正しい相続手続きを踏めば確認や手続きを進められることがあります。
+              自分での確認が不安な方は、先に相談先の考え方もご確認ください。
+            </p>
+          </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <a
+              href="#check-first"
+              className="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+            >
+              手がかりを探す場所を見る
+            </a>
+            <a
+              href="#consult"
+              className="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+            >
+              相続の相談先を見る
+            </a>
+          </div>
         </header>
 
         <section
@@ -352,9 +380,47 @@ export default function DigitalIhin002Client() {
             <MicroCopy text="※金融機関名が分かるだけでも、その後の確認や相談が進めやすくなります。" />
           </div>
 
+          <div className="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
+            <h3 className="text-base font-bold text-slate-900">
+              スマホが開けず、銀行アプリやメール通知を確認できない方へ
+            </h3>
+            <p className="mt-3 text-sm leading-7 text-slate-700">
+              親のスマホのパスワードがわからないと、ネット銀行の手がかりも追いにくくなります。
+              先にスマホ側の確認ポイントを整理したい方は、こちらもあわせてご確認ください。
+            </p>
+            <div className="mt-4">
+              <Link href="/guide/ihinseiri/digitalihin-001" className={secondaryLinkClass}>
+                親のスマホのパスワードがわからないときは？
+              </Link>
+            </div>
+          </div>
+
           <p>
             手がかりを集める段階では、完璧に把握しきれなくても大丈夫です。
             まずは「どの金融機関が関係していそうか」を整理するだけでも前進です。
+          </p>
+        </Section>
+
+        <Section id="caution-login" title="注意｜親のID・パスワードで勝手にログイン・送金しない">
+          <p>
+            親のネット銀行が分からないとき、もしIDやパスワードの手がかりが見つかっても、
+            家族が本人になり代わって勝手にログインし、送金や解約を進めるのは避けた方が安心です。
+          </p>
+
+          <div className="rounded-2xl bg-rose-50 p-5 ring-1 ring-rose-100">
+            <CrossList
+              items={[
+                '本人のID・パスワードで勝手にログインする',
+                '家族判断で送金や出金を進める',
+                '他の相続人への共有前に動いてしまう',
+                '正式な相続手続きを飛ばして処理しようとする',
+              ]}
+            />
+          </div>
+
+          <p>
+            相続では、後から「誰が何を確認し、どう動いたか」が問題になりやすいです。
+            だからこそ、口座の存在を探すことと、本人になり代わって操作することは分けて考えた方が安全です。
           </p>
         </Section>
 
@@ -388,6 +454,13 @@ export default function DigitalIhin002Client() {
             相続全体の判断が遅れやすくなることがあります。特に、自力での確認範囲に限界を感じるときは、
             相談先を早めに確認しておくと安心です。
           </p>
+
+          <div className="rounded-2xl bg-amber-50 p-5 ring-1 ring-amber-200">
+            <p className="text-[15px] leading-8 text-slate-700">
+              ネット銀行はパスワードが分からなくても、正しい相続手続きで確認を進められることがあります。
+              ただし、金融機関の特定や相続全体の整理に不安がある場合は、早い段階で相談先を把握しておくと動きやすくなります。
+            </p>
+          </div>
 
           <div className="rounded-2xl bg-white p-5 ring-1 ring-slate-200">
             <h3 className="text-lg font-bold text-slate-900">相談を考えたいケース</h3>
@@ -423,25 +496,26 @@ export default function DigitalIhin002Client() {
             />
             <MicroCopy text="※複雑な照会手続きや確認も、専門家に相談すると漏れなく安全に進めやすくなります。" />
           </div>
-<AffiliateCtaBox
-  title="相続税や相続全体の相談先も整理したい方へ"
-  description="サブスクの解約や毎月の請求を整理していく中で、相続税申告や税理士への相談が必要になる場合があります。相続全体の費用感や相談先の候補も早めに把握しておくと、あとから手続きが進めやすくなります。"
-  buttonText="税理士ドットコムで無料相談する"
-  href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
-  lpName="digitalihin_002"
-  lpId="guide_ihinseiri_digitalihin_002"
-  position="bottom"
-  programName="zeirishi_dotcom"
-  ctaId="cta_digitalihin_002_zeirishi"
-  partnerCategory="tax_accountant_service"
-  sourceSection="debt_risk"
-  gaEventName="cta_click_digitalihin_002"
-  summaryItems={[
-    { label: "相談内容", value: "相続税申告・税理士探しの相談" },
-    { label: "こんな方に", value: "相続全体の費用や税務も気になる方" },
-    { label: "タイミング", value: "手続きの全体像を整理したいとき" },
-  ]}
-/>
+
+          <AffiliateCtaBox
+            title="相続税や相続全体の相談先も整理したい方へ"
+            description="ネット銀行の確認を進める中で、相続税申告や税理士への相談が必要になる場合があります。相続全体の費用感や相談先の候補も早めに把握しておくと、あとから手続きを進めやすくなります。"
+            buttonText="税理士ドットコムで無料相談する"
+            href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
+            lpName="digitalihin_002"
+            lpId="guide_ihinseiri_digitalihin_002"
+            position="bottom"
+            programName="zeirishi_dotcom"
+            ctaId="cta_digitalihin_002_zeirishi"
+            partnerCategory="tax_accountant_service"
+            sourceSection="consult"
+            gaEventName="cta_click_digitalihin_002"
+            summaryItems={[
+              { label: "相談内容", value: "相続税申告・税理士探しの相談" },
+              { label: "こんな方に", value: "相続全体の費用や税務も気になる方" },
+              { label: "タイミング", value: "手続きの全体像を整理したいとき" },
+            ]}
+          />
         </Section>
 
         <Section id="related" title="他の悩みともつながる理由">
@@ -496,6 +570,7 @@ export default function DigitalIhin002Client() {
                 '通帳がないから何も分からないと決めつける',
                 'スマホの中だけに答えがあると思い込む',
                 '引き落とし履歴を見ないまま片付けを進める',
+                '本人のID・パスワードで勝手にログインしようとする',
                 '負債の可能性を見ずに資産だけ探そうとする',
               ]}
             />
@@ -546,6 +621,7 @@ export default function DigitalIhin002Client() {
             <ul className="space-y-3 text-[15px] leading-8 text-slate-700">
               <li>・通帳だけでなく、引き落とし履歴やメール通知も確認する</li>
               <li>・スマホ以外の端末や書類も一緒に見る</li>
+              <li>・本人のIDやパスワードで勝手に操作しない</li>
               <li>・資産だけでなく、借金や未払いの可能性も意識する</li>
               <li>・自力で限界を感じたら、相談先を早めに確認する</li>
             </ul>

@@ -170,7 +170,7 @@ export default function DigitalIhin001Page() {
 
           <div className="mt-8">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-001/main-visual.png"
+              src="/images/guide/ihinseiri/digitalihin-001/main-visual.webp"
               alt="親のスマホのパスワードがわからず、書類やスマホを前に整理の優先順位を考えている様子"
             />
             <MicroCopy text="※スマホだけにこだわらず、郵便物、通帳、パソコン、書類をあわせて確認すると全体像をつかみやすくなります。" />
@@ -454,7 +454,7 @@ export default function DigitalIhin001Page() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-001/digital-estate-scene.png"
+              src="/images/guide/ihinseiri/digitalihin-001/digital-estate-scene.webp"
               alt="スマホ、パソコン、書類をまとめて整理しているデジタル遺品のイメージ"
             />
             <MicroCopy text="※スマホだけを見るのではなく、パソコンや書類も含めて考えると、確認漏れや片付けの停滞を減らしやすくなります。" />
@@ -505,7 +505,7 @@ export default function DigitalIhin001Page() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-001/service-scene.png"
+              src="/images/guide/ihinseiri/digitalihin-001/service-scene.webp"
               alt="実家の遺品整理を専門業者が仕分けしている様子"
             />
             <MicroCopy text="※スマホやパソコンだけでなく、実家全体の整理をまとめて考えると、家族の負担を減らしやすくなります。" />

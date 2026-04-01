@@ -207,7 +207,7 @@ export default function DigitalIhin006Client() {
 
           <div className="mt-8">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-006/main-visual.png"
+              src="/images/guide/ihinseiri/digitalihin-006/main-visual.webp"
               alt="亡くなった親のスマホや書類、封筒、ノートパソコンを前に、処分の順番を落ち着いて整理している様子"
             />
             <MicroCopy text="※パスワードがわからずデータ消去できないスマホは、すぐに捨てる前に、契約・課金・家族の確認事項が残っていないかを整理しておくと安心です。" />
@@ -312,7 +312,7 @@ export default function DigitalIhin006Client() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-006/check-points.png"
+              src="/images/guide/ihinseiri/digitalihin-006/check-points.webp"
               alt="スマホ本体、封筒、メモ、ノートパソコンを並べて処分前に確認する項目を整理している様子"
             />
             <MicroCopy text="※スマホ本体が開けなくても、請求書や付属品、他の端末と合わせて見ることで、確認すべきことが見えてくる場合があります。" />
@@ -478,7 +478,7 @@ export default function DigitalIhin006Client() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-006/consult-scene.png"
+              src="/images/guide/ihinseiri/digitalihin-006/consult-scene.webp"
               alt="スマホ、箱、書類、ノートパソコンを前に、実家全体の片付けとして整理方針を考えている様子"
             />
             <MicroCopy text="※スマホだけの悩みに見えても、実際には実家全体の整理順が決まっていないことが原因になっている場合があります。" />

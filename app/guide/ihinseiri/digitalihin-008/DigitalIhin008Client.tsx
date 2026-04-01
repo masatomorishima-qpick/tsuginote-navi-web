@@ -209,7 +209,7 @@ export default function DigitalIhin008Client() {
 
           <div className="mt-8">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-008/main-visual.png"
+              src="/images/guide/ihinseiri/digitalihin-008/main-visual.webp"
               alt="故人のスマホや書類を前に、何を確認したいのかを落ち着いて整理している様子"
             />
             <MicroCopy text="※故人のスマホは、無理にロック解除を急ぐより、まず何を確認したいのかを整理した方が進めやすいことがあります。" />

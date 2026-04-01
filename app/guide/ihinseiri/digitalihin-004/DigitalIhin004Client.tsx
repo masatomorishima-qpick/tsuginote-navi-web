@@ -210,7 +210,7 @@ export default function DigitalIhin004Client() {
 
           <div className="mt-8">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-004/main-visual.png"
+              src="/images/guide/ihinseiri/digitalihin-004/main-visual.webp"
               alt="遺品のパソコンや書類、スマホを前に確認対象を整理している様子"
             />
             <MicroCopy text="※パソコンだけでなく、スマホ、書類、外付けHDD、郵便物なども一緒に見ると、確認すべき情報が見えやすくなります。" />
@@ -378,7 +378,7 @@ export default function DigitalIhin004Client() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-004/check-items.png"
+              src="/images/guide/ihinseiri/digitalihin-004/check-items.webp"
               alt="パソコン、外付けHDD、スマホ、書類を並べて確認対象を整理している様子"
             />
             <MicroCopy text="※パソコン単体で判断するより、周辺の遺品や書類も含めて見ると、確認の抜け漏れを減らしやすくなります。" />
@@ -519,7 +519,7 @@ export default function DigitalIhin004Client() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-004/consult-scene.png"
+              src="/images/guide/ihinseiri/digitalihin-004/consult-scene.webp"
               alt="実家の片付け全体を整理しながら相談先を検討している様子"
             />
             <MicroCopy text="※パソコン以外にも遺品が多い場合は、処分だけでなく全体の整理の順番を考える方が進めやすいです。" />

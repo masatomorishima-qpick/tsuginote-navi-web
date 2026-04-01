@@ -186,7 +186,6 @@ function BrandHeader() {
             alt="つぎの手ナビ"
             width={754}
             height={201}
-            priority
             className="h-12 w-auto sm:h-14"
           />
         </Link>
@@ -242,7 +241,7 @@ export default function JikkaKatadukeNanikaraPage() {
 
           <div className="mt-8">
             <InfoImage
-              src="/images/guide/jikka-kataduke/main-visual.png"
+              src="/images/guide/jikka-kataduke/main-visual.webp"
               alt="親が亡くなった後の実家片付けを始める前に書類や物を整理しているイメージ"
             />
             <MicroCopy text="※最初から家全体を片付けるのではなく、書類や契約関係を先に分けると後から困りにくくなります。" />
@@ -276,7 +275,7 @@ export default function JikkaKatadukeNanikaraPage() {
 
         <div className="mt-8">
           <InfoImage
-            src="/images/guide/jikka-kataduke/boxes-3way.png"
+            src="/images/guide/jikka-kataduke/boxes-3way.webp"
             alt="実家の片付けで最初に分ける3つの箱のイメージ"
           />
           <MicroCopy text="※実家の片付けでは「残すもの」「保留するもの」「捨てるもの」の3つに分けるだけでも全体像が整理しやすくなります。" />
@@ -337,7 +336,7 @@ export default function JikkaKatadukeNanikaraPage() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/jikka-kataduke/files-organized.png"
+              src="/images/guide/jikka-kataduke/files-organized.webp"
               alt="実家の片付けで重要書類をクリアファイルに整理している様子"
             />
             <MicroCopy text="※このように重要度別にファイルを分けると、通帳や権利書、請求書などの紛失を防ぎやすくなります。" />
@@ -415,7 +414,7 @@ export default function JikkaKatadukeNanikaraPage() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/jikka-kataduke/self-or-service-chart.png"
+              src="/images/guide/jikka-kataduke/self-or-service-chart.webp"
               alt="実家の片付けを自分で進めるか業者に頼むかを判断するフローチャート"
             />
             <MicroCopy text="※物量、期限、距離、家族の負担の4点で考えると、自分で進めるか業者に相談するか判断しやすくなります。" />
@@ -449,7 +448,7 @@ export default function JikkaKatadukeNanikaraPage() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/jikka-kataduke/service-scene.png"
+              src="/images/guide/jikka-kataduke/service-scene.webp"
               alt="実家の片付けを専門業者が丁寧に仕分けしている様子"
             />
             <MicroCopy text="※自力での対応が難しい場合でも、最初に無料見積もりで費用感を確認しておくと判断しやすくなります。" />

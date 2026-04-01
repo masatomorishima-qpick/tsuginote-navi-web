@@ -210,7 +210,7 @@ export default function DigitalIhin007Client() {
 
           <div className="mt-8">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-007/main-visual.png"
+              src="/images/guide/ihinseiri/digitalihin-007/main-visual.webp"
               alt="親のスマホを売るべきか迷い、スマホや書類を前に確認事項を整理している様子"
             />
             <MicroCopy text="※初期化できないスマホは、すぐに売るより、契約や支払いの手がかりが残っていないかを先に確認した方が安心です。" />

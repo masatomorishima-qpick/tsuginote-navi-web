@@ -203,7 +203,7 @@ export default function DigitalIhin003Client() {
 
           <div className="mt-8">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-003/main-visual.png"
+              src="/images/guide/ihinseiri/digitalihin-003/main-visual.webp"
               alt="クレジットカード明細やスマホ、ノートパソコンを前に、継続課金の手がかりを確認している様子"
             />
             <MicroCopy text="※スマホが開けなくても、クレジットカード明細、口座引き落とし、メール通知などから継続課金の手がかりが見つかることがあります。" />
@@ -348,7 +348,7 @@ export default function DigitalIhin003Client() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-003/check-items.png"
+              src="/images/guide/ihinseiri/digitalihin-003/check-items.webp"
               alt="クレジットカード明細、スマホ、ノートパソコン、書類を並べて継続課金の手がかりを確認している様子"
             />
             <MicroCopy text="※継続課金の全体像を先に整理すると、何を止めるべきか、どこまで確認が必要かを判断しやすくなります。" />
@@ -415,7 +415,7 @@ export default function DigitalIhin003Client() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-003/consult-scene.png"
+              src="/images/guide/ihinseiri/digitalihin-003/consult-scene.webp"
               alt="複数の請求書類を前に、専門家に相談して安心している遺族の様子"
             />
             <MicroCopy text="※何の請求か分からないものが複数ある場合は、継続課金だけでなく相続全体の整理として考えた方が安心です。" />

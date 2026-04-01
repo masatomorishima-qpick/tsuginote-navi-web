@@ -209,7 +209,7 @@ export default function DigitalIhin002Client() {
 
           <div className="mt-8">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-002/main-visual.png"
+              src="/images/guide/ihinseiri/digitalihin-002/main-visual.webp"
               alt="親のネット銀行や口座の手がかりを、通帳やノートパソコン、郵便物から確認している様子"
             />
             <MicroCopy text="※通帳が少なくても、メール、引き落とし履歴、スマホやパソコン内の手がかりから金融機関名が見つかることがあります。" />
@@ -374,7 +374,7 @@ export default function DigitalIhin002Client() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-002/check-items.png"
+              src="/images/guide/ihinseiri/digitalihin-002/check-items.webp"
               alt="通帳、ノートパソコン、スマートフォン、郵便物を並べてネット銀行の手がかりを確認している様子"
             />
             <MicroCopy text="※金融機関名が分かるだけでも、その後の確認や相談が進めやすくなります。" />
@@ -491,7 +491,7 @@ export default function DigitalIhin002Client() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-002/consult-scene.png"
+              src="/images/guide/ihinseiri/digitalihin-002/consult-scene.webp"
               alt="司法書士が書類や財産確認の手続きを整理し、遺族が安心して相談している様子"
             />
             <MicroCopy text="※複雑な照会手続きや確認も、専門家に相談すると漏れなく安全に進めやすくなります。" />

@@ -206,7 +206,7 @@ export default function DigitalIhin005Client() {
 
           <div className="mt-8">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-005/main-visual.png"
+              src="/images/guide/ihinseiri/digitalihin-005/main-visual.webp"
               alt="亡くなった親のスマホ、書類、封筒、メモを前に解約前の確認事項を整理している様子"
             />
             <MicroCopy text="※スマホはすぐに解約する前に、電話番号の扱い、契約情報、メールやSMSの手がかりを確認しておくと進めやすくなります。" />
@@ -350,7 +350,7 @@ export default function DigitalIhin005Client() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-005/check-items.png"
+              src="/images/guide/ihinseiri/digitalihin-005/check-items.webp"
               alt="スマホ、請求書、封筒、メモ、ノートパソコンを並べて解約前の確認事項を整理している様子"
             />
             <MicroCopy text="※スマホの解約前に、通信会社、メール、SMS、金融系アプリ、請求の手がかりを整理しておくと後戻りしにくくなります。" />
@@ -418,7 +418,7 @@ export default function DigitalIhin005Client() {
 
           <div className="mt-2">
             <InfoImage
-              src="/images/guide/ihinseiri/digitalihin-005/consult-scene.png"
+              src="/images/guide/ihinseiri/digitalihin-005/consult-scene.webp"
               alt="スマホや書類、箱を前に実家全体の片付けとして整理方法を考えている様子"
             />
             <MicroCopy text="※スマホだけでなく、書類やパソコンも含めて整理が必要な場合は、全体の順番を考える方が進めやすいです。" />

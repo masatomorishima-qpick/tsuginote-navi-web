@@ -7,33 +7,39 @@ import AffiliateCtaBox from '@/components/AffiliateCtaBox';
 import SiteFooter from '@/components/SiteFooter';
 
 const toc = [
-  { id: 'conclusion', label: 'まず結論と最初にやること' },
-  { id: 'why-hard', label: 'なぜ遺品のパソコンはすぐ捨てにくいのか' },
+  { id: 'conclusion', label: 'まず結論｜最初にやること' },
+  { id: 'why-not-trash', label: '遺品のパソコンをそのまま捨ててはいけない理由' },
   { id: 'check-first', label: '捨てる前に確認したいこと' },
-  { id: 'self-limit', label: '自力で進めにくいケース' },
-  { id: 'consult', label: '実家片付け全体で考えたいケース' },
+  { id: 'data-erase', label: 'データ消去の考え方' },
+  { id: 'dispose-methods', label: '処分方法を比較する' },
+  { id: 'cannot-init', label: '初期化できない・ログインできないときはどうするか' },
+  { id: 'consult', label: '業者に頼んだ方がよいケース' },
   { id: 'related', label: '他の悩みともつながる理由' },
   { id: 'ng', label: 'やってはいけないこと' },
   { id: 'faq', label: 'よくある質問' },
-  { id: 'summary', label: 'まとめと最短で失敗しない動き方' },
+  { id: 'summary', label: 'まとめ｜最短で失敗しない動き方' },
 ];
 
 const faqs = [
   {
     q: '遺品のパソコンはそのまま捨てても大丈夫ですか？',
-    a: 'すぐに捨てるのはおすすめしにくいです。写真、契約情報、ネット銀行やクレジットカードの履歴、仕事のファイルなどが残っている可能性があります。まずは周辺の書類やスマホも含めて、確認が必要な情報がありそうかを整理するのが先です。',
+    a: 'そのまま捨てるのはおすすめしにくいです。写真、契約情報、ネット銀行やクレジットカードの履歴、メール、仕事のファイルなどが残っている可能性があります。まずは処分前に確認が必要な情報がありそうかを整理してください。',
   },
   {
     q: 'パソコンの電源が入らない場合はどうすればいいですか？',
-    a: '無理に起動や分解を試すより、まずは外付けHDD、USBメモリ、紙のメモ、通信関連の書類など周辺の手がかりを確認するのがおすすめです。パソコンだけに答えがあるとは限りません。',
+    a: '無理に分解したり何度も起動を試したりするより、まずは外付けHDD、USBメモリ、紙のメモ、通信関連の書類、スマホなど周辺の手がかりを確認するのがおすすめです。パソコンだけに答えがあるとは限りません。',
+  },
+  {
+    q: '初期化できないときでも処分できますか？',
+    a: '初期化できない場合でも、処分方法はあります。ただし、確認が必要な情報が残っていないかを見たうえで、データ消去や回収の考え方を整理してから進めた方が安心です。',
   },
   {
     q: 'スマホや書類も多くて何から始めればよいかわかりません。',
-    a: 'パソコンだけを単独で処分しようとせず、実家全体の片付けの中で確認対象を分ける方が進めやすいです。特に遠方の実家や物量が多い場合は、最初に保留にするものと片付け対象を分けると混乱しにくくなります。',
+    a: 'パソコンだけを単独で処分しようとせず、実家全体の片付けの中で確認対象と処分対象を分ける方が進めやすいです。特に遠方の実家や物量が多い場合は、最初に保留にするものを分けると混乱しにくくなります。',
   },
   {
     q: 'パソコン以外の遺品も多い場合はどう考えればよいですか？',
-    a: 'その場合は、パソコンの処分だけで終わらないことが多いです。スマホ、通帳、郵便物、家具、家電などと一緒に、実家全体の片付けとして考えた方が、後からやり直しになりにくいです。',
+    a: 'その場合は、パソコン処分だけで終わらないことが多いです。スマホ、通帳、郵便物、家具、家電などと一緒に、実家全体の片付けとして考えた方が、後からやり直しになりにくいです。',
   },
 ];
 
@@ -193,7 +199,7 @@ export default function DigitalIhin004Client() {
               </Link>
             </li>
             <li>/</li>
-            <li className="text-slate-700">遺品のパソコンの捨て方と安全に処分する進め方</li>
+            <li className="text-slate-700">遺品のパソコンはどう捨てる？</li>
           </ol>
         </nav>
 
@@ -211,16 +217,40 @@ export default function DigitalIhin004Client() {
           </div>
 
           <h1 className="mt-8 text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
-            遺品のパソコンの捨て方と安全に処分する進め方
+            遺品のパソコンはどう捨てる？
+            <br className="hidden sm:block" />
+            安全な処分方法とやってはいけないこと
           </h1>
 
           <p className="mt-5 max-w-3xl text-base leading-8 text-slate-700">
-            親が亡くなったあと、実家の片付けで困りやすいもののひとつがパソコンです。
-            見た目はただの家電でも、写真、メール、契約情報、ネット銀行の履歴、仕事のファイルなど、
-            故人の大切な情報が入っていることがあります。
-            この記事では、遺品のパソコンをすぐ捨てずに確認したいこと、自力で進めにくいケース、
-            実家全体の片付けとして考えた方がよい場面を整理します。
+            遺品のパソコンは、そのまま捨てたり急いで初期化したりする前に、
+            中に確認すべき情報が残っていないかを整理することが大切です。
+            写真やメールだけでなく、契約情報、ネット銀行の手がかり、会員サイト、仕事のファイルなどが
+            入っていることもあります。この記事では、遺品のパソコンを安全に処分するために、
+            先に確認したいこと、データ消去の考え方、処分方法の違いを順番に整理します。
           </p>
+
+          <div className="mt-6 rounded-2xl bg-amber-50 px-5 py-4 ring-1 ring-amber-200">
+            <p className="text-sm leading-7 text-slate-700">
+              遺品のパソコンは、初期化できない場合でも処分方法があります。まずは急いで手放さず、
+              確認すべきものと処分してよいものを分けるのがおすすめです。
+            </p>
+          </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <a
+              href="#dispose-methods"
+              className="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+            >
+              処分方法を先に見る
+            </a>
+            <a
+              href="#consult"
+              className="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+            >
+              遺品整理の相談先を見る
+            </a>
+          </div>
         </header>
 
         <section
@@ -228,10 +258,10 @@ export default function DigitalIhin004Client() {
           className="mt-8 rounded-3xl bg-amber-50 p-6 ring-1 ring-amber-200"
         >
           <h2 className="text-xl font-bold text-slate-900">
-            まず結論と最初にやること
+            まず結論｜遺品のパソコンは、そのまま捨てずに確認してから処分する
           </h2>
           <p className="mt-4 text-[15px] leading-8 text-slate-700">
-            遺品のパソコンは、いきなり初期化したり処分方法を探したりするより、
+            遺品のパソコンは、いきなり初期化したり捨てたりするより、
             まずは中に確認すべき情報がありそうかを整理することが先です。
             パソコンだけでなく、スマホ、郵便物、通帳、メモ、外付けHDDなども一緒に見ると、
             契約や資産の手がかりが見つかることがあります。
@@ -279,10 +309,10 @@ export default function DigitalIhin004Client() {
           </ul>
         </div>
 
-        <Section id="why-hard" title="なぜ遺品のパソコンはすぐ捨てにくいのか">
+        <Section id="why-not-trash" title="遺品のパソコンをそのまま捨ててはいけない理由">
           <p>
-            パソコンが難しいのは、単なる家電ではなく、故人の生活や契約の入口になっていることがあるからです。
-            家族からは見えにくい情報がまとまって入っているため、すぐ捨てると後から困ることがあります。
+            遺品のパソコンが難しいのは、単なる家電ではなく、故人の生活や契約の入口になっていることがあるからです。
+            家族からは見えにくい情報がまとまって入っているため、そのまま捨てると後から困ることがあります。
           </p>
 
           <div className="grid gap-6 md:grid-cols-3">
@@ -301,9 +331,9 @@ export default function DigitalIhin004Client() {
             </div>
 
             <div className="rounded-2xl bg-white p-5 ring-1 ring-slate-200">
-              <h3 className="text-base font-bold text-slate-900">他の遺品と情報が分散している</h3>
+              <h3 className="text-base font-bold text-slate-900">情報漏えいの不安がある</h3>
               <p className="mt-3 text-sm leading-7 text-slate-700">
-                スマホ、通帳、郵便物、メモ、外付け機器などと合わせて見ないと全体像が見えにくいことがあります。
+                個人情報やログイン情報が残っている可能性があるため、処分方法とデータ消去の考え方を分けて考える必要があります。
               </p>
             </div>
           </div>
@@ -360,29 +390,101 @@ export default function DigitalIhin004Client() {
           </p>
         </Section>
 
-        <Section id="self-limit" title="自力で進めにくいケース">
+        <Section id="data-erase" title="データ消去の考え方">
           <p>
-            ある程度までは家族で進められても、次のようなケースではパソコンの処分だけで終わらないことがあります。
+            遺品のパソコン処分で不安になりやすいのが、データ消去です。
+            ただし、データを消すことと、捨て方を決めることは分けて考えた方が整理しやすくなります。
           </p>
 
-          <div className="rounded-2xl bg-rose-50 p-5 ring-1 ring-rose-100">
+          <div className="grid gap-8 md:grid-cols-2">
+            <div className="rounded-2xl bg-white p-5 ring-1 ring-slate-200">
+              <h3 className="text-base font-bold text-slate-900">先に意識したいこと</h3>
+              <div className="mt-4">
+                <DotList
+                  items={[
+                    '確認すべき情報が残っていないかを見る',
+                    'スマホや書類に手がかりが残っていないか合わせて確認する',
+                    '外付けHDDやUSBメモリも忘れずに見る',
+                    '処分だけ急がず、保留にする期間を持つ',
+                  ]}
+                />
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-rose-50 p-5 ring-1 ring-rose-100">
+              <h3 className="text-base font-bold text-slate-900">急いでやらない方がいいこと</h3>
+              <div className="mt-4">
+                <CrossList
+                  items={[
+                    '確認前に初期化する',
+                    'ログインできないまま自己判断で進める',
+                    '周辺機器を見ずに本体だけ処分する',
+                    '実家の他の遺品を確認せずに終わらせる',
+                  ]}
+                />
+              </div>
+            </div>
+          </div>
+
+          <p>
+            「安全に捨てたい」という気持ちが強いと、すぐに消去へ進みたくなりますが、
+            まずは確認対象と処分対象を分けて考えることが失敗を減らす近道です。
+          </p>
+        </Section>
+
+        <Section id="dispose-methods" title="遺品のパソコンの処分方法を比較する">
+          <p>
+            遺品のパソコン処分には、自治体回収、メーカー回収、回収業者、遺品整理の中でまとめて進める方法などがあります。
+            どれがよいかは、パソコン単体なのか、実家全体の片付けの一部なのかで変わります。
+          </p>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-2xl bg-white p-5 ring-1 ring-slate-200">
+              <h3 className="text-base font-bold text-slate-900">パソコン単体で進める方法</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-700">
+                他に片付けるものが少なく、確認もほぼ終わっている場合は、単体処分を考えやすいです。
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-white p-5 ring-1 ring-slate-200">
+              <h3 className="text-base font-bold text-slate-900">保留にして後で処分する方法</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-700">
+                契約や資産の手がかりが残っていそうなら、先に保留にして他の遺品確認を進める方が安心です。
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-white p-5 ring-1 ring-slate-200">
+              <h3 className="text-base font-bold text-slate-900">実家片付けと一緒に進める方法</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-700">
+                遺品が多い場合は、パソコンだけ切り出すより、実家片付け全体の中で進めた方が楽なことがあります。
+              </p>
+            </div>
+          </div>
+        </Section>
+
+        <Section id="cannot-init" title="初期化できない・ログインできないときはどうするか">
+          <p>
+            パソコン処分でよく困るのが、「パスワードがわからない」「初期化できない」「電源が入らない」というケースです。
+            こうした場合でも、すぐに詰みではありません。
+          </p>
+
+          <div className="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
             <DotList
               items={[
-                'パソコン以外にもスマホや書類が多い',
-                '遠方の実家で何度も通えない',
-                '何を残して何を捨てるか判断しにくい',
-                '家族内で処分の判断が分かれている',
-                '実家全体の片付けも同時に進める必要がある',
+                'まずは周辺のスマホ、書類、メモ、外付け機器の確認を優先する',
+                'ログインできないなら、確認対象としていったん保留にする',
+                '本体だけで判断せず、実家全体の整理と一緒に考える',
+                '自力で難しい場合は、処分方法だけでなく整理方針ごと相談する',
               ]}
             />
           </div>
 
           <p>
-            この場合は、パソコンだけ先に片付けるより、実家全体の整理の中で順番を決めた方が進めやすくなります。
+            初期化できないこと自体よりも、「確認が必要かもしれないのに急いで処分する」ことの方が失敗につながりやすいです。
           </p>
         </Section>
 
-        <Section id="consult" title="実家片付け全体で考えたいケース">
+        <Section id="consult" title="業者に頼んだ方がよいケース">
           <p>
             遺品のパソコン処分で悩んでいるように見えても、実際にはスマホ、通帳、郵便物、家具、家電など、
             他の整理とつながっていることが少なくありません。
@@ -390,7 +492,7 @@ export default function DigitalIhin004Client() {
           </p>
 
           <div className="rounded-2xl bg-white p-5 ring-1 ring-slate-200">
-            <h3 className="text-lg font-bold text-slate-900">実家全体で考えたいケース</h3>
+            <h3 className="text-lg font-bold text-slate-900">業者相談を考えたいケース</h3>
             <div className="mt-4">
               <DotList
                 items={[
@@ -398,6 +500,7 @@ export default function DigitalIhin004Client() {
                   '短い日程でまとめて進めたい',
                   '確認不足で後からやり直したくない',
                   '家族だけでは手が足りない',
+                  '遠方の実家で何度も通えない',
                 ]}
               />
             </div>
@@ -422,45 +525,45 @@ export default function DigitalIhin004Client() {
             <MicroCopy text="※パソコン以外にも遺品が多い場合は、処分だけでなく全体の整理の順番を考える方が進めやすいです。" />
           </div>
 
-<AffiliateCtaBox
-  title="スマホやパソコンだけでなく、実家の遺品整理全体を進めたい方へ"
-  serviceLead="ご家族だけで整理が難しい場合は、片付け・仕分け・回収までまとめて相談できるサービスを早めに確認しておくと、全体の見通しを立てやすくなります。"
-  description="親のスマホのパスワードがわからないときは、スマホ単体で考えるより、パソコンや書類、実家全体の片付けの中で整理した方が進みやすいことがあります。物量が多い場合や、遠方で何度も通えない場合、家族だけで対応が難しい場合は、まず無料見積もりで費用感や進め方を確認しておくと安心です。"
-  buttonText="遺品整理110番を確認する"
-  href="https://px.a8.net/svt/ejp?a8mat=4AZNCN+786GWQ+39GM+5MFLEA"
-  lpName="digitalihin_004"
-  lpId="guide_ihinseiri_digitalihin_004"
-  position="bottom"
-  programName="ihinseiri_110"
-  ctaId="cta_digitalihin_004_ihin110"
-  partnerCategory="estate_cleanup"
-  sourceSection="consult"
-  gaEventName="cta_click_digitalihin_004_ihin110"
-  summaryItems={[
-    {
-      label: 'サービス名',
-      value: '遺品整理110番',
-    },
-    {
-      label: '対応エリア',
-      value: '全国対応です。',
-    },
-    {
-      label: '相談内容',
-      value: '遺品整理・片付け・回収の相談です。',
-    },
-    {
-      label: '相談',
-      value: '無料見積もりから確認できます。',
-    },
-  ]}
-  operatorName="シェアリングテクノロジー株式会社"
-/>
+          <AffiliateCtaBox
+            title="パソコンだけでなく、実家の遺品整理全体を進めたい方へ"
+            serviceLead="ご家族だけで整理が難しい場合は、片付け・仕分け・回収までまとめて相談できるサービスを早めに確認しておくと、全体の見通しを立てやすくなります。"
+            description="遺品のパソコン処分は、パソコン単体で考えるより、スマホや書類、家具、家電も含めた実家全体の片付けの中で整理した方が進みやすいことがあります。物量が多い場合や、遠方で何度も通えない場合、家族だけで対応が難しい場合は、まず無料見積もりで費用感や進め方を確認しておくと安心です。"
+            buttonText="遺品整理110番を確認する"
+            href="https://px.a8.net/svt/ejp?a8mat=4AZNCN+786GWQ+39GM+5MFLEA"
+            lpName="digitalihin_004"
+            lpId="guide_ihinseiri_digitalihin_004"
+            position="bottom"
+            programName="ihinseiri_110"
+            ctaId="cta_digitalihin_004_ihin110"
+            partnerCategory="estate_cleanup"
+            sourceSection="consult"
+            gaEventName="cta_click_digitalihin_004_ihin110"
+            summaryItems={[
+              {
+                label: 'サービス名',
+                value: '遺品整理110番',
+              },
+              {
+                label: '対応エリア',
+                value: '全国対応です。',
+              },
+              {
+                label: '相談内容',
+                value: '遺品整理・片付け・回収の相談です。',
+              },
+              {
+                label: '相談',
+                value: '無料見積もりから確認できます。',
+              },
+            ]}
+            operatorName="シェアリングテクノロジー株式会社"
+          />
         </Section>
 
         <Section id="related" title="他の悩みともつながる理由">
           <p>
-            パソコンの処分の悩みは、スマホ、ネット銀行、実家片付けともつながっています。
+            パソコン処分の悩みは、スマホ、ネット銀行、実家片付けともつながっています。
             パソコンだけを単独で考えるより、他の記事もあわせて見る方が整理しやすくなります。
           </p>
 
@@ -551,7 +654,7 @@ export default function DigitalIhin004Client() {
           <FaqAccordion faqs={faqs} />
         </Section>
 
-        <Section id="summary" title="まとめと最短で失敗しない動き方">
+        <Section id="summary" title="まとめ｜遺品のパソコンを安全に処分するための進め方">
           <p>
             遺品のパソコンは、すぐに捨てるのではなく、まず確認対象として扱うのが基本です。
             周辺の書類やスマホ、外付け機器も含めて、契約や資産、写真などの手がかりがないかを整理してから処分を考える方が安心です。
@@ -561,8 +664,9 @@ export default function DigitalIhin004Client() {
             <ul className="space-y-3 text-[15px] leading-8 text-slate-700">
               <li>・パソコン本体をすぐ捨てずに確認対象として分ける</li>
               <li>・スマホ、書類、外付けHDD、メモも一緒に見る</li>
-              <li>・契約や資産の手がかりがありそうかを整理する</li>
+              <li>・データ消去と処分方法は分けて考える</li>
               <li>・遺品が多い場合は実家全体の片付けとして考える</li>
+              <li>・家族だけで難しい場合は業者相談も検討する</li>
             </ul>
           </div>
 

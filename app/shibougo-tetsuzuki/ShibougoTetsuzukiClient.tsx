@@ -149,6 +149,7 @@ export default function ShibougoTetsuzukiClient() {
   useEffect(() => {
     const sectionIds = [
       "today_first",
+      "funeral_cta",
       "within_7days",
       "within_30days",
       "after_settlement",
@@ -207,6 +208,32 @@ export default function ShibougoTetsuzukiClient() {
       lp_id: "after_death_lp",
       event_name: "intent_select",
       component_id: "after_death_timeline_nav",
+      choice_id: choiceId,
+      choice_label: choiceLabel,
+      section_id: targetId,
+      selected_intent_id: choiceId,
+      metadata: {
+        target_section: targetId,
+      },
+    });
+
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const handleHeroShortcutClick = (
+    choiceId: string,
+    choiceLabel: string,
+    targetId: string
+  ) => {
+    setSelectedIntentId(choiceId);
+
+    void trackEvent({
+      lp_id: "after_death_lp",
+      event_name: "hero_shortcut_click",
+      component_id: "after_death_hero_shortcuts",
       choice_id: choiceId,
       choice_label: choiceLabel,
       section_id: targetId,
@@ -289,6 +316,36 @@ export default function ShibougoTetsuzukiClient() {
                 ))}
               </div>
             </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() =>
+                  handleHeroShortcutClick(
+                    "hero_today_first",
+                    "まず今日やることを確認する",
+                    "today_first"
+                  )
+                }
+                className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-amber-200 bg-white px-5 py-3 text-sm font-semibold text-amber-700 transition hover:bg-amber-50"
+              >
+                まず今日やることを確認する
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleHeroShortcutClick(
+                    "hero_funeral_first",
+                    "葬儀社の相談先を先に見る",
+                    "funeral_cta"
+                  )
+                }
+                className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-amber-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-700"
+              >
+                葬儀社の相談先を先に見る
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -358,7 +415,7 @@ export default function ShibougoTetsuzukiClient() {
           まずは連絡先、葬儀や搬送、死亡診断書など、今日中に整理したいことから確認すると混乱を減らしやすくなります。
         </div>
 
-        <div className="mt-8 border-t border-slate-200 pt-8">
+        <div id="funeral_cta" className="mt-8 border-t border-slate-200 pt-8">
           <AffiliateCtaBox
             title="急ぎで葬儀社を探したい方へ"
             serviceLead="比較検討の時間が取りづらいときは、まず即時対応できる窓口を確認しておくと安心です。"
@@ -596,7 +653,6 @@ export default function ShibougoTetsuzukiClient() {
           今の段階では全てを決めきれなくても、次に確認すべきテーマを把握しておくことが大切です。
         </div>
 
-
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link
             href="/souzoku-tetsuzuki"
@@ -613,28 +669,27 @@ export default function ShibougoTetsuzukiClient() {
         </div>
 
         <div className="mt-8 border-t border-slate-200 pt-8">
-<AffiliateCtaBox
-  title="相続税申告や税理士探しを早めに整理したい方へ"
-  description="ご家族が亡くなった後、相続税の申告が必要かどうか分からず不安な方や、税理士選びで迷っている方向けの相談先です。早めに相談先の候補を把握しておくと、その後の手続きを進めやすくなります。"
-  buttonText="税理士ドットコムで無料相談する"
-  href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
-  lpName="death_procedures"
-  lpId="after_death_lp"
-  position="bottom"
-  programName="zeirishi_dotcom"
-  ctaId="cta_after_death_zeirishi"
-  partnerCategory="tax_accountant_service"
-  sourceSection="after_settlement_zeirishi"
-  selectedIntentId={selectedIntentId}
-  gaEventName="cta_click_shibougo"
-  summaryItems={[
-    { label: "相談内容", value: "相続税申告・税理士探しの相談" },
-    { label: "こんな方に", value: "何を誰に相談すべきか整理したい方" },
-    { label: "タイミング", value: "必要な手続きを確認し始めたとき" },
-  ]}
-/>
+          <AffiliateCtaBox
+            title="相続税申告や税理士探しを早めに整理したい方へ"
+            description="ご家族が亡くなった後、相続税の申告が必要かどうか分からず不安な方や、税理士選びで迷っている方向けの相談先です。早めに相談先の候補を把握しておくと、その後の手続きを進めやすくなります。"
+            buttonText="税理士ドットコムで無料相談する"
+            href="https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p"
+            lpName="death_procedures"
+            lpId="after_death_lp"
+            position="bottom"
+            programName="zeirishi_dotcom"
+            ctaId="cta_after_death_zeirishi"
+            partnerCategory="tax_accountant_service"
+            sourceSection="after_settlement_zeirishi"
+            selectedIntentId={selectedIntentId}
+            gaEventName="cta_click_shibougo"
+            summaryItems={[
+              { label: "相談内容", value: "相続税申告・税理士探しの相談" },
+              { label: "こんな方に", value: "何を誰に相談すべきか整理したい方" },
+              { label: "タイミング", value: "必要な手続きを確認し始めたとき" },
+            ]}
+          />
         </div>
-
       </section>
 
       <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">

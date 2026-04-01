@@ -8,21 +8,21 @@ import { trackEvent } from "@/lib/trackEvent";
 import AffiliateCtaBox from "@/components/AffiliateCtaBox";
 
 const consultationAffiliateItems = [
-{
-  id: "zeirishi-dotcom",
-  title: "相続税申告や税理士探しを早めに整理したい方へ",
-  description:
-    "ご家族が亡くなった後、相続税の申告が必要かどうか分からず不安な方や、税理士選びで迷っている方向けの相談先です。早めに相談先の候補を把握しておくと、その後の手続きを進めやすくなります。",
-  buttonText: "税理士ドットコムで無料相談する",
-  href: "https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p",
-  lpName: "zeirishi_dotcom_after_death_lp",
-  programName: "税理士ドットコム",
-  summaryItems: [
-    { label: "相談内容", value: "相続税申告・税理士探しの相談" },
-    { label: "こんな方に", value: "何を誰に相談すべきか整理したい方" },
-    { label: "タイミング", value: "必要な手続きを確認し始めたとき" },
-  ],
-},
+  {
+    id: "zeirishi-dotcom",
+    title: "相続税申告や税理士探しを早めに整理したい方へ",
+    description:
+      "ご家族が亡くなった後、相続税の申告が必要かどうか分からず不安な方や、税理士選びで迷っている方向けの相談先です。早めに相談先の候補を把握しておくと、その後の手続きを進めやすくなります。",
+    buttonText: "税理士ドットコムで無料相談する",
+    href: "https://h.accesstrade.net/sp/cc?rk=0100kl2m00oq1p",
+    lpName: "zeirishi_dotcom_after_death_lp",
+    programName: "税理士ドットコム",
+    summaryItems: [
+      { label: "相談内容", value: "相続税申告・税理士探しの相談" },
+      { label: "こんな方に", value: "何を誰に相談すべきか整理したい方" },
+      { label: "タイミング", value: "必要な手続きを確認し始めたとき" },
+    ],
+  },
 ];
 
 const cleanupAffiliateItem = {
@@ -337,6 +337,7 @@ export default function SouzokuTetsuzukiClient() {
       "deadline_docs",
       "documents_check",
       "advisor_guide",
+      "consultation_cta",
       "case_by_case",
       "cleanup_timing",
       "faq_section",
@@ -395,6 +396,32 @@ export default function SouzokuTetsuzukiClient() {
       lp_id: "inheritance_lp",
       event_name: "intent_select",
       component_id: "inheritance_quick_nav",
+      choice_id: choiceId,
+      choice_label: choiceLabel,
+      section_id: targetId,
+      selected_intent_id: choiceId,
+      metadata: {
+        target_section: targetId,
+      },
+    });
+
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const handleHeroShortcutClick = (
+    choiceId: string,
+    choiceLabel: string,
+    targetId: string
+  ) => {
+    setSelectedIntentId(choiceId);
+
+    void trackEvent({
+      lp_id: "inheritance_lp",
+      event_name: "hero_shortcut_click",
+      component_id: "inheritance_hero_shortcuts",
       choice_id: choiceId,
       choice_label: choiceLabel,
       section_id: targetId,
@@ -481,6 +508,36 @@ export default function SouzokuTetsuzukiClient() {
               <div className="mt-6 rounded-2xl bg-amber-50 px-4 py-4 text-sm leading-7 text-amber-900 sm:text-base">
                 <span className="font-semibold">お急ぎの方へ：</span>
                 借金が不安な方は「期限」を、不動産がある方は「相談先」や「片付けの順番」を先にご確認いただくとスムーズです。
+              </div>
+
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleHeroShortcutClick(
+                      "hero_deadline_first",
+                      "急ぐ期限を先に確認する",
+                      "deadline_docs"
+                    )
+                  }
+                  className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-emerald-200 bg-white px-5 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                >
+                  急ぐ期限を先に確認する
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleHeroShortcutClick(
+                      "hero_advisor_first",
+                      "どこに相談すべきかを見る",
+                      "advisor_guide"
+                    )
+                  }
+                  className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                >
+                  どこに相談すべきかを見る
+                </button>
               </div>
             </div>
           </div>
@@ -781,16 +838,20 @@ export default function SouzokuTetsuzukiClient() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
+      <section
+        id="consultation_cta"
+        className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10"
+      >
         <p className="text-sm font-semibold tracking-[0.08em] text-emerald-700">
-          相談先のご案内
+          税務相談のご案内
         </p>
         <h2 className="mt-2 text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
-          状況に応じて相談先を選びたい方へ
+          相続税や準確定申告が気になる方へ
         </h2>
         <p className="mt-4 text-base leading-8 text-slate-600 sm:text-lg">
-          借金の不安が強い方、相続とあわせて法的な整理が必要そうな方は、
-          早めに専門家へ相談した方が進めやすくなります。ご自身の状況に近い相談先を選んでください。
+          不動産や金融資産がある方、相続税の対象かどうか分からず不安な方、
+          準確定申告や税理士選びも含めて整理したい方は、早めに税務の相談先を把握しておくと進めやすくなります。
+          相続全体の流れを整理する中で、税務の論点があるかを先に確認したい方に向いています。
         </p>
 
         <div className="mt-6 grid gap-6">
@@ -813,7 +874,7 @@ export default function SouzokuTetsuzukiClient() {
         </div>
 
         <p className="mt-4 text-sm leading-7 text-slate-500">
-          ※ ご状況によって適した相談先は異なります。内容を整理したうえでご相談ください。
+          ※ ご状況によって適した相談先は異なります。税務の確認が必要か迷う段階でも、候補を把握しておくと判断しやすくなります。
         </p>
       </section>
 

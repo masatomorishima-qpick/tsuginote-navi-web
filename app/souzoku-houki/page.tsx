@@ -198,6 +198,23 @@ export default function SouzokuHoukiPage() {
                 <span className="font-semibold">お急ぎの方へ：</span>
                 亡くなってから3か月が近い方、借金や保証債務が不安な方は、まず期限と相談先を先にご確認ください。
               </div>
+
+<div className="mt-4 grid gap-3 sm:grid-cols-2">
+  <a
+    href="#deadline_section"
+    className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-rose-200 bg-white px-5 py-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-50"
+  >
+    期限を先に確認する
+  </a>
+
+  <a
+    href="#cta_section"
+    className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-rose-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-700"
+  >
+    相談先を先に見る
+  </a>
+</div>
+
             </div>
           </div>
         </div>

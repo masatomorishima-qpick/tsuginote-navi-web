@@ -167,9 +167,12 @@ export default function OfficeCard({
   );
   const wantsEnglish = answers.englishPreference === "want_english";
 
-  function safeTrack(eventName: string, params?: Record<string, unknown>) {
+  function safeTrack(
+    eventName: Parameters<typeof trackAppEvent>[0],
+    params?: Parameters<typeof trackAppEvent>[1]
+  ) {
     try {
-      trackAppEvent(eventName as Parameters<typeof trackAppEvent>[0], params);
+      trackAppEvent(eventName, params);
     } catch (error) {
       console.error("[OfficeCard] track failed", eventName, error);
     }
@@ -184,15 +187,16 @@ export default function OfficeCard({
       target: "youtube",
     });
   };
-const trackLawyerPlaylistClick = () => {
-  safeTrack("office_video_link_clicked", {
-    area,
-    category,
-    session_id: sessionId,
-    office_id: office.id,
-    target: "lawyer_playlist",
-  });
-};
+
+  const trackLawyerPlaylistClick = () => {
+    safeTrack("office_video_link_clicked", {
+      area,
+      category,
+      session_id: sessionId,
+      office_id: office.id,
+      target: "lawyer_playlist",
+    });
+  };
 
   const trackOfficeContactClick = (
     contactMethod: "line" | "phone" | "email"
@@ -336,56 +340,56 @@ const trackLawyerPlaylistClick = () => {
           </section>
         ) : null}
 
-<section className="mt-6">
-  <div className="mb-2 flex items-center gap-2">
-    <PlayCircle className="h-4 w-4 text-slate-500" />
-    <h3 className="text-sm font-semibold text-slate-900">
-      事務所紹介動画
-    </h3>
-  </div>
+        <section className="mt-6">
+          <div className="mb-2 flex items-center gap-2">
+            <PlayCircle className="h-4 w-4 text-slate-500" />
+            <h3 className="text-sm font-semibold text-slate-900">
+              事務所紹介動画
+            </h3>
+          </div>
 
-  <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
-    {videoSource?.type === "embed" ? (
-      <iframe
-        className="aspect-video w-full"
-        src={videoSource.url}
-        title={`${office.officeName} 事務所紹介動画`}
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      />
-    ) : videoSource?.type === "link" ? (
-      <div className="p-4">
-        <a
-          href={videoSource.linkUrl}
-          target="_blank"
-          rel="noreferrer"
-          onClick={trackVideoLinkClick}
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-900 underline underline-offset-4"
-        >
-          YouTubeで見る
-        </a>
-      </div>
-    ) : (
-      <div className="flex h-40 items-center justify-center px-4 text-sm text-slate-500">
-        動画の掲載は準備中です
-      </div>
-    )}
-  </div>
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+            {videoSource?.type === "embed" ? (
+              <iframe
+                className="aspect-video w-full"
+                src={videoSource.url}
+                title={`${office.officeName} 事務所紹介動画`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : videoSource?.type === "link" ? (
+              <div className="p-4">
+                <a
+                  href={videoSource.linkUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={trackVideoLinkClick}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-slate-900 underline underline-offset-4"
+                >
+                  YouTubeで見る
+                </a>
+              </div>
+            ) : (
+              <div className="flex h-40 items-center justify-center px-4 text-sm text-slate-500">
+                動画の掲載は準備中です
+              </div>
+            )}
+          </div>
 
-  {playlistHref ? (
-  <div className="mt-3">
-    <a
-      href={playlistHref}
-      target="_blank"
-      rel="noreferrer"
-      onClick={trackLawyerPlaylistClick}
-      className="text-sm font-medium text-slate-700 underline underline-offset-4"
-    >
-      所属弁護士の動画一覧を見る
-    </a>
-  </div>
-  ) : null}
-</section>
+          {playlistHref ? (
+            <div className="mt-3">
+              <a
+                href={playlistHref}
+                target="_blank"
+                rel="noreferrer"
+                onClick={trackLawyerPlaylistClick}
+                className="text-sm font-medium text-slate-700 underline underline-offset-4"
+              >
+                所属弁護士の動画一覧を見る
+              </a>
+            </div>
+          ) : null}
+        </section>
 
         <section className="mt-6">
           <h3 className="text-sm font-semibold text-slate-900">連絡方法</h3>

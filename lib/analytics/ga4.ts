@@ -5,11 +5,13 @@ export type ContactMethod = 'line' | 'phone' | 'email';
 export type GA4EventName =
   | 'survey_start'
   | 'survey_step_view'
+  | 'survey_answer_select'
   | 'survey_complete'
   | 'results_view'
   | 'results_load_more_click'
   | 'office_contact_click'
-  | 'office_website_click';
+  | 'office_website_click'
+  | 'office_video_link_clicked';
 
 export type GA4EventParams = {
   area?: string;
@@ -24,7 +26,6 @@ export type GA4EventParams = {
 
 declare global {
   interface Window {
-    dataLayer: unknown[];
     gtag?: (
       command: 'event' | 'config' | 'set' | 'js',
       targetIdOrEventName: string | Date,
@@ -84,12 +85,15 @@ function shouldUseDebugMode(): boolean {
     window.location.hostname === 'localhost' ||
     window.location.hostname === '127.0.0.1';
 
-  const hasDebugParam = new URLSearchParams(window.location.search).get('ga_debug') === '1';
+  const hasDebugParam =
+    new URLSearchParams(window.location.search).get('ga_debug') === '1';
 
   return isLocalhost || hasDebugParam;
 }
 
-function sanitizeParams(params: GA4EventParams): Record<string, string | number | boolean> {
+function sanitizeParams(
+  params: GA4EventParams
+): Record<string, string | number | boolean> {
   const sanitized: Record<string, string | number | boolean> = {};
 
   Object.entries(params).forEach(([key, value]) => {

@@ -1,15 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import {
-  Check,
-  Clock3,
-  UserRound,
-  MousePointerClick,
-  FileText,
-  Search,
-  PhoneCall,
-} from "lucide-react";
+import { FileText, Search, PhoneCall } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   buildTrackingContext,
@@ -240,7 +232,10 @@ function buildSafeTrackingContext(
   category: string
 ): TrackingContext {
   try {
-    const context = buildTrackingContext({ area, category }) as Partial<TrackingContext>;
+    const context = buildTrackingContext({
+      area,
+      category,
+    }) as Partial<TrackingContext>;
 
     return {
       area: typeof context.area === "string" && context.area ? context.area : area,
@@ -284,21 +279,6 @@ function ProgressBar({ current }: { current: number }) {
           style={{ width: `${percent}%` }}
         />
       </div>
-    </div>
-  );
-}
-
-function TrustPill({
-  icon,
-  text,
-}: {
-  icon: ReactNode;
-  text: string;
-}) {
-  return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-[12px] font-medium text-slate-700 sm:text-[13px]">
-      <span className="text-orange-500">{icon}</span>
-      <span>{text}</span>
     </div>
   );
 }
@@ -467,9 +447,12 @@ export default function SurveyWizard({
     };
   }, []);
 
-  function safeTrack(eventName: string, params?: Record<string, unknown>) {
+  function safeTrack(
+    eventName: Parameters<typeof trackAppEvent>[0],
+    params?: Parameters<typeof trackAppEvent>[1]
+  ) {
     try {
-      trackAppEvent(eventName as Parameters<typeof trackAppEvent>[0], params);
+      trackAppEvent(eventName, params);
     } catch (error) {
       console.error("[SurveyWizard] track failed", eventName, error);
     }
@@ -482,8 +465,8 @@ export default function SurveyWizard({
       safeTrack("survey_step_view", {
         ...trackingContext,
         step_number: stepIndex,
-        question_id: question?.trackingId ?? null,
-        question_number: question?.number ?? null,
+        question_id: question?.trackingId,
+        question_number: question?.number,
       });
 
       trackedStepNumbersRef.current.add(stepIndex);

@@ -8,6 +8,9 @@ export default function SiteFooter() {
           <p>© {new Date().getFullYear()} つぎの手ナビ</p>
 
           <nav className="flex flex-wrap items-center justify-center gap-5">
+            <Link href="/login?next=/digital" className="hover:text-slate-700">
+              デジタル資産の整理
+            </Link>
             <Link href="/privacy" className="hover:text-slate-700">
               プライバシーポリシー
             </Link>

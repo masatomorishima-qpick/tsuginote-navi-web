@@ -3,6 +3,7 @@ import BackButton from '@/components/common/BackButton';
 import ResultsListClient from '@/components/result/ResultsListClient';
 import SurveySubmitTracker from '@/components/result/SurveySubmitTracker';
 import SiteFooter from '@/components/SiteFooter';
+import DigitalAssetsCrossLink from '@/components/DigitalAssetsCrossLink';
 import { getPublishedOffices } from '@/lib/offices/getPublishedOffices';
 import { matchOffices } from '@/lib/survey/matching';
 import type {
@@ -321,6 +322,11 @@ export default async function ResultsPage({
           category={category}
           sessionId={sessionId}
         />
+      </section>
+
+      {/* デジタル資産機能へのクロスリンク（手続きの相談先を見終えた高意図の位置） */}
+      <section className="mx-auto max-w-4xl px-4 pb-10 sm:px-6">
+        <DigitalAssetsCrossLink />
       </section>
 
       <SiteFooter />

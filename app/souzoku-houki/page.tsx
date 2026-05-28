@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
 import AffiliateCtaBox from "@/components/AffiliateCtaBox";
+import DigitalAssetsCrossLink from "@/components/DigitalAssetsCrossLink";
 
 export const metadata: Metadata = {
   title: "相続放棄の期限は3か月｜判断材料・相談先・注意点を整理",
@@ -554,6 +555,11 @@ export default function SouzokuHoukiPage() {
         <div className="rounded-2xl bg-slate-100 px-5 py-4 text-sm leading-7 text-slate-500 sm:text-base">
           ※ 本ページは一般的な情報整理を目的としています。個別事情によって必要な対応は異なるため、最終判断は専門家へご相談ください。
         </div>
+      </section>
+
+      {/* デジタル資産整理へのクロスリンク（読み終わった読者への関連提案） */}
+      <section className="mx-auto max-w-5xl px-4 pb-12 sm:px-6">
+        <DigitalAssetsCrossLink />
       </section>
 
       <SiteFooter />

@@ -1,18 +1,21 @@
 import BackButton from "@/components/common/BackButton";
 import SiteFooter from "@/components/SiteFooter";
+import MarketingHeader from "@/components/MarketingHeader";
 
 export default function CompanyPage() {
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
-      <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <div className="mb-8">
-            <BackButton
-              fallbackHref="/tokyo/souzoku-houki/start"
-              label="← 前のページへ戻る"
-              className="text-sm font-medium text-emerald-700 hover:text-emerald-800"
-            />
-          </div>
+    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
+      <MarketingHeader />
+      <main className="flex-1">
+        <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <div className="mb-8">
+              <BackButton
+                fallbackHref="/"
+                label="← 前のページへ戻る"
+                className="text-sm font-medium text-emerald-700 hover:text-emerald-800"
+              />
+            </div>
 
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
             運営会社
@@ -57,9 +60,9 @@ export default function CompanyPage() {
             </dl>
           </div>
         </div>
-      </section>
-
+        </section>
+      </main>
       <SiteFooter />
-    </main>
+    </div>
   );
 }

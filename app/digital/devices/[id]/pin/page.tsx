@@ -1,0 +1,154 @@
+/**
+ * /digital/devices/[id]/pin — 登録済み PIN の管理ページ
+ *
+ * サーバー側で検証：
+ *   1. ログイン済みであること（未ログインなら /login へ）
+ *   2. そのデバイスが本人の物で、削除されていないこと
+ *   3. PIN が登録済みであること（未登録なら登録画面にリダイレクト）
+ *
+ * 画面上の操作（PIN を表示／更新／削除）はすべてクライアント component で実装し、
+ * step-up / パスフレーズ入力 / 復号 / 30 秒自動マスク を PinManagePanel が担当する。
+ *
+ * 🔒 このサーバーコンポーネントは **暗号文も平文も参照しない**。
+ *    PIN の実データを取得するのは GET /api/digital/pins/[device_id]（step-up 通過必須）のみ。
+ */
+
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound, redirect } from 'next/navigation';
+import {
+  ChevronRight,
+  KeyRound,
+  ShieldCheck,
+  Info,
+  ArrowLeft,
+} from 'lucide-react';
+import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
+import { getDeviceById, deviceHasPin } from '@/lib/digital/devices';
+import { isStepupEnabled } from '@/lib/digital/stepup';
+import PinManagePanel from '@/components/digital/PinManagePanel';
+
+export const metadata: Metadata = {
+  title: 'パスワードを表示・管理 | つぎの手ナビ',
+  robots: { index: false, follow: false },
+};
+
+export const dynamic = 'force-dynamic';
+
+type Props = { params: Promise<{ id: string }> };
+
+export default async function PinManagePage({ params }: Props) {
+  const { id } = await params;
+  const supabase = await createDigitalServerClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect(`/login?next=/digital/devices/${id}/pin`);
+  }
+
+  const device = await getDeviceById(supabase, user.id, id);
+  if (!device) {
+    notFound();
+  }
+
+  // 未登録なら登録画面へ
+  const hasPin = await deviceHasPin(supabase, user.id, id);
+  if (!hasPin) {
+    redirect(`/digital/devices/${id}/pin/new`);
+  }
+
+  const stepupEnabled = isStepupEnabled();
+
+  return (
+    <div className="mx-auto max-w-2xl">
+      {/* パンくず */}
+      <nav
+        aria-label="パンくず"
+        className="mb-4 flex items-center gap-1 text-xs text-slate-500"
+      >
+        <Link href="/digital" className="hover:text-emerald-700 hover:underline">
+          ダッシュボード
+        </Link>
+        <ChevronRight className="h-3 w-3" aria-hidden="true" />
+        <Link
+          href="/digital/devices"
+          className="hover:text-emerald-700 hover:underline"
+        >
+          パスワード保管
+        </Link>
+        <ChevronRight className="h-3 w-3" aria-hidden="true" />
+        <Link
+          href={`/digital/devices/${device.id}`}
+          className="truncate hover:text-emerald-700 hover:underline"
+        >
+          {device.device_name}
+        </Link>
+        <ChevronRight className="h-3 w-3" aria-hidden="true" />
+        <span className="text-slate-700">パスワードを表示・管理</span>
+      </nav>
+
+      <header className="mb-6">
+        <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
+          <KeyRound className="h-6 w-6 text-emerald-600" aria-hidden="true" />
+          パスワード
+        </h1>
+        <p className="mt-1 text-sm text-slate-600">
+          {device.device_name} に登録されたパスワードを表示します。
+          {stepupEnabled
+            ? 'セキュリティのため、操作ごとにメール再認証とマスターコード入力が必要です。'
+            : 'マスターコードの入力が必要です。表示されたパスワードは 30 秒で自動的に隠れます。'}
+        </p>
+      </header>
+
+      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+        <div className="mb-4 flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900">
+          <ShieldCheck
+            className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600"
+            aria-hidden="true"
+          />
+          <div className="space-y-0.5 leading-relaxed">
+            <p className="font-medium">この操作のセキュリティ設定</p>
+            <ul className="list-inside list-disc text-emerald-900/90">
+              {stepupEnabled && (
+                <li>メール宛ての 6 桁ワンタイムコードで再認証します。</li>
+              )}
+              <li>登録時に設定した<b>マスターコード</b>がないとパスワードは表示できません。</li>
+              <li>表示されたパスワードは 30 秒で自動的に隠れます。</li>
+            </ul>
+          </div>
+        </div>
+
+        <PinManagePanel
+          deviceId={device.id}
+          deviceName={device.device_name}
+          userEmail={user.email ?? null}
+          stepupEnabled={stepupEnabled}
+        />
+
+        <div className="mt-5 flex items-start gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+          <Info
+            className="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-400"
+            aria-hidden="true"
+          />
+          <p className="leading-relaxed">
+            マスターコードを忘れてしまったときは「パスワードを削除」→「再登録」の手順で作り直してください。
+            削除後は自動で登録画面に戻ります。
+          </p>
+        </div>
+      </section>
+
+      <div className="mt-4 text-right">
+        <Link
+          href={`/digital/devices/${device.id}`}
+          className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-emerald-700 hover:underline"
+        >
+          <ArrowLeft className="h-3 w-3" aria-hidden="true" />
+          デバイス編集画面に戻る
+        </Link>
+      </div>
+    </div>
+  );
+}

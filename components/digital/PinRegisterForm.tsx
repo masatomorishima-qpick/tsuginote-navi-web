@@ -23,7 +23,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Loader2,
-  ShieldCheck,
   AlertTriangle,
   Eye,
   EyeOff,
@@ -250,7 +249,7 @@ export default function PinRegisterForm({ deviceId, deviceName }: Props) {
         } else if (json?.error === 'plan_required') {
           setGeneralError(
             json.detail ??
-              'スマホ・PC のパスワード保管機能は STANDARD プランのみご利用いただけます。'
+              'スマホ・PC のパスワード保管機能は STANDARDプランのみご利用いただけます。'
           );
         } else {
           setGeneralError(
@@ -324,52 +323,25 @@ export default function PinRegisterForm({ deviceId, deviceName }: Props) {
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-          <div className="flex items-start gap-3">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 sm:p-5">
+          <div className="flex items-start gap-2.5">
             <AlertTriangle
               className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600"
               aria-hidden="true"
             />
             <div className="space-y-2">
               <p className="font-semibold">
-                マスターコードを忘れるとパスワードは取り出せません
+                マスターコードを忘れると取り出せません
               </p>
-              <ul className="list-inside list-disc space-y-1 leading-relaxed text-amber-900/90">
-                <li>
-                  パスワードは <b>あなたが入力したマスターコード</b>で暗号化されます。
-                  運営やサポートでも取り出せません。
-                </li>
-                <li>
-                  マスターコードは <b>ログインパスワードとは別物</b>です。必ず、
-                  <b>メモ帳・パスワード管理アプリ・大切な方に預ける封書</b>
-                  など、ご自身で管理できる場所に保管してください。
-                </li>
-                <li>
-                  ここで決めたマスターコードは、<b>今後登録するすべてのパスワード共通</b>
-                  のものになります。
-                </li>
-              </ul>
+              <p className="leading-relaxed text-amber-900/90">
+                マスターコードはログインパスワードとは別物で、運営やサポートでも復元できません。
+                メモ帳・パスワード管理アプリ・大切な方への封書など、ご自身で管理できる場所に必ず保管してください。
+                今後登録するすべてのパスワードで共通して使用します。
+              </p>
             </div>
           </div>
         </div>
       )}
-
-      {/* 暗号化の仕組みのセーフティ説明 */}
-      <div className="flex gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-        <ShieldCheck
-          className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-600"
-          aria-hidden="true"
-        />
-        <div>
-          <p className="font-medium">
-            パスワードはこの画面内で暗号化されてから送信されます
-          </p>
-          <p className="mt-1 leading-relaxed text-emerald-800/90">
-            お使いのブラウザ内で強力な暗号化を行い、暗号化されたデータのみを保存します。
-            サーバーにはそのままのパスワードもマスターコードも送信されません。
-          </p>
-        </div>
-      </div>
 
       {/* 連携先がいる場合、引き継ぎ対象を明示 */}
       {recipients.length > 0 && (

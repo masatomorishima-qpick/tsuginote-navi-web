@@ -18,7 +18,6 @@ import { redirect } from 'next/navigation';
 import {
   AlertTriangle,
   CheckCircle2,
-  ChevronRight,
   Clock,
   ShieldCheck,
   XCircle,
@@ -107,18 +106,11 @@ export default async function InvitationAcceptPage({ params }: Props) {
   }
 
   // すでに承認済み
+  //   フォーム送信直後と、後日メールリンクを再アクセスしたケースを区別できないため、
+  //   ミスリードを避けるため /digital にそのままリダイレクトする。
+  //   フォーム送信直後の成功表示は InvitationAcceptForm 側で行う。
   if (status === 'accepted') {
-    return (
-      <div className="mx-auto max-w-2xl py-8">
-        <ErrorCard
-          icon="check"
-          title="この招待はすでに承認されています"
-          message="連携はすでに完了しています。ダッシュボードから現状をご確認いただけます。"
-          actionHref="/digital"
-          actionLabel="ダッシュボードへ"
-        />
-      </div>
-    );
+    redirect('/digital');
   }
 
   // ⑤ ログイン中ユーザーのメールが招待先と一致するか
@@ -167,56 +159,64 @@ export default async function InvitationAcceptPage({ params }: Props) {
   const ownerDisplayName =
     ownerProfile?.display_name ?? ownerProfile?.preferred_name ?? null;
 
-  // ⑧ 正常系：承認フォームを表示
+  // ⑧ 正常系：承認フォームを表示（新スタイル：bg-[#F5F5F0] + 白丸角カード）
   return (
-    <div className="mx-auto max-w-2xl space-y-6 py-8">
-      {/* パンくず（簡易） */}
-      <nav
-        aria-label="パンくず"
-        className="flex items-center gap-1 text-xs text-slate-500"
-      >
-        <Link href="/digital" className="hover:text-emerald-700 hover:underline">
-          ダッシュボード
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <span className="text-slate-700">連携承認</span>
-      </nav>
+    <div className="min-h-screen bg-[#F5F5F0]">
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-10">
+        {/* 大見出し（中央寄せ、十分な余白） */}
+        <header className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            連携のご案内
+          </h1>
+        </header>
 
-      {/* 見出し */}
-      <header>
-        <h1 className="text-2xl font-bold text-slate-900">
-          大切な方からの連携のご案内
-        </h1>
-        <p className="mt-1 text-sm text-slate-600">
-          {ownerDisplayName ?? '招待元の方'} さまから、もしものときに必要な情報の連携先としてあなたが指定されました。
-          連携の合言葉をご設定のうえ、連携の承認手続きを完了してください。
-        </p>
-      </header>
+        <div className="space-y-4">
+        {/* 見出し */}
+        <section className="bg-white rounded-2xl border border-gray-100 p-5">
+          <p className="text-base font-semibold text-gray-900">
+            {ownerDisplayName ?? '招待元の方'} さまから連携のご案内が届いています
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-gray-600">
+            もしものときに、必要な情報の連携先として指定されました。
+            下のフォームで「連携の合言葉」をご設定のうえ、承認してください。
+          </p>
+        </section>
 
-      {/* 内容の説明 */}
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5 text-sm text-emerald-900">
-        <p className="flex items-start gap-2 font-semibold">
-          <ShieldCheck
-            className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-600"
-            aria-hidden="true"
-          />
-          今すぐ何かが見られるわけではありません
-        </p>
-        <p className="mt-2 leading-relaxed text-emerald-800/90">
-          ご本人がご存命の間は、{ownerDisplayName ?? '招待元の方'} さまの情報があなたに共有されることはありません。
-          ご本人が亡くなった事実が確認された後、はじめて開示されます。
-          （ご本人が「生前から共有」を ON にした場合のみ、生前から閲覧可能になります）
-        </p>
+        {/* 安心の案内（簡潔に） */}
+        <section className="bg-white rounded-2xl border border-gray-100 p-5">
+          <p className="flex items-start gap-2 text-sm font-medium text-gray-900">
+            <ShieldCheck
+              className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-600"
+              aria-hidden="true"
+            />
+            今すぐ情報が見られるわけではありません
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-gray-600">
+            ご本人がご存命の間は、情報があなたに共有されることはありません。
+            ご本人が亡くなった事実が確認された後、はじめて開示されます。
+          </p>
+        </section>
+
+        {/* 承認フォーム */}
+        <InvitationAcceptForm
+          token={token}
+          recipientEmail={invitation.recipient_email}
+          recipientName={invitation.recipient_name}
+          ownerDisplayName={ownerDisplayName}
+          expiresAt={invitation.expires_at}
+        />
+
+        {/* 戻るリンク（下部） */}
+        <div className="pt-4 text-center">
+          <Link
+            href="/digital"
+            className="inline-flex items-center gap-1 text-sm text-emerald-600 active:opacity-70"
+          >
+            ← ダッシュボードに戻る
+          </Link>
+        </div>
+        </div>
       </div>
-
-      {/* 承認フォーム */}
-      <InvitationAcceptForm
-        token={token}
-        recipientEmail={invitation.recipient_email}
-        recipientName={invitation.recipient_name}
-        ownerDisplayName={ownerDisplayName}
-        expiresAt={invitation.expires_at}
-      />
     </div>
   );
 }

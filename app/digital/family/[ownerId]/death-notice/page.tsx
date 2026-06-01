@@ -12,7 +12,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { ChevronRight, AlertTriangle, Clock } from 'lucide-react';
+import { AlertTriangle, Clock } from 'lucide-react';
 import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { getDisplayNameById } from '@/lib/digital/profile';
@@ -79,18 +79,6 @@ export default async function DeathNoticePage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      {/* パンくず */}
-      <nav
-        aria-label="パンくず"
-        className="flex items-center gap-1 text-xs text-slate-500"
-      >
-        <Link href="/digital" className="hover:text-emerald-700 hover:underline">
-          ダッシュボード
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <span className="text-slate-700">逝去のご報告</span>
-      </nav>
-
       {/* 見出し */}
       <header>
         <h1 className="text-2xl font-bold text-slate-900">

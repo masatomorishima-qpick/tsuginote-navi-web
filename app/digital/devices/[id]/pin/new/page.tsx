@@ -9,7 +9,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { ChevronRight, KeyRound, Crown, ArrowRight } from 'lucide-react';
+import { KeyRound, Crown, ArrowRight } from 'lucide-react';
 import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 import { getDeviceById, deviceHasPin } from '@/lib/digital/devices';
 import { getOwnSubscription, effectivePlan } from '@/lib/digital/subscriptions';
@@ -56,32 +56,6 @@ export default async function NewPinPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-2xl">
-      {/* パンくず */}
-      <nav
-        aria-label="パンくず"
-        className="mb-4 flex items-center gap-1 text-xs text-slate-500"
-      >
-        <Link href="/digital" className="hover:text-emerald-700 hover:underline">
-          ダッシュボード
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <Link
-          href="/digital/devices"
-          className="hover:text-emerald-700 hover:underline"
-        >
-          パスワード保管
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <Link
-          href={`/digital/devices/${device.id}`}
-          className="truncate hover:text-emerald-700 hover:underline"
-        >
-          {device.device_name}
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <span className="text-slate-700">パスワードを登録</span>
-      </nav>
-
       <header className="mb-6">
         <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
           <KeyRound className="h-6 w-6 text-emerald-600" aria-hidden="true" />
@@ -97,7 +71,7 @@ export default async function NewPinPage({ params }: Props) {
           <PinRegisterForm deviceId={device.id} deviceName={device.device_name} />
         </section>
       ) : (
-        // FREE プラン用：STANDARD アップグレード案内
+        // FREEプラン用：STANDARD アップグレード案内
         <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 sm:p-6">
           <div className="flex items-start gap-3">
             <Crown
@@ -106,10 +80,10 @@ export default async function NewPinPage({ params }: Props) {
             />
             <div className="flex-1">
               <h2 className="text-lg font-bold text-emerald-900">
-                スマホ・PC のパスワード保管は STANDARD プラン限定の機能です
+                スマホ・PC のパスワード保管は STANDARDプラン限定の機能です
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-emerald-900/90">
-                ロック解除パスワードを暗号化して安全に保管する機能は、STANDARD プランでご利用いただけます。
+                ロック解除パスワードを暗号化して安全に保管する機能は、STANDARDプランでご利用いただけます。
                 30 日間の無料トライアルを使い切った方も、アップグレードでいつでも再開できます。
               </p>
               <ul className="mt-4 space-y-1 text-sm text-emerald-900/90">
@@ -120,10 +94,10 @@ export default async function NewPinPage({ params }: Props) {
 
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/digital/settings/upgrade"
+                  href="/digital/settings/plan"
                   className="inline-flex items-center justify-center gap-1.5 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
                 >
-                  STANDARD にアップグレード
+                  STANDARDプランにアップグレード
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
                 <Link

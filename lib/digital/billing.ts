@@ -38,6 +38,10 @@ type StripeSubscription = {
   current_period_start?: number | null;
   current_period_end?: number | null;
   cancel_at_period_end: boolean;
+  // Stripe 側の trial 期間。trial_period_days で作成された場合などにセットされる。
+  // unix epoch (秒)。trial が無ければ null。
+  trial_start?: number | null;
+  trial_end?: number | null;
   items: {
     data: Array<{
       current_period_start?: number | null;
@@ -152,8 +156,20 @@ async function applySubscription(
   const startIso = safeIsoFromUnix(periodStart);
   const endIso = safeIsoFromUnix(periodEnd);
 
-  // Stripe items[0].quantity を取り出す（無ければ 1 を仮定）
+  // quantity は active_links 数を真実として扱う。
+  //   Stripe 側の subscription item quantity は最低 1 という制約があるため、
+  //   連携 0 名で cancel_at_period_end=true にしても Stripe quantity は 1 のまま残る。
+  //   その値で DB を上書きしてしまうと、UI で「連携中：0 名」を表示できなくなる。
+  //   そのため、family_links の active 件数を直接参照して DB.quantity を決定する。
+  const { count: activeLinksCount, error: linksErr } = await admin
+    .from('digital_family_links')
+    .select('id', { count: 'exact', head: true })
+    .eq('owner_user_id', userId)
+    .eq('status', 'active');
   const stripeQuantity = sub.items.data[0]?.quantity ?? 1;
+  // family_links のクエリ失敗時のみ Stripe quantity にフォールバック
+  const resolvedQuantity =
+    linksErr || activeLinksCount === null ? stripeQuantity : activeLinksCount;
 
   // 必須項目（Stripe 側の状態を確実に反映したいフィールド）は常に書く。
   // 日付項目は変換に成功した場合のみ書く（null/undefined や invalid を弾く）。
@@ -163,11 +179,19 @@ async function applySubscription(
     stripe_subscription_id: sub.id,
     billing_cycle: billingCycle,
     cancel_at_period_end: sub.cancel_at_period_end,
-    quantity: stripeQuantity,           // ← Stripe quantity を DB に同期
+    quantity: resolvedQuantity,         // ← active_links 数を優先（cancel_at_period_end 中の整合性確保）
     updated_at: new Date().toISOString(),
   };
   if (startIso) update.current_period_start = startIso;
   if (endIso) update.current_period_end = endIso;
+
+  // trial 期間：Stripe 側が trial_end を持つ場合は DB の trial_expires_at に同期。
+  // これにより Checkout 完了時 (trial_period_days で開始) や Customer Portal で
+  // trial 変更された場合に、UI 表示も Stripe 側の正しい終了日に揃う。
+  const trialEndIso = safeIsoFromUnix(sub.trial_end ?? null);
+  if (trialEndIso) {
+    update.trial_expires_at = trialEndIso;
+  }
 
   const { error } = await admin
     .from('digital_subscriptions')
@@ -188,6 +212,31 @@ async function applySubscriptionDeleted(
   userId: string,
   sub: StripeSubscription
 ): Promise<void> {
+  // DB に記録されている stripe_subscription_id を取得
+  const { data: row } = await admin
+    .from('digital_subscriptions')
+    .select('stripe_subscription_id')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  // 孤児サブスク（重複作成等）の cancel イベントが届いた場合、
+  // DB に登録されている「現役」サブスクとは別物なので無視する。
+  // 無視しないと、現役サブスクの記録が誤って消去されてしまう。
+  if (
+    row?.stripe_subscription_id &&
+    row.stripe_subscription_id !== sub.id
+  ) {
+    console.warn(
+      '[applySubscriptionDeleted] ignoring orphan subscription deletion',
+      {
+        userId,
+        db_sub_id: row.stripe_subscription_id,
+        deleted_sub_id: sub.id,
+      }
+    );
+    return;
+  }
+
   const { error } = await admin
     .from('digital_subscriptions')
     .update({

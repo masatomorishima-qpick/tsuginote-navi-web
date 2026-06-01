@@ -3,8 +3,11 @@
 /**
  * ManageBillingButton
  *
- * 「お支払い情報の管理」ボタン。クリックで /api/digital/billing/portal を叩き、
- * Stripe Customer Portal の URL を取得して遷移する。
+ * Stripe 連携ボタン。状況に応じて 2 種類のエンドポイントを呼び分ける：
+ *   - endpoint='portal'   : Stripe Customer Portal（既存 Sub の管理：解約・カード変更）
+ *   - endpoint='checkout' : Stripe Checkout（新規 Sub 作成 + カード登録、trialing 中で Sub なしのケース）
+ *
+ * 既定は portal。trialing 中のカード登録初回フローでは checkout を指定する。
  */
 
 import { useState } from 'react';
@@ -14,11 +17,14 @@ type Props = {
   /** Stripe customer がまだ無いユーザーは disabled にしておく用 */
   disabled?: boolean;
   label?: string;
+  /** 呼び出すエンドポイント。既定は 'portal' */
+  endpoint?: 'portal' | 'checkout';
 };
 
 export default function ManageBillingButton({
   disabled = false,
   label = 'お支払い情報を管理する（解約・支払い方法）',
+  endpoint = 'portal',
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +35,11 @@ export default function ManageBillingButton({
     setLoading(true);
 
     try {
-      const res = await fetch('/api/digital/billing/portal', {
+      const apiPath =
+        endpoint === 'checkout'
+          ? '/api/digital/billing/checkout'
+          : '/api/digital/billing/portal';
+      const res = await fetch(apiPath, {
         method: 'POST',
       });
       const json = (await res.json()) as {
@@ -68,7 +78,11 @@ export default function ManageBillingButton({
         ) : (
           <CreditCard className="h-4 w-4" aria-hidden="true" />
         )}
-        {loading ? 'カスタマーポータルを準備中…' : label}
+        {loading
+          ? endpoint === 'checkout'
+            ? 'Stripe 決済画面を準備中…'
+            : 'カスタマーポータルを準備中…'
+          : label}
       </button>
       {error && (
         <div className="flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800">

@@ -9,7 +9,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { ChevronRight } from 'lucide-react';
 import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 import AccountDeleteForm from '@/components/digital/AccountDeleteForm';
 
@@ -54,39 +53,34 @@ export default async function AccountDeletePage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      {/* パンくず */}
-      <nav
-        aria-label="パンくず"
-        className="flex items-center gap-1 text-xs text-slate-500"
-      >
-        <Link
-          href="/digital"
-          className="hover:text-emerald-700 hover:underline"
-        >
-          ダッシュボード
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <Link
-          href="/digital/settings"
-          className="hover:text-emerald-700 hover:underline"
-        >
-          設定
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <span className="text-slate-700">アカウント削除</span>
-      </nav>
+    <div className="min-h-screen bg-[#F5F5F0]">
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-10">
+        {/* 大見出し（中央寄せ、十分な余白） */}
+        <header className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            アカウント削除（退会）
+          </h1>
+          <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+            つぎの手ナビ デジタル資産のアカウントを削除します。
+            登録されたデータ、共有リンク、リマインド設定はすべて削除されます。
+          </p>
+        </header>
 
-      {/* 見出し */}
-      <header>
-        <h1 className="text-2xl font-bold text-slate-900">アカウント削除（退会）</h1>
-        <p className="mt-1 text-sm text-slate-600">
-          つぎの手ナビ デジタル資産のアカウントを削除します。
-          登録されたデータ、共有リンク、リマインド設定はすべて削除されます。
-        </p>
-      </header>
+        <div className="space-y-6">
 
-      <AccountDeleteForm userEmail={user.email} />
+        <AccountDeleteForm userEmail={user.email} />
+
+        {/* 戻るリンク（下部） */}
+        <div className="pt-4 text-center">
+          <Link
+            href="/digital/settings"
+            className="inline-flex items-center gap-1 text-sm text-emerald-600 active:opacity-70"
+          >
+            ← 設定に戻る
+          </Link>
+        </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -53,7 +53,7 @@ export default function UpgradeButton({
         const msg =
           json.detail ??
           (json.error === 'already_subscribed'
-            ? '既に STANDARD プランをご利用中です。'
+            ? '既に STANDARDプランをご利用中です。'
             : '決済画面の準備に失敗しました。時間をおいて再度お試しください。');
         setError(msg);
         setLoading(false);

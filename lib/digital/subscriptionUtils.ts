@@ -22,6 +22,7 @@ import {
  * 判定ロジック:
  *   - plan='standard' かつ status='active' → STANDARD 利用可能
  *   - plan='standard' かつ status='trialing' かつ trial_expires_at が未来 → 利用可能
+ *   - plan='standard' かつ status='past_due' かつ current_period_end が未来 → 利用可能（猶予期間）
  *   - plan='standard' かつ status='canceled' かつ current_period_end が未来 → 利用可能
  *   - その他 → FREE 扱い
  */
@@ -40,6 +41,14 @@ export function isStandardActive(sub: DigitalSubscription | null): boolean {
     // 30 日無料トライアル中（trial_expires_at が未来であれば有効）
     if (!sub.trial_expires_at) return false;
     return new Date(sub.trial_expires_at).getTime() > now;
+  }
+
+  if (sub.status === 'past_due') {
+    // 支払い失敗の猶予期間。Stripe が再請求を試みている間（current_period_end まで）は
+    // 既存の STANDARD 機能を利用可能とし、ユーザーにカード再確認の機会を与える。
+    // 連携相手側にも急なサービス停止のショックを与えないための猶予。
+    if (!sub.current_period_end) return false;
+    return new Date(sub.current_period_end).getTime() > now;
   }
 
   if (sub.status === 'canceled') {

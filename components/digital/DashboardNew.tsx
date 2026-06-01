@@ -109,10 +109,10 @@ export default function DashboardNew({
           {!isStandard ? (
             <button
               type="button"
-              onClick={() => router.push('/digital/settings/upgrade')}
+              onClick={() => router.push('/digital/settings/plan')}
               className="mt-2 text-sm text-emerald-600 font-medium flex-shrink-0"
             >
-              STANDARD にアップグレード →
+              STANDARDプランにアップグレード →
             </button>
           ) : (
             <button
@@ -323,7 +323,7 @@ export default function DashboardNew({
         ) : (
           <div
             className="bg-emerald-50 rounded-2xl p-5 mb-3 border border-emerald-100 cursor-pointer active:opacity-70"
-            onClick={() => router.push('/digital/settings/upgrade')}
+            onClick={() => router.push('/digital/settings/plan')}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">

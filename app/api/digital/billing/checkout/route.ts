@@ -74,14 +74,22 @@ export async function POST(req: Request) {
     }
 
     // ② 既にサブスクがある場合は 409
+    //   - active / trialing / past_due いずれかで stripe_subscription_id があれば
+    //     Checkout を再実行すると Stripe 側で重複サブスクが作られてしまうため拒否。
+    //   - canceled / free / incomplete 等で sub_id が無ければ新規 Checkout を許可する。
     const sub = await getOwnSubscription(supabase, user.id);
-    if (sub && isStandardActive(sub) && sub.status === 'active') {
+    const hasLiveSubscription =
+      !!sub?.stripe_subscription_id &&
+      (sub.status === 'active' ||
+        sub.status === 'trialing' ||
+        sub.status === 'past_due');
+    if (hasLiveSubscription) {
       return NextResponse.json(
         {
           ok: false,
           error: 'already_subscribed',
           detail:
-            '既に STANDARD プランをご利用中です。プラン変更はカスタマーポータルから行ってください。',
+            '既にサブスクリプションをご登録いただいています。カードのご変更・解約は「お支払い情報を管理する」（カスタマーポータル）からお願いします。',
         },
         { status: 409 }
       );
@@ -114,7 +122,7 @@ export async function POST(req: Request) {
         customer: customerId,
         line_items: [{ price: priceId, quantity }],
         success_url: `${appUrl}/digital/settings/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${appUrl}/digital/settings/upgrade?canceled=1`,
+        cancel_url: `${appUrl}/digital/settings/plan?canceled=1`,
         allow_promotion_codes: false,
         subscription_data: {
           trial_period_days: PER_RECIPIENT_PRICING.trialDays,

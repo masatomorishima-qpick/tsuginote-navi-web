@@ -20,7 +20,6 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import {
   AlertTriangle,
-  ChevronRight,
   ShieldCheck,
   ExternalLink,
 } from 'lucide-react';
@@ -132,21 +131,6 @@ export default async function FamilyOwnerViewPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      {/* パンくず */}
-      <nav
-        aria-label="パンくず"
-        className="flex items-center gap-1 text-xs text-slate-500"
-      >
-        <Link href="/digital" className="hover:text-emerald-700 hover:underline">
-          ダッシュボード
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <span className="truncate text-slate-700">
-          {isDeathDisclosed ? '故 ' : ''}
-          {ownerDisplayName ?? '連携先の方'} さまの情報
-        </span>
-      </nav>
-
       {/* 見出し */}
       <header>
         <h1 className="text-2xl font-bold text-slate-900">

@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import {
   AlertTriangle,
-  ChevronRight,
   KeyRound,
   ShieldCheck,
   ShieldOff,
@@ -55,31 +54,12 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
 
   const hasPin = await deviceHasPin(supabase, user.id, id);
 
-  // STANDARD プランかどうか（PIN 保管機能を表示するか）
+  // STANDARDプランかどうか（PIN 保管機能を表示するか）
   const subscription = await getOwnSubscription(supabase, user.id);
   const canStorePin = PLAN_LIMITS[effectivePlan(subscription)].canStorePin;
 
   return (
     <div className="mx-auto max-w-2xl">
-      {/* パンくず */}
-      <nav
-        aria-label="パンくず"
-        className="mb-4 flex items-center gap-1 text-xs text-slate-500"
-      >
-        <Link href="/digital" className="hover:text-emerald-700 hover:underline">
-          ダッシュボード
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <Link
-          href="/digital/devices"
-          className="hover:text-emerald-700 hover:underline"
-        >
-          パスワード保管
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <span className="truncate text-slate-700">{device.device_name}</span>
-      </nav>
-
       <header className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
@@ -97,7 +77,7 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
               className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-white px-3 py-2 text-xs font-medium text-emerald-800 hover:bg-emerald-50"
             >
               <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-              PIN を表示・更新
+              パスワードを表示・更新
             </Link>
           ) : (
             <Link
@@ -105,7 +85,7 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
               className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-medium text-white hover:bg-emerald-700"
             >
               <KeyRound className="h-4 w-4" aria-hidden="true" />
-              PIN を登録する
+              パスワードを登録する
             </Link>
           )}
         </div>
@@ -125,7 +105,7 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
             <p className="mt-1 text-emerald-900/90">
               {canStorePin
                 ? '次に、このデバイスのロック解除パスワードを保管しましょう。下のボタンから登録できます。'
-                : 'デバイス情報の登録が完了しました。STANDARD プランにアップグレードすると、ロック解除パスワードの保管機能もご利用いただけます。'}
+                : 'デバイス情報の登録が完了しました。STANDARDプランにアップグレードすると、ロック解除パスワードの保管機能もご利用いただけます。'}
             </p>
           </div>
         </div>
@@ -160,7 +140,7 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
         </div>
       )}
 
-      {/* PIN 未登録 & FREE プラン：アップグレード誘導 */}
+      {/* PIN 未登録 & FREEプラン：アップグレード誘導 */}
       {!hasPin && !canStorePin && (
         <div className="mb-4 flex items-start gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
           <ShieldOff
@@ -168,9 +148,9 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
             aria-hidden="true"
           />
           <p>
-            ロック解除パスワードの保管は STANDARD プラン限定の機能です。
+            ロック解除パスワードの保管は STANDARDプラン限定の機能です。
             <Link
-              href="/digital/settings/upgrade"
+              href="/digital/settings/plan"
               className="ml-1 font-semibold text-emerald-700 hover:underline"
             >
               アップグレード

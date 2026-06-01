@@ -11,7 +11,7 @@
  *   - アップグレード / 解約 / プラン変更 ボタン
  *
  * Stripe 連携：段階 6 で実装済み。
- *   - アップグレード → /digital/settings/upgrade（UpgradeButton で Checkout）
+ *   - アップグレード → /digital/settings/plan（UpgradeButton で Checkout）
  *   - お支払い情報の管理 → ManageBillingButton で Customer Portal を開く
  */
 
@@ -109,8 +109,8 @@ export default function PlanCard({ subscription }: Props) {
               </p>
               <p className="mt-1 leading-relaxed text-amber-800/90">
                 {daysLeft > 0
-                  ? `${formatDate(subscription?.trial_expires_at)}まで STANDARD のすべての機能をご利用いただけます。継続するにはクレジットカード登録をお願いします。`
-                  : '現在は STANDARD 機能が一時停止しています。クレジットカード登録で利用を再開できます。'}
+                  ? `${formatDate(subscription?.trial_expires_at)}までSTANDARDプランのすべての機能をご利用いただけます。継続するにはクレジットカード登録をお願いします。`
+                  : '現在はSTANDARDプランの機能が一時停止しています。クレジットカード登録で利用を再開できます。'}
               </p>
             </div>
           </div>
@@ -132,7 +132,7 @@ export default function PlanCard({ subscription }: Props) {
               <div className="flex-1 text-sm">
                 <p className="font-semibold text-amber-900">解約予定</p>
                 <p className="mt-1 leading-relaxed text-amber-800/90">
-                  {formatDate(subscription.current_period_end)}まで STANDARD 機能をご利用いただけます。それ以降は FREE プランへ自動的に切り替わります。
+                  {formatDate(subscription.current_period_end)}までSTANDARDプランの機能をご利用いただけます。それ以降はFREEプランへ自動的に切り替わります。
                 </p>
                 <p className="mt-1 text-xs text-amber-800/80">
                   解約を取りやめたい場合は「お支払い情報を管理する」からお手続きいただけます。
@@ -170,7 +170,7 @@ export default function PlanCard({ subscription }: Props) {
         <div className="rounded-xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-700">
           {isStandard ? (
             <>
-              <p className="font-semibold text-slate-900">STANDARD でご利用中の機能</p>
+              <p className="font-semibold text-slate-900">STANDARDプランでご利用中の機能</p>
               <ul className="mt-2 list-inside list-disc space-y-0.5">
                 <li>デジタル資産・サービスの登録（無制限）</li>
                 <li>スマホ・PC のパスワード保管</li>
@@ -180,12 +180,12 @@ export default function PlanCard({ subscription }: Props) {
             </>
           ) : (
             <>
-              <p className="font-semibold text-slate-900">FREE プランの内容</p>
+              <p className="font-semibold text-slate-900">FREEプランの内容</p>
               <ul className="mt-2 list-inside list-disc space-y-0.5">
                 <li>デジタル資産・サービスの登録（無制限）</li>
-                <li>大切な方に共有（PDF・期限付き URL）/ リマインダー / 操作履歴</li>
+                <li>大切な方に共有（PDF 出力）/ リマインダー / 操作履歴</li>
                 <li className="text-slate-400">
-                  スマホ・PC のパスワード保管は STANDARD のみ
+                  スマホ・PC のパスワード保管はSTANDARDプランのみ
                 </li>
               </ul>
             </>
@@ -202,10 +202,10 @@ export default function PlanCard({ subscription }: Props) {
             <>
               <div>
                 <p className="text-sm font-semibold text-slate-900">
-                  STANDARD にアップグレード
+                  STANDARDプランにアップグレード
                 </p>
                 <p className="mt-1 text-xs leading-relaxed text-slate-600">
-                  大切な方を 1 名招待すると、自動的に STANDARD プランが開始されます。
+                  大切な方を 1 名招待すると、自動的に STANDARDプランが開始されます。
                   料金は <b>連携 1 名あたり {PER_RECIPIENT_PRICING.label}（税込）</b>。
                   最初の招待から <b>30 日間は無料</b>です。
                 </p>

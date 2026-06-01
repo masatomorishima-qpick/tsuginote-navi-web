@@ -18,15 +18,13 @@
  *              包装済みの秘密鍵だけが送信される。
  */
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import {
   AlertCircle,
   CheckCircle2,
   KeyRound,
   Loader2,
-  Lock,
   ShieldCheck,
 } from 'lucide-react';
 import { generateRecipientKeypair } from '@/lib/crypto/envelope';
@@ -48,9 +46,6 @@ export default function InvitationAcceptForm({
   ownerDisplayName,
   expiresAt,
 }: Props) {
-  const router = useRouter();
-  const [, startTransition] = useTransition();
-
   const [passphrase, setPassphrase] = useState('');
   const [passphraseConfirm, setPassphraseConfirm] = useState('');
   const [agreed, setAgreed] = useState(false);
@@ -59,7 +54,6 @@ export default function InvitationAcceptForm({
     'idle' | 'generating_keys' | 'submitting' | 'done'
   >('idle');
   const [error, setError] = useState<string | null>(null);
-  const [needsCheckoutUrl, setNeedsCheckoutUrl] = useState<string | null>(null);
 
   const ownerLabel = ownerDisplayName ?? '招待元の方';
   const expires = new Intl.DateTimeFormat('ja-JP', {
@@ -139,13 +133,13 @@ export default function InvitationAcceptForm({
         return;
       }
 
-      // ③ 成功
-      // billing.status === 'need_checkout' の場合、オーナーがまだ未課金。connection は確立。
-      if (json.billing?.status === 'need_checkout' && json.billing.checkout_url) {
-        setNeedsCheckoutUrl(json.billing.checkout_url);
-      }
+      // ③ 成功（オーナー側のカード未登録の場合でも、連携自体は確立しているため
+      //         連携者にはその情報を表示しない。オーナーが自身のダッシュボードで対応する）
       setStep('done');
-      startTransition(() => router.refresh());
+      // 注：router.refresh() は呼ばない。
+      //   ページ側でステータス再判定が走ると「accepted」分岐に入り、
+      //   このフォームの「連携を承認しました」画面が「すでに承認されています」エラーで
+      //   上書きされてしまうため。ユーザーは下部の「ダッシュボードへ」ボタンで遷移する。
     } catch (err) {
       const detail = err instanceof Error ? err.message : 'unexpected_error';
       console.error('[InvitationAcceptForm] failed', detail);
@@ -171,18 +165,6 @@ export default function InvitationAcceptForm({
             大切な方への情報開示が行われます。
           </p>
 
-          {needsCheckoutUrl && (
-            <div className="mt-4 w-full rounded-lg border border-amber-200 bg-amber-50 p-3 text-left text-xs text-amber-900">
-              <p className="font-semibold">
-                {ownerLabel} さまのカード登録待ち
-              </p>
-              <p className="mt-1 leading-relaxed">
-                連携を完全に有効にするには、{ownerLabel} さまにクレジットカードのご登録をお願いする必要があります。
-                招待元の方にこの旨をお伝えください。
-              </p>
-            </div>
-          )}
-
           <Link
             href="/digital"
             className="mt-6 inline-flex items-center justify-center gap-1.5 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
@@ -197,39 +179,41 @@ export default function InvitationAcceptForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"
+      className="space-y-5 rounded-2xl border border-gray-100 bg-white p-5 sm:p-6"
     >
       {/* 招待内容のサマリー */}
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-        <p className="font-semibold">
+      <div className="rounded-xl bg-emerald-50 p-4 text-sm">
+        <p className="font-semibold text-gray-900">
           {ownerLabel} さまからの招待
         </p>
-        <ul className="mt-2 space-y-1 text-xs text-emerald-800/90">
-          <li>
-            あなたの呼称：<b className="text-emerald-900">{recipientName}</b>
-          </li>
-          <li>
-            あなたのメール：<b className="text-emerald-900">{recipientEmail}</b>
-          </li>
-          <li>
-            この招待の有効期限：<b className="text-emerald-900">{expires}</b>
-          </li>
-        </ul>
+        <dl className="mt-2 space-y-1 text-xs text-gray-700">
+          <div className="flex gap-2">
+            <dt className="text-gray-500">あなたの呼称</dt>
+            <dd className="font-medium text-gray-900">{recipientName}</dd>
+          </div>
+          <div className="flex gap-2">
+            <dt className="text-gray-500">あなたのメール</dt>
+            <dd className="font-medium text-gray-900">{recipientEmail}</dd>
+          </div>
+          <div className="flex gap-2">
+            <dt className="text-gray-500">有効期限</dt>
+            <dd className="font-medium text-gray-900">{expires}</dd>
+          </div>
+        </dl>
       </div>
 
-      {/* 説明 */}
-      <div className="space-y-3 text-sm leading-relaxed text-slate-700">
-        <p>
+      {/* 説明（簡潔に） */}
+      <div className="text-sm leading-relaxed text-gray-700">
+        <p className="flex items-start gap-2">
           <ShieldCheck
-            className="mr-1 inline h-4 w-4 text-emerald-600"
+            className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600"
             aria-hidden="true"
           />
-          連携を承認するには、あなた専用の <b>連携の合言葉</b> を設定していただきます。
-        </p>
-        <p className="text-xs text-slate-500">
-          連携の合言葉は、ご本人が亡くなった事実が確認されたあと、{ownerLabel} さまの情報を見るときに使います。
-          この連携の合言葉は <b>当社のサーバーには一切送信されず、当社からも復元できません</b>。
-          忘れずに紙にメモするなど、安全な方法で保管してください。
+          <span>
+            あなた専用の <b>連携の合言葉</b> を設定してください。
+            この合言葉は当社のサーバーには送信されず、運営からも復元できません。
+            紙にメモするなど、安全な方法で保管してください。
+          </span>
         </p>
       </div>
 
@@ -294,11 +278,11 @@ export default function InvitationAcceptForm({
         </div>
       )}
 
-      <div className="flex flex-col gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end">
+      <div className="pt-2">
         <button
           type="submit"
           disabled={step !== 'idle'}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300"
         >
           {step === 'generating_keys' && (
             <>
@@ -315,24 +299,10 @@ export default function InvitationAcceptForm({
           {step === 'idle' && (
             <>
               <KeyRound className="h-4 w-4" aria-hidden="true" />
-              連携の合言葉を設定して連携を承認する
+              連携の合言葉を設定して承認する
             </>
           )}
         </button>
-      </div>
-
-      {/* セキュリティ補足 */}
-      <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
-        <p className="flex items-start gap-1.5">
-          <Lock
-            className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-slate-500"
-            aria-hidden="true"
-          />
-          <span>
-            暗号化の処理はすべてご自身のブラウザ内で完結します。
-            連携の合言葉そのものは当社のサーバーには送信されません。
-          </span>
-        </p>
       </div>
     </form>
   );

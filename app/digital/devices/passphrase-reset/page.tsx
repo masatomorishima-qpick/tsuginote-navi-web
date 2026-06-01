@@ -9,7 +9,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { ChevronRight } from 'lucide-react';
 import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 import { isStepupEnabled } from '@/lib/digital/stepup';
 import PinResetClient from '@/components/digital/PinResetClient';
@@ -34,25 +33,6 @@ export default async function PassphraseResetPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      {/* パンくず */}
-      <nav
-        aria-label="パンくず"
-        className="flex items-center gap-1 text-xs text-slate-500"
-      >
-        <Link href="/digital" className="hover:text-emerald-700 hover:underline">
-          ダッシュボード
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <Link
-          href="/digital/devices"
-          className="hover:text-emerald-700 hover:underline"
-        >
-          デバイス
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <span className="text-slate-700">マスターコードを忘れたとき</span>
-      </nav>
-
       {/* 見出し */}
       <header>
         <h1 className="text-2xl font-bold text-slate-900">

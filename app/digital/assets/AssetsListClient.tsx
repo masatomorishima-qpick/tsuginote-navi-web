@@ -25,29 +25,24 @@ export default function AssetsListClient({
 
   return (
     <div className="min-h-screen bg-[#F5F5F0]">
-      {/* ヘッダー */}
-      <header className="bg-white border-b border-gray-100">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => router.push('/digital')}
-            className="text-sm text-emerald-600 active:opacity-70 flex-shrink-0"
-          >
-            ← ダッシュボード
-          </button>
-          <h1 className="text-base font-medium text-gray-900">デジタル資産</h1>
-          <button
-            type="button"
-            onClick={() => router.push('/digital/assets/new')}
-            className="text-sm text-emerald-600 active:opacity-70 flex-shrink-0"
-          >
-            ＋ 追加
-          </button>
-        </div>
-      </header>
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-10">
+        {/* 大見出し（中央寄せ、十分な余白） */}
+        <header className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            デジタル資産
+          </h1>
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={() => router.push('/digital/assets/new')}
+              className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 active:bg-emerald-800"
+            >
+              ＋ サービスを追加
+            </button>
+          </div>
+        </header>
 
-      {/* 本体 */}
-      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+        <div className="space-y-4">
         {assets.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
             <p className="text-sm text-gray-500">まだ登録されていません</p>
@@ -95,6 +90,18 @@ export default function AssetsListClient({
               );
             })
         )}
+
+        {/* 戻るリンク（下部） */}
+        <div className="pt-4 text-center">
+          <button
+            type="button"
+            onClick={() => router.push('/digital')}
+            className="inline-flex items-center gap-1 text-sm text-emerald-600 active:opacity-70"
+          >
+            ← ダッシュボードに戻る
+          </button>
+        </div>
+        </div>
       </div>
     </div>
   );

@@ -17,7 +17,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import {
-  ChevronRight,
   KeyRound,
   ShieldCheck,
   Info,
@@ -64,32 +63,6 @@ export default async function PinManagePage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-2xl">
-      {/* パンくず */}
-      <nav
-        aria-label="パンくず"
-        className="mb-4 flex items-center gap-1 text-xs text-slate-500"
-      >
-        <Link href="/digital" className="hover:text-emerald-700 hover:underline">
-          ダッシュボード
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <Link
-          href="/digital/devices"
-          className="hover:text-emerald-700 hover:underline"
-        >
-          パスワード保管
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <Link
-          href={`/digital/devices/${device.id}`}
-          className="truncate hover:text-emerald-700 hover:underline"
-        >
-          {device.device_name}
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <span className="text-slate-700">パスワードを表示・管理</span>
-      </nav>
-
       <header className="mb-6">
         <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
           <KeyRound className="h-6 w-6 text-emerald-600" aria-hidden="true" />

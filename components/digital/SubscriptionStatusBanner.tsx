@@ -1,9 +1,16 @@
 /* ────────────────────────────────────────────────────────────────
- * サブスク状態警告バナー
- *   - 解約予定：琥珀
- *   - 支払い遅延（past_due）：赤
- *   - トライアル残り 5 日以内：青みのある情報帯
- *   - それ以外：表示しない（PlanBadge で十分）
+ * サブスク状態警告バナー（ダッシュボード /digital に表示）
+ *
+ * 2026-06 改訂：iPhone SE 等の狭幅でテキストが縦縞化しないよう、
+ *   レイアウトを縦積みベースにシンプル化。
+ *   - 解約予定（cancel_at_period_end / canceled）：amber
+ *   - 連携 0 名による自動解約予定：amber（再招待 CTA 付き）
+ *   - 支払い遅延（past_due）：rose（カード再確認 CTA）
+ *   - トライアル残り 5 日以内：emerald（アップグレード CTA）
+ *
+ * 「プラン管理」リンクはダッシュボード上部の PlanCard 側にあるため、
+ * このバナーでは「設定で詳細を見る」等の冗長なボタンは付けない。
+ * （アクション必須のものだけ専用 CTA を 1 つ配置）
  * ──────────────────────────────────────────────────────────────── */
 
 import Link from 'next/link';
@@ -21,32 +28,62 @@ export default function SubscriptionStatusBanner({
   const status = subscription.status;
   const cancelPending = subscription.cancel_at_period_end;
   const daysLeft = trialDaysLeft(subscription);
+  const quantity = subscription.quantity ?? 0;
 
-  // 解約予定（cancel_at_period_end=true、または status='canceled'）
+  // 連携 0 名による自動解約予定（cancel_at_period_end=true かつ quantity=0）
+  if (
+    cancelPending &&
+    quantity === 0 &&
+    subscription.current_period_end
+  ) {
+    return (
+      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <div className="flex items-start gap-2.5">
+          <AlertCircle
+            className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600"
+            aria-hidden="true"
+          />
+          <div className="flex-1 min-w-0 text-sm">
+            <p className="font-semibold text-amber-900">
+              {formatJpDate(subscription.current_period_end)} で解約予定
+            </p>
+            <p className="mt-0.5 text-xs leading-relaxed text-amber-800/80">
+              連携先がいないため、期間終了時に FREEプランに切り替わります。
+            </p>
+          </div>
+        </div>
+        <Link
+          href="/digital/share"
+          className="mt-3 inline-flex w-full items-center justify-center gap-1 rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
+        >
+          大切な方を招待する
+          <ArrowRight className="h-3 w-3" aria-hidden="true" />
+        </Link>
+      </div>
+    );
+  }
+
+  // 通常の解約予定（Portal で手動キャンセル、cancel_at_period_end=true で quantity>0）
   if (
     (cancelPending || status === 'canceled') &&
     subscription.current_period_end
   ) {
     return (
-      <div className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-        <AlertCircle
-          className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600"
-          aria-hidden="true"
-        />
-        <div className="flex-1">
-          <p className="font-semibold">解約予定</p>
-          <p className="mt-1 leading-relaxed text-amber-800/90">
-            {formatJpDate(subscription.current_period_end)}まで STANDARD 機能をご利用いただけます。
-            それ以降は FREE プランへ自動的に切り替わります。
-          </p>
+      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <div className="flex items-start gap-2.5">
+          <AlertCircle
+            className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600"
+            aria-hidden="true"
+          />
+          <div className="flex-1 min-w-0 text-sm">
+            <p className="font-semibold text-amber-900">
+              {formatJpDate(subscription.current_period_end)} で解約予定
+            </p>
+            <p className="mt-0.5 text-xs leading-relaxed text-amber-800/80">
+              期間終了後、FREEプランに切り替わります。
+            </p>
+          </div>
         </div>
-        <Link
-          href="/digital/settings"
-          className="inline-flex flex-shrink-0 items-center gap-1 self-center rounded-full border border-amber-400 bg-white px-3 py-1.5 text-xs font-semibold text-amber-800 hover:bg-amber-100"
-        >
-          設定で詳細を見る
-          <ArrowRight className="h-3 w-3" aria-hidden="true" />
-        </Link>
       </div>
     );
   }
@@ -54,23 +91,26 @@ export default function SubscriptionStatusBanner({
   // 支払い遅延
   if (status === 'past_due') {
     return (
-      <div className="flex items-start gap-3 rounded-xl border border-rose-300 bg-rose-50 p-4 text-sm text-rose-900">
-        <AlertTriangle
-          className="mt-0.5 h-5 w-5 flex-shrink-0 text-rose-600"
-          aria-hidden="true"
-        />
-        <div className="flex-1">
-          <p className="font-semibold">お支払いの確認ができておりません</p>
-          <p className="mt-1 leading-relaxed text-rose-800/90">
-            クレジットカードの請求が完了できなかったため、STANDARD 機能の利用が一時的に制限される可能性があります。
-            お支払い情報のご確認をお願いいたします。
-          </p>
+      <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
+        <div className="flex items-start gap-2.5">
+          <AlertTriangle
+            className="mt-0.5 h-4 w-4 flex-shrink-0 text-rose-600"
+            aria-hidden="true"
+          />
+          <div className="flex-1 min-w-0 text-sm">
+            <p className="font-semibold text-rose-900">
+              お支払い確認中
+            </p>
+            <p className="mt-0.5 text-xs leading-relaxed text-rose-800/80">
+              クレジットカードのご確認をお願いします。
+            </p>
+          </div>
         </div>
         <Link
-          href="/digital/settings"
-          className="inline-flex flex-shrink-0 items-center gap-1 self-center rounded-full bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-700"
+          href="/digital/settings/plan"
+          className="mt-3 inline-flex w-full items-center justify-center gap-1 rounded-full bg-rose-600 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-700"
         >
-          設定で確認
+          お支払い情報を確認する
           <ArrowRight className="h-3 w-3" aria-hidden="true" />
         </Link>
       </div>
@@ -80,26 +120,30 @@ export default function SubscriptionStatusBanner({
   // トライアル残り 5 日以下（5 日切ってから注意喚起）
   if (status === 'trialing' && daysLeft !== null && daysLeft <= 5) {
     return (
-      <div className="flex items-start gap-3 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900">
-        <Sparkles
-          className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-600"
-          aria-hidden="true"
-        />
-        <div className="flex-1">
-          <p className="font-semibold">
-            無料トライアル{daysLeft > 0 ? `残り ${daysLeft} 日` : 'が終了しました'}
-          </p>
-          <p className="mt-1 leading-relaxed text-emerald-800/90">
-            {daysLeft > 0
-              ? '継続してご利用いただくには、STANDARD プランへのアップグレード手続きをお願いいたします。'
-              : '現在は STANDARD 機能が一時停止しています。アップグレードで利用を再開できます。'}
-          </p>
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+        <div className="flex items-start gap-2.5">
+          <Sparkles
+            className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600"
+            aria-hidden="true"
+          />
+          <div className="flex-1 min-w-0 text-sm">
+            <p className="font-semibold text-emerald-900">
+              {daysLeft > 0
+                ? `無料期間 残り ${daysLeft} 日`
+                : '無料期間が終了しました'}
+            </p>
+            <p className="mt-0.5 text-xs leading-relaxed text-emerald-800/80">
+              {daysLeft > 0
+                ? 'クレジットカードのご登録をお願いします。'
+                : '継続してご利用いただくにはアップグレードが必要です。'}
+            </p>
+          </div>
         </div>
         <Link
-          href="/digital/settings/upgrade"
-          className="inline-flex flex-shrink-0 items-center gap-1 self-center rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700"
+          href="/digital/settings/plan"
+          className="mt-3 inline-flex w-full items-center justify-center gap-1 rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
         >
-          アップグレード
+          クレジットカードを登録する
           <ArrowRight className="h-3 w-3" aria-hidden="true" />
         </Link>
       </div>

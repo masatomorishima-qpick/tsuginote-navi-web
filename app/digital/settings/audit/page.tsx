@@ -22,13 +22,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import {
-  ChevronRight,
-  ScrollText,
-  Filter,
-  ArrowLeft,
-  Info,
-} from 'lucide-react';
+import { Filter, Info } from 'lucide-react';
 import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 import { listOwnAuditLogs } from '@/lib/digital/auditQueries';
 import {
@@ -90,41 +84,21 @@ export default async function AuditLogsPage({ searchParams }: Props) {
   const safePage = Math.min(page, totalPages);
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      {/* パンくず */}
-      <nav
-        aria-label="パンくず"
-        className="flex items-center gap-1 text-xs text-slate-500"
-      >
-        <Link href="/digital" className="hover:text-emerald-700 hover:underline">
-          ダッシュボード
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <Link
-          href="/digital/settings"
-          className="hover:text-emerald-700 hover:underline"
-        >
-          設定
-        </Link>
-        <ChevronRight className="h-3 w-3" aria-hidden="true" />
-        <span className="text-slate-700">操作履歴</span>
-      </nav>
+    <div className="min-h-screen bg-[#F5F5F0]">
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-10">
+        {/* 大見出し（中央寄せ、十分な余白） */}
+        <header className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            操作履歴
+          </h1>
+        </header>
 
-      <header>
-        <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
-          <ScrollText
-            className="h-6 w-6 text-emerald-600"
-            aria-hidden="true"
-          />
-          操作履歴（監査ログ）
-        </h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <div className="space-y-4">
+        {/* 説明 */}
+        <p className="px-1 text-xs text-gray-500 leading-relaxed">
           ご自身のアカウントで行われた操作を新しい順に表示します。
-          ログは{' '}
-          <span className="font-medium text-slate-700">過去 90 日分</span>
-          を自動保持し、それ以降は削除されます。
+          ログは過去 90 日分を自動保持し、それ以降は削除されます。
         </p>
-      </header>
 
       {/* 説明 */}
       <div className="flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900">
@@ -216,14 +190,16 @@ export default async function AuditLogsPage({ searchParams }: Props) {
         )}
       </section>
 
-      <div className="text-right">
-        <Link
-          href="/digital/settings"
-          className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-emerald-700 hover:underline"
-        >
-          <ArrowLeft className="h-3 w-3" aria-hidden="true" />
-          設定に戻る
-        </Link>
+        {/* 戻るリンク（下部） */}
+        <div className="pt-4 text-center">
+          <Link
+            href="/digital/settings"
+            className="inline-flex items-center gap-1 text-sm text-emerald-600 active:opacity-70"
+          >
+            ← 設定に戻る
+          </Link>
+        </div>
+        </div>
       </div>
     </div>
   );

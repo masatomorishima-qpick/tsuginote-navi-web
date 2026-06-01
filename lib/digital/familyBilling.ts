@@ -39,6 +39,8 @@ export type FamilySubscriptionSyncResult =
   | { ok: true; status: 'no_op'; currentQuantity: number; targetQuantity: number }
   | { ok: true; status: 'updated'; currentQuantity: number; targetQuantity: number }
   | { ok: true; status: 'canceled'; previousQuantity: number }
+  // 連携 0 名で「期間終了で解約予定」をセット（Portal 解約と同等）
+  | { ok: true; status: 'scheduled_cancellation'; previousQuantity: number }
   | { ok: false; status: 'need_checkout'; checkoutUrl: string; targetQuantity: number }
   | { ok: false; status: 'error'; detail: string };
 
@@ -73,6 +75,7 @@ function getAppUrl(): string {
 type StripeSubscriptionLite = {
   id: string;
   status: string;
+  cancel_at_period_end?: boolean;
   items: { data: Array<{ id: string; quantity?: number }> };
 };
 
@@ -101,8 +104,39 @@ async function updateSubscriptionQuantity(
   });
 }
 
+/**
+ * 期間終了で解約予定にする（cancel_at_period_end=true）。
+ * Portal 解約と同じ挙動。連携 0 名になった瞬間の自動解約で使用。
+ * 期間中（current_period_end まで）はサービス利用可能、期間終了時に Webhook 経由で FREE 降格。
+ */
+async function scheduleSubscriptionCancellation(
+  subscriptionId: string
+): Promise<void> {
+  await stripeRequest({
+    method: 'POST',
+    path: `/v1/subscriptions/${subscriptionId}`,
+    body: {
+      cancel_at_period_end: true,
+    },
+  });
+}
+
+/**
+ * 解約予定を取り消す（cancel_at_period_end=false）。
+ * 自動解約予定中に連携先が再追加された場合に使用。
+ */
+async function resumeSubscription(subscriptionId: string): Promise<void> {
+  await stripeRequest({
+    method: 'POST',
+    path: `/v1/subscriptions/${subscriptionId}`,
+    body: {
+      cancel_at_period_end: false,
+    },
+  });
+}
+
 async function cancelSubscriptionNow(subscriptionId: string): Promise<void> {
-  // 即時キャンセル（連携者数 0 になった瞬間。期間終了待ちはしない）
+  // 即時キャンセル（現状未使用。将来的に「いますぐ完全に止めたい」ボタン用に残置）
   await stripeRequest({
     method: 'DELETE',
     path: `/v1/subscriptions/${subscriptionId}`,
@@ -190,7 +224,17 @@ export async function syncSubscriptionQuantity(
     if (targetQuantity === 0) {
       // 連携者ゼロ
       if (!hasActiveSubscription) {
-        // サブスクも無し → 何もしない
+        // サブスクも無し → UI 整合性のため DB quantity を 0 に揃えて終わり。
+        // （trialing 中に連携者を全解除したケース。Stripe 側には何もしない）
+        if (currentQuantity !== 0) {
+          await admin
+            .from('digital_subscriptions')
+            .update({
+              quantity: 0,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('user_id', ownerUserId);
+        }
         return {
           ok: true,
           status: 'no_op',
@@ -198,27 +242,36 @@ export async function syncSubscriptionQuantity(
           targetQuantity,
         };
       }
-      // サブスク有り → 即時キャンセル
+      // サブスク有り → 期間終了で解約予定にする（Portal 解約と挙動を統一）
+      //   即時キャンセルではなく cancel_at_period_end=true。
+      //   理由：ユーザーは既に当該期間分の料金を支払っており、
+      //         期間終了まで利用可能なのが Portal 解約と整合する。
+      //         連携先を再追加すれば、syncSubscriptionQuantity が呼ばれて
+      //         自動的に解約予定を取り消す（下の resumeSubscription 呼び出し）。
       try {
-        await cancelSubscriptionNow(subscriptionId!);
-        // DB 側は Webhook（customer.subscription.deleted）で更新されるが、
+        await scheduleSubscriptionCancellation(subscriptionId!);
+        // DB 側は Webhook（customer.subscription.updated）で更新されるが、
         // 念のためここでも反映しておく（race condition 対策）
         await admin
           .from('digital_subscriptions')
           .update({
             quantity: 0,
+            cancel_at_period_end: true,
             updated_at: new Date().toISOString(),
           })
           .eq('user_id', ownerUserId);
 
         return {
           ok: true,
-          status: 'canceled',
+          status: 'scheduled_cancellation',
           previousQuantity: currentQuantity,
         };
       } catch (err) {
-        const detail = err instanceof Error ? err.message : 'cancel_failed';
-        console.error('[syncSubscriptionQuantity] cancel failed', detail);
+        const detail = err instanceof Error ? err.message : 'schedule_cancel_failed';
+        console.error(
+          '[syncSubscriptionQuantity] schedule cancellation failed',
+          detail
+        );
         return { ok: false, status: 'error', detail };
       }
     }
@@ -273,6 +326,31 @@ export async function syncSubscriptionQuantity(
     } catch (err) {
       const detail = err instanceof Error ? err.message : 'subscription_fetch_failed';
       return { ok: false, status: 'error', detail };
+    }
+
+    // 解約予定（cancel_at_period_end=true）の状態で連携先が再追加された場合、
+    // 自動的に解約予定を取り消す。
+    //   これは「連携 0 名 → 自動解約予定」シナリオで、ユーザーが再度連携を
+    //   追加したケースを想定。ユーザー視点では「再開」が自然な挙動。
+    //   ※ Portal 解約と区別はしていないが、Portal でわざわざ解約予定にした
+    //     ユーザーが追加で連携を増やすのは稀なシナリオ。万一そうなった場合も
+    //     ユーザーは Portal で再度キャンセルすれば良い。
+    if (stripeSub.cancel_at_period_end === true) {
+      try {
+        await resumeSubscription(subscriptionId!);
+        await admin
+          .from('digital_subscriptions')
+          .update({
+            cancel_at_period_end: false,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('user_id', ownerUserId);
+        // この後の updateSubscriptionQuantity に進む
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : 'resume_failed';
+        console.error('[syncSubscriptionQuantity] resume failed', detail);
+        return { ok: false, status: 'error', detail };
+      }
     }
 
     const itemId = stripeSub.items?.data?.[0]?.id;

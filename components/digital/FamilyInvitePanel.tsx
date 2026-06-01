@@ -36,6 +36,21 @@ import type {
   DigitalFamilyInvitation,
   DigitalFamilyLink,
 } from '@/lib/digital/family';
+import ConfirmDialog from './ConfirmDialog';
+
+/**
+ * 確認ダイアログの状態（discriminated union）。
+ * 同時に複数のダイアログは開かない前提で 1 つの state に集約。
+ */
+type DialogState =
+  | { type: 'none' }
+  | { type: 'revoke_invitation'; invitation: DigitalFamilyInvitation }
+  | {
+      type: 'revoke_link';
+      linkId: string;
+      recipientName: string | null;
+      isLast: boolean;
+    };
 
 type Props = {
   initialLinks: DigitalFamilyLink[];
@@ -88,6 +103,9 @@ export default function FamilyInvitePanel({
   const pendingInvitations = invitations.filter(
     (i) => getInvitationStatus(i) === 'pending'
   );
+
+  // 確認ダイアログの状態（招待取消 / 連携解除）
+  const [dialog, setDialog] = useState<DialogState>({ type: 'none' });
 
   // フォームの開閉
   const [showForm, setShowForm] = useState(false);
@@ -180,29 +198,29 @@ export default function FamilyInvitePanel({
     }
   }
 
-  async function handleRevokeInvitation(invitation: DigitalFamilyInvitation) {
-    if (!confirm('この招待を取り消してもよろしいですか？')) return;
-    try {
-      const res = await fetch(
-        `/api/digital/family/invitations/${encodeURIComponent(invitation.token)}`,
-        { method: 'DELETE' }
-      );
-      const json = (await res.json()) as { ok: boolean; detail?: string };
-      if (!res.ok || !json.ok) {
-        alert(json.detail ?? '招待の取り消しに失敗しました。');
-        return;
-      }
-      setInvitations((prev) =>
-        prev.map((i) =>
-          i.id === invitation.id
-            ? { ...i, revoked_at: new Date().toISOString() }
-            : i
-        )
-      );
-    } catch (err) {
-      console.error('[FamilyInvitePanel] revoke invitation failed', err);
-      alert('ネットワークエラーが発生しました。');
+  /** 招待取消の確認ダイアログを開く */
+  function handleRevokeInvitation(invitation: DigitalFamilyInvitation) {
+    setDialog({ type: 'revoke_invitation', invitation });
+  }
+
+  /** 招待取消の実行（ダイアログから呼ばれる） */
+  async function executeRevokeInvitation(invitation: DigitalFamilyInvitation) {
+    const res = await fetch(
+      `/api/digital/family/invitations/${encodeURIComponent(invitation.token)}`,
+      { method: 'DELETE' }
+    );
+    const json = (await res.json()) as { ok: boolean; detail?: string };
+    if (!res.ok || !json.ok) {
+      throw new Error(json.detail ?? '招待の取り消しに失敗しました。');
     }
+    setInvitations((prev) =>
+      prev.map((i) =>
+        i.id === invitation.id
+          ? { ...i, revoked_at: new Date().toISOString() }
+          : i
+      )
+    );
+    setDialog({ type: 'none' });
   }
 
   async function handleResendInvitation(invitation: DigitalFamilyInvitation) {
@@ -264,35 +282,30 @@ export default function FamilyInvitePanel({
     }
   }
 
-  async function handleRevokeLink(linkId: string, recipientName: string | null) {
-    const label = recipientName ? `「${recipientName}」` : 'この方';
-    const lastOne = activeLinks.length === 1;
-    const message = lastOne
-      ? `${label}は最後の連携相手です。解除すると STANDARD プランが即時終了します（日割りでの返金はありません）。スマホ・PC のパスワード保管機能はご利用いただけなくなりますが、保管済みのパスワードは残ります。新しく連携を追加すれば、いつでも再開できます。本当に解除してよろしいですか？`
-      : `${label}との連携を解除してもよろしいですか？`;
-    if (!confirm(message)) return;
+  /** 連携解除の確認ダイアログを開く */
+  function handleRevokeLink(linkId: string, recipientName: string | null) {
+    const isLast = activeLinks.length === 1;
+    setDialog({ type: 'revoke_link', linkId, recipientName, isLast });
+  }
 
-    try {
-      const res = await fetch(`/api/digital/family/links/${linkId}`, {
-        method: 'DELETE',
-      });
-      const json = (await res.json()) as { ok: boolean; detail?: string };
-      if (!res.ok || !json.ok) {
-        alert(json.detail ?? '連携の解除に失敗しました。');
-        return;
-      }
-      setLinks((prev) =>
-        prev.map((l) =>
-          l.id === linkId
-            ? { ...l, status: 'revoked', revoked_at: new Date().toISOString() }
-            : l
-        )
-      );
-      startTransition(() => router.refresh());
-    } catch (err) {
-      console.error('[FamilyInvitePanel] revoke link failed', err);
-      alert('ネットワークエラーが発生しました。');
+  /** 連携解除の実行（ダイアログから呼ばれる） */
+  async function executeRevokeLink(linkId: string) {
+    const res = await fetch(`/api/digital/family/links/${linkId}`, {
+      method: 'DELETE',
+    });
+    const json = (await res.json()) as { ok: boolean; detail?: string };
+    if (!res.ok || !json.ok) {
+      throw new Error(json.detail ?? '連携の解除に失敗しました。');
     }
+    setLinks((prev) =>
+      prev.map((l) =>
+        l.id === linkId
+          ? { ...l, status: 'revoked', revoked_at: new Date().toISOString() }
+          : l
+      )
+    );
+    setDialog({ type: 'none' });
+    startTransition(() => router.refresh());
   }
 
   return (
@@ -635,6 +648,56 @@ export default function FamilyInvitePanel({
         </Link>
         をご覧ください。
       </p>
+
+      {/* 招待取消の確認ダイアログ */}
+      {dialog.type === 'revoke_invitation' && (
+        <ConfirmDialog
+          open
+          title="招待を取り消しますか？"
+          description={[
+            `${dialog.invitation.recipient_name} さま宛の招待を取り消します。`,
+            '取り消し後、この招待リンクは無効になります。同じ方を再度招待することは可能です。',
+          ]}
+          confirmLabel="招待を取り消す"
+          cancelLabel="キャンセル"
+          variant="default"
+          onClose={() => setDialog({ type: 'none' })}
+          onConfirm={() => executeRevokeInvitation(dialog.invitation)}
+        />
+      )}
+
+      {/* 連携解除（複数残）の確認ダイアログ */}
+      {dialog.type === 'revoke_link' && !dialog.isLast && (
+        <ConfirmDialog
+          open
+          title="連携を解除しますか？"
+          description={`${dialog.recipientName ? `「${dialog.recipientName}」` : 'この方'} との連携を解除します。`}
+          confirmLabel="連携を解除する"
+          cancelLabel="キャンセル"
+          variant="default"
+          onClose={() => setDialog({ type: 'none' })}
+          onConfirm={() => executeRevokeLink(dialog.linkId)}
+        />
+      )}
+
+      {/* 連携解除（最後の 1 件）の確認ダイアログ：プラン変更を伴うので warning + チェック */}
+      {dialog.type === 'revoke_link' && dialog.isLast && (
+        <ConfirmDialog
+          open
+          title="最後の連携相手を解除しますか？"
+          description={[
+            `${dialog.recipientName ? `「${dialog.recipientName}」` : 'この方'} は最後の連携相手です。`,
+            '解除すると、現在のご契約期間の終了時に STANDARDプランが終了し、FREEプランに切り替わります。期間中はサービスを引き続きご利用いただけます。',
+            'また、期間中に新しい連携先を招待・承認いただくと、自動的に STANDARDプランを継続できます。',
+          ]}
+          confirmLabel="解除する"
+          cancelLabel="キャンセル"
+          variant="warning"
+          requireAcknowledge="現在の期間終了で STANDARDプランが終了することを理解しました"
+          onClose={() => setDialog({ type: 'none' })}
+          onConfirm={() => executeRevokeLink(dialog.linkId)}
+        />
+      )}
     </div>
   );
 }

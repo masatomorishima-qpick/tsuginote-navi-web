@@ -90,7 +90,7 @@ const SECTIONS: HelpSection[] = [
         a: (
           <>
             <p>
-              STANDARD プランは「連携先 1 名あたり月額 ¥110（税込）」の従量課金制です。
+              STANDARDプランは「連携先 1 名あたり月額 ¥110（税込）」の従量課金制です。
               連携先がゼロ人のときは料金は発生しません。
             </p>
             <p className="mt-2">
@@ -106,12 +106,15 @@ const SECTIONS: HelpSection[] = [
             <p>
               解約方法は 2 通りあります。
             </p>
+            <p className="mt-2">
+              いずれの方法でも、現在のご契約期間の終了時に STANDARDプランが終了し、FREEプランに切り替わります（期間中はサービスを引き続きご利用いただけます）。
+            </p>
             <ul className="mt-2 list-disc pl-5 space-y-1">
               <li>
-                <b>連携をすべて解除する</b>：連携先がゼロ人になると、STANDARD プランは即時終了します（日割り返金はありません）。
+                <b>連携をすべて解除する</b>：最後の連携先を解除すると、自動的に「期間終了で解約予定」となります。期間中に新しい連携先を追加すれば、自動的に継続できます。
               </li>
               <li>
-                <b>Stripe カスタマーポータルから解約する</b>：「設定」→「プラン」内の「お支払い情報を管理する」から手続きできます。
+                <b>Stripe カスタマーポータルから解約する</b>：「設定」→「プラン」内の「お支払い情報を管理する」から手続きできます。期間終了前であれば「解約を取り消す」ことも可能です。
               </li>
             </ul>
           </>
@@ -126,8 +129,8 @@ const SECTIONS: HelpSection[] = [
               たとえば 3 名から 2 名に減らした場合、減った分の料金が次回請求に充当されます。
             </p>
             <p className="mt-2">
-              ただし、最後の 1 名を解除して連携人数がゼロになった場合は、STANDARD プランそのものが即時終了します
-              （こちらは日割り返金の対象外です）。
+              最後の 1 名を解除して連携人数がゼロになった場合は、現在のご契約期間の終了時に STANDARDプランが終了し、FREEプランに切り替わります（期間中はサービスを引き続きご利用いただけます）。
+              期間中に新しい連携先を追加すれば、自動的に STANDARDプランを継続できます。
             </p>
           </>
         ),
@@ -383,23 +386,15 @@ const SECTIONS: HelpSection[] = [
 export default function DigitalSettingsHelpPage() {
   return (
     <div className="min-h-screen bg-[#F5F5F0]">
-      {/* ヘッダー */}
-      <header className="bg-white border-b border-gray-100">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Link
-            href="/digital/settings"
-            className="text-sm text-emerald-600 active:opacity-70 flex-shrink-0"
-          >
-            ← 設定
-          </Link>
-          <h1 className="text-base font-medium text-gray-900 flex-1 text-center pr-12">
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-10">
+        {/* 大見出し（中央寄せ、十分な余白） */}
+        <header className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
             ヘルプ
           </h1>
-        </div>
-      </header>
+        </header>
 
-      {/* 本体 */}
-      <div className="max-w-2xl mx-auto px-4 py-4 space-y-6">
+        <div className="space-y-6">
         {/* ご利用の流れ */}
         <section aria-labelledby="help-usage-flow">
           <h2 id="help-usage-flow" className="px-1 mb-2 text-xs text-gray-500">
@@ -472,6 +467,17 @@ export default function DigitalSettingsHelpPage() {
             </div>
           </section>
         ))}
+
+        {/* 戻るリンク（下部） */}
+        <div className="pt-4 text-center">
+          <Link
+            href="/digital/settings"
+            className="inline-flex items-center gap-1 text-sm text-emerald-600 active:opacity-70"
+          >
+            ← 設定に戻る
+          </Link>
+        </div>
+        </div>
       </div>
     </div>
   );

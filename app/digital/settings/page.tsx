@@ -63,23 +63,15 @@ export default async function DigitalSettingsPage() {
 
   return (
     <div className="min-h-screen bg-[#F5F5F0]">
-      {/* ヘッダー */}
-      <header className="bg-white border-b border-gray-100">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Link
-            href="/digital"
-            className="text-sm text-emerald-600 active:opacity-70 flex-shrink-0"
-          >
-            ← ダッシュボード
-          </Link>
-          <h1 className="text-base font-medium text-gray-900 flex-1 text-center pr-24">
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-10">
+        {/* 大見出し（中央寄せ、十分な余白） */}
+        <header className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
             設定
           </h1>
-        </div>
-      </header>
+        </header>
 
-      {/* 本体 */}
-      <div className="max-w-2xl mx-auto px-4 py-4 space-y-6">
+        <div className="space-y-6">
         {/* アカウントグループ */}
         <section aria-labelledby="group-account">
           <h2
@@ -206,6 +198,17 @@ export default async function DigitalSettingsPage() {
             </Link>
           </div>
         </section>
+
+        {/* 戻るリンク（下部） */}
+        <div className="pt-4 text-center">
+          <Link
+            href="/digital"
+            className="inline-flex items-center gap-1 text-sm text-emerald-600 active:opacity-70"
+          >
+            ← ダッシュボードに戻る
+          </Link>
+        </div>
+        </div>
       </div>
     </div>
   );

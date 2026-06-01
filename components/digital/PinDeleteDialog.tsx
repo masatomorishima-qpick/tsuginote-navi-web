@@ -126,7 +126,8 @@ export default function PinDeleteDialog({
 
       setPhase('done');
       setSubmitting(false);
-      onDeleted?.();
+      // 完了画面（done）をユーザーに確実に見てもらうため、ここでは onDeleted を呼ばない。
+      // ユーザーが「閉じる」ボタンを押したタイミングで親に通知して画面遷移する。
     } catch (err) {
       console.error('[PinDeleteDialog] delete failed', err);
       setError('ネットワークエラーが発生しました。');
@@ -299,7 +300,11 @@ export default function PinDeleteDialog({
                 <div className="flex justify-end">
                   <button
                     type="button"
-                    onClick={onClose}
+                    onClick={() => {
+                      // ユーザーが完了画面を確認したので、ここで親に通知 → 画面遷移
+                      onClose();
+                      onDeleted?.();
+                    }}
                     className="inline-flex items-center justify-center rounded-lg bg-slate-800 px-5 py-2 text-sm font-semibold text-white hover:bg-slate-900"
                   >
                     閉じる

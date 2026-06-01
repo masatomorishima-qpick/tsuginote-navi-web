@@ -8,7 +8,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import {
-  AlertTriangle,
   KeyRound,
   ShieldCheck,
   ShieldOff,
@@ -134,7 +133,7 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
                 ロック解除パスワードを保管しましょう
               </p>
               <p className="mt-0.5 text-xs text-slate-600">
-                AES-256 で暗号化して保管。お客様のパスフレーズなしでは誰も復号できません。
+                暗号化して安全に保管します。マスターコードなしでは誰も取り出せません。
               </p>
             </div>
           </div>
@@ -164,26 +163,6 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
               アップグレード
             </Link>
             でご利用いただけます。
-          </p>
-        </div>
-      )}
-
-      {/* パスフレーズが復元不可であることの注意書き（PIN 保管可能なプランのみ） */}
-      {canStorePin && (
-        <div className="mb-4 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
-          <AlertTriangle
-            className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600"
-            aria-hidden="true"
-          />
-          <p>
-            <b>ご注意：「合言葉」を忘れると、ここに保管したパスワードは取り出せなくなります。</b>
-            合言葉は当社では復元できません。
-            <Link
-              href="/digital/settings/help"
-              className="ml-1 underline hover:text-amber-700"
-            >
-              詳しくはヘルプページをご覧ください →
-            </Link>
           </p>
         </div>
       )}

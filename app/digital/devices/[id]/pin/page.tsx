@@ -51,10 +51,13 @@ export default async function PinManagePage({ params }: Props) {
     notFound();
   }
 
-  // 未登録なら登録画面へ
+  // 未登録ならデバイス編集画面へ
+  //   ここに来るケースは主に「削除直後の refresh」「直リンクで未登録のデバイスに来た」の 2 種。
+  //   どちらも /[id] のデバイス編集画面に飛ばすことで、「パスワード未保管」表示 +
+  //   「パスワードを登録する」CTA を提示し、ユーザーが次のアクションを選べるようにする。
   const hasPin = await deviceHasPin(supabase, user.id, id);
   if (!hasPin) {
-    redirect(`/digital/devices/${id}/pin/new`);
+    redirect(`/digital/devices/${id}`);
   }
 
   const stepupEnabled = isStepupEnabled();

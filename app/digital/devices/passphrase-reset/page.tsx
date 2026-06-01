@@ -32,23 +32,37 @@ export default async function PassphraseResetPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      {/* 見出し */}
-      <header>
-        <h1 className="text-2xl font-bold text-slate-900">
-          マスターコードを忘れたとき
-        </h1>
-        <p className="mt-1 text-sm leading-relaxed text-slate-600">
-          パスワード（スマホ・PC のロック解除パスワード）を守るマスターコードが
-          わからなくなった場合は、いったんリセットして、新しいマスターコードで
-          登録し直してください。
-        </p>
-      </header>
+    <div className="min-h-screen bg-[#F5F5F0]">
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-10">
+        {/* 大見出し（中央寄せ、十分な余白） */}
+        <header className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            マスターコードを忘れたとき
+          </h1>
+          <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+            パスワード（スマホ・PC のロック解除パスワード）を守るマスターコードが
+            わからなくなった場合は、いったんリセットして、新しいマスターコードで
+            登録し直してください。
+          </p>
+        </header>
 
-      <PinResetClient
-        userEmail={user.email ?? null}
-        stepupEnabled={isStepupEnabled()}
-      />
+        <div className="space-y-6">
+          <PinResetClient
+            userEmail={user.email ?? null}
+            stepupEnabled={isStepupEnabled()}
+          />
+
+          {/* 戻るリンク（下部） */}
+          <div className="pt-4 text-center">
+            <Link
+              href="/digital/devices"
+              className="inline-flex items-center gap-1 text-sm text-emerald-600 active:opacity-70"
+            >
+              ← パスワード保管に戻る
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

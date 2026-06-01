@@ -12,7 +12,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, Save, ArrowLeft, Info } from 'lucide-react';
+import { Loader2, Save, Info } from 'lucide-react';
 import type { DigitalDevice, DeviceDisposalStatus } from '@/types/digital';
 import { DEVICE_DISPOSAL_STATUS_LABELS } from '@/types/digital';
 
@@ -127,22 +127,23 @@ export default function DeviceForm({ mode, initial }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* 案内 */}
-      <div className="flex gap-3 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">
-        <Info
-          className="mt-0.5 h-5 w-5 flex-shrink-0 text-sky-600"
-          aria-hidden="true"
-        />
-        <div>
-          <p className="font-semibold">
-            この画面では「デバイス情報」だけを登録します
-          </p>
-          <p className="mt-1 leading-relaxed">
-            パスワードは登録後、デバイス一覧の「パスワードを登録する」から別途設定します。
-            パスワードは端末内で暗号化してから送信されるため、運営側からも閲覧できません。
-          </p>
+      {/* 案内（新規作成時のみ：編集ページでは自明な情報なので非表示） */}
+      {mode === 'create' && (
+        <div className="flex gap-3 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">
+          <Info
+            className="mt-0.5 h-5 w-5 flex-shrink-0 text-sky-600"
+            aria-hidden="true"
+          />
+          <div>
+            <p className="font-semibold">
+              この画面では「デバイス情報」だけを登録します
+            </p>
+            <p className="mt-1 leading-relaxed">
+              パスワードは登録後、デバイス一覧の「パスワードを登録する」から別途設定します。
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {generalError && (
         <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
@@ -290,10 +291,9 @@ export default function DeviceForm({ mode, initial }: Props) {
       <div className="flex flex-col-reverse items-stretch gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href="/digital/devices"
-          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
         >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          デバイス一覧に戻る
+          キャンセル
         </Link>
         <button
           type="submit"

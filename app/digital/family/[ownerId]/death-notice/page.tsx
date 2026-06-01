@@ -78,17 +78,20 @@ export default async function DeathNoticePage({ params }: Props) {
     .maybeSingle();
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      {/* 見出し */}
-      <header>
-        <h1 className="text-2xl font-bold text-slate-900">
-          {ownerDisplayName} さまの逝去をご報告
-        </h1>
-        <p className="mt-1 text-sm leading-relaxed text-slate-600">
-          {ownerDisplayName} さまがお亡くなりになった事実をご報告いただくと、
-          運営での確認とご本人への最終確認を経て、連携先の皆さまに登録情報が開示されます。
-        </p>
-      </header>
+    <div className="min-h-screen bg-[#F5F5F0]">
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-10">
+        {/* 大見出し（中央寄せ、十分な余白） */}
+        <header className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            {ownerDisplayName} さまの逝去をご報告
+          </h1>
+          <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+            {ownerDisplayName} さまがお亡くなりになった事実をご報告いただくと、
+            運営での確認とご本人への最終確認を経て、連携先の皆さまに登録情報が開示されます。
+          </p>
+        </header>
+
+        <div className="space-y-6">
 
       {existingNotice ? (
         // 既に通知が進行中／開示済み
@@ -144,6 +147,18 @@ export default async function DeathNoticePage({ params }: Props) {
         // 通知フォーム
         <DeathNoticeForm ownerId={ownerId} ownerDisplayName={ownerDisplayName} />
       )}
+
+          {/* 戻るリンク（下部） */}
+          <div className="pt-4 text-center">
+            <Link
+              href="/digital"
+              className="inline-flex items-center gap-1 text-sm text-emerald-600 active:opacity-70"
+            >
+              ← ダッシュボードに戻る
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

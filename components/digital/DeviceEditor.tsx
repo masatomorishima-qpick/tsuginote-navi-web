@@ -84,7 +84,7 @@ export default function DeviceEditor({ device, hasPin }: Props) {
           このデバイスを削除
         </button>
         <p className="mt-2 text-xs text-slate-500">
-          論理削除のため、一覧からは直ちに見えなくなります。データは監査ログ保持期間の間は DB に残ります。
+          削除後、このデバイスは一覧からすぐに見えなくなります。
         </p>
 
         {blockedReason && (

@@ -176,7 +176,7 @@ export default function StepupDialog({
       role="dialog"
       aria-modal="true"
       aria-labelledby="stepup-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 p-4"
       onClick={(e) => {
         if (
           e.target === e.currentTarget &&
@@ -186,7 +186,7 @@ export default function StepupDialog({
           onClose();
       }}
     >
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+      <div className="my-auto max-h-[calc(100vh-2rem)] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">

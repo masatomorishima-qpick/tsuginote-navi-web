@@ -17,10 +17,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import {
-  KeyRound,
   ShieldCheck,
   Info,
-  ArrowLeft,
 } from 'lucide-react';
 import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 import { getDeviceById, deviceHasPin } from '@/lib/digital/devices';
@@ -62,19 +60,22 @@ export default async function PinManagePage({ params }: Props) {
   const stepupEnabled = isStepupEnabled();
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <header className="mb-6">
-        <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
-          <KeyRound className="h-6 w-6 text-emerald-600" aria-hidden="true" />
-          パスワード
-        </h1>
-        <p className="mt-1 text-sm text-slate-600">
-          {device.device_name} に登録されたパスワードを表示します。
-          {stepupEnabled
-            ? 'セキュリティのため、操作ごとにメール再認証とマスターコード入力が必要です。'
-            : 'マスターコードの入力が必要です。表示されたパスワードは 30 秒で自動的に隠れます。'}
-        </p>
-      </header>
+    <div className="min-h-screen bg-[#F5F5F0]">
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-10">
+        {/* 大見出し（中央寄せ、十分な余白） */}
+        <header className="mb-6 sm:mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl text-center">
+            パスワード
+          </h1>
+          <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+            {device.device_name} に登録されたパスワードを表示します。
+            {stepupEnabled
+              ? 'セキュリティのため、操作ごとにメール再認証とマスターコード入力が必要です。'
+              : 'マスターコードの入力が必要です。表示されたパスワードは 30 秒で自動的に隠れます。'}
+          </p>
+        </header>
+
+        <div className="space-y-4">
 
       <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
         <div className="mb-4 flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900">
@@ -113,14 +114,16 @@ export default async function PinManagePage({ params }: Props) {
         </div>
       </section>
 
-      <div className="mt-4 text-right">
-        <Link
-          href={`/digital/devices/${device.id}`}
-          className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-emerald-700 hover:underline"
-        >
-          <ArrowLeft className="h-3 w-3" aria-hidden="true" />
-          デバイス編集画面に戻る
-        </Link>
+          {/* 戻るリンク（下部） */}
+          <div className="pt-4 text-center">
+            <Link
+              href={`/digital/devices/${device.id}`}
+              className="inline-flex items-center gap-1 text-sm text-emerald-600 active:opacity-70"
+            >
+              ← デバイス編集画面に戻る
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

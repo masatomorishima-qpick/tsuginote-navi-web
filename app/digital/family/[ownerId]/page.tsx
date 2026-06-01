@@ -130,19 +130,22 @@ export default async function FamilyOwnerViewPage({ params }: Props) {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      {/* 見出し */}
-      <header>
-        <h1 className="text-2xl font-bold text-slate-900">
-          {isDeathDisclosed ? '故 ' : ''}
-          {ownerDisplayName ?? '連携先の方'} さまの情報
-        </h1>
-        <p className="mt-1 text-sm text-slate-600">
-          {isDeathDisclosed
-            ? '開示が確定したため、ご登録情報をご確認いただけます。'
-            : '現在、ご登録情報をご確認いただける状態です。'}
-        </p>
-      </header>
+    <div className="min-h-screen bg-[#F5F5F0]">
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-10">
+        {/* 大見出し（中央寄せ、十分な余白） */}
+        <header className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            {isDeathDisclosed ? '故 ' : ''}
+            {ownerDisplayName ?? '連携先の方'} さまの情報
+          </h1>
+          <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+            {isDeathDisclosed
+              ? '開示が確定したため、ご登録情報をご確認いただけます。'
+              : '現在、ご登録情報をご確認いただける状態です。'}
+          </p>
+        </header>
+
+        <div className="space-y-6">
 
       {/* 状態バッジ */}
       <div
@@ -281,6 +284,18 @@ export default async function FamilyOwnerViewPage({ params }: Props) {
 
       <div className="rounded-xl bg-slate-50 p-3 text-xs text-slate-500">
         ※ この画面は連携先である本人のみ閲覧可能です。スクリーンショット・共有はご遠慮ください。
+      </div>
+
+          {/* 戻るリンク（下部） */}
+          <div className="pt-4 text-center">
+            <Link
+              href="/digital"
+              className="inline-flex items-center gap-1 text-sm text-emerald-600 active:opacity-70"
+            >
+              ← ダッシュボードに戻る
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

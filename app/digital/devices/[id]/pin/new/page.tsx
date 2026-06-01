@@ -9,7 +9,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { KeyRound, Crown, ArrowRight } from 'lucide-react';
+import { Crown, ArrowRight } from 'lucide-react';
 import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 import { getDeviceById, deviceHasPin } from '@/lib/digital/devices';
 import { getOwnSubscription, effectivePlan } from '@/lib/digital/subscriptions';
@@ -55,16 +55,19 @@ export default async function NewPinPage({ params }: Props) {
   const canStorePin = PLAN_LIMITS[plan].canStorePin;
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <header className="mb-6">
-        <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
-          <KeyRound className="h-6 w-6 text-emerald-600" aria-hidden="true" />
-          パスワードを登録
-        </h1>
-        <p className="mt-1 text-sm text-slate-600">
-          パスワードはブラウザ内で暗号化されてから送信されます。サーバーにはそのままの形では残りません。
-        </p>
-      </header>
+    <div className="min-h-screen bg-[#F5F5F0]">
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-10">
+        {/* 大見出し（中央寄せ、十分な余白） */}
+        <header className="mb-6 sm:mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl text-center">
+            パスワードを登録
+          </h1>
+          <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+            パスワードはブラウザ内で暗号化されてから送信されます。サーバーにはそのままの形では残りません。
+          </p>
+        </header>
+
+        <div className="space-y-4">
 
       {canStorePin ? (
         <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
@@ -111,6 +114,18 @@ export default async function NewPinPage({ params }: Props) {
           </div>
         </section>
       )}
+
+          {/* 戻るリンク（下部） */}
+          <div className="pt-4 text-center">
+            <Link
+              href={`/digital/devices/${device.id}`}
+              className="inline-flex items-center gap-1 text-sm text-emerald-600 active:opacity-70"
+            >
+              ← デバイス編集画面に戻る
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

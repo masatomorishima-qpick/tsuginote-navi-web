@@ -59,37 +59,45 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
   const canStorePin = PLAN_LIMITS[effectivePlan(subscription)].canStorePin;
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <header className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+    <div className="min-h-screen bg-[#F5F5F0]">
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-10">
+        {/* 大見出し（中央寄せ、十分な余白） */}
+        <header className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
             {device.device_name} を編集
           </h1>
-          <p className="mt-1 text-sm text-slate-600">
-            デバイス情報の修正後、「変更を保存」を押してください。
-          </p>
-        </div>
+        </header>
 
-        <div className="flex items-center gap-2">
-          {hasPin ? (
-            <Link
-              href={`/digital/devices/${device.id}/pin`}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-white px-3 py-2 text-xs font-medium text-emerald-800 hover:bg-emerald-50"
-            >
-              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-              パスワードを表示・更新
-            </Link>
-          ) : (
-            <Link
-              href={`/digital/devices/${device.id}/pin/new`}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-medium text-white hover:bg-emerald-700"
-            >
-              <KeyRound className="h-4 w-4" aria-hidden="true" />
-              パスワードを登録する
-            </Link>
-          )}
+        <div className="space-y-4">
+
+      {/* PIN 登録済み：表示・更新への誘導カード（hasPin=false 側と同じスタイルに揃える） */}
+      {hasPin && (
+        <div className="flex flex-col gap-3 rounded-xl border border-emerald-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100">
+              <ShieldCheck
+                className="h-5 w-5 text-emerald-700"
+                aria-hidden="true"
+              />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">
+                パスワード保管済み
+              </p>
+              <p className="mt-0.5 text-xs text-slate-600">
+                暗号化して安全に保管しています。表示・更新・削除ができます。
+              </p>
+            </div>
+          </div>
+          <Link
+            href={`/digital/devices/${device.id}/pin`}
+            className="inline-flex flex-shrink-0 items-center justify-center gap-1.5 rounded-full border border-emerald-300 bg-white px-5 py-2.5 text-sm font-semibold text-emerald-800 hover:bg-emerald-50"
+          >
+            パスワードを表示・更新
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
         </div>
-      </header>
+      )}
 
       {/* デバイス追加完了の成功バナー（?created=1 の時のみ） */}
       {justCreated && (
@@ -183,6 +191,18 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
       <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
         <DeviceEditor device={device} hasPin={hasPin} />
       </section>
+
+          {/* 戻るリンク（下部） */}
+          <div className="pt-4 text-center">
+            <Link
+              href="/digital/devices"
+              className="inline-flex items-center gap-1 text-sm text-emerald-600 active:opacity-70"
+            >
+              ← パスワード保管に戻る
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

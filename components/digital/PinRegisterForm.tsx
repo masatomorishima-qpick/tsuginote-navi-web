@@ -27,7 +27,6 @@ import {
   Eye,
   EyeOff,
   Save,
-  ArrowLeft,
   KeyRound,
   Lock,
   Users,
@@ -503,10 +502,9 @@ export default function PinRegisterForm({ deviceId, deviceName }: Props) {
       <div className="flex flex-col-reverse items-stretch gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href="/digital/devices"
-          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
         >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          デバイス一覧に戻る
+          キャンセル
         </Link>
         <button
           type="submit"

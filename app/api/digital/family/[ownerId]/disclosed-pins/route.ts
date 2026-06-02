@@ -7,9 +7,12 @@
  * 返すのは **暗号文のみ**。復号はクライアント（連携者のブラウザ）で行う。
  * サーバーは平文 PIN を一切扱わない。
  *
- * アクセス条件（いずれか）：
- *   - 生前共有 ON の active な連携者
- *   - 死後開示（disclosed）が確定している owner の active な連携者
+ * アクセス条件：
+ *   - 既定：死後開示（disclosed）が確定している owner の active な連携者のみ
+ *   - DIGITAL_LIFETIME_PIN_REVEAL_ENABLED=true のとき：
+ *     生前共有 ON の active な連携者にも開示する（フィーチャーフラグ）
+ *   ※ パスワードはアカウント全体のアクセス権を持つため、既定では死後のみ。
+ *     ユーザーニーズに応じて env で切り替え可能。
  *
  * 返却内容：
  *   - recipient_keypair：連携者自身の鍵ペア（秘密鍵を復号するため）
@@ -20,6 +23,7 @@
 import { NextResponse } from 'next/server';
 import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
+import { isLifetimePinRevealEnabled } from '@/lib/digital/featureFlags';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -66,7 +70,10 @@ export async function GET(
       );
     }
 
-    // ③ アクセス可否判定：生前共有 ON または 死後開示済み
+    // ③ アクセス可否判定
+    //   既定：死後開示済みの場合のみ閲覧可。
+    //   フィーチャーフラグ DIGITAL_LIFETIME_PIN_REVEAL_ENABLED=true のときは、
+    //   生前共有 ON の連携相手にも開示する。
     let isDisclosed = false;
     const { data: disclosedNotice } = await admin
       .from('digital_death_notices')
@@ -77,14 +84,17 @@ export async function GET(
       .maybeSingle();
     isDisclosed = !!disclosedNotice;
 
-    const canAccess = link.share_during_lifetime || isDisclosed;
+    const lifetimePinRevealEnabled = isLifetimePinRevealEnabled();
+    const canAccess =
+      isDisclosed ||
+      (lifetimePinRevealEnabled && link.share_during_lifetime);
     if (!canAccess) {
       return NextResponse.json(
         {
           ok: false,
           error: 'not_accessible',
           detail:
-            'ご本人がご存命の間は閲覧できません。お亡くなりになった事実が確認された後にご確認いただけます。',
+            'ご本人がご存命の間はパスワードを閲覧できません。お亡くなりになった事実が確認された後にご確認いただけます。',
         },
         { status: 403 }
       );

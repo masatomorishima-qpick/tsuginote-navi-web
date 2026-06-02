@@ -34,6 +34,7 @@ import {
 } from '@/types/digital';
 import { KeyRound } from 'lucide-react';
 import { formatJpDate } from '@/lib/digital/utils';
+import { isLifetimePinRevealEnabled } from '@/lib/digital/featureFlags';
 import RecipientPinReveal from '@/components/digital/RecipientPinReveal';
 
 export const metadata: Metadata = {
@@ -87,6 +88,11 @@ export default async function FamilyOwnerViewPage({ params }: Props) {
 
   const isDeathDisclosed = !!disclosedNotice;
   const canView = shareDuringLifetime || isDeathDisclosed;
+  // パスワード（PIN）の閲覧可否：既定は死後開示済みのみ。
+  // フィーチャーフラグ ON のときは生前共有 ON でも閲覧可能（リスク高、非推奨）。
+  const canViewPin =
+    isDeathDisclosed ||
+    (isLifetimePinRevealEnabled() && shareDuringLifetime);
 
   if (!canView) {
     // 連携はあるが、生前共有 OFF かつ未開示 → 待機中画面
@@ -260,27 +266,49 @@ export default async function FamilyOwnerViewPage({ params }: Props) {
         </div>
       )}
 
-      {/* スマホ・PC のパスワード（PIN）復号セクション */}
-      <section
-        aria-labelledby="section-pin-reveal"
-        className="rounded-2xl border border-violet-200 bg-violet-50/40 p-5 sm:p-6"
-      >
-        <h2
-          id="section-pin-reveal"
-          className="flex items-center gap-2 text-lg font-semibold text-slate-900"
+      {/* スマホ・PC のパスワード（PIN）復号セクション
+            既定では死後開示済みのときのみ表示。
+            DIGITAL_LIFETIME_PIN_REVEAL_ENABLED=true なら生前共有 ON のときも表示。 */}
+      {canViewPin ? (
+        <section
+          aria-labelledby="section-pin-reveal"
+          className="rounded-2xl border border-violet-200 bg-violet-50/40 p-5 sm:p-6"
         >
-          <KeyRound className="h-5 w-5 text-violet-700" aria-hidden="true" />
-          スマホ・PC のロック解除パスワード
-        </h2>
-        <p className="mt-2 text-sm leading-relaxed text-slate-600">
-          {isDeathDisclosed
-            ? `故 ${ownerDisplayName ?? 'ご本人'} さまが保管されていた、スマートフォンや PC のロック解除パスワードです。`
-            : `${ownerDisplayName ?? 'ご本人'} さまが保管されている、スマートフォンや PC のロック解除パスワードです。`}
-        </p>
-        <div className="mt-4">
-          <RecipientPinReveal ownerId={ownerId} />
-        </div>
-      </section>
+          <h2
+            id="section-pin-reveal"
+            className="flex items-center gap-2 text-lg font-semibold text-slate-900"
+          >
+            <KeyRound className="h-5 w-5 text-violet-700" aria-hidden="true" />
+            スマホ・PC のロック解除パスワード
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+            {isDeathDisclosed
+              ? `故 ${ownerDisplayName ?? 'ご本人'} さまが保管されていた、スマートフォンや PC のロック解除パスワードです。`
+              : `${ownerDisplayName ?? 'ご本人'} さまが保管されている、スマートフォンや PC のロック解除パスワードです。`}
+          </p>
+          <div className="mt-4">
+            <RecipientPinReveal ownerId={ownerId} />
+          </div>
+        </section>
+      ) : (
+        // 生前共有 ON だが PIN 開示は未許可（既定挙動）：開示時期を案内
+        <section
+          aria-labelledby="section-pin-pending"
+          className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"
+        >
+          <h2
+            id="section-pin-pending"
+            className="flex items-center gap-2 text-base font-semibold text-slate-700"
+          >
+            <KeyRound className="h-5 w-5 text-slate-400" aria-hidden="true" />
+            スマホ・PC のロック解除パスワード
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+            ご本人がお亡くなりになった事実が確認された後にお届けします。
+            現在は閲覧いただけません。
+          </p>
+        </section>
+      )}
 
       <div className="rounded-xl bg-slate-50 p-3 text-xs text-slate-500">
         ※ この画面は連携先である本人のみ閲覧可能です。スクリーンショット・共有はご遠慮ください。

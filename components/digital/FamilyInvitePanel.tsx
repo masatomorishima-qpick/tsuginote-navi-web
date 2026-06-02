@@ -37,6 +37,7 @@ import type {
   DigitalFamilyLink,
 } from '@/lib/digital/family';
 import ConfirmDialog from './ConfirmDialog';
+import Toast, { type ToastVariant } from './Toast';
 
 /**
  * 確認ダイアログの状態（discriminated union）。
@@ -106,6 +107,16 @@ export default function FamilyInvitePanel({
 
   // 確認ダイアログの状態（招待取消 / 連携解除）
   const [dialog, setDialog] = useState<DialogState>({ type: 'none' });
+
+  // Toast 通知（alert() の代わり）
+  const [toast, setToast] = useState<{
+    message: string;
+    variant: ToastVariant;
+  } | null>(null);
+
+  function notify(message: string, variant: ToastVariant = 'info') {
+    setToast({ message, variant });
+  }
 
   // フォームの開閉
   const [showForm, setShowForm] = useState(false);
@@ -241,16 +252,16 @@ export default function FamilyInvitePanel({
         detail?: string;
       };
       if (!res.ok || !json.ok || !json.invitation) {
-        alert(json.detail ?? '招待メールの再送に失敗しました。');
+        notify(json.detail ?? '招待メールの再送に失敗しました。', 'danger');
         return;
       }
       setInvitations((prev) =>
         prev.map((i) => (i.id === json.invitation!.id ? json.invitation! : i))
       );
-      alert('招待メールを再送しました。');
+      notify('招待メールを再送しました', 'success');
     } catch (err) {
       console.error('[FamilyInvitePanel] resend failed', err);
-      alert('ネットワークエラーが発生しました。');
+      notify('ネットワークエラーが発生しました', 'danger');
     }
   }
 
@@ -270,15 +281,19 @@ export default function FamilyInvitePanel({
         detail?: string;
       };
       if (!res.ok || !json.ok || !json.link) {
-        alert(json.detail ?? '生前共有の切り替えに失敗しました。');
+        notify(json.detail ?? '生前共有の切り替えに失敗しました。', 'danger');
         return;
       }
       setLinks((prev) =>
         prev.map((l) => (l.id === linkId ? json.link! : l))
       );
+      notify(
+        nextEnabled ? '生前共有を ON にしました' : '生前共有を OFF にしました',
+        'success'
+      );
     } catch (err) {
       console.error('[FamilyInvitePanel] toggle failed', err);
-      alert('ネットワークエラーが発生しました。');
+      notify('ネットワークエラーが発生しました', 'danger');
     }
   }
 
@@ -340,9 +355,12 @@ export default function FamilyInvitePanel({
                   onClick={async () => {
                     try {
                       await navigator.clipboard.writeText(mailFallbackUrl);
-                      alert('URL をコピーしました。');
+                      notify('URL をコピーしました', 'success');
                     } catch {
-                      alert('コピーに失敗しました。URL を手動で選択してください。');
+                      notify(
+                        'コピーに失敗しました。URL を手動で選択してください',
+                        'danger'
+                      );
                     }
                   }}
                   className="inline-flex flex-shrink-0 items-center justify-center gap-1 rounded-full bg-amber-600 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-700"
@@ -648,6 +666,15 @@ export default function FamilyInvitePanel({
         </Link>
         をご覧ください。
       </p>
+
+      {/* Toast 通知（alert() の代わり） */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          variant={toast.variant}
+          onClose={() => setToast(null)}
+        />
+      )}
 
       {/* 招待取消の確認ダイアログ */}
       {dialog.type === 'revoke_invitation' && (

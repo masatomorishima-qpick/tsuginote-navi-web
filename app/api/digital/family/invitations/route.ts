@@ -129,10 +129,20 @@ export async function POST(req: Request) {
         pending_limit_reached: 409,
         links_limit_reached: 409,
         recipient_already_linked: 409,
+        resend_cooldown: 429, // Too Many Requests
         unexpected: 500,
       };
       return NextResponse.json(
-        { ok: false, error: createResult.error, detail: createResult.detail },
+        {
+          ok: false,
+          error: createResult.error,
+          detail: createResult.detail,
+          // resend_cooldown 時のクライアント向けカウントダウン用
+          retry_after_seconds:
+            'retryAfterSeconds' in createResult
+              ? createResult.retryAfterSeconds
+              : undefined,
+        },
         { status: statusByError[createResult.error] ?? 500 }
       );
     }

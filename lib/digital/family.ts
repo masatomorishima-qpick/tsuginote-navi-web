@@ -34,6 +34,14 @@ const INVITATION_TOKEN_BYTES = 36;
 /** 招待有効期限（日数） */
 export const INVITATION_TTL_DAYS = 7;
 
+/**
+ * 再送のクールダウン秒数。
+ * - 連打スパム防止のため、前回の last_sent_at から N 秒未満は拒否する。
+ * - 正当な「メール届かないのでもう一度」はすぐ許容したいので 60 秒に設定。
+ *   厳格にしたい場合はこの値を増やす（例：300 = 5 分）。
+ */
+export const INVITATION_RESEND_COOLDOWN_SECONDS = 60;
+
 /** 同時保有可能な未承認招待の上限（オーナー 1 人につき） */
 export const MAX_PENDING_INVITATIONS = 5;
 
@@ -253,8 +261,11 @@ export type CreateInvitationResult =
         | 'pending_limit_reached'
         | 'links_limit_reached'
         | 'recipient_already_linked'
+        | 'resend_cooldown'
         | 'unexpected';
       detail?: string;
+      /** resend_cooldown 時：次に再送できるようになるまでの秒数 */
+      retryAfterSeconds?: number;
     };
 
 /**
@@ -311,6 +322,22 @@ export async function createOrResendInvitation(
 
   // 既存招待がある場合：再送（last_sent_at と recipient_name を更新、期限も延長）
   if (existingPending) {
+    // ── レート制限：前回送信から COOLDOWN_SECONDS 未満の連打は拒否 ──
+    const lastSentAtMs = new Date(
+      (existingPending as DigitalFamilyInvitation).last_sent_at
+    ).getTime();
+    const elapsedSeconds = Math.floor((Date.now() - lastSentAtMs) / 1000);
+    if (elapsedSeconds < INVITATION_RESEND_COOLDOWN_SECONDS) {
+      const retryAfterSeconds =
+        INVITATION_RESEND_COOLDOWN_SECONDS - elapsedSeconds;
+      return {
+        ok: false,
+        error: 'resend_cooldown',
+        retryAfterSeconds,
+        detail: `招待メールは ${INVITATION_RESEND_COOLDOWN_SECONDS} 秒に 1 回までです。あと約 ${retryAfterSeconds} 秒お待ちください。`,
+      };
+    }
+
     const newExpiresAt = new Date(
       Date.now() + INVITATION_TTL_DAYS * 24 * 60 * 60 * 1000
     ).toISOString();

@@ -38,6 +38,7 @@ import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { acceptInvitation } from '@/lib/digital/family';
 import { syncSubscriptionQuantity } from '@/lib/digital/familyBilling';
+import { sendOwnerLinkAcceptedEmail } from '@/lib/email/ownerPaymentReminder';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -189,7 +190,36 @@ export async function POST(
 
     if (!syncRes.ok && syncRes.status === 'need_checkout') {
       // オーナーがまだサブスクを持っていないので、オーナーが Checkout を完了する必要がある。
-      // 連携者側はここで止まらず承認は完了させる。オーナーには別途メール通知する設計。
+      // 連携者側はここで止まらず承認は完了させる。オーナーへはカード登録を促すメールを送る。
+      // メール送信は best-effort：失敗しても承認フローは止めない。
+      if (ownerEmail) {
+        const appUrl = (
+          process.env.NEXT_PUBLIC_APP_URL ?? 'https://tsuginotenavi.jp'
+        ).replace(/\/+$/, '');
+        try {
+          const mailRes = await sendOwnerLinkAcceptedEmail({
+            ownerEmail,
+            recipientName: acceptRes.link.recipient_name ?? null,
+            manageUrl: `${appUrl}/digital/settings/plan`,
+          });
+          if (!mailRes.ok) {
+            console.warn(
+              '[accept POST] owner payment reminder email not sent',
+              mailRes.error
+            );
+          }
+        } catch (mailErr) {
+          console.warn(
+            '[accept POST] owner payment reminder email threw',
+            mailErr
+          );
+        }
+      } else {
+        console.warn(
+          '[accept POST] ownerEmail missing; skip payment reminder email'
+        );
+      }
+
       return NextResponse.json({
         ok: true,
         link: acceptRes.link,

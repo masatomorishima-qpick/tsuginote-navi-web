@@ -32,7 +32,8 @@ export default function PdfDownloadPanel({ assetCount }: Props) {
 
       // ファイル名をレスポンスヘッダから取り出す
       const disposition = res.headers.get('Content-Disposition') ?? '';
-      const filename = extractFilename(disposition) ?? 'tsuginotenavi_letter.pdf';
+      const filename =
+        extractFilename(disposition) ?? 'つぎの手ナビ デジタル資産.pdf';
 
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);

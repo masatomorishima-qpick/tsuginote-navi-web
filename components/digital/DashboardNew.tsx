@@ -70,9 +70,11 @@ export default function DashboardNew({
           </div>
         )}
 
-        {/* プランバー（Apple 風：プラン名を大きく強調） */}
-        <div className="flex items-start justify-between py-6 gap-3">
-          <div className="min-w-0 flex-1">
+        {/* プランバー（Apple 風：プラン名を大きく強調）
+            縦積みにして、プラン名がアップグレードボタンに押し潰されて
+            折り返す不具合（「フリ／ープ／ラン」）を防ぐ。 */}
+        <div className="flex flex-col items-start py-6">
+          <div className="min-w-0 w-full">
             <p className="text-2xl font-bold text-gray-900 tracking-tight sm:text-3xl">
               {isStandard ? 'STANDARDプラン' : 'フリープラン'}
             </p>

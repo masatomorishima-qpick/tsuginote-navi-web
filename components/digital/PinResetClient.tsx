@@ -170,7 +170,7 @@ export default function PinResetClient({ userEmail, stepupEnabled }: Props) {
           <h2 className="font-semibold text-slate-900">リセットすると</h2>
           <ul className="mt-2 list-inside list-disc space-y-1.5 leading-relaxed">
             <li>
-              保存済みのスマホ・PC のロック解除パスワードが
+              保存済みのスマホ・パソコンのパスワードが
               <b>すべて削除</b>されます。
             </li>
             <li>
@@ -201,7 +201,7 @@ export default function PinResetClient({ userEmail, stepupEnabled }: Props) {
               className="mt-0.5 h-4 w-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500"
             />
             <span>
-              スマホ・PC のロック解除コードは、自分で確認・控えました
+              スマホ・パソコンのロック解除コードは、自分で確認・控えました
               （登録し直すときに入力できます）。
             </span>
           </label>

@@ -25,7 +25,6 @@
 import { useState } from 'react';
 import {
   Loader2,
-  ShieldCheck,
   Trash2,
   X,
   AlertTriangle,
@@ -194,18 +193,17 @@ export default function PinDeleteDialog({
 
             {phase === 'confirm' && (
               <div className="mt-4 space-y-4">
-                <div className="flex items-start gap-2 rounded-xl border border-rose-300 bg-rose-50 p-3 text-sm text-rose-900">
-                  <AlertTriangle
-                    className="mt-0.5 h-5 w-5 flex-shrink-0 text-rose-600"
-                    aria-hidden="true"
-                  />
-                  <div className="space-y-1 leading-relaxed">
-                    <p className="font-semibold">削除すると元に戻せません</p>
-                    <p className="text-rose-900/90">
-                      このデバイスに登録されている暗号化済みパスワードを完全に消去します。
-                      デバイス自体は残ります。必要な場合は再度「パスワードを登録」から設定してください。
-                    </p>
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2 rounded-xl border border-rose-300 bg-rose-50 p-3 text-sm font-semibold text-rose-900">
+                    <AlertTriangle
+                      className="h-5 w-5 flex-shrink-0 text-rose-600"
+                      aria-hidden="true"
+                    />
+                    削除すると元に戻せません
                   </div>
+                  <p className="px-1 text-xs leading-relaxed text-slate-500">
+                    ※ デバイス情報は残ります。あとからまた「パスワードを登録」で設定できます。
+                  </p>
                 </div>
 
                 <div>
@@ -217,7 +215,7 @@ export default function PinDeleteDialog({
                   </label>
                   <p className="mb-1.5 text-xs text-slate-500">
                     「<span className="font-medium text-slate-700">{deviceName}</span>」と
-                    一字違わず入力してください。
+                    そのまま入力してください。
                   </p>
                   <input
                     id="delete-confirm"
@@ -237,17 +235,17 @@ export default function PinDeleteDialog({
                     htmlFor="delete-reason"
                     className="mb-1.5 block text-sm font-semibold text-slate-700"
                   >
-                    削除理由（任意）
+                    メモ（任意）
                   </label>
                   <p className="mb-1.5 text-xs text-slate-500">
-                    監査ログに残ります。空欄の場合は「user_initiated」として記録されます。
+                    あとで見返せるように、ひとことメモを残せます。空欄でもかまいません。
                   </p>
                   <input
                     id="delete-reason"
                     type="text"
                     value={reason}
                     onChange={(e) => setReason(e.target.value.slice(0, 100))}
-                    placeholder="例: マスターコードを忘れたため再登録"
+                    placeholder="例：マスターコードを忘れたため、登録し直します"
                     disabled={submitting}
                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100 disabled:bg-slate-100"
                   />
@@ -293,8 +291,7 @@ export default function PinDeleteDialog({
                     aria-hidden="true"
                   />
                   <p className="leading-relaxed">
-                    パスワードを削除しました。必要になったときは「パスワードを登録」から再設定してください。
-                    <ShieldCheck className="mx-1 inline-block h-4 w-4 text-emerald-600" aria-hidden="true" />
+                    パスワードを削除しました。必要になったときは「パスワードを登録」からまた設定できます。
                   </p>
                 </div>
                 <div className="flex justify-end">

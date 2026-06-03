@@ -155,6 +155,9 @@ ${getOpsEmail()}
       await sendEmail({
         to: getOpsEmail(),
         subject: `[つぎの手ナビ] 通報者本人による取り消し（${ownerDisplayName}）`,
+        html: `<p>通報者：${escapeHtml(notifierName)}<br>本人：${escapeHtml(
+          ownerDisplayName
+        )}<br>通知 ID：${escapeHtml(notice.id)}<br>取り消し日時：${new Date().toISOString()}</p>`,
         text: `通報者：${notifierName}
 本人　：${ownerDisplayName}
 通知 ID：${notice.id}

@@ -1,0 +1,32 @@
+# Dependabot — 依存ライブラリの脆弱性検知・定期更新
+#
+# これにより、npm パッケージの新バージョン・脆弱性修正を Dependabot が定期的に検知し、
+# 更新用のプルリクエストを自動作成します（＝「脆弱性診断を定期的に実施」の仕組み化）。
+#
+# ★ あわせて GitHub リポジトリの Settings → "Code security"（旧 Code security and analysis）で
+#   以下を ON にしてください：
+#     - Dependabot alerts        … 既知の脆弱性を検知して通知
+#     - Dependabot security updates … 脆弱性修正の PR を自動作成
+#
+version: 2
+updates:
+  # アプリ本体（Next.js / npm）
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "deps"
+
+  # GitHub Actions のワークフロー（あれば）
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      timezone: "Asia/Tokyo"

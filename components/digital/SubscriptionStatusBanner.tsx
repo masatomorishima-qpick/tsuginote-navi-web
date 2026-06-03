@@ -6,7 +6,7 @@
  *   - 解約予定（cancel_at_period_end / canceled）：amber
  *   - 連携 0 名による自動解約予定：amber（再招待 CTA 付き）
  *   - 支払い遅延（past_due）：rose（カード再確認 CTA）
- *   - トライアル残り 5 日以内：emerald（アップグレード CTA）
+ *   - トライアル残り 7 日以内：emerald（アップグレード CTA）
  *
  * 「プラン管理」リンクはダッシュボード上部の PlanCard 側にあるため、
  * このバナーでは「設定で詳細を見る」等の冗長なボタンは付けない。
@@ -117,8 +117,8 @@ export default function SubscriptionStatusBanner({
     );
   }
 
-  // トライアル残り 5 日以下（5 日切ってから注意喚起）
-  if (status === 'trialing' && daysLeft !== null && daysLeft <= 5) {
+  // トライアル残り 7 日以下（リマインドメールの早期送信＝7 日前と閾値を揃える）
+  if (status === 'trialing' && daysLeft !== null && daysLeft <= 7) {
     return (
       <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
         <div className="flex items-start gap-2.5">

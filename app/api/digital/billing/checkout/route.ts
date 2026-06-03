@@ -27,10 +27,12 @@ import { NextResponse } from 'next/server';
 import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { ensureStripeCustomer } from '@/lib/stripe/billing';
-import { getOwnSubscription, isStandardActive } from '@/lib/digital/subscriptions';
-import { countActiveLinks } from '@/lib/digital/family';
+import { getOwnSubscription } from '@/lib/digital/subscriptions';
+import {
+  countActiveLinks,
+  reactivateSuspendedLinksForOwner,
+} from '@/lib/digital/family';
 import { stripeRequest } from '@/lib/stripe/client';
-import { PER_RECIPIENT_PRICING } from '@/types/digital';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -98,6 +100,20 @@ export async function POST(req: Request) {
     // ③ 入力 quantity（任意）と family_links 数から決定
     const body = (await req.json().catch(() => ({}))) as { quantity?: unknown };
     const admin = createAdminSupabaseClient();
+
+    // 休止中の連携を先に復活させる（課題 #30）。
+    //   未払いでトライアル満了 → cron で休止された連携が残っている場合、
+    //   オーナーがカードを登録（＝ここを通る）時点で active に戻す。
+    //   復活させてから active 連携数を数えることで、Checkout に渡す quantity が
+    //   実際の連携数と一致し、請求数量の取りこぼしを防ぐ。
+    const reactivated = await reactivateSuspendedLinksForOwner(admin, user.id);
+    if (reactivated > 0) {
+      console.log('[api/digital/billing/checkout] reactivated suspended links', {
+        userId: user.id,
+        reactivated,
+      });
+    }
+
     const linksCount = await countActiveLinks(admin, user.id);
 
     let quantity: number;
@@ -108,10 +124,23 @@ export async function POST(req: Request) {
       quantity = Math.max(1, linksCount);
     }
 
-    // ④ Stripe Customer を取得 or 作成
+    // ④ トライアル残日数を算出
+    //   無料トライアルは「初回 1 回だけ」。一度消化したユーザーが再加入（休止からの
+    //   復活を含む）する場合は再付与せず即課金する。
+    //     - trial_expires_at が未来 → 残り日数分だけトライアルを継続
+    //     - 期限切れ／未設定     → トライアルなし（即課金）
+    const trialExpiresMs = sub?.trial_expires_at
+      ? new Date(sub.trial_expires_at).getTime()
+      : null;
+    const remainingTrialDays =
+      trialExpiresMs && trialExpiresMs > Date.now()
+        ? Math.ceil((trialExpiresMs - Date.now()) / (24 * 60 * 60 * 1000))
+        : 0;
+
+    // ⑤ Stripe Customer を取得 or 作成
     const customerId = await ensureStripeCustomer(admin, user.id, user.email);
 
-    // ⑤ Checkout Session 発行（trial 30 日）
+    // ⑥ Checkout Session 発行（トライアル残があればその日数のみ、無ければ即課金）
     const priceId = getPriceId();
     const appUrl = getAppUrl();
     const session = await stripeRequest<{ id: string; url: string | null }>({
@@ -125,7 +154,10 @@ export async function POST(req: Request) {
         cancel_url: `${appUrl}/digital/settings/plan?canceled=1`,
         allow_promotion_codes: false,
         subscription_data: {
-          trial_period_days: PER_RECIPIENT_PRICING.trialDays,
+          // トライアル残がある場合のみ付与。消化済み（=0）なら付けず即課金。
+          ...(remainingTrialDays > 0
+            ? { trial_period_days: remainingTrialDays }
+            : {}),
           metadata: {
             user_id: user.id,
             per_recipient_quantity: String(quantity),

@@ -16,7 +16,7 @@ import DeviceList from '@/components/digital/DeviceList';
 export const metadata: Metadata = {
   title: 'パスワード保管｜つぎの手ナビ デジタル資産',
   description:
-    'スマートフォンや PC のロック解除パスワードを、大切な方に安全に引き継ぐためのデバイス一覧です。',
+    'スマートフォンや PC のデバイス・パスワードを、大切な方に安全に引き継ぐためのデバイス一覧です。',
   robots: { index: false, follow: false },
 };
 
@@ -59,7 +59,7 @@ export default async function DevicesPage() {
         {/* 説明 + 追加ボタン */}
         <section className="bg-white rounded-2xl border border-gray-100 p-5">
           <p className="text-sm text-gray-600 leading-relaxed">
-            スマートフォンや PC のロック解除パスワードを、暗号化して安全に保管できます。
+            スマートフォンや PC のデバイス・パスワードを、暗号化して安全に保管できます。
           </p>
           <Link
             href="/digital/devices/new"

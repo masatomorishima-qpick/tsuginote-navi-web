@@ -62,7 +62,7 @@ export default async function AccountDeletePage() {
           </h1>
           <p className="mt-2 text-sm text-gray-600 leading-relaxed">
             つぎの手ナビ デジタル資産のアカウントを削除します。
-            登録されたデータ、共有リンク、リマインド設定はすべて削除されます。
+            登録されたデータ、連携設定、リマインド設定はすべて削除されます。
           </p>
         </header>
 

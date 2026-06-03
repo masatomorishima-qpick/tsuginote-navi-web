@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { Shield, Globe, Smartphone, Lock, CheckCircle2, Circle, Users } from 'lucide-react';
+import { Shield, Globe, Smartphone, Lock, CheckCircle2, Circle, Users, CreditCard } from 'lucide-react';
 import SubscriptionStatusBanner from '@/components/digital/SubscriptionStatusBanner';
 import RecipientLinksCorner from '@/components/digital/RecipientLinksCorner';
 import KekDistributePrompt from '@/components/digital/KekDistributePrompt';
@@ -38,6 +38,8 @@ type DashboardNewProps = {
     DigitalFamilyLink,
     'id' | 'recipient_name' | 'status' | 'created_at'
   >[];
+  /** 休止中（suspended）の連携件数。> 0 のとき「カード登録で再開」案内を表示する（課題 #30） */
+  suspendedOwnerLinkCount?: number;
   /** 自分（オーナー）が死亡通知を受けている場合の情報 */
   pendingDeathNotice?: PendingDeathNotice | null;
 };
@@ -51,6 +53,7 @@ export default function DashboardNew({
   subscription,
   recipientLinks,
   ownerLinks,
+  suspendedOwnerLinkCount = 0,
   pendingDeathNotice,
 }: DashboardNewProps) {
   const router = useRouter();
@@ -364,6 +367,33 @@ export default function DashboardNew({
                 <span className="text-sm text-emerald-600">
                   30日間無料で試す
                 </span>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* 休止中の連携の案内（課題 #30）：未払いで休止された連携がある場合、
+            カード登録で再開できることを案内する */}
+        {suspendedOwnerLinkCount > 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-3">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 flex-shrink-0 rounded-xl bg-amber-100 flex items-center justify-center">
+                <CreditCard className="w-5 h-5 text-amber-700" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-base font-medium text-amber-900">
+                  {suspendedOwnerLinkCount}名との連携が休止中です
+                </p>
+                <p className="mt-1 text-sm text-amber-800/90 leading-relaxed">
+                  無料トライアルが終了したため、連携を一時休止しています。クレジットカードを登録すると、すぐに連携を再開できます。登録されたデジタル資産情報は保持されています。
+                </p>
+                <button
+                  type="button"
+                  onClick={() => router.push('/digital/settings/plan')}
+                  className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-full bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white active:opacity-80"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  カードを登録して再開する
+                </button>
               </div>
             </div>
           </div>

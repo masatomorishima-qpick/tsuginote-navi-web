@@ -87,7 +87,7 @@ export default function DigitalAssetsCrossLink({
             </li>
             <li className="flex gap-2">
               <span className="text-emerald-600">✓</span>
-              期限付き共有リンク（30/60/90日）で安全にシェア
+              もしものとき、大切な方へ情報を確実に連携
             </li>
           </ul>
 

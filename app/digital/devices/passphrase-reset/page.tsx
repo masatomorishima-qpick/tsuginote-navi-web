@@ -40,7 +40,7 @@ export default async function PassphraseResetPage() {
             マスターコードを忘れたとき
           </h1>
           <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-            パスワード（スマホ・PC のロック解除パスワード）を守るマスターコードが
+            デバイス・パスワード（スマホ・パソコンの画面ロック等に使うパスワード）を守るマスターコードが
             わからなくなった場合は、いったんリセットして、新しいマスターコードで
             登録し直してください。
           </p>

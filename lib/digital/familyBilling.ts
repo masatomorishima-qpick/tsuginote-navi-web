@@ -145,7 +145,8 @@ async function cancelSubscriptionNow(subscriptionId: string): Promise<void> {
 
 async function createCheckoutSessionForNewSubscription(
   customerId: string,
-  quantity: number
+  quantity: number,
+  trialPeriodDays: number
 ): Promise<string> {
   const priceId = getPriceId();
   const appUrl = getAppUrl();
@@ -161,7 +162,10 @@ async function createCheckoutSessionForNewSubscription(
       cancel_url: `${appUrl}/digital/share?canceled=1`,
       allow_promotion_codes: false,
       subscription_data: {
-        trial_period_days: TRIAL_DAYS,
+        // トライアル残がある場合のみ付与。消化済み（=0）なら付けず即課金。
+        ...(trialPeriodDays > 0
+          ? { trial_period_days: trialPeriodDays }
+          : {}),
       },
       payment_method_types: ['card'],
     },
@@ -288,11 +292,28 @@ export async function syncSubscriptionQuantity(
         return { ok: false, status: 'error', detail };
       }
 
+      // トライアル残日数（無料トライアルは初回 1 回のみ）。
+      //   行が無い新規 → 通常トライアル。残あり → 残り日数。消化済み → 0（即課金）。
+      const trialExpiresMs = subRow?.trial_expires_at
+        ? new Date(subRow.trial_expires_at as string).getTime()
+        : null;
+      let remainingTrialDays: number;
+      if (!subRow) {
+        remainingTrialDays = TRIAL_DAYS;
+      } else if (trialExpiresMs && trialExpiresMs > Date.now()) {
+        remainingTrialDays = Math.ceil(
+          (trialExpiresMs - Date.now()) / (24 * 60 * 60 * 1000)
+        );
+      } else {
+        remainingTrialDays = 0;
+      }
+
       let checkoutUrl: string;
       try {
         checkoutUrl = await createCheckoutSessionForNewSubscription(
           customerId,
-          targetQuantity
+          targetQuantity,
+          remainingTrialDays
         );
       } catch (err) {
         const detail = err instanceof Error ? err.message : 'checkout_failed';

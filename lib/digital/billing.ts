@@ -15,6 +15,7 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { DigitalSubscriptionStatus } from '@/types/digital';
+import { reactivateSuspendedLinksForOwner } from './family';
 
 // ============================================================================
 // Stripe Webhook Event 型（最低限）
@@ -155,6 +156,14 @@ async function applySubscription(
     sub.current_period_end ?? sub.items.data[0]?.current_period_end ?? null;
   const startIso = safeIsoFromUnix(periodStart);
   const endIso = safeIsoFromUnix(periodEnd);
+
+  // 課金可能な状態（active/trialing）になったら、休止中（suspended）の連携を
+  // 復活させる（課題 #30・安全網）。主経路は billing/checkout 側で復活させているが、
+  // Customer Portal 等の別経路でサブスクが有効化されたケースの取りこぼしをここで拾う。
+  // この後の active_links カウントに復活分を含めるため、カウント前に実行する。
+  if (internalStatus === 'active' || internalStatus === 'trialing') {
+    await reactivateSuspendedLinksForOwner(admin, userId);
+  }
 
   // quantity は active_links 数を真実として扱う。
   //   Stripe 側の subscription item quantity は最低 1 という制約があるため、

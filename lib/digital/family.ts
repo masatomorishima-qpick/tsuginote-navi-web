@@ -74,10 +74,13 @@ export type DigitalFamilyLink = {
   owner_user_id: string;
   recipient_user_id: string;
   recipient_name: string | null;
-  status: 'active' | 'revoked';
+  // 'suspended'：未払い（トライアル満了・カード未登録）で一時休止中。
+  //   active 以外なので課金数量・死亡開示の対象から外れる。カード登録で active へ戻す。
+  status: 'active' | 'revoked' | 'suspended';
   share_during_lifetime: boolean;
   created_at: string;
   revoked_at: string | null;
+  suspended_at: string | null;
 };
 
 export type InvitationStatus =
@@ -267,6 +270,78 @@ export async function countActiveLinks(
     return 0;
   }
   return count ?? 0;
+}
+
+/**
+ * オーナーの active な連携を 'suspended'（休止）にする（課題 #30）。
+ *
+ * 用途：trial-reminders cron が、トライアル満了・カード未登録（事実上 FREE）の
+ *       オーナーの連携を休止するために呼ぶ。
+ *
+ * 冪等性：status='active' の行だけを対象にするため、再実行しても二重処理にならない
+ *         （既に suspended / revoked の行は対象外）。
+ *
+ * @returns 休止に切り替えた件数（失敗時は 0）
+ */
+export async function suspendActiveLinksForOwner(
+  admin: SupabaseClient,
+  ownerUserId: string
+): Promise<number> {
+  const { data, error } = await admin
+    .from('digital_family_links')
+    .update({
+      status: 'suspended',
+      suspended_at: new Date().toISOString(),
+    })
+    .eq('owner_user_id', ownerUserId)
+    .eq('status', 'active')
+    .select('id');
+  if (error) {
+    console.error('[lib/digital/family] suspendActiveLinksForOwner failed', {
+      ownerUserId,
+      error: error.message,
+    });
+    return 0;
+  }
+  return data?.length ?? 0;
+}
+
+/**
+ * オーナーの 'suspended'（休止）連携を 'active' に戻す（課題 #30）。
+ *
+ * 用途：オーナーがカードを登録（Checkout 完了）して支払い可能になったときに、
+ *       休止していた連携を復活させるために呼ぶ。
+ *
+ * 注意：呼び出し側は、復活後に Stripe の subscription quantity を
+ *       active 連携数に合わせて同期すること（請求数量の取りこぼし防止）。
+ *       本番の主経路（billing/checkout）では、本関数で復活 → countActiveLinks で
+ *       数量算出 → その数量で Checkout を作成する順序にしている。
+ *
+ * 冪等性：status='suspended' の行だけを対象にするため、再実行しても安全。
+ *
+ * @returns 復活させた件数（失敗時は 0）
+ */
+export async function reactivateSuspendedLinksForOwner(
+  admin: SupabaseClient,
+  ownerUserId: string
+): Promise<number> {
+  const { data, error } = await admin
+    .from('digital_family_links')
+    .update({
+      status: 'active',
+      suspended_at: null,
+    })
+    .eq('owner_user_id', ownerUserId)
+    .eq('status', 'suspended')
+    .select('id');
+  if (error) {
+    console.error(
+      '[lib/digital/family] reactivateSuspendedLinksForOwner failed',
+      { ownerUserId, error: error.message }
+    );
+    return 0;
+  }
+  return data?.length ?? 0;
 }
 
 // =============================================================================

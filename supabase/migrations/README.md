@@ -6,8 +6,11 @@
 ## 実行順（Supabase ダッシュボード → SQL Editor に順に貼り付けて実行）
 
 ```
-001 → 002 → 003 → 004 → 005 → 006 → 007 → 008 → 009 → 010 → 011 → 012 → 013 → 014
+001 → 002 → 003 → 004 → 005 → 006 → 007 → 008 → 009 → 010 → 011 → 012 → 013 → 014 → 015 → 016
 ```
+
+- `015_family_link_suspended.sql` は連携リンクに `suspended`（休止）ステータスと `suspended_at` 列を追加（課題 #30：未払いオーナーの連携を休止するため）。本番・開発の両方に適用する。
+- `016_trial_final_reminder_column.sql` は `digital_subscriptions` に `trial_warning_final_sent_at` 列を追加（トライアル終了前日リマインドの重複送信防止）。本番・開発の両方に適用する。
 
 - `004` で作成する `digital_share_links` は `013` で drop する。順番どおり流せば整合する。
 - `008_per_recipient_billing.sql`（最大）に死亡通知・書類・招待・連携・KEK 等の中核テーブルが含まれる。

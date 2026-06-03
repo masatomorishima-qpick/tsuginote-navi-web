@@ -112,7 +112,7 @@ export default function AccountDeleteForm({ userEmail }: Props) {
           className="mt-0.5 h-5 w-5 rounded border-slate-300 text-rose-600 focus:ring-rose-500"
         />
         <span className="text-sm text-slate-800">
-          上記の内容を確認しました。登録データと共有リンクをすべて削除することに同意します。
+          上記の内容を確認しました。登録データをすべて削除することに同意します。
         </span>
       </label>
 

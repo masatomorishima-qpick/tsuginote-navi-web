@@ -23,7 +23,7 @@ const notoSansJP = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: "つぎの手ナビ デジタル資産｜大切な方へのデジタル引き継ぎ",
   description:
-    "スマホ・PC のパスワードや、ご利用中のサブスク・SNS を大切な方に引き継ぐ準備ができるサービスです。30 日間無料、クレジットカード登録不要。",
+    "スマホ・パソコン のパスワードや、ご利用中のサブスク・SNS を大切な方に引き継ぐ準備ができるサービスです。30 日間無料、クレジットカード登録不要。",
   icons: {
     icon: "/icon.png",
     shortcut: "/icon.png",

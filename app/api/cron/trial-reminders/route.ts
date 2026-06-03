@@ -19,14 +19,19 @@ import { NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import {
   sendTrialWarningEmail,
+  sendTrialFinalReminderEmail,
   sendTrialEndedEmail,
 } from '@/lib/email/trialReminder';
+import { suspendActiveLinksForOwner } from '@/lib/digital/family';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// リマインド発火日数（トライアル終了 N 日前）
-const WARNING_DAYS_BEFORE = 5;
+// 早期リマインド発火日数（トライアル終了 N 日前・1 回）
+const WARNING_DAYS_BEFORE = 7;
+
+// 前日リマインド発火日数（トライアル終了 N 日前・1 回）。直前の最終リマインド。
+const FINAL_WARNING_DAYS_BEFORE = 1;
 
 // 1 回の実行で処理する最大件数（無限ループ予防）
 const MAX_BATCH_SIZE = 200;
@@ -72,14 +77,24 @@ export async function GET(req: Request) {
     started_at: now.toISOString(),
     warning_sent: 0,
     warning_errors: 0,
+    final_warning_sent: 0,
+    final_warning_errors: 0,
     ended_sent: 0,
     ended_errors: 0,
     skipped: 0,
+    links_suspended: 0,
   };
 
   try {
-    // ② リマインドメール送信対象
+    // 前日リマインドの境界（now + 1 日）。早期リマインドはこの境界より先（まだ余裕がある）
+    // のものだけに絞り、前日窓と二重送信にならないようにする。
+    const finalDeadline = new Date(
+      now.getTime() + FINAL_WARNING_DAYS_BEFORE * 24 * 60 * 60 * 1000
+    );
+
+    // ② 早期リマインドメール送信対象（7 日前窓・1 回）
     //    条件：status='trialing' / trial_expires_at が WARNING_DAYS_BEFORE 日以内に切れる
+    //    かつ まだ前日窓には入っていない（finalDeadline より先）
     //    かつ stripe_subscription_id がまだ無い（カード未登録）
     //    かつ trial_warning_sent_at が NULL（未送信）
     const warningDeadline = new Date(
@@ -94,7 +109,7 @@ export async function GET(req: Request) {
       .is('trial_warning_sent_at', null)
       .not('trial_expires_at', 'is', null)
       .lt('trial_expires_at', warningDeadline.toISOString())
-      .gt('trial_expires_at', now.toISOString())
+      .gt('trial_expires_at', finalDeadline.toISOString())
       .limit(MAX_BATCH_SIZE);
 
     if (warningErr) {
@@ -141,6 +156,72 @@ export async function GET(req: Request) {
         } else {
           summary.warning_errors++;
           console.warn('[cron/trial-reminders] warning send failed', {
+            userId,
+            error: mailRes.error,
+          });
+        }
+      }
+    }
+
+    // ②-2 前日リマインドメール送信対象（24h 前窓・1 回）
+    //    条件：status='trialing' / trial_expires_at が前日窓（finalDeadline）以内かつ未来
+    //    かつ stripe_subscription_id がまだ無い（カード未登録）
+    //    かつ trial_warning_final_sent_at が NULL（未送信）
+    const { data: finalWarningCandidates, error: finalWarningErr } = await admin
+      .from('digital_subscriptions')
+      .select('user_id, trial_expires_at')
+      .eq('status', 'trialing')
+      .is('stripe_subscription_id', null)
+      .is('trial_warning_final_sent_at', null)
+      .not('trial_expires_at', 'is', null)
+      .lt('trial_expires_at', finalDeadline.toISOString())
+      .gt('trial_expires_at', now.toISOString())
+      .limit(MAX_BATCH_SIZE);
+
+    if (finalWarningErr) {
+      console.error(
+        '[cron/trial-reminders] final warning lookup failed',
+        finalWarningErr
+      );
+    } else {
+      for (const row of finalWarningCandidates ?? []) {
+        const userId = row.user_id as string;
+        const trialExpiresAt = row.trial_expires_at as string;
+
+        let email: string | null = null;
+        try {
+          const { data: u } = await admin.auth.admin.getUserById(userId);
+          email = u?.user?.email ?? null;
+        } catch (err) {
+          console.warn('[cron/trial-reminders] getUser failed (final)', {
+            userId,
+            err,
+          });
+        }
+        if (!email) {
+          summary.skipped++;
+          continue;
+        }
+
+        const expDate = new Date(trialExpiresAt);
+
+        const mailRes = await sendTrialFinalReminderEmail({
+          recipientEmail: email,
+          trialExpiresAt: expDate,
+          upgradeUrl,
+        });
+        if (mailRes.ok) {
+          summary.final_warning_sent++;
+          await admin
+            .from('digital_subscriptions')
+            .update({
+              trial_warning_final_sent_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+            .eq('user_id', userId);
+        } else {
+          summary.final_warning_errors++;
+          console.warn('[cron/trial-reminders] final warning send failed', {
             userId,
             error: mailRes.error,
           });
@@ -200,6 +281,59 @@ export async function GET(req: Request) {
           console.warn('[cron/trial-reminders] ended send failed', {
             userId,
             error: mailRes.error,
+          });
+        }
+      }
+    }
+
+    // ④ 連携の休止スイープ（課題 #30）
+    //    条件：status='trialing' / trial_expires_at が現在より過去（満了）
+    //    かつ stripe_subscription_id がまだ無い（カード未登録＝事実上 FREE）
+    //    → そのオーナーの active な連携を 'suspended' に切り替える。
+    //    トライアル終了通知メール（trial_ended_sent_at）とは独立した冪等スイープとし、
+    //    トライアル満了後に作られた連携も毎日拾えるようにする。
+    //    suspendActiveLinksForOwner は status='active' のみ対象なので二重処理にならない。
+    const { data: suspendCandidates, error: suspendErr } = await admin
+      .from('digital_subscriptions')
+      .select('user_id')
+      .eq('status', 'trialing')
+      .is('stripe_subscription_id', null)
+      .not('trial_expires_at', 'is', null)
+      .lt('trial_expires_at', now.toISOString())
+      .limit(MAX_BATCH_SIZE);
+
+    if (suspendErr) {
+      console.error('[cron/trial-reminders] suspend lookup failed', suspendErr);
+    } else {
+      for (const row of suspendCandidates ?? []) {
+        const userId = row.user_id as string;
+        try {
+          // 安全ガード：このオーナーについて進行中／開示済みの死亡通知があれば
+          // 休止しない。トライアル中に本人が亡くなったケースで連携を休止すると、
+          // 故人はカード登録できず、ご遺族が永久に開示を受けられなくなるため。
+          //   （rejected は対象外＝通常の生存ユーザーなので休止してよい）
+          const { data: notice } = await admin
+            .from('digital_death_notices')
+            .select('id')
+            .eq('owner_user_id', userId)
+            .in('status', [
+              'pending',
+              'awaiting_objection_period',
+              'disclosed',
+            ])
+            .limit(1)
+            .maybeSingle();
+          if (notice) {
+            summary.skipped++;
+            continue;
+          }
+
+          const n = await suspendActiveLinksForOwner(admin, userId);
+          summary.links_suspended += n;
+        } catch (err) {
+          console.warn('[cron/trial-reminders] suspend links failed', {
+            userId,
+            err,
           });
         }
       }

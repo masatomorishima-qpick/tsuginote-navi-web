@@ -111,8 +111,8 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
             </p>
             <p className="mt-1 text-emerald-900/90">
               {canStorePin
-                ? '次に、このデバイスのロック解除パスワードを保管しましょう。下のボタンから登録できます。'
-                : 'デバイス情報の登録が完了しました。STANDARDプランにアップグレードすると、ロック解除パスワードの保管機能もご利用いただけます。'}
+                ? '次に、このデバイスのパスワードを保管しましょう。下のボタンから登録できます。'
+                : 'デバイス情報の登録が完了しました。STANDARDプランにアップグレードすると、デバイス・パスワードの保管機能もご利用いただけます。'}
             </p>
           </div>
         </div>
@@ -130,7 +130,7 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
             </div>
             <div>
               <p className="text-sm font-semibold text-slate-900">
-                ロック解除パスワードを保管しましょう
+                デバイス・パスワードを保管しましょう
               </p>
               <p className="mt-0.5 text-xs text-slate-600">
                 暗号化して安全に保管します。マスターコードなしでは誰も取り出せません。
@@ -155,7 +155,7 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
             aria-hidden="true"
           />
           <p>
-            ロック解除パスワードの保管は STANDARDプラン限定の機能です。
+            デバイス・パスワードの保管は STANDARDプラン限定の機能です。
             <Link
               href="/digital/settings/plan"
               className="ml-1 font-semibold text-emerald-700 hover:underline"

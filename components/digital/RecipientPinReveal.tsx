@@ -3,7 +3,7 @@
 /**
  * RecipientPinReveal
  *
- * 連携者が、開示されたオーナーの PIN（スマホ・PC パスワード）を
+ * 連携者が、開示されたオーナーの PIN（スマホ・パソコン パスワード）を
  * 自分のパスフレーズで復号して表示するコンポーネント。
  *
  * 復号フロー（すべてブラウザ内で完結、サーバーに平文は出ない）：
@@ -211,7 +211,7 @@ export default function RecipientPinReveal({ ownerId }: Props) {
       <div className="space-y-3">
         {results.length === 0 ? (
           <p className="rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-500">
-            登録されているスマホ・PC のパスワードはありません。
+            登録されているスマホ・パソコン のパスワードはありません。
           </p>
         ) : (
           <ul className="space-y-2">
@@ -280,7 +280,7 @@ export default function RecipientPinReveal({ ownerId }: Props) {
   return (
     <form onSubmit={handleReveal} className="space-y-3">
       <p className="text-sm leading-relaxed text-slate-600">
-        スマホ・PC のパスワードを表示するには、
+        スマホ・パソコン のパスワードを表示するには、
         連携承認時にご自身で設定された<b>連携の合言葉</b>を入力してください。
       </p>
       <div>

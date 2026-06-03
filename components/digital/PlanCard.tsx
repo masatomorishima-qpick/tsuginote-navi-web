@@ -173,7 +173,7 @@ export default function PlanCard({ subscription }: Props) {
               <p className="font-semibold text-slate-900">STANDARDプランでご利用中の機能</p>
               <ul className="mt-2 list-inside list-disc space-y-0.5">
                 <li>デジタル資産・サービスの登録（無制限）</li>
-                <li>スマホ・PC のパスワード保管</li>
+                <li>スマホ・パソコン のパスワード保管</li>
                 <li>大切な方への連携アカウント（連携者 1 名ごと {PER_RECIPIENT_PRICING.label}）</li>
                 <li>PDF 出力 / リマインダー / 操作履歴</li>
               </ul>
@@ -185,7 +185,7 @@ export default function PlanCard({ subscription }: Props) {
                 <li>デジタル資産・サービスの登録（無制限）</li>
                 <li>大切な方に共有（PDF 出力）/ リマインダー / 操作履歴</li>
                 <li className="text-slate-400">
-                  スマホ・PC のパスワード保管はSTANDARDプランのみ
+                  スマホ・パソコン のパスワード保管はSTANDARDプランのみ
                 </li>
               </ul>
             </>

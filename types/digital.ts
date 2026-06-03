@@ -228,6 +228,10 @@ export type DigitalSubscription = {
   cancel_at_period_end: boolean;
   // 連携者数（Phase 1.5：digital_family_links の active 件数と同期、Stripe quantity と一致）
   quantity: number;
+  // トライアルリマインド送信履歴（009 / 016）。NULL なら未送信。
+  trial_warning_sent_at?: string | null;        // 早期（7 日前窓・1 回）
+  trial_warning_final_sent_at?: string | null;  // 前日（24h 前・1 回）
+  trial_ended_sent_at?: string | null;          // 満了当日
   // 監査
   created_at: string;
   updated_at: string;
@@ -253,7 +257,7 @@ export const SUBSCRIPTION_STATUS_LABELS: Record<DigitalSubscriptionStatus, strin
 export const PLAN_LIMITS = {
   free: {
     maxAssets: Infinity,    // 2026-05 改訂：FREE もデジタル資産は無制限（5 件制限を撤廃）
-    canStorePin: false,     // スマホ・PC のパスワード保管
+    canStorePin: false,     // スマホ・パソコン のパスワード保管
   },
   standard: {
     maxAssets: Infinity,

@@ -83,10 +83,10 @@ export default async function NewPinPage({ params }: Props) {
             />
             <div className="flex-1">
               <h2 className="text-lg font-bold text-emerald-900">
-                スマホ・PC のパスワード保管は STANDARDプラン限定の機能です
+                スマホ・パソコン のパスワード保管は STANDARDプラン限定の機能です
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-emerald-900/90">
-                ロック解除パスワードを暗号化して安全に保管する機能は、STANDARDプランでご利用いただけます。
+                デバイス・パスワードを暗号化して安全に保管する機能は、STANDARDプランでご利用いただけます。
                 30 日間の無料トライアルを使い切った方も、アップグレードでいつでも再開できます。
               </p>
               <ul className="mt-4 space-y-1 text-sm text-emerald-900/90">

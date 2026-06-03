@@ -257,7 +257,7 @@ export default async function FamilyOwnerViewPage({ params }: Props) {
         </section>
       )}
 
-      {/* スマホ・PC のパスワード（PIN）復号セクション
+      {/* スマホ・パソコン のパスワード（PIN）復号セクション
             既定では死後開示済みのときのみ表示。
             DIGITAL_LIFETIME_PIN_REVEAL_ENABLED=true なら生前共有 ON のときも表示。 */}
       {canViewPin ? (

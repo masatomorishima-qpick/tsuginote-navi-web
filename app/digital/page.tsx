@@ -197,10 +197,15 @@ export default async function DigitalDashboardPage() {
   }
 
   // 自分が owner として連携している家族リンクの取得（active のみ）
+  // 加えて、休止中（suspended）の件数も数える（課題 #30：カード登録で再開の案内表示用）。
   let ownerLinks: DigitalFamilyLink[] = [];
+  let suspendedOwnerLinkCount = 0;
   try {
     const allOwnerLinks = await listLinksByOwner(supabase, user.id);
     ownerLinks = allOwnerLinks.filter((l) => l.status === 'active');
+    suspendedOwnerLinkCount = allOwnerLinks.filter(
+      (l) => l.status === 'suspended'
+    ).length;
   } catch (err) {
     console.error('[digital/page] listLinksByOwner failed', err);
   }
@@ -283,6 +288,7 @@ export default async function DigitalDashboardPage() {
       subscription={subscription}
       recipientLinks={recipientLinks}
       ownerLinks={ownerLinks}
+      suspendedOwnerLinkCount={suspendedOwnerLinkCount}
       pendingDeathNotice={pendingDeathNotice}
     />
   );

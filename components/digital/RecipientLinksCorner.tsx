@@ -19,14 +19,48 @@ import {
   ChevronRight,
   CheckCircle2,
   Clock,
+  AlertTriangle,
+  ShieldOff,
+  UserCheck,
 } from 'lucide-react';
 import { formatJpDate } from '@/lib/digital/utils';
 import type { DigitalFamilyLink } from '@/lib/digital/family';
+import DeathNoticeCancelButton from '@/components/digital/DeathNoticeCancelButton';
+
+/** 通報者本人が取り消せる時間：24h（lib/digital/deathNotice.ts と同期）*/
+const NOTIFIER_SELF_CANCEL_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 export type RecipientLinkInfoLite = {
   link: DigitalFamilyLink;
   ownerDisplayName: string | null;
   ownerEmail: string | null;
+  /**
+   * 当該 owner についての最新の死亡通知の状態。
+   * 通知が無ければ null。pending / awaiting_objection_period の場合は
+   * 「ご逝去をご報告する」ボタンを差し止め、進捗カードを出す。
+   * rejected の場合は「取り下げとなりました」、disclosed の場合は閲覧導線。
+   */
+  latestDeathNotice?: {
+    id: string;
+    status:
+      | 'pending'
+      | 'awaiting_objection_period'
+      | 'rejected'
+      | 'disclosed';
+    reportedDeathDate: string;
+    objectionDeadline: string | null;
+    objectionAt: string | null;
+    opsRejectedReason: string | null;
+    createdAt: string;
+    /** 当該通知の申請者がログインユーザー本人か（取り消しボタン表示判定）*/
+    isOwnNotice: boolean;
+    /**
+     * status='rejected' のとき、その理由が「通報者本人による取り消し」かどうか。
+     * UI 文言を「申請を受理されませんでした」(ops 却下) と
+     * 「申請をキャンセルしました」(self cancel) で分けるための判定フラグ。
+     */
+    cancelledByNotifier: boolean;
+  } | null;
 };
 
 export default function RecipientLinksCorner({
@@ -58,7 +92,7 @@ export default function RecipientLinksCorner({
       </div>
 
       <ul className="mt-4 space-y-3">
-        {links.map(({ link, ownerDisplayName, ownerEmail }) => {
+        {links.map(({ link, ownerDisplayName, ownerEmail, latestDeathNotice }) => {
           const canView = link.share_during_lifetime;
           // プライバシー配慮：share_during_lifetime の事実を直接見せず、
           // 「いま見られるかどうか」だけを中立的な文言で表現する。
@@ -81,9 +115,14 @@ export default function RecipientLinksCorner({
                   連携開始日：{formatJpDate(link.created_at)}
                 </p>
 
-                {/* ステータスバッジ */}
-                <div className="mt-2">
-                  {canView ? (
+                {/* ステータスバッジ
+                    ・ 生前共有 ON で閲覧可能なときのみ表示
+                    ・「ご本人ご存命中（非表示）」のような恒常表示は
+                      通常状態を毎日見せる必要が薄く、UI ノイズになるため削除
+                    ・ 状況に変化（死亡通知あり）があれば後段の DeathNoticeStatusCard
+                      で目立つカードを出す */}
+                {canView && (
+                  <div className="mt-2">
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
                       <CheckCircle2
                         className="h-3 w-3"
@@ -91,13 +130,8 @@ export default function RecipientLinksCorner({
                       />
                       現在ご確認いただけます
                     </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-                      <Clock className="h-3 w-3" aria-hidden="true" />
-                      ご本人ご存命中（非表示）
-                    </span>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
 
               {/* 閲覧用ボタン（canView 時のみ） */}
@@ -113,34 +147,240 @@ export default function RecipientLinksCorner({
                 </div>
               )}
 
-              {/* もしものとき：ご逝去のご報告 + ヘルプ導線 */}
-              <div className="mt-4 border-t border-slate-100 pt-3">
-                <div className="mb-2 flex items-center justify-between">
-                  <p className="text-xs font-medium text-slate-700">
-                    もしものときは
-                  </p>
+              {/* 死亡通知の進捗・結果カード（通知が存在する場合）*/}
+              {latestDeathNotice && (
+                <DeathNoticeStatusCard
+                  ownerId={link.owner_user_id}
+                  notice={latestDeathNotice}
+                />
+              )}
+
+              {/* もしものとき：通知が無いとき、または却下/disclosed のときに表示
+                  pending / awaiting_objection_period のときは「報告する」ボタンを
+                  二重に出さないよう非表示にする */}
+              {(!latestDeathNotice ||
+                latestDeathNotice.status === 'rejected') && (
+                <div className="mt-4 border-t border-slate-100 pt-3">
+                  <div className="mb-2 flex items-center justify-between">
+                    <p className="text-xs font-medium text-slate-700">
+                      もしものときは
+                    </p>
+                    <Link
+                      href="/digital/settings/help#death-notice"
+                      className="inline-flex items-center gap-0.5 text-xs text-violet-600 hover:underline"
+                    >
+                      手順を見る
+                      <ChevronRight
+                        className="h-3 w-3"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  </div>
                   <Link
-                    href="/digital/settings/help#death-notice"
-                    className="inline-flex items-center gap-0.5 text-xs text-violet-600 hover:underline"
+                    href={`/digital/family/${link.owner_user_id}/death-notice`}
+                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
                   >
-                    手順を見る
-                    <ChevronRight
-                      className="h-3 w-3"
-                      aria-hidden="true"
-                    />
+                    ご逝去をご報告する
                   </Link>
                 </div>
-                <Link
-                  href={`/digital/family/${link.owner_user_id}/death-notice`}
-                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  ご逝去をご報告する
-                </Link>
-              </div>
+              )}
             </li>
           );
         })}
       </ul>
     </section>
+  );
+}
+
+/**
+ * 死亡通知の進捗・結果を表示する小カード（連携相手向け）。
+ *
+ * 表示分岐：
+ *   - pending                   → 書類確認中（運営対応待ち）
+ *   - awaiting_objection_period → ご本人への最終確認中（〜M月D日）
+ *   - rejected                  → 取り下げ済み（理由が分かれば併記）
+ *   - disclosed                 → 開示済み（情報閲覧へ）
+ *
+ * 各状態で「詳細を見る」ボタンから /digital/family/[ownerId]/death-notice
+ * に遷移できる（ownerId 側の page.tsx で詳細を表示）。
+ */
+function DeathNoticeStatusCard({
+  ownerId,
+  notice,
+}: {
+  ownerId: string;
+  notice: NonNullable<RecipientLinkInfoLite['latestDeathNotice']>;
+}) {
+  const detailHref = `/digital/family/${ownerId}/death-notice`;
+
+  if (notice.status === 'pending') {
+    // 通報者本人かつ申請から 24h 以内なら取り消しボタンを出す
+    const elapsedMs = Date.now() - new Date(notice.createdAt).getTime();
+    const canSelfCancel =
+      notice.isOwnNotice && elapsedMs < NOTIFIER_SELF_CANCEL_WINDOW_MS;
+    return (
+      <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
+        <div className="flex items-start gap-3">
+          <Clock
+            className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-700"
+            aria-hidden="true"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-base font-semibold text-slate-900">
+              死亡通知：書類確認中
+            </p>
+
+            {/* あなたが申請者であることをバッジで明示
+                自分が出した申請であることをひと目で認識できるよう、
+                短く「申請者です」と表示。*/}
+            {notice.isOwnNotice && (
+              <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-violet-200 bg-violet-100 px-2.5 py-1 text-xs font-medium text-violet-800">
+                <UserCheck className="h-3 w-3" aria-hidden="true" />
+                申請者です
+              </span>
+            )}
+
+            <p className="mt-2 text-sm leading-relaxed text-slate-700">
+              運営にて 5 営業日以内に書類を確認します。
+            </p>
+
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+              <Link
+                href={detailHref}
+                className="inline-flex items-center gap-0.5 text-sm font-medium text-violet-700 hover:underline"
+              >
+                詳細を見る
+                <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+              {canSelfCancel && (
+                <DeathNoticeCancelButton noticeId={notice.id} />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (notice.status === 'awaiting_objection_period') {
+    const deadlineLabel = notice.objectionDeadline
+      ? new Date(notice.objectionDeadline).toLocaleDateString('ja-JP', {
+          timeZone: 'Asia/Tokyo',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      : null;
+    return (
+      <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
+        <div className="flex items-start gap-3">
+          <Clock
+            className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-700"
+            aria-hidden="true"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-base font-semibold text-slate-900">
+              死亡通知：ご本人への最終確認中
+            </p>
+            <p className="mt-1.5 text-sm leading-relaxed text-slate-700">
+              {deadlineLabel ? (
+                <>
+                  <b className="text-slate-900">{deadlineLabel}</b> まで異議申立がなければ、ご情報が開示されます。
+                </>
+              ) : (
+                'ご本人への最終確認期間中です。'
+              )}
+            </p>
+            <Link
+              href={detailHref}
+              className="mt-3 inline-flex items-center gap-0.5 text-sm font-medium text-violet-700 hover:underline"
+            >
+              詳細を見る
+              <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (notice.status === 'rejected') {
+    // 取り下げの 3 ケース：
+    //   ① 通報者本人による取り消し（pending 中に自分でキャンセル）
+    //   ② ご本人からの異議申立（awaiting_objection_period 中）
+    //   ③ 運営による書類不備等の却下
+    // それぞれ理由が違うので文言を分ける（同じ文言だとミスリードになる）
+    if (notice.cancelledByNotifier) {
+      // 通報者本人による取り消し：簡潔な一行表示
+      // （自分でキャンセルした人にとっては自明な内容なので最小限）
+      return (
+        <div className="mt-4 rounded-xl border border-slate-300 bg-slate-50 p-4">
+          <div className="flex items-center gap-3">
+            <ShieldOff
+              className="h-5 w-5 flex-shrink-0 text-slate-600"
+              aria-hidden="true"
+            />
+            <p className="text-base font-semibold text-slate-900">
+              逝去申請をキャンセルしました
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    const isOwnerObjection = !!notice.objectionAt;
+    return (
+      <div className="mt-4 rounded-xl border border-slate-300 bg-slate-50 p-4">
+        <div className="flex items-start gap-3">
+          <ShieldOff
+            className="mt-0.5 h-5 w-5 flex-shrink-0 text-slate-600"
+            aria-hidden="true"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-base font-semibold text-slate-900">
+              {isOwnerObjection
+                ? '逝去申請は取り下げとなりました'
+                : '逝去申請は受理されませんでした'}
+            </p>
+            <p className="mt-1.5 text-sm leading-relaxed text-slate-700">
+              {isOwnerObjection
+                ? 'ご本人からのお返事により取り下げとなりました。'
+                : '運営による書類確認の結果、申請を受理できませんでした。'}
+            </p>
+            {/* 「詳細を見る」リンクは置かない：
+                rejected 状態の遷移先は再申請フォーム（/digital/family/[ownerId]/death-notice）であり、
+                下段に表示される「ご逝去をご報告する」ボタンと同じ画面に飛ぶため重複する。
+                取り下げ後は次の行動（再申請 or 何もしない）が下段ボタンで完結する。 */}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // disclosed
+  return (
+    <div className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-4">
+      <div className="flex items-start gap-3">
+        <AlertTriangle
+          className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-700"
+          aria-hidden="true"
+        />
+        <div className="flex-1 min-w-0">
+          <p className="text-base font-semibold text-slate-900">
+            情報が開示されました
+          </p>
+          <p className="mt-1.5 text-sm leading-relaxed text-slate-700">
+            ご登録情報をご確認いただけます。
+          </p>
+          <Link
+            href={`/digital/family/${ownerId}`}
+            className="mt-3 inline-flex items-center gap-0.5 text-sm font-medium text-violet-700 hover:underline"
+          >
+            情報を見る
+            <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }

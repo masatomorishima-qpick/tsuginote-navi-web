@@ -24,7 +24,10 @@ import { NextResponse } from 'next/server';
 import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { createDeathNotice } from '@/lib/digital/deathNotice';
-import { listLinksByOwner } from '@/lib/digital/family';
+import {
+  getRecipientNameByOwner,
+  listLinksByOwner,
+} from '@/lib/digital/family';
 import { getDisplayNameById } from '@/lib/digital/profile';
 import { sendEmail } from '@/lib/email/client';
 
@@ -108,10 +111,20 @@ export async function POST(req: Request) {
         not_linked: 403,
         self_notification: 400,
         duplicate_pending: 409,
+        same_owner_cooldown: 429,           // 同一 owner、cooldown 中
+        same_owner_lifetime_exceeded: 429,  // 同一 owner、生涯上限超過
+        notifier_rate_limited: 429,         // 通報者の 30 日合算上限
         unexpected: 500,
       };
       return NextResponse.json(
-        { ok: false, error: created.error, detail: created.detail },
+        {
+          ok: false,
+          error: created.error,
+          detail: created.detail,
+          // cooldown エラー時はクライアント表示用に retry_after_days を返す
+          retry_after_days:
+            'retryAfterDays' in created ? created.retryAfterDays : undefined,
+        },
         { status: statusByError[created.error] ?? 500 }
       );
     }
@@ -122,11 +135,22 @@ export async function POST(req: Request) {
     //    すべて失敗してもメイン処理（通知作成）はロールバックしない
     try {
       // 通報者の表示名（任意）
+      //   オーナー視点では、自分が招待時につけた呼称（family_links.recipient_name）が
+      //   最も自然。次にプロフィール表示名、最後にフォールバック。
       let notifierName = '連携者の方';
       try {
-        const profile = await getDisplayNameById(admin, user.id);
-        notifierName =
-          profile?.display_name ?? profile?.preferred_name ?? notifierName;
+        const recipientName = await getRecipientNameByOwner(
+          admin,
+          body.owner_user_id,
+          user.id
+        );
+        if (recipientName) {
+          notifierName = recipientName;
+        } else {
+          const profile = await getDisplayNameById(admin, user.id);
+          notifierName =
+            profile?.display_name ?? profile?.preferred_name ?? notifierName;
+        }
       } catch {
         // ignore
       }
@@ -268,7 +292,7 @@ ${p.helpUrl}
 
 ──
 つぎの手ナビ デジタル資産
-お問い合わせ：support@tsuginotenavi.jp
+お問い合わせ：info@blueadventures.jp
 `;
 }
 
@@ -311,7 +335,7 @@ function ownerImmediateNoticeHtml(p: {
       </p>
     </div>
     <div style="margin-top:24px;text-align:center;font-size:11px;color:#94a3b8;">
-      つぎの手ナビ デジタル資産<br>support@tsuginotenavi.jp
+      つぎの手ナビ デジタル資産<br>info@blueadventures.jp
     </div>
   </div>
 </body></html>`;
@@ -336,7 +360,7 @@ ${p.helpUrl}
 
 ──
 つぎの手ナビ デジタル資産
-support@tsuginotenavi.jp
+info@blueadventures.jp
 `;
 }
 
@@ -372,7 +396,7 @@ function recipientAwarenessHtml(p: {
       </p>
     </div>
     <div style="margin-top:24px;text-align:center;font-size:11px;color:#94a3b8;">
-      つぎの手ナビ デジタル資産<br>support@tsuginotenavi.jp
+      つぎの手ナビ デジタル資産<br>info@blueadventures.jp
     </div>
   </div>
 </body></html>`;

@@ -32,6 +32,44 @@ export const OBJECTION_PERIOD_DAYS = 14;
 /** 異議申立トークンの長さ（生バイト、URL-safe Base64 で 48 文字以上） */
 const OBJECTION_TOKEN_BYTES = 36;
 
+// -----------------------------------------------------------------------------
+// イタズラ防止：レート制限・取り消しに関する定数
+// -----------------------------------------------------------------------------
+
+/**
+ * 通報者本人がご自身の申請を取り消せる時間（秒）。
+ * status='pending' 中のみ有効。運営が確認 OK にした後は、誤送信回避ではなく
+ * ご本人の異議申立フローに乗せるため、通報者側からの取り消しは不可。
+ */
+export const NOTIFIER_SELF_CANCEL_WINDOW_SECONDS = 24 * 60 * 60; // 24 時間
+
+/**
+ * 同一通報者 → 同一 owner の通知について、却下後の再申請まで必要な日数。
+ * 直近の rejection（運営却下 or 本人異議）から 90 日経過していなければ再申請不可。
+ * （通報者自身の取り消し = 'notifier_self_cancel' は cooldown 対象外）
+ */
+export const SAME_OWNER_REJECTION_COOLDOWN_DAYS = 90;
+
+/**
+ * 同一通報者 → 同一 owner の通知について、生涯で許される最大累積申請件数。
+ * 通報者自身の取り消しはカウントしない。
+ * これを超えると、たとえ cooldown を抜けても新規申請は不可（要 ops 介入）。
+ */
+export const SAME_OWNER_MAX_LIFETIME_NOTICES = 3;
+
+/**
+ * 同一通報者の全 owner 合算での、直近 30 日間の上限申請件数。
+ * 連続スパム抑止のため。取り消しを含む全件をカウント。
+ */
+export const NOTIFIER_MAX_NOTICES_PER_30_DAYS = 5;
+
+/**
+ * 通報者自身による取り消しを表すセンチネル値。
+ * status='rejected' + ops_verifier='__notifier_self_cancel__' で「通報者本人の取り消し」と判定。
+ * （現状の DB スキーマに status='cancelled' を追加せずに済むよう、既存列で表現）
+ */
+export const NOTIFIER_SELF_CANCEL_MARKER = '__notifier_self_cancel__';
+
 // =============================================================================
 // 型定義
 // =============================================================================
@@ -109,8 +147,13 @@ export type CreateDeathNoticeResult =
         | 'not_linked'
         | 'self_notification'
         | 'duplicate_pending'
+        | 'same_owner_cooldown'    // 同一 owner、却下後 90 日以内
+        | 'same_owner_lifetime_exceeded' // 同一 owner、生涯 3 回超過
+        | 'notifier_rate_limited'  // 30 日 5 件超過
         | 'unexpected';
       detail?: string;
+      /** rate limit エラー時のクライアント向け補足 */
+      retryAfterDays?: number;
     };
 
 /**
@@ -182,6 +225,71 @@ export async function createDeathNotice(
       error: 'duplicate_pending',
       detail:
         '既に同じ方についての死亡通知が確認中です。重ねての通知は不要です。',
+    };
+  }
+
+  // -----------------------------------------------------------------------
+  // イタズラ防止：レート制限チェック
+  // -----------------------------------------------------------------------
+  // 同一通報者 → 同一 owner 履歴を取得（取り消しを除外）
+  //   - 取り消し（notifier_self_cancel）はカウントしない
+  //   - それ以外（pending/awaiting/rejected by ops/objected by owner/disclosed）はカウント
+  const { data: sameOwnerHistory } = await admin
+    .from('digital_death_notices')
+    .select('id, status, ops_verifier, ops_verified_at, created_at')
+    .eq('owner_user_id', input.ownerUserId)
+    .eq('notifier_user_id', input.notifierUserId)
+    .order('created_at', { ascending: false });
+
+  const meaningful = (sameOwnerHistory ?? []).filter(
+    (n) => n.ops_verifier !== NOTIFIER_SELF_CANCEL_MARKER
+  );
+
+  // (i) 生涯回数チェック
+  if (meaningful.length >= SAME_OWNER_MAX_LIFETIME_NOTICES) {
+    return {
+      ok: false,
+      error: 'same_owner_lifetime_exceeded',
+      detail: `同じ方への死亡通知は生涯 ${SAME_OWNER_MAX_LIFETIME_NOTICES} 回までです。状況が変わった場合は info@blueadventures.jp までご連絡ください。`,
+    };
+  }
+
+  // (ii) 直近の rejection からの cooldown チェック
+  const mostRecentRejected = meaningful.find(
+    (n) => n.status === 'rejected'
+  );
+  if (mostRecentRejected) {
+    const rejectedAt = new Date(
+      (mostRecentRejected.ops_verified_at as string | null) ??
+        (mostRecentRejected.created_at as string)
+    );
+    const elapsedDays = Math.floor(
+      (Date.now() - rejectedAt.getTime()) / (24 * 60 * 60 * 1000)
+    );
+    if (elapsedDays < SAME_OWNER_REJECTION_COOLDOWN_DAYS) {
+      const retryAfterDays =
+        SAME_OWNER_REJECTION_COOLDOWN_DAYS - elapsedDays;
+      return {
+        ok: false,
+        error: 'same_owner_cooldown',
+        detail: `前回の死亡通知から ${SAME_OWNER_REJECTION_COOLDOWN_DAYS} 日経過していないため、再度の申請は受け付けられません。あと約 ${retryAfterDays} 日お待ちください。`,
+        retryAfterDays,
+      };
+    }
+  }
+
+  // (iii) 通報者横断のレート制限（全 owner 合算、取り消しも含む 30 日合算）
+  const since30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const { count: notifierCount30 } = await admin
+    .from('digital_death_notices')
+    .select('id', { count: 'exact', head: true })
+    .eq('notifier_user_id', input.notifierUserId)
+    .gt('created_at', since30.toISOString());
+  if ((notifierCount30 ?? 0) >= NOTIFIER_MAX_NOTICES_PER_30_DAYS) {
+    return {
+      ok: false,
+      error: 'notifier_rate_limited',
+      detail: `死亡通知の申請は 30 日に ${NOTIFIER_MAX_NOTICES_PER_30_DAYS} 件までです。お困りの場合は info@blueadventures.jp までご連絡ください。`,
     };
   }
 
@@ -320,6 +428,90 @@ export async function verifyByOps(
     return { ok: false, error: 'unexpected', detail: updErr.message };
   }
 
+  return { ok: true, notice: updated as DigitalDeathNotice };
+}
+
+/**
+ * 通報者本人が、自分で提出した申請を取り消す。
+ *
+ * 条件：
+ *   - 通知の notifier_user_id が要求者と一致
+ *   - status='pending'（運営確認前のみ）
+ *   - 作成から NOTIFIER_SELF_CANCEL_WINDOW_SECONDS（24h）以内
+ *
+ * 動作：status='rejected'、ops_verifier=NOTIFIER_SELF_CANCEL_MARKER をセット。
+ *   この扱いにより、後の再申請レート制限カウントから除外される
+ *   （誤送信の救済として連続再申請を許す設計）。
+ *
+ * メール送信は呼び出し側で行う（運営・本人へ取り消しの旨を通知）。
+ */
+export async function cancelByNotifier(
+  admin: SupabaseClient,
+  noticeId: string,
+  notifierUserId: string
+): Promise<
+  | { ok: true; notice: DigitalDeathNotice }
+  | {
+      ok: false;
+      error:
+        | 'not_found'
+        | 'forbidden'
+        | 'invalid_status'
+        | 'cancel_window_expired'
+        | 'unexpected';
+      detail?: string;
+    }
+> {
+  const { data: existing, error: getErr } = await admin
+    .from('digital_death_notices')
+    .select('*')
+    .eq('id', noticeId)
+    .maybeSingle();
+  if (getErr) {
+    return { ok: false, error: 'unexpected', detail: getErr.message };
+  }
+  if (!existing) return { ok: false, error: 'not_found' };
+
+  if (existing.notifier_user_id !== notifierUserId) {
+    return {
+      ok: false,
+      error: 'forbidden',
+      detail: 'この通知の取り消しは申請者ご本人のみ可能です。',
+    };
+  }
+  if (existing.status !== 'pending') {
+    return {
+      ok: false,
+      error: 'invalid_status',
+      detail:
+        '既に運営にて確認が始まっているため、ご自身での取り消しはできません。お困りの場合は info@blueadventures.jp までご連絡ください。',
+    };
+  }
+
+  const createdAt = new Date(existing.created_at as string);
+  const elapsedSeconds = Math.floor((Date.now() - createdAt.getTime()) / 1000);
+  if (elapsedSeconds > NOTIFIER_SELF_CANCEL_WINDOW_SECONDS) {
+    return {
+      ok: false,
+      error: 'cancel_window_expired',
+      detail: `申請から ${Math.floor(NOTIFIER_SELF_CANCEL_WINDOW_SECONDS / 3600)} 時間が経過したため、ご自身での取り消しはできません。お困りの場合は info@blueadventures.jp までご連絡ください。`,
+    };
+  }
+
+  const { data: updated, error: updErr } = await admin
+    .from('digital_death_notices')
+    .update({
+      status: 'rejected',
+      ops_verifier: NOTIFIER_SELF_CANCEL_MARKER,
+      ops_verified_at: new Date().toISOString(),
+      ops_rejected_reason: '通報者本人による取り消し（pending 中）',
+    })
+    .eq('id', noticeId)
+    .select('*')
+    .single();
+  if (updErr) {
+    return { ok: false, error: 'unexpected', detail: updErr.message };
+  }
   return { ok: true, notice: updated as DigitalDeathNotice };
 }
 

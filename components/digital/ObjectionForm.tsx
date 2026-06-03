@@ -60,23 +60,20 @@ export default function ObjectionForm({ token }: Props) {
 
   if (done) {
     return (
-      <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-5">
-        <div className="flex items-start gap-3">
-          <CheckCircle2
-            className="mt-0.5 h-6 w-6 flex-shrink-0 text-emerald-600"
-            aria-hidden="true"
-          />
-          <div>
-            <p className="text-sm font-semibold text-emerald-900">
-              異議申立を受け付けました
-            </p>
-            <p className="mt-1 text-xs leading-relaxed text-emerald-800/90">
-              この通知は取り下げとなり、大切な方への情報開示は行われません。
-              通報者の方にも、ご本人がご無事である旨の連絡が届きます。
-              <br />
-              ご不明な点があれば support@tsuginotenavi.jp までご連絡ください。
-            </p>
+      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 sm:p-6">
+        <div className="flex flex-col items-center text-center">
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600">
+            <CheckCircle2 className="h-6 w-6 text-white" aria-hidden="true" />
           </div>
+          <p className="text-lg font-bold text-slate-900">
+            お返事ありがとうございました
+          </p>
+          <p className="mt-2 text-base leading-relaxed text-slate-700">
+            通知は取り下げとなり、ご登録情報は公開されません。
+          </p>
+          <p className="mt-3 text-sm text-slate-600">
+            通報者の方にも、お元気である旨の連絡が届きます。
+          </p>
         </div>
       </div>
     );
@@ -88,28 +85,28 @@ export default function ObjectionForm({ token }: Props) {
         type="button"
         onClick={handleClick}
         disabled={submitting}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-rose-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-rose-600 px-6 py-4 text-base font-semibold text-white shadow-sm transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-slate-300"
       >
         {submitting ? (
-          <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+          <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
         ) : (
-          <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+          <ShieldCheck className="h-5 w-5" aria-hidden="true" />
         )}
-        {submitting ? '送信中…' : '私は生きています（異議申立を送信）'}
+        {submitting ? '送信中…' : '私は生きています（通知を取り下げる）'}
       </button>
 
       {error && (
-        <div className="flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800">
+        <div className="flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">
           <AlertCircle
-            className="mt-0.5 h-3.5 w-3.5 flex-shrink-0"
+            className="mt-0.5 h-4 w-4 flex-shrink-0"
             aria-hidden="true"
           />
           <span>{error}</span>
         </div>
       )}
 
-      <p className="text-xs leading-relaxed text-slate-500">
-        ※ このボタンを押せるのはご本人だけです（このページの URL はご本人のメールアドレスにしか送られていません）。
+      <p className="text-sm leading-relaxed text-slate-500">
+        ※ このボタンを押せるのはご本人だけです。
       </p>
     </div>
   );

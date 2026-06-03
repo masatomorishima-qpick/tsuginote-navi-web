@@ -6,9 +6,9 @@
  */
 
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
-  AlertTriangle,
   CheckCircle2,
   ChevronRight,
   XCircle,
@@ -19,6 +19,7 @@ import {
   DEATH_NOTICE_STATUS_LABELS,
 } from '@/lib/digital/deathNotice';
 import { getDisplayNameById } from '@/lib/digital/profile';
+import { getRecipientNameByOwner } from '@/lib/digital/family';
 import ObjectionForm from '@/components/digital/ObjectionForm';
 
 export const metadata: Metadata = {
@@ -88,7 +89,12 @@ export default async function DeathObjectionPage({ params }: Props) {
     );
   }
 
-  // 通報者・本人の表示名
+  // 表示名の優先順位
+  //   本人（ownerDisplayName）：プロフィールから取得（自分自身のメール宛 UI なので
+  //     family_links は使わない、というか自分のリンクは存在しない）
+  //   通報者（notifierDisplayName）：オーナーが招待時につけた呼称
+  //     （family_links.recipient_name）を最優先。次にプロフィール表示名。
+  //     例：オーナーが「妻」と招待していれば「妻 さまから」と表示される。
   let ownerDisplayName: string | null = null;
   let notifierDisplayName: string | null = null;
   try {
@@ -98,79 +104,97 @@ export default async function DeathObjectionPage({ params }: Props) {
     // ignore
   }
   try {
-    const notifier = await getDisplayNameById(admin, notice.notifier_user_id);
-    notifierDisplayName =
-      notifier?.display_name ?? notifier?.preferred_name ?? null;
+    notifierDisplayName = await getRecipientNameByOwner(
+      admin,
+      notice.owner_user_id,
+      notice.notifier_user_id
+    );
+    if (!notifierDisplayName) {
+      const notifier = await getDisplayNameById(admin, notice.notifier_user_id);
+      notifierDisplayName =
+        notifier?.display_name ?? notifier?.preferred_name ?? null;
+    }
   } catch {
     // ignore
   }
 
+  // 期限を「2026年6月16日（火）23:13」形式で整形
+  const deadlineLabel = deadline
+    ? deadline.toLocaleString('ja-JP', {
+        timeZone: 'Asia/Tokyo',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : '';
+
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-8 sm:py-12">
+    <div className="min-h-screen bg-[#F5F5F0] px-4 py-8 sm:py-12">
       <div className="mx-auto max-w-xl space-y-6">
-        {/* シンプルなブランドヘッダー */}
+        {/* ブランドヘッダー */}
         <div className="text-center">
-          <p className="text-xs font-semibold text-emerald-700">
+          <p className="text-sm font-semibold text-emerald-700">
             つぎの手ナビ デジタル資産
           </p>
         </div>
 
-        {/* メインカード */}
-        <div className="rounded-2xl border border-rose-200 bg-white p-6 shadow-sm sm:p-8">
-          <div className="mb-4 flex items-start gap-3">
-            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-rose-100">
-              <AlertTriangle
-                className="h-6 w-6 text-rose-600"
-                aria-hidden="true"
-              />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900">
-                大切な確認のお願い
-              </h1>
-              <p className="mt-1 text-sm text-slate-600">
-                ご本人にしかお送りしていないメールから、このページを開いていただいています。
-              </p>
-            </div>
-          </div>
+        {/* メインカード — 寄り添うトーン、字サイズ大、無駄省略 */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          {/* 大きな見出し（カード内）*/}
+          <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+            {ownerDisplayName ?? 'ご本人'} さま、確認のお願いです
+          </h1>
 
-          <div className="space-y-3 text-sm leading-relaxed text-slate-700">
+          {/* 本文 — text-base で 16px、leading-relaxed で読みやすく */}
+          <div className="mt-5 space-y-4 text-base leading-relaxed text-slate-700">
             <p>
               <b>{notifierDisplayName ?? '連携者の方'}</b> さまから、
-              <b>{ownerDisplayName ?? 'ご本人'}</b> さま（あなた）が
-              <b>{notice.reported_death_date}</b> にお亡くなりになったとのご報告がございました。
+              {ownerDisplayName ?? 'ご本人'} さまについて
+              「<b>{notice.reported_death_date}</b> にお亡くなりになった」
+              とのご報告をお預かりしました。
             </p>
             <p>
-              書類確認は完了しており、このまま <b>{deadline?.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })} まで</b>
-              に異議申立がない場合、大切な方への情報開示が行われます。
+              下のボタンを押していただければ、この通知は <b>取り下げ</b> となり、
+              ご登録情報は <b>公開されません</b>。
             </p>
-            <p>
-              ご本人がこのページを開いているということは、ご報告に誤りが含まれている可能性があります。
-              下のボタンから「私は生きています」をワンクリックで送信してください。
-              ボタンを押した瞬間に通知は取り下げとなり、開示は行われません。
+            <p className="text-sm text-slate-600">
+              お返事の期限：<b className="text-slate-800">{deadlineLabel} まで</b>
             </p>
           </div>
 
+          {/* 異議申立ボタン */}
           <div className="mt-6">
             <ObjectionForm token={token} />
           </div>
         </div>
 
-        {/* 補足 */}
-        <div className="rounded-xl bg-white p-4 text-xs leading-relaxed text-slate-600 ring-1 ring-slate-200">
-          <p className="font-semibold text-slate-700">
-            お困りの場合
-          </p>
-          <p className="mt-1">
-            ボタンを押せない、または誤って通知を取り下げてしまった場合は、運営までご連絡ください。
-            <br />
-            <a
-              href="mailto:support@tsuginotenavi.jp"
-              className="font-medium text-emerald-700 hover:underline"
-            >
-              support@tsuginotenavi.jp
-            </a>
-          </p>
+        {/* 補足（最小限）*/}
+        <p className="text-center text-sm leading-relaxed text-slate-600">
+          お困りの場合は{' '}
+          <a
+            href="mailto:info@blueadventures.jp"
+            className="font-medium text-emerald-700 hover:underline"
+          >
+            info@blueadventures.jp
+          </a>
+          {' '}までご連絡ください。
+        </p>
+
+        {/* ダッシュボードへ戻る導線
+            ※ このページはトークン認証のためログインなしでも開ける。
+              未ログインの場合 /digital → middleware で /login に誘導される。
+              既にログイン済（ダッシュボードのアラートから来た）場合は
+              そのままダッシュボードへ戻れる。 */}
+        <div className="pt-2 text-center">
+          <Link
+            href="/digital"
+            className="inline-flex items-center gap-1 text-sm font-medium text-emerald-700 hover:underline"
+          >
+            ← ダッシュボードに戻る
+          </Link>
         </div>
       </div>
     </div>
@@ -201,21 +225,38 @@ function SimpleStateCard({
   }[icon];
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-12">
-      <div className="mx-auto max-w-xl">
+    <div className="min-h-screen bg-[#F5F5F0] px-4 py-12">
+      <div className="mx-auto max-w-xl space-y-6">
         <div className={`rounded-2xl border ${palette.border} ${palette.bg} p-6 sm:p-8`}>
           <div className="flex flex-col items-center text-center">
             <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-white">
               {iconNode}
             </div>
             <h1 className={`text-lg font-bold ${palette.text}`}>{title}</h1>
-            <p className={`mt-2 text-sm leading-relaxed ${palette.text}`}>
+            <p className={`mt-2 text-base leading-relaxed ${palette.text}`}>
               {message}
             </p>
-            <p className="mt-4 text-xs text-slate-500">
-              お困りの場合は <a href="mailto:support@tsuginotenavi.jp" className="text-emerald-700 hover:underline">support@tsuginotenavi.jp</a> までご連絡ください。
+            <p className="mt-4 text-sm text-slate-500">
+              お困りの場合は{' '}
+              <a
+                href="mailto:info@blueadventures.jp"
+                className="text-emerald-700 hover:underline"
+              >
+                info@blueadventures.jp
+              </a>
+              {' '}までご連絡ください。
             </p>
           </div>
+        </div>
+
+        {/* ダッシュボードへ戻る導線（未ログインの場合は /login にリダイレクト）*/}
+        <div className="text-center">
+          <Link
+            href="/digital"
+            className="inline-flex items-center gap-1 text-sm font-medium text-emerald-700 hover:underline"
+          >
+            ← ダッシュボードに戻る
+          </Link>
         </div>
       </div>
     </div>

@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
           ok: false,
           error: 'plan_required',
           detail:
-            'スマホ・PC のパスワード保管機能は STANDARD プランのみご利用いただけます。',
+            'スマホ・PC のパスワード保管機能は STANDARDプランのみご利用いただけます。',
           required_plan: 'standard',
         },
         { status: 403 }

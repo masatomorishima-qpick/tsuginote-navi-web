@@ -221,6 +221,38 @@ export async function listLinksByRecipient(
   return (data ?? []) as DigitalFamilyLink[];
 }
 
+/**
+ * オーナーが連携相手につけた呼称（recipient_name）を引く。
+ *
+ * 用途：オーナー視点 UI で連携相手を表示するときに、
+ *   オーナー自身が招待時につけたあだ名（例「妻」「長男」「親友 田中」）を
+ *   優先表示するため。
+ *
+ * 戻り値：
+ *   - recipient_name が設定されていれば文字列
+ *   - リンクが無い / 取得失敗のときは null
+ *
+ * 呼び出し側は通常、null の場合に通報者本人のプロフィール表示名へフォールバックする。
+ */
+export async function getRecipientNameByOwner(
+  admin: SupabaseClient,
+  ownerUserId: string,
+  recipientUserId: string
+): Promise<string | null> {
+  const { data, error } = await admin
+    .from('digital_family_links')
+    .select('recipient_name')
+    .eq('owner_user_id', ownerUserId)
+    .eq('recipient_user_id', recipientUserId)
+    .maybeSingle();
+  if (error) {
+    console.warn('[lib/digital/family] getRecipientNameByOwner failed', error);
+    return null;
+  }
+  const name = (data?.recipient_name as string | null) ?? null;
+  return name && name.trim() ? name.trim() : null;
+}
+
 export async function countActiveLinks(
   supabase: SupabaseClient,
   ownerUserId: string

@@ -61,14 +61,14 @@ export async function sendAccountDeletionEmail(
 この削除は取り消すことができません。再度ご利用される場合は、新規ご登録が必要です。
 
 このメールに心当たりがない場合は、第三者により操作された可能性があります。
-お手数ですが、support@tsuginotenavi.jp までご連絡ください。
+お手数ですが、info@blueadventures.jp までご連絡ください。
 
 ご利用いただきまして、誠にありがとうございました。
 
 ──
 つぎの手ナビ デジタル資産
 https://tsuginotenavi.jp
-お問い合わせ：support@tsuginotenavi.jp
+お問い合わせ：info@blueadventures.jp
 `;
 
   const html = `<!DOCTYPE html>
@@ -126,7 +126,7 @@ https://tsuginotenavi.jp
         </p>
         <p style="margin:0;font-size:12px;line-height:1.7;color:#78350f;">
           第三者によりアカウント操作が行われた可能性があります。
-          お手数ですが、<a href="mailto:support@tsuginotenavi.jp" style="color:#92400e;text-decoration:underline;">support@tsuginotenavi.jp</a> までご連絡ください。
+          お手数ですが、<a href="mailto:info@blueadventures.jp" style="color:#92400e;text-decoration:underline;">info@blueadventures.jp</a> までご連絡ください。
         </p>
       </section>
 
@@ -138,7 +138,7 @@ https://tsuginotenavi.jp
     <div style="margin-top:24px;text-align:center;font-size:11px;color:#94a3b8;line-height:1.6;">
       <strong>つぎの手ナビ デジタル資産</strong><br>
       <a href="https://tsuginotenavi.jp" style="color:#94a3b8;text-decoration:underline;">https://tsuginotenavi.jp</a><br>
-      お問い合わせ：support@tsuginotenavi.jp
+      お問い合わせ：info@blueadventures.jp
     </div>
   </div>
 </body>

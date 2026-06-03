@@ -65,7 +65,7 @@ export async function GET(req: Request) {
 
   const admin = createAdminSupabaseClient();
   const now = new Date();
-  const upgradeUrl = `${getAppUrl()}/digital/settings/upgrade`;
+  const upgradeUrl = `${getAppUrl()}/digital/settings/plan`;
 
   // 結果サマリーを返す（運用時の Cron 観測用）
   const summary = {

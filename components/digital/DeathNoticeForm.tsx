@@ -17,7 +17,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import {
   AlertCircle,
   CheckCircle2,
@@ -33,9 +32,80 @@ type Props = {
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ACCEPTED_TYPES = '.jpg,.jpeg,.png,.heic,.heif,.pdf';
 
-export default function DeathNoticeForm({ ownerId, ownerDisplayName }: Props) {
-  const router = useRouter();
+const SUPPORT_EMAIL = 'info@blueadventures.jp';
 
+/**
+ * サーバーからのエラーコード（英語）をユーザー向けの説明文に変換する。
+ *
+ * 設計方針：
+ *   - ユーザーが対処可能な 4xx 系：具体的な行動指針を提示
+ *   - サーバー側の 5xx 系：エラーコードを添えて問い合わせを案内
+ *   - 生の英語エラーや内部パスは露出しない
+ *
+ * 戻り値：画面に表示する完成された日本語メッセージ
+ */
+function describeNoticeCreateError(error: string | undefined): string {
+  switch (error) {
+    case 'duplicate_pending':
+      return '既に同じ方についての死亡通知が確認中です。重ねての通知は不要です。';
+    case 'not_linked':
+      return 'この方からの連携が確認できませんでした。連携承認状況をご確認ください。';
+    case 'unauthorized':
+      return 'ログインの有効期限が切れている可能性があります。再度ログインのうえお試しください。';
+    case 'invalid_input':
+    case 'invalid_relation':
+    case 'invalid_date':
+      return 'ご入力内容に不備があります。続柄と逝去日をご確認のうえ再度お試しください。';
+    case 'self_notification':
+      return 'ご自分宛ての死亡通知は作成できません。';
+    case 'same_owner_cooldown':
+      // API の detail に「あと約 N 日」が含まれるが、ここでは詳細は呼び出し側に
+      // 任せて一般メッセージのみ返す（詳細を出したい場合は detail を併用する）
+      return `前回の申請から一定期間が経過していないため、再申請を受け付けられませんでした。詳細は ${SUPPORT_EMAIL} までご連絡ください。`;
+    case 'same_owner_lifetime_exceeded':
+      return `同じ方への死亡通知の累計申請回数が上限に達しました。状況が変わった場合は ${SUPPORT_EMAIL} までご連絡ください。`;
+    case 'notifier_rate_limited':
+      return `死亡通知の申請が直近 30 日の上限に達しました。お困りの場合は ${SUPPORT_EMAIL} までご連絡ください。`;
+    default:
+      return `死亡通知の作成に失敗しました。時間をおいて再度お試しください。問題が解決しない場合は ${SUPPORT_EMAIL} までご連絡ください（エラーコード：${error ?? 'unknown'}）。`;
+  }
+}
+
+/**
+ * 書類アップロード時のエラーコードをユーザー向けの説明文に変換する。
+ *
+ * @param documentLabel 「死亡を証明する書類」「身分証」など、対象書類のラベル
+ */
+function describeDocumentUploadError(
+  documentLabel: string,
+  error: string | undefined
+): string {
+  switch (error) {
+    case 'file_too_large':
+      return `${documentLabel}のサイズが 10MB を超えています。別のファイルをお試しください。`;
+    case 'invalid_mime_type':
+      return `${documentLabel}の種別が対応外です。JPEG / PNG / HEIC / PDF のいずれかをお選びください。`;
+    case 'empty_file':
+      return `${documentLabel}が空のファイルです。再度ファイルをお選び直しください。`;
+    case 'no_file':
+      return `${documentLabel}が読み取れませんでした。再度ファイルをお選び直しください。`;
+    case 'invalid_form_data':
+      return `${documentLabel}の送信中に通信が中断された可能性があります。電波の良い場所で再度お試しください。`;
+    case 'unauthorized':
+      return 'ログインの有効期限が切れている可能性があります。再度ログインのうえお試しください。';
+    case 'forbidden':
+      return 'この通知に対するアップロード権限がありません。連携状況をご確認ください。';
+    case 'invalid_status':
+      return 'この通知は既に処理済みのため、書類を追加できません。';
+    case 'storage_upload_failed':
+    case 'metadata_save_failed':
+    case 'unexpected':
+    default:
+      return `${documentLabel}のアップロード中にサーバー側で問題が発生しました。お手数ですが ${SUPPORT_EMAIL} までご連絡ください（エラーコード：${error ?? 'unknown'}）。`;
+  }
+}
+
+export default function DeathNoticeForm({ ownerId, ownerDisplayName }: Props) {
   const [relation, setRelation] = useState('');
   const [deathDate, setDeathDate] = useState('');
   const [note, setNote] = useState('');
@@ -112,14 +182,13 @@ export default function DeathNoticeForm({ ownerId, ownerDisplayName }: Props) {
       };
 
       if (!createRes.ok || !createJson.ok || !createJson.notice) {
-        const msg =
-          createJson.detail ??
-          (createJson.error === 'duplicate_pending'
-            ? '既に同じ方についての死亡通知が確認中です。重ねての通知は不要です。'
-            : createJson.error === 'not_linked'
-              ? 'この方からの連携が確認できませんでした。'
-              : '死亡通知の作成に失敗しました。時間をおいて再度お試しください。');
-        setError(msg);
+        // サーバーログ向けに詳細を残す（detail には英語が含まれる場合があるため画面には出さない）
+        console.error('[DeathNoticeForm] notice create failed', {
+          status: createRes.status,
+          error: createJson.error,
+          detail: createJson.detail,
+        });
+        setError(describeNoticeCreateError(createJson.error));
         setStep('idle');
         return;
       }
@@ -146,8 +215,13 @@ export default function DeathNoticeForm({ ownerId, ownerDisplayName }: Props) {
         detail?: string;
       };
       if (!deathCertRes.ok || !deathCertJson.ok) {
+        console.error('[DeathNoticeForm] death-cert upload failed', {
+          status: deathCertRes.status,
+          error: deathCertJson.error,
+          detail: deathCertJson.detail,
+        });
         setError(
-          `死亡通知は受け付けましたが、死亡を証明する書類のアップロードに失敗しました（${deathCertJson.detail ?? deathCertJson.error}）。お手数ですが support@tsuginotenavi.jp までご連絡ください。`
+          `死亡通知は受け付けましたが、${describeDocumentUploadError('死亡を証明する書類', deathCertJson.error)}`
         );
         setStep('idle');
         return;
@@ -170,48 +244,91 @@ export default function DeathNoticeForm({ ownerId, ownerDisplayName }: Props) {
         detail?: string;
       };
       if (!idCertRes.ok || !idCertJson.ok) {
+        console.error('[DeathNoticeForm] id-cert upload failed', {
+          status: idCertRes.status,
+          error: idCertJson.error,
+          detail: idCertJson.detail,
+        });
         setError(
-          `死亡通知と死亡を証明する書類は受け付けましたが、身分証のアップロードに失敗しました（${idCertJson.detail ?? idCertJson.error}）。お手数ですが support@tsuginotenavi.jp までご連絡ください。`
+          `死亡通知と死亡を証明する書類は受け付けましたが、${describeDocumentUploadError('身分証', idCertJson.error)}`
         );
         setStep('idle');
         return;
       }
 
       // ③ 完了
+      //
+      // ※ ここで router.refresh() を呼ばないこと。
+      //   refresh するとサーバーコンポーネントが再フェッチされ、
+      //   existingNotice が「在り」になってフォーム → 「既に通知が進行中」
+      //   カードに置き換わり、せっかくの成功画面が一瞬で消えてしまう。
+      //   ユーザーが完了内容（書類確認 → 14 日異議申立期間 → 開示）を
+      //   読めるよう、setStep('done') のまま留まる。
+      //   ユーザーが「ダッシュボードに戻る」リンクを押した時点で
+      //   通常の遷移が走り、その後に existingNotice カードが表示される。
       setStep('done');
-      router.refresh();
     } catch (err) {
+      // ネットワーク切断・タイムアウト・JSON パース失敗など、想定外の例外。
+      // err.message は英語の技術的内容を含むため画面には出さず、ログのみに残す。
       const detail = err instanceof Error ? err.message : 'unexpected_error';
-      console.error('[DeathNoticeForm] failed', detail);
-      setError(`エラーが発生しました：${detail}`);
+      console.error('[DeathNoticeForm] unexpected error', detail);
+      setError(
+        `通信中に問題が発生しました。電波の良い場所で少し時間をおいて再度お試しください。問題が続く場合は ${SUPPORT_EMAIL} までご連絡ください。`
+      );
       setStep('idle');
     }
   }
 
   if (step === 'done') {
     return (
-      <div className="rounded-2xl border border-emerald-300 bg-emerald-50 p-6 sm:p-8">
+      <div className="rounded-2xl border border-emerald-200 bg-white p-6 sm:p-8">
         <div className="flex flex-col items-center text-center">
-          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-600">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-600">
             <CheckCircle2 className="h-7 w-7 text-white" aria-hidden="true" />
           </div>
-          <h2 className="text-xl font-bold text-emerald-900">
+          <h2 className="text-xl font-bold text-slate-900">
             死亡通知を受け付けました
           </h2>
-          <p className="mt-2 text-sm leading-relaxed text-emerald-900/90">
-            ご報告ありがとうございます。これから運営にて書類の確認を行います。
-            <br />
-            確認完了後、ご本人への最終確認期間（14 日間）を経て、
-            連携先の皆さまへの情報開示が行われます。
-            <br />
-            進捗はこのダッシュボードでご確認いただけます。
+          <p className="mt-3 text-sm leading-relaxed text-slate-600">
+            ご報告ありがとうございます。
           </p>
-          <Link
-            href="/digital"
-            className="mt-6 inline-flex items-center justify-center rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
-          >
-            ダッシュボードに戻る
-          </Link>
+
+          {/* これからの流れ（順序の見える化） */}
+          <ol className="mt-5 w-full max-w-md space-y-3 text-left">
+            <li className="flex gap-3">
+              <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-700">
+                1
+              </span>
+              <div className="text-sm leading-relaxed text-slate-700">
+                <p className="font-semibold text-slate-900">運営による書類確認</p>
+                <p className="mt-0.5 text-slate-600">
+                  通常 5 営業日以内に確認いたします。
+                </p>
+              </div>
+            </li>
+            <li className="flex gap-3">
+              <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-700">
+                2
+              </span>
+              <div className="text-sm leading-relaxed text-slate-700">
+                <p className="font-semibold text-slate-900">ご本人への最終確認期間（14 日間）</p>
+                <p className="mt-0.5 text-slate-600">
+                  万一ご本人からのお知らせがあった場合は、通知が取り消されます。
+                </p>
+              </div>
+            </li>
+            <li className="flex gap-3">
+              <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-700">
+                3
+              </span>
+              <div className="text-sm leading-relaxed text-slate-700">
+                <p className="font-semibold text-slate-900">情報の開示</p>
+                <p className="mt-0.5 text-slate-600">
+                  連携先の皆さまへ登録情報が開示されます。進捗はダッシュボードでご確認いただけます。
+                </p>
+              </div>
+            </li>
+          </ol>
         </div>
       </div>
     );

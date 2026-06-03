@@ -9,13 +9,20 @@ import {
   ArrowRight,
   Tablet,
   Laptop,
-  Monitor
+  Monitor,
+  Sparkles,
+  Plus,
+  UserPlus
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 interface OnboardingFlowProps {
-  onComplete?: () => void
+  /**
+   * Onboarding 完了時に呼ばれる。nextPath を渡すと、その URL に遷移する。
+   * 未指定の場合は親側のデフォルト（通常は /digital）に従う。
+   */
+  onComplete?: (nextPath?: string) => void
 }
 
 const steps = [
@@ -62,20 +69,22 @@ const popularAssets = [
 
 const deviceTypes = [
   { name: "iPhone", icon: Smartphone, badge: null },
-  { name: "Android", icon: Smartphone, badge: "Android" },
+  { name: "Android", icon: Smartphone, badge: null },
   { name: "iPad", icon: Tablet, badge: null },
   { name: "Mac", icon: Laptop, badge: null },
   { name: "Windows PC", icon: Monitor, badge: null },
 ]
 
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
+  const [showWelcome, setShowWelcome] = useState(true)
   const [currentStep, setCurrentStep] = useState(0)
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null)
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
 
   // 選択したサービス・デバイスを保存してから onComplete を呼ぶ
-  const handleComplete = async () => {
+  // Step 3 の「次にできること」カードからは nextPath を渡して個別 URL に遷移する。
+  const handleComplete = async (nextPath?: string) => {
     if (isSaving) return
     setIsSaving(true)
     try {
@@ -84,7 +93,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         const selectedAssetData = popularAssets.find(
           (a) => a.name === selectedAsset
         )
-        await fetch('/api/digital/assets', {
+        const res = await fetch('/api/digital/assets', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -93,23 +102,40 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             death_action: 'undecided',
           }),
         })
+        if (!res.ok) {
+          console.error(
+            '[OnboardingFlow] asset save failed',
+            res.status,
+            await res.text()
+          )
+        }
       }
       // デバイスの保存（未選択ならスキップ）
+      // disposal_status は必須項目なので、初期値 'in_use'（使用中）で保存。
+      // 後から /digital/devices/[id] で変更可能。
       if (selectedDevice !== null) {
-        await fetch('/api/digital/devices', {
+        const res = await fetch('/api/digital/devices', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             device_name: selectedDevice,
+            disposal_status: 'in_use',
           }),
         })
+        if (!res.ok) {
+          console.error(
+            '[OnboardingFlow] device save failed',
+            res.status,
+            await res.text()
+          )
+        }
       }
     } catch (err) {
       console.error('[OnboardingFlow] save failed', err)
     } finally {
       setIsSaving(false)
     }
-    onComplete?.()
+    onComplete?.(nextPath)
   }
 
   const handleNext = () => {
@@ -122,6 +148,63 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   const handleSkip = () => {
     void handleComplete()
+  }
+
+  // -----------------------------------------------------------------------
+  // Welcome 画面（チュートリアル導入）— 「はじめる」を押すまで表示
+  // -----------------------------------------------------------------------
+  if (showWelcome) {
+    return (
+      <div className="fixed inset-0 bg-background z-50 flex flex-col">
+        {/* 本体 — Apple 風シンプルなウェルカム */}
+        <div className="flex-1 overflow-y-auto px-6 py-12 flex flex-col justify-center">
+          <div className="max-w-md mx-auto text-center space-y-8">
+            {/* アイコン */}
+            <div className="w-20 h-20 mx-auto bg-emerald-100 rounded-3xl flex items-center justify-center">
+              <Sparkles className="w-10 h-10 text-emerald-700" />
+            </div>
+
+            {/* タイトル（大きく） */}
+            <h1 className="text-3xl font-bold text-foreground leading-tight tracking-tight">
+              ようこそ、<br />
+              つぎの手ナビ<br />
+              デジタル資産へ
+            </h1>
+
+            {/* サブ */}
+            <p className="text-base text-foreground/90">
+              もしものときの準備、始めましょう。
+            </p>
+
+            {/* 説明 */}
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              さっそく 3 ステップ（1〜2 分）で、初期設定を行います。
+            </p>
+          </div>
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="sticky bottom-0 p-6 bg-background/80 backdrop-blur-lg border-t border-border">
+          <div className="space-y-3">
+            <Button
+              onClick={() => setShowWelcome(false)}
+              className="w-full h-14 rounded-2xl text-base font-medium bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              はじめる
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+            <button
+              type="button"
+              onClick={handleSkip}
+              disabled={isSaving}
+              className="w-full text-center text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              あとで設定する
+            </button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -239,57 +322,98 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         )}
 
         {currentStep === 2 && (
-          <div className="space-y-6 py-8">
+          <div className="space-y-8 py-8">
+            {/* 完了の達成感 */}
             <div className="text-center space-y-3">
-              <div className="w-16 h-16 mx-auto bg-emerald-100 rounded-2xl flex items-center justify-center">
-                <Lock className="w-8 h-8 text-emerald-700" />
+              <div className="w-20 h-20 mx-auto bg-emerald-100 rounded-3xl flex items-center justify-center">
+                <CheckCircle2 className="w-10 h-10 text-emerald-700" />
               </div>
-              <h1 className="text-2xl font-semibold text-foreground">
-                パスワードを安全に残せます
+              <h1 className="text-3xl font-bold text-foreground leading-tight tracking-tight">
+                準備完了！
               </h1>
-              <p className="text-muted-foreground text-balance">
-                運営も見られない暗号化で、大切な方だけに届けます
+              <p className="text-base text-muted-foreground">
+                {selectedAsset && selectedDevice
+                  ? `${selectedAsset} と ${selectedDevice} を登録しました。`
+                  : selectedAsset
+                  ? `${selectedAsset} を登録しました。`
+                  : selectedDevice
+                  ? `${selectedDevice} を登録しました。`
+                  : '初期設定が完了しました。'}
               </p>
             </div>
 
-            <div className="bg-card rounded-2xl p-5 shadow-sm border border-emerald-200">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-foreground">STANDARD</h3>
-                  <span className="px-3 py-1 bg-emerald-600 text-white text-sm rounded-full font-medium">
-                    30日間無料
-                  </span>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                    <span className="text-foreground">スマホ・PCのパスワード保管</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                    <span className="text-foreground">大切な人への連携アカウント</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                    <span className="text-foreground">デジタル資産・サービスの登録（無制限）</span>
-                  </div>
-                </div>
-                <div className="pt-2 border-t border-border space-y-1">
-                  <p className="text-center">
-                    <span className="text-sm text-muted-foreground">連携者1名ごと </span>
-                    <span className="text-3xl font-bold text-foreground">¥110</span>
-                    <span className="text-muted-foreground"> / 月（税込）</span>
-                  </p>
-                  <p className="text-center text-xs text-muted-foreground">
-                    30日間は無料。いつでも解約できます
-                  </p>
-                </div>
-              </div>
-            </div>
+            {/* 次にできること */}
+            <div className="space-y-3">
+              <p className="px-1 text-sm font-semibold text-foreground">
+                次にできること
+              </p>
 
-            <p className="text-center text-[15px] text-muted-foreground my-4">
-              大切な方が困らない準備を、今日から。
-            </p>
+              <button
+                type="button"
+                onClick={() => void handleComplete('/digital/assets/new')}
+                disabled={isSaving}
+                className="w-full flex items-start gap-3 p-4 rounded-2xl border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left disabled:opacity-50"
+              >
+                <div className="flex-shrink-0 w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                  <Plus className="w-5 h-5 text-emerald-700" aria-hidden="true" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-foreground">サービスをもっと追加</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    SNS・金融など 7 カテゴリで整理
+                  </p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-muted-foreground mt-3" aria-hidden="true" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => void handleComplete('/digital/devices')}
+                disabled={isSaving}
+                className="w-full flex items-start gap-3 p-4 rounded-2xl border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left disabled:opacity-50"
+              >
+                <div className="flex-shrink-0 w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                  <Lock className="w-5 h-5 text-emerald-700" aria-hidden="true" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <p className="font-medium text-foreground">
+                      デバイスのパスワードを保管
+                    </p>
+                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                      STANDARDプラン
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    マスターコードで安全に保管
+                  </p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-muted-foreground mt-3" aria-hidden="true" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => void handleComplete('/digital/share')}
+                disabled={isSaving}
+                className="w-full flex items-start gap-3 p-4 rounded-2xl border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left disabled:opacity-50"
+              >
+                <div className="flex-shrink-0 w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                  <UserPlus className="w-5 h-5 text-emerald-700" aria-hidden="true" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <p className="font-medium text-foreground">大切な方を招待</p>
+                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                      STANDARDプラン
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    最大 10 名まで連携アカウントで共有
+                  </p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-muted-foreground mt-3" aria-hidden="true" />
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -297,23 +421,17 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       {/* Bottom CTA */}
       <div className="sticky bottom-0 p-6 bg-background/80 backdrop-blur-lg border-t border-border">
         {currentStep === 2 ? (
-          <div className="space-y-3">
-            <Button
-              onClick={handleNext}
-              disabled={isSaving}
-              className="w-full h-14 rounded-2xl text-base font-medium bg-emerald-600 text-white hover:bg-emerald-700"
-            >
-              無料トライアルを開始
-            </Button>
-            <button
-              onClick={handleSkip}
-              disabled={isSaving}
-              className="w-full text-center text-[13px] text-muted-foreground"
-            >
-              今はスキップ
-            </button>
-          </div>
+          // Step 3 = 完了画面：シンプルに「ダッシュボードへ」のみ（スキップ導線不要）
+          <Button
+            onClick={() => void handleComplete()}
+            disabled={isSaving}
+            className="w-full h-14 rounded-2xl text-base font-medium bg-emerald-600 text-white hover:bg-emerald-700"
+          >
+            ダッシュボードへ
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
         ) : (
+          // Step 1, 2 = 「次へ」ボタン（未選択時は disabled）
           <Button
             onClick={handleNext}
             className="w-full h-14 rounded-2xl text-base font-medium bg-emerald-600 text-white hover:bg-emerald-700"

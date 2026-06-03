@@ -42,7 +42,7 @@ import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 export const metadata: Metadata = {
   title: 'つぎの手ナビ デジタル資産｜大切な方へのデジタル引き継ぎ',
   description:
-    'スマホ・PC のパスワードや、ご利用中のサブスク・SNS を大切な方に引き継ぐ準備ができるサービスです。30 日間無料、クレジットカード登録不要。',
+    'スマホ・PC のパスワードや、ご利用中のサブスク・SNS を大切な方に引き継ぐ準備ができるサービスです。メール登録だけですぐに始められ、FREEプランはずっと無料です。',
 };
 
 export const dynamic = 'force-dynamic';
@@ -155,7 +155,7 @@ function Hero() {
         </div>
 
         <p className="mt-4 text-sm text-slate-500 sm:text-base">
-          ※ クレジットカード不要・30 日間無料
+          ※ メール登録だけで今すぐ始められます（FREEプランはずっと無料）
         </p>
       </div>
     </section>
@@ -202,31 +202,29 @@ function Audience() {
 // 3. できること
 // =============================================================================
 function Features() {
-  // できることセクションのアイコン定義（カスタム PNG）
+  // 2026-05 改訂：機能の羅列ではなく「得られる価値」を 3 つに集約。
+  //   STANDARDプランで提供される主要機能であることを見出しに明示。
   const items = [
+    {
+      iconSrc: '/images/icons/shield-check.png',
+      iconAlt: '盾とチェックマークのアイコン',
+      title: 'もしものとき、大切な方へ情報を確実に連携',
+      body:
+        'ご逝去の事実を運営が確認し、14 日間の異議申立期間を経たうえで、登録された情報をご指定の連携先（最大 10 名）へ連携します。',
+    },
     {
       iconSrc: '/images/icons/password.png',
       iconAlt: '盾と鍵のアイコン',
-      title: 'パスワード保管',
-      body: 'スマホ・PC のロック解除パスワードを暗号化して保管。本人のマスターコードなしでは誰も取り出せません。',
-    },
-    {
-      iconSrc: '/images/icons/organize.png',
-      iconAlt: '整理されたグリッドのアイコン',
-      title: 'デジタル資産の整理',
-      body: 'サブスク・SNS・金融など、お使いのサービスを 7 カテゴリで整理。「もしもの時」の希望も指定できます。',
-    },
-    {
-      iconSrc: '/images/icons/pdf-export.png',
-      iconAlt: '書類と矢印のアイコン',
-      title: '大切な方に共有',
-      body: '有効期限つきの URL を発行して大切な方にお伝えするか、同じ内容の A4 PDF をその場でダウンロード。印刷・郵送・メール添付にもお使いいただけます。',
+      title: 'スマホ・PC のパスワードも安全に引き継げる',
+      body:
+        '端末内で暗号化してから保管されるため、運営にもデータベースにも平文では見えません。生前はあなたのマスターコードで保護され、もしものときは連携先が「連携の合言葉」で取り出せます。',
     },
     {
       iconSrc: '/images/icons/wishes.png',
       iconAlt: '封筒とハートのアイコン',
-      title: 'もしもの指示も残せる',
-      body: '解約してほしい・大切な方に引き継ぎたい・思い出として残したい ── サービスごとに選べます。',
+      title: '「どうしてほしいか」もまとめて伝えられる',
+      body:
+        '解約してほしい・引き継いでほしい・追悼にしたい ── 各サービスごとに、生前のあなたの意思を残せます。',
     },
   ];
 
@@ -235,7 +233,13 @@ function Features() {
       <div className="mx-auto max-w-3xl">
         <h2 className="text-center text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
           できること
+          <span className="mt-2 block text-sm font-medium text-slate-500 sm:text-base md:text-lg">
+            （STANDARDプラン）
+          </span>
         </h2>
+        <p className="mt-4 text-center text-base text-slate-600 sm:text-lg">
+          もしもの安心を、3 つのかたちで。
+        </p>
 
         <div className="mt-12 space-y-5">
           {items.map((it, i) => (
@@ -261,6 +265,10 @@ function Features() {
             </div>
           ))}
         </div>
+
+        <p className="mt-8 text-center text-sm text-slate-500 sm:text-base">
+          ※ FREEプランでも、デジタル資産の登録と PDF 出力はご利用いただけます。
+        </p>
       </div>
     </section>
   );
@@ -276,8 +284,10 @@ function Plans() {
         <h2 className="text-center text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
           プラン
         </h2>
-        <p className="mt-4 text-center text-base text-slate-600 sm:text-lg">
-          まずは 30 日間、無料でじっくり試せます
+        <p className="mx-auto mt-4 max-w-xl text-center text-base text-slate-600 sm:text-lg">
+          初回登録から 30 日間、STANDARDプランを無料でお試し。
+          <br className="sm:hidden" />
+          その後は FREEプランで続けてご利用いただけます。
         </p>
 
         <div className="mt-12 space-y-5 sm:space-y-6">
@@ -285,16 +295,12 @@ function Plans() {
           <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
             <div className="flex items-baseline justify-between gap-4">
               <h3 className="text-xl font-bold text-slate-900 sm:text-2xl">FREE</h3>
-              <p className="text-2xl font-bold text-slate-900 sm:text-3xl">
-                ¥0
-                <span className="ml-1 text-sm font-normal text-slate-500">ずっと無料</span>
-              </p>
+              <p className="text-2xl font-bold text-slate-900 sm:text-3xl">¥0</p>
             </div>
-            <p className="mt-2 text-sm text-slate-500 sm:text-base">まずは試してみたい方へ</p>
 
             <ul className="mt-6 space-y-3 text-base text-slate-700 sm:text-lg">
               <PlanRow ok>デジタル資産・サービスの登録（無制限）</PlanRow>
-              <PlanRow ok>大切な方に共有（PDF・期限付き URL）</PlanRow>
+              <PlanRow ok>大切な方に共有（PDF 出力）</PlanRow>
               <PlanRow ok>定期リマインド</PlanRow>
               <PlanRow>スマホ・PC のパスワード保管</PlanRow>
               <PlanRow>連携アカウントでの常時共有</PlanRow>
@@ -315,10 +321,8 @@ function Plans() {
                 </span>
               </p>
             </div>
-            <p className="mt-2 text-sm text-slate-500 sm:text-base">
-              大切な方 1 名ごと ¥110/月。最初の招待から 30 日間は無料。
-              <br />
-              <span className="text-xs">例：妻に共有 = ¥110/月、妻+お子様 2 人 = ¥330/月</span>
+            <p className="mt-2 text-xs text-slate-500 sm:text-sm">
+              例：妻に共有 = ¥110/月、妻+お子様 2 人 = ¥330/月
             </p>
 
             <ul className="mt-6 space-y-3 text-base text-slate-700 sm:text-lg">
@@ -330,6 +334,12 @@ function Plans() {
             </ul>
           </div>
         </div>
+
+        {/* PDF 内容に関する補足 */}
+        <p className="mx-auto mt-6 max-w-xl text-center text-xs leading-relaxed text-slate-500 sm:text-sm">
+          ※ PDF に含まれるのは、登録したサービス名・公式 URL・引き継ぎご希望・メモ・担当の方のみです。
+          パスワードや口座番号などの機微情報は一切含まれません。
+        </p>
       </div>
     </section>
   );
@@ -383,7 +393,7 @@ function UsageFlow() {
       title: '数十秒で、すぐに始められる。',
       subtitle: 'メール認証 または Google アカウント',
       description:
-        '面倒な書類は不要。会員登録すれば、その場でデジタル資産の整理を始められます。',
+        'ご登録時に書類のご準備は不要。会員登録すれば、その場でデジタル資産の整理を始められます。',
       icon: UserPlus,
     },
     {
@@ -399,7 +409,7 @@ function UsageFlow() {
       title: '信頼できる大切な方を、招待する。',
       subtitle: '最大 10 名まで、月額 ¥110/名',
       description:
-        'ご家族・パートナー・親しい友人など、信頼できる方を招待。最初の招待から 30 日間は無料でお試しいただけます。',
+        'ご家族・パートナー・親しい友人など、信頼できる方を招待。初回登録から 30 日間は無料でお試しいただけます。',
       icon: Send,
     },
     {
@@ -415,7 +425,7 @@ function UsageFlow() {
       title: '1 年間お役立ていただいて、完全削除。',
       subtitle: '個人情報を、最後まで守る',
       description:
-        '連携から 1 年間、大切な方に必要な情報をご活用いただいた後、すべてのデータを完全に削除します。お預かりした情報を、最後まで責任を持って守ります。',
+        'もしものときの情報連携から 1 年間、大切な方に必要な情報をご活用いただいた後、すべてのデータを完全に削除します。お預かりした情報を、最後まで責任を持って守ります。',
       icon: Trash2,
     },
   ];
@@ -510,7 +520,7 @@ function StatsCTA() {
           <p className="mt-3 text-sm text-emerald-50 sm:text-base">
             最多の困りごとは
             <br />
-            <b className="text-white">「スマホ・PC のパスワード不明」（29%）</b>
+            <b className="text-white">「スマホ・PC のパスワード不明」</b>
           </p>
           <p className="mt-2 text-xs text-emerald-100 sm:text-sm">
             2026 年 BlueAdventures 調べ
@@ -518,10 +528,8 @@ function StatsCTA() {
         </div>
 
         <p className="mt-8 text-base leading-relaxed text-emerald-50 sm:text-lg">
-          つぎの手ナビなら、その「鍵」となる
+          つぎの手ナビなら、スマホ・PC のパスワードを
           <br className="sm:hidden" />
-          スマホ・PC のパスワードを
-          <br />
           安全に保管し、必要なときに大切な方に届けられます。
         </p>
 
@@ -533,11 +541,6 @@ function StatsCTA() {
             無料ではじめる
           </Link>
         </div>
-        <p className="mt-4 text-sm text-emerald-100 sm:text-base">
-          ※ メールアドレスだけで簡単登録
-          <br className="sm:hidden" />
-          ・クレジットカード不要
-        </p>
       </div>
     </section>
   );
@@ -549,16 +552,19 @@ function StatsCTA() {
 function Trust() {
   const items = [
     {
-      title: '完全プライベート',
-      body: '生前は本人しかアクセスできません。大切な方や運営でも閲覧不可です。',
+      title: '見られるのはご本人だけ',
+      body:
+        'スマホ・PC のパスワードは、ご本人が決めた合言葉（マスターコード）で守られており、ご本人とご指定の連携先以外は見ることができません。生前の情報共有はあなた自身で決められます。（生前はデジタル資産のみ共有可能です）',
     },
     {
-      title: 'データ暗号化',
-      body: 'スマホ・PC のパスワードは AES-256 で暗号化して保管します。',
+      title: '強いセキュリティで大切に保管',
+      body:
+        'あなたのパスワードは、お使いの端末（スマホ・PC）の中で「強いセキュリティ」をかけてから保管されます。万が一情報が漏れても、そのセキュリティを解除するマスターコードがないと中身を見ることはできません。',
     },
     {
-      title: '広告なし',
-      body: '安心して使っていただけるよう、広告は一切表示しません。',
+      title: '1 年後の完全削除',
+      body:
+        'もしものときの情報連携を終えた後、お預かりしたすべての情報を 1 年後に完全削除します。最後まで責任を持って守ります。',
     },
   ];
 
@@ -600,26 +606,31 @@ function Trust() {
 function FAQ() {
   const faqs = [
     {
-      q: '大切な方は、登録した情報をどうやって受け取れますか？',
+      q: '連携先の方は、登録した情報をどうやって受け取れますか？',
       a:
-        '受け取り方は 2 通りあります。(1) ご本人が生前に「大切な方に共有」ページから、有効期限つきの URL や PDF をお渡しする方法。(2) ご逝去後に、運営の本人確認と異議申立期間（14 日間）を経て、登録された大切な方へ情報を連携する方法です。どちらの場合も、サービス名・ご希望・担当の方・メモ・公式 URL などの登録内容が連携対象となります。',
+        '受け取り方は 2 通りあります。生前にご本人から PDF や連携アカウントを通じて共有を受ける方法と、ご逝去の事実を運営が確認し 14 日間の異議申立期間を経て自動で連携される方法です。なお、PDF にはデジタル資産情報のみが含まれ、スマホ・PC のパスワードは含まれません。',
+    },
+    {
+      q: '連携先の方も会員登録は必要ですか？費用はかかりますか？',
+      a:
+        '連携先の方も、メール認証または Google アカウントで無料の会員登録が必要です。費用は招待したご本人がご負担いただくため、連携先の方には一切かかりません。',
     },
     {
       q: 'マスターコードを忘れたらどうなりますか？',
       a: 'マスターコードは当社でも復元できない設計です。お客様自身で安全に保管をお願いします。万一忘れた場合は、保存したパスワードを削除して、新しいマスターコードで再登録していただきます。',
     },
     {
-      q: 'STANDARD から FREE に戻したら、サービスの登録情報はどうなりますか？',
+      q: 'STANDARDプランからFREEプランに戻したら、サービスの登録情報はどうなりますか？',
       a:
-        'すべての情報は保持されます。デジタル資産・サービスの登録は FREE プランでも無制限にご利用いただけます。STANDARD 限定の機能（スマホ・PC のパスワード保管 等）のみご利用いただけなくなりますが、登録した資産情報は引き続き閲覧・編集できます。',
+        'すべての情報は保持されます。デジタル資産・サービスの登録はFREEプランでも無制限にご利用いただけます。STANDARDプラン限定の機能（スマホ・PC のパスワード保管 等）のみご利用いただけなくなりますが、登録した資産情報は引き続き閲覧・編集できます。',
     },
     {
-      q: 'クレジットカード以外の支払い方法はありますか？',
-      a: 'クレジットカード（Visa / Mastercard / JCB / AMEX）、Apple Pay、Google Pay に対応しています。',
+      q: 'どんな決済方法に対応していますか？',
+      a: 'クレジットカード（Visa / Mastercard / JCB / AMEX）に対応しています。',
     },
     {
       q: 'データはどのように保管されますか？',
-      a: '日本のクラウドデータベースに暗号化して保管します。スマホ・PC のパスワードはお客様のマスターコードで暗号化された状態で保存され、サーバー側でも取り出せません。',
+      a: '日本のサーバーで強いセキュリティをかけて保管します。スマホ・PC のパスワードはお客様のマスターコードで守られており、運営側でも中身を見ることはできません。',
     },
   ];
 
@@ -689,10 +700,6 @@ function FinalCTA() {
             <ArrowRight className="h-5 w-5" aria-hidden="true" />
           </Link>
         </div>
-
-        <p className="mt-4 text-sm text-slate-500 sm:text-base">
-          5 分で登録完了 ・ 今すぐ使える
-        </p>
       </div>
     </section>
   );

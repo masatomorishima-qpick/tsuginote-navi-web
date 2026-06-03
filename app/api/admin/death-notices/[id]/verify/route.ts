@@ -25,6 +25,7 @@ import { NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { verifyByOps, rejectByOps } from '@/lib/digital/deathNotice';
 import { getDisplayNameById } from '@/lib/digital/profile';
+import { getRecipientNameByOwner } from '@/lib/digital/family';
 import { sendObjectionInvitationEmail } from '@/lib/email/deathNotice';
 
 export const runtime = 'nodejs';
@@ -129,12 +130,28 @@ export async function POST(
           // ignore
         }
         try {
-          const notifier = await getDisplayNameById(
+          // 通報者の表示名は次の優先順位：
+          //   ① オーナー自身が招待時につけた呼称（family_links.recipient_name）
+          //      例：「妻」「長男」— オーナーが見たとき最も自然
+          //   ② 通報者本人のプロフィール表示名
+          //   ③ 既定値（「連携者の方」など）
+          const recipientName = await getRecipientNameByOwner(
             admin,
+            notice.owner_user_id,
             notice.notifier_user_id
           );
-          notifierName =
-            notifier?.display_name ?? notifier?.preferred_name ?? notifierName;
+          if (recipientName) {
+            notifierName = recipientName;
+          } else {
+            const notifier = await getDisplayNameById(
+              admin,
+              notice.notifier_user_id
+            );
+            notifierName =
+              notifier?.display_name ??
+              notifier?.preferred_name ??
+              notifierName;
+          }
         } catch {
           // ignore
         }

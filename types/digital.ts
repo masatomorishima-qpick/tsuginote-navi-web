@@ -204,7 +204,7 @@ export type DigitalSubscriptionStatus =
   | 'active'      // 有効な有料サブスク（plan='standard'）
   | 'past_due'    // Stripe 支払い失敗
   | 'canceled'    // 解約済み（期間終了まで利用可能）
-  | 'free';       // FREE プランへ降格済み（plan='free'）
+  | 'free';       // FREEプランへ降格済み（plan='free'）
 
 // 課金サイクル
 export type BillingCycle = 'monthly' | 'yearly';
@@ -245,7 +245,7 @@ export const SUBSCRIPTION_STATUS_LABELS: Record<DigitalSubscriptionStatus, strin
   active: '有効',
   past_due: 'お支払い確認中',
   canceled: '解約予定（期間終了まで利用可）',
-  free: 'FREE プラン',
+  free: 'FREEプラン',
 };
 
 // プラン別の機能制限

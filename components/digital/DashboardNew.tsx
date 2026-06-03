@@ -4,6 +4,9 @@ import { Shield, Globe, Smartphone, Lock, CheckCircle2, Circle, Users } from 'lu
 import SubscriptionStatusBanner from '@/components/digital/SubscriptionStatusBanner';
 import RecipientLinksCorner from '@/components/digital/RecipientLinksCorner';
 import KekDistributePrompt from '@/components/digital/KekDistributePrompt';
+import PendingDeathNoticeAlert, {
+  type PendingDeathNotice,
+} from '@/components/digital/PendingDeathNoticeAlert';
 import type {
   DigitalSubscription,
   DigitalDeviceWithPinFlag,
@@ -35,6 +38,8 @@ type DashboardNewProps = {
     DigitalFamilyLink,
     'id' | 'recipient_name' | 'status' | 'created_at'
   >[];
+  /** 自分（オーナー）が死亡通知を受けている場合の情報 */
+  pendingDeathNotice?: PendingDeathNotice | null;
 };
 
 export default function DashboardNew({
@@ -46,6 +51,7 @@ export default function DashboardNew({
   subscription,
   recipientLinks,
   ownerLinks,
+  pendingDeathNotice,
 }: DashboardNewProps) {
   const router = useRouter();
   const isStandard = plan === 'standard';
@@ -57,6 +63,13 @@ export default function DashboardNew({
   return (
     <div className="min-h-screen bg-[#F5F5F0]">
       <div className="max-w-2xl mx-auto px-4 pb-8">
+        {/* ★ 最上段：あなたについて死亡通知が出ている場合のアラート（最重要のため一番上）*/}
+        {pendingDeathNotice && (
+          <div className="pt-4">
+            <PendingDeathNoticeAlert notice={pendingDeathNotice} />
+          </div>
+        )}
+
         {/* プランバー（Apple 風：プラン名を大きく強調） */}
         <div className="flex items-start justify-between py-6 gap-3">
           <div className="min-w-0 flex-1">

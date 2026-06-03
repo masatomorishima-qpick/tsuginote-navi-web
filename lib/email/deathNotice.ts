@@ -68,7 +68,7 @@ ${deadline} までに異議申立をいただけない場合、${input.notifierD
 報告内容に基づき、大切な方への情報開示が行われます。
 
 ご不明な点がございましたら、こちらまでお問い合わせください：
-  support@tsuginotenavi.jp
+  info@blueadventures.jp
 
 ──
 つぎの手ナビ デジタル資産
@@ -111,7 +111,7 @@ ${deadline} までに異議申立をいただけない場合、${input.notifierD
     </div>
     <div style="margin-top:24px;text-align:center;font-size:11px;color:#94a3b8;line-height:1.6;">
       <strong>つぎの手ナビ デジタル資産</strong><br>
-      お問い合わせ：support@tsuginotenavi.jp
+      お問い合わせ：info@blueadventures.jp
     </div>
   </div>
 </body></html>`;
@@ -155,7 +155,7 @@ export async function sendDisclosureNotifyEmail(
 
 ──
 つぎの手ナビ デジタル資産
-お問い合わせ：support@tsuginotenavi.jp
+お問い合わせ：info@blueadventures.jp
 `;
 
   const html = `<!DOCTYPE html>
@@ -187,7 +187,7 @@ export async function sendDisclosureNotifyEmail(
     </div>
     <div style="margin-top:24px;text-align:center;font-size:11px;color:#94a3b8;line-height:1.6;">
       <strong>つぎの手ナビ デジタル資産</strong><br>
-      お問い合わせ：support@tsuginotenavi.jp
+      お問い合わせ：info@blueadventures.jp
     </div>
   </div>
 </body></html>`;

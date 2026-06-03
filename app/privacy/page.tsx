@@ -4,9 +4,9 @@ import MarketingHeader from "@/components/MarketingHeader";
 import BackButton from "@/components/common/BackButton";
 
 export const metadata: Metadata = {
-  title: "プライバシーポリシー | つぎの手ナビ 2nd",
+  title: "プライバシーポリシー | つぎの手ナビ",
   description:
-    "つぎの手ナビ 2nd における情報の取扱い、匿名データの利用目的、Cookie等の利用について記載しています。",
+    "つぎの手ナビ における情報の取扱い、匿名データの利用目的、Cookie等の利用について記載しています。",
 };
 
 export default function PrivacyPage() {
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
           </h1>
 
           <p className="mt-6 text-sm leading-7 text-slate-600 sm:text-base">
-            BlueAdventures が運営する「つぎの手ナビ 2nd」（以下、「当サイト」といいます。）は、
+            BlueAdventures が運営する「つぎの手ナビ」（以下、「当サイト」といいます。）は、
             当サイトをご利用いただく方の情報の取扱いについて、以下のとおり定めます。
           </p>
 

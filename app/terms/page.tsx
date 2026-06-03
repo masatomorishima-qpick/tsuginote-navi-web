@@ -4,9 +4,9 @@ import MarketingHeader from "@/components/MarketingHeader";
 import BackButton from "@/components/common/BackButton";
 
 export const metadata: Metadata = {
-  title: "利用規約 | つぎの手ナビ 2nd",
+  title: "利用規約 | つぎの手ナビ",
   description:
-    "つぎの手ナビ 2nd の利用規約です。中立的な候補表示、連絡方法、免責、禁止事項などを記載しています。",
+    "つぎの手ナビ の利用規約です。中立的な候補表示、連絡方法、免責、禁止事項などを記載しています。",
 };
 
 export default function TermsPage() {
@@ -30,7 +30,7 @@ export default function TermsPage() {
 
           <p className="mt-6 text-sm leading-7 text-slate-600 sm:text-base">
             この利用規約（以下、「本規約」といいます。）は、BlueAdventures
-            が運営する「つぎの手ナビ 2nd」（以下、「当サイト」といいます。）の利用条件を定めるものです。
+            が運営する「つぎの手ナビ」（以下、「当サイト」といいます。）の利用条件を定めるものです。
             当サイトをご利用になる方は、本規約に同意したものとみなします。
           </p>
 

@@ -7,9 +7,10 @@
  *     a) link.share_during_lifetime = true（生前共有 ON）
  *     b) disclosed_at が確定済みの death_notice が存在する（死後開示済み）
  *
- * Phase 1 では：
+ * 表示内容：
  *   - 資産情報（サービス名 / カテゴリ / 希望 / 担当 / メモ / 公式URL）を表示
- *   - PIN の復号は V-27 の死後開示専用画面で対応予定（このページでは表示しない）
+ *   - 死後開示済み（または生前共有＋フラグ ON）のとき、デバイス・パスワード（PIN）の
+ *     復号セクションを表示（RecipientPinReveal）
  *
  * セキュリティ：service_role 経由で他人のデータを取得するため、上記の表示条件チェックを
  *               この page.tsx 内で厳密に行う。チェックを通らなければ閲覧不可。
@@ -20,8 +21,8 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import {
   AlertTriangle,
-  ShieldCheck,
   ExternalLink,
+  Globe,
 } from 'lucide-react';
 import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
@@ -33,7 +34,6 @@ import {
   type DigitalCategory,
 } from '@/types/digital';
 import { KeyRound } from 'lucide-react';
-import { formatJpDate } from '@/lib/digital/utils';
 import { isLifetimePinRevealEnabled } from '@/lib/digital/featureFlags';
 import RecipientPinReveal from '@/components/digital/RecipientPinReveal';
 
@@ -153,59 +153,42 @@ export default async function FamilyOwnerViewPage({ params }: Props) {
 
         <div className="space-y-6">
 
-      {/* 状態バッジ */}
-      <div
-        className={`flex items-start gap-3 rounded-xl border p-4 text-sm ${
-          isDeathDisclosed
-            ? 'border-slate-300 bg-slate-50 text-slate-700'
-            : 'border-emerald-200 bg-emerald-50 text-emerald-900'
-        }`}
-      >
-        <ShieldCheck
-          className={`mt-0.5 h-5 w-5 flex-shrink-0 ${isDeathDisclosed ? 'text-slate-500' : 'text-emerald-600'}`}
-          aria-hidden="true"
-        />
-        <div>
-          <p className="font-medium">
-            {isDeathDisclosed
-              ? `開示済み（${ownerDisplayName ?? 'ご本人'} さまのご逝去確認後）`
-              : '閲覧可能'}
-          </p>
-          {isDeathDisclosed && disclosedNotice?.disclosed_at && (
-            <p className="mt-0.5 text-xs">
-              開示日：{formatJpDate(disclosedNotice.disclosed_at)}
-            </p>
-          )}
-          <p className="mt-1 text-xs leading-relaxed">
-            パスワード・ID・口座番号は含まれていません。
-            記載されているのは「サービス名」「引き継ぐかたのご希望」「担当の方」「メモ」「公式サイトのURL」のみです。
-          </p>
-        </div>
-      </div>
-
-      {/* 資産一覧（カテゴリ別） */}
+      {/* デジタル資産（ダッシュボードと同じ見出し・カードスタイルに統一） */}
       {assets.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+        <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center text-sm text-slate-500">
           登録されているサービスはまだありません。
         </div>
       ) : (
-        <div className="space-y-5">
-          {CATEGORY_ORDER.filter((c) => grouped.has(c)).map((category) => (
-            <section
-              key={category}
-              aria-label={CATEGORY_LABELS[category]}
-              className="rounded-2xl border border-slate-200 bg-white p-5"
-            >
-              <h2 className="mb-3 text-sm font-semibold text-slate-700">
-                {CATEGORY_LABELS[category]}（{grouped.get(category)!.length} 件）
-              </h2>
-              <ul className="space-y-3">
-                {grouped.get(category)!.map((asset) => (
-                  <li
-                    key={asset.id}
-                    className="rounded-xl border border-slate-200 bg-white p-4"
-                  >
-                    <div className="flex items-start justify-between gap-3">
+        <section
+          aria-label="デジタル資産"
+          className="rounded-2xl border border-gray-100 bg-white p-5 sm:p-6"
+        >
+          {/* セクション見出し（ダッシュボードの「デジタル資産」カードと同じ体裁） */}
+          <div className="mb-5 flex items-center gap-3 border-b border-gray-100 pb-4">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100">
+              <Globe className="h-5 w-5 text-emerald-700" aria-hidden="true" />
+            </div>
+            <div>
+              <p className="text-lg font-semibold text-slate-900">デジタル資産</p>
+              <p className="text-sm text-gray-400">{assets.length}件登録済み</p>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {CATEGORY_ORDER.filter((c) => grouped.has(c)).map((category) => (
+              <div key={category}>
+                <h3 className="mb-3 text-sm font-semibold text-emerald-700">
+                  {CATEGORY_LABELS[category]}
+                  <span className="ml-1 font-normal text-gray-400">
+                    {grouped.get(category)!.length}件
+                  </span>
+                </h3>
+                <ul className="space-y-3">
+                  {grouped.get(category)!.map((asset) => (
+                    <li
+                      key={asset.id}
+                      className="rounded-xl border border-gray-100 bg-gray-50/60 p-4"
+                    >
                       <div className="min-w-0">
                         <p className="truncate text-base font-semibold text-slate-900">
                           {asset.service_name}
@@ -225,45 +208,53 @@ export default async function FamilyOwnerViewPage({ params }: Props) {
                           </a>
                         )}
                       </div>
-                    </div>
-                    <dl className="mt-3 grid grid-cols-1 gap-x-4 gap-y-2 text-xs sm:grid-cols-2">
-                      <div>
-                        <dt className="text-slate-400">引き継ぐかたのご希望</dt>
-                        <dd className="mt-0.5 text-slate-700">
-                          {DEATH_ACTION_LABELS[asset.death_action]}
-                        </dd>
-                      </div>
-                      {asset.assignee_name && (
+                      <dl className="mt-3 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
                         <div>
-                          <dt className="text-slate-400">担当の方</dt>
-                          <dd className="mt-0.5 text-slate-700">
-                            {asset.assignee_name}
+                          <dt className="text-xs font-medium text-slate-500">
+                            引き継ぐかたのご希望
+                          </dt>
+                          <dd className="mt-0.5 text-sm text-slate-800">
+                            {DEATH_ACTION_LABELS[asset.death_action]}
                           </dd>
                         </div>
-                      )}
-                      {asset.monthly_cost !== null && (
-                        <div>
-                          <dt className="text-slate-400">月額目安</dt>
-                          <dd className="mt-0.5 text-slate-700">
-                            ¥{asset.monthly_cost.toLocaleString()}
-                          </dd>
-                        </div>
-                      )}
-                      {asset.memo && (
-                        <div className="sm:col-span-2">
-                          <dt className="text-slate-400">メモ</dt>
-                          <dd className="mt-0.5 whitespace-pre-wrap text-slate-700">
-                            {asset.memo}
-                          </dd>
-                        </div>
-                      )}
-                    </dl>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
-        </div>
+                        {asset.assignee_name && (
+                          <div>
+                            <dt className="text-xs font-medium text-slate-500">
+                              担当の方
+                            </dt>
+                            <dd className="mt-0.5 text-sm text-slate-800">
+                              {asset.assignee_name}
+                            </dd>
+                          </div>
+                        )}
+                        {asset.monthly_cost !== null && (
+                          <div>
+                            <dt className="text-xs font-medium text-slate-500">
+                              月額目安
+                            </dt>
+                            <dd className="mt-0.5 text-sm text-slate-800">
+                              ¥{asset.monthly_cost.toLocaleString()}
+                            </dd>
+                          </div>
+                        )}
+                        {asset.memo && (
+                          <div className="sm:col-span-2">
+                            <dt className="text-xs font-medium text-slate-500">
+                              メモ
+                            </dt>
+                            <dd className="mt-0.5 whitespace-pre-wrap text-sm text-slate-800">
+                              {asset.memo}
+                            </dd>
+                          </div>
+                        )}
+                      </dl>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
       )}
 
       {/* スマホ・PC のパスワード（PIN）復号セクション
@@ -272,19 +263,21 @@ export default async function FamilyOwnerViewPage({ params }: Props) {
       {canViewPin ? (
         <section
           aria-labelledby="section-pin-reveal"
-          className="rounded-2xl border border-violet-200 bg-violet-50/40 p-5 sm:p-6"
+          className="rounded-2xl border-2 border-violet-300 bg-violet-50 p-5 shadow-sm sm:p-6"
         >
           <h2
             id="section-pin-reveal"
-            className="flex items-center gap-2 text-lg font-semibold text-slate-900"
+            className="flex items-center gap-3 text-lg font-semibold text-slate-900"
           >
-            <KeyRound className="h-5 w-5 text-violet-700" aria-hidden="true" />
-            スマホ・PC のロック解除パスワード
+            <span className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-violet-100">
+              <KeyRound className="h-5 w-5 text-violet-700" aria-hidden="true" />
+            </span>
+            デバイス・パスワード
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
             {isDeathDisclosed
-              ? `故 ${ownerDisplayName ?? 'ご本人'} さまが保管されていた、スマートフォンや PC のロック解除パスワードです。`
-              : `${ownerDisplayName ?? 'ご本人'} さまが保管されている、スマートフォンや PC のロック解除パスワードです。`}
+              ? `故 ${ownerDisplayName ?? 'ご本人'} さまが残された、スマホ・パソコンのパスワードです。`
+              : `${ownerDisplayName ?? 'ご本人'} さまの、スマホ・パソコンのパスワードです。`}
           </p>
           <div className="mt-4">
             <RecipientPinReveal ownerId={ownerId} />
@@ -298,14 +291,16 @@ export default async function FamilyOwnerViewPage({ params }: Props) {
         >
           <h2
             id="section-pin-pending"
-            className="flex items-center gap-2 text-base font-semibold text-slate-700"
+            className="flex items-center gap-3 text-base font-semibold text-slate-700"
           >
-            <KeyRound className="h-5 w-5 text-slate-400" aria-hidden="true" />
-            スマホ・PC のロック解除パスワード
+            <span className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-slate-100">
+              <KeyRound className="h-5 w-5 text-slate-400" aria-hidden="true" />
+            </span>
+            デバイス・パスワード
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
             ご本人がお亡くなりになった事実が確認された後にお届けします。
-            現在は閲覧いただけません。
+            現在はご覧いただけません。
           </p>
         </section>
       )}

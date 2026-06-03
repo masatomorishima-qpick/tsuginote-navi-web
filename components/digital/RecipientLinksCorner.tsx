@@ -19,7 +19,6 @@ import {
   ChevronRight,
   CheckCircle2,
   Clock,
-  AlertTriangle,
   ShieldOff,
   UserCheck,
 } from 'lucide-react';
@@ -93,7 +92,11 @@ export default function RecipientLinksCorner({
 
       <ul className="mt-4 space-y-3">
         {links.map(({ link, ownerDisplayName, ownerEmail, latestDeathNotice }) => {
-          const canView = link.share_during_lifetime;
+          // 開示済み（ご逝去確認後）も「閲覧可能」状態に含める。
+          // これにより、生前共有 OFF の連携先でも開示後は同じ導線（バッジ＋ボタン）で
+          // 情報にアクセスでき、別途「開示されました」カードを重ねる必要がなくなる。
+          const isDisclosed = latestDeathNotice?.status === 'disclosed';
+          const canView = link.share_during_lifetime || isDisclosed;
           // プライバシー配慮：share_during_lifetime の事実を直接見せず、
           // 「いま見られるかどうか」だけを中立的な文言で表現する。
           return (
@@ -128,7 +131,9 @@ export default function RecipientLinksCorner({
                         className="h-3 w-3"
                         aria-hidden="true"
                       />
-                      現在ご確認いただけます
+                      {isDisclosed
+                        ? '情報が開示されました'
+                        : '現在ご確認いただけます'}
                     </span>
                   </div>
                 )}
@@ -357,30 +362,8 @@ function DeathNoticeStatusCard({
     );
   }
 
-  // disclosed
-  return (
-    <div className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-4">
-      <div className="flex items-start gap-3">
-        <AlertTriangle
-          className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-700"
-          aria-hidden="true"
-        />
-        <div className="flex-1 min-w-0">
-          <p className="text-base font-semibold text-slate-900">
-            情報が開示されました
-          </p>
-          <p className="mt-1.5 text-sm leading-relaxed text-slate-700">
-            ご登録情報をご確認いただけます。
-          </p>
-          <Link
-            href={`/digital/family/${ownerId}`}
-            className="mt-3 inline-flex items-center gap-0.5 text-sm font-medium text-violet-700 hover:underline"
-          >
-            情報を見る
-            <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+  // disclosed：
+  //   開示済みは上段のステータスバッジ「情報が開示されました」＋紫の「情報を見る」
+  //   ボタンで導線が完結するため、ここで別カードを重ねない（重複排除）。
+  return null;
 }

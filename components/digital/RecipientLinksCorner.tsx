@@ -26,9 +26,6 @@ import { formatJpDate } from '@/lib/digital/utils';
 import type { DigitalFamilyLink } from '@/lib/digital/family';
 import DeathNoticeCancelButton from '@/components/digital/DeathNoticeCancelButton';
 
-/** 通報者本人が取り消せる時間：24h（lib/digital/deathNotice.ts と同期）*/
-const NOTIFIER_SELF_CANCEL_WINDOW_MS = 24 * 60 * 60 * 1000;
-
 export type RecipientLinkInfoLite = {
   link: DigitalFamilyLink;
   ownerDisplayName: string | null;
@@ -219,10 +216,9 @@ function DeathNoticeStatusCard({
   const detailHref = `/digital/family/${ownerId}/death-notice`;
 
   if (notice.status === 'pending') {
-    // 通報者本人かつ申請から 24h 以内なら取り消しボタンを出す
-    const elapsedMs = Date.now() - new Date(notice.createdAt).getTime();
-    const canSelfCancel =
-      notice.isOwnNotice && elapsedMs < NOTIFIER_SELF_CANCEL_WINDOW_MS;
+    // 通報者本人なら取り消しボタンを描画。
+    // 「申請から 24h 以内か」の時刻判定は render 中の Date.now() を避けるため
+    // クライアント側（DeathNoticeCancelButton）で行う（#28 react-hooks/purity 対応）。
     return (
       <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
         <div className="flex items-start gap-3">
@@ -257,8 +253,11 @@ function DeathNoticeStatusCard({
                 詳細を見る
                 <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
               </Link>
-              {canSelfCancel && (
-                <DeathNoticeCancelButton noticeId={notice.id} />
+              {notice.isOwnNotice && (
+                <DeathNoticeCancelButton
+                  noticeId={notice.id}
+                  createdAt={notice.createdAt}
+                />
               )}
             </div>
           </div>

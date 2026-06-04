@@ -17,13 +17,25 @@ import { useRouter } from 'next/navigation';
 import { XCircle } from 'lucide-react';
 import ConfirmDialog from '@/components/digital/ConfirmDialog';
 
+/** 通報者本人が取り消せる時間：24h（lib/digital/deathNotice.ts と同期）*/
+const NOTIFIER_SELF_CANCEL_WINDOW_MS = 24 * 60 * 60 * 1000;
+
 type Props = {
   noticeId: string;
+  /** 通知の申請日時（ISO 文字列）。24h を過ぎていたらボタンを出さない */
+  createdAt: string;
 };
 
-export default function DeathNoticeCancelButton({ noticeId }: Props) {
+export default function DeathNoticeCancelButton({ noticeId, createdAt }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  // マウント時に一度だけ判定（render 本体での Date.now() 直呼びを避ける）。
+  // 表示中に 24h を跨いだ場合は API 側の cancel_window_expired が最終防衛線。
+  const [withinCancelWindow] = useState(
+    () =>
+      Date.now() - new Date(createdAt).getTime() <
+      NOTIFIER_SELF_CANCEL_WINDOW_MS
+  );
 
   async function handleConfirm() {
     const res = await fetch(
@@ -49,6 +61,8 @@ export default function DeathNoticeCancelButton({ noticeId }: Props) {
     setOpen(false);
     router.refresh();
   }
+
+  if (!withinCancelWindow) return null;
 
   return (
     <>

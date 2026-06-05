@@ -11,7 +11,7 @@ import type { MetadataRoute } from "next";
  *   - /digital/* は認証必須なので sitemap には含めない。
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://tsuginotenavi.jp";
+  const baseUrl = "https://www.tsuginotenavi.jp";
 
   const digitalLegacyGuideSlugs = [
     "digitalihin-001",
@@ -63,5 +63,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.5,
     })),
+    // デジタル整理術（前向き整理の新方針記事。転換導線の主力のため priority 高め）
+    {
+      url: `${baseUrl}/guide/digital-seiri`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/guide/digital-seiri/digital-dansyari`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
   ];
 }

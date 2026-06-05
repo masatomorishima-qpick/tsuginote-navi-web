@@ -718,6 +718,9 @@ function Footer() {
         <p className="mt-2 text-xs text-slate-400 sm:text-sm">大切な方へのデジタル引き継ぎ</p>
 
         <nav className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm sm:text-base">
+          <Link href="/guide/digital-seiri" className="text-slate-300 hover:text-white">
+            役立ち情報
+          </Link>
           <Link href="/terms" className="text-slate-300 hover:text-white">
             利用規約
           </Link>

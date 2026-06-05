@@ -14,7 +14,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/digital/", "/auth/", "/api/"],
     },
-    sitemap: "https://tsuginotenavi.jp/sitemap.xml",
-    host: "https://tsuginotenavi.jp",
+    sitemap: "https://www.tsuginotenavi.jp/sitemap.xml",
+    host: "https://www.tsuginotenavi.jp",
   };
 }

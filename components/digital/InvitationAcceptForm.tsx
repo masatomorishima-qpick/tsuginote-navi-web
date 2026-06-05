@@ -28,6 +28,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { generateRecipientKeypair } from '@/lib/crypto/envelope';
+import { sendGA4Event } from '@/lib/analytics/ga4';
 
 type Props = {
   token: string;
@@ -135,6 +136,8 @@ export default function InvitationAcceptForm({
 
       // ③ 成功（オーナー側のカード未登録の場合でも、連携自体は確立しているため
       //         連携者にはその情報を表示しない。オーナーが自身のダッシュボードで対応する）
+      // GA4：連携承認（キーイベント #33）
+      sendGA4Event('digital_invite_approved');
       setStep('done');
       // 注：router.refresh() は呼ばない。
       //   ページ側でステータス再判定が走ると「accepted」分岐に入り、

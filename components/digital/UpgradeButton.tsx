@@ -12,6 +12,7 @@
 
 import { useState } from 'react';
 import { CreditCard, Loader2, AlertCircle } from 'lucide-react';
+import { sendGA4Event } from '@/lib/analytics/ga4';
 
 type Props = {
   label?: string;
@@ -59,6 +60,9 @@ export default function UpgradeButton({
         setLoading(false);
         return;
       }
+
+      // GA4：カード登録開始（キーイベント #33）。beacon 送信なので遷移しても届く
+      sendGA4Event('digital_checkout_start');
 
       window.location.href = json.url;
     } catch (err) {

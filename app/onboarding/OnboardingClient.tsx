@@ -25,6 +25,7 @@ import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import { createDigitalBrowserClient } from '@/lib/supabase/digitalBrowser';
+import { sendGA4Event } from '@/lib/analytics/ga4';
 
 export default function OnboardingClient({
   userId,
@@ -92,6 +93,8 @@ export default function OnboardingClient({
       if (error) {
         console.error('onboarding upsert error:', error);
       }
+      // GA4：会員登録完了（キーイベント #33）。失敗してもフローは止めない
+      sendGA4Event('digital_sign_up');
     } catch (e) {
       console.error('onboarding complete error:', e);
     } finally {

@@ -11,7 +11,13 @@ export type GA4EventName =
   | 'results_load_more_click'
   | 'office_contact_click'
   | 'office_website_click'
-  | 'office_video_link_clicked';
+  | 'office_video_link_clicked'
+  // ---- デジタル資産サービスのコンバージョンイベント（#33・2026-06-05 追加）----
+  // GA 管理画面で「キーイベント」に指定して転換率を計測する
+  | 'digital_sign_up'          // 会員登録完了（オンボーディング完了時）
+  | 'digital_invite_sent'      // 大切な方への招待送信
+  | 'digital_invite_approved'  // 連携承認（課金につながる行動）
+  | 'digital_checkout_start';  // Stripe Checkout への遷移（カード登録開始）
 
 export type GA4EventParams = {
   area?: string;

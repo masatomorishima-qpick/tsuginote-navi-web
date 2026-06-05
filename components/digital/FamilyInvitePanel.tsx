@@ -38,6 +38,7 @@ import type {
 } from '@/lib/digital/family';
 import ConfirmDialog from './ConfirmDialog';
 import Toast, { type ToastVariant } from './Toast';
+import { sendGA4Event } from '@/lib/analytics/ga4';
 
 /**
  * 確認ダイアログの状態（discriminated union）。
@@ -176,6 +177,9 @@ export default function FamilyInvitePanel({
         setSubmitting(false);
         return;
       }
+
+      // GA4：招待送信（キーイベント #33）
+      sendGA4Event('digital_invite_sent');
 
       // 一覧に反映
       setInvitations((prev) => {

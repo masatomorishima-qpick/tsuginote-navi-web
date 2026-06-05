@@ -49,6 +49,21 @@ function getFromAddress(input?: { from?: string; fromDisplayName?: string }): st
   return `${displayName} <${address}>`;
 }
 
+/**
+ * Resend のレート制限（既定 2 リクエスト/秒）対策。
+ *
+ * 1 つの処理で複数通を連続送信すると（例：死亡通知提出時の
+ * 本人宛→連携者宛→運営宛の 3 通）、3 通目が 429 で落ちることがある。
+ * 2026-06-05 の本番テストで運営宛通知だけが送信されない事象を確認したため、
+ * 429 のときは少し待って自動リトライする。
+ */
+const RATE_LIMIT_RETRIES = 2;
+const RATE_LIMIT_WAIT_MS = 700;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult> {
   const apiKey = getApiKey();
   if (!apiKey) {
@@ -65,24 +80,45 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
   }
 
   try {
-    const res = await fetch(`${RESEND_API_BASE}/emails`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: getFromAddress(input),
-        to: Array.isArray(input.to) ? input.to : [input.to],
-        subject: input.subject,
-        html: input.html,
-        text: input.text,
-        reply_to: input.replyTo,
-      }),
-      cache: 'no-store',
-    });
+    let res: Response | null = null;
+    let json: { id?: string; error?: { message?: string } } = {};
 
-    const json = (await res.json()) as { id?: string; error?: { message?: string } };
+    for (let attempt = 0; attempt <= RATE_LIMIT_RETRIES; attempt++) {
+      res = await fetch(`${RESEND_API_BASE}/emails`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: getFromAddress(input),
+          to: Array.isArray(input.to) ? input.to : [input.to],
+          subject: input.subject,
+          html: input.html,
+          text: input.text,
+          reply_to: input.replyTo,
+        }),
+        cache: 'no-store',
+      });
+
+      json = (await res.json()) as { id?: string; error?: { message?: string } };
+
+      // レート制限（429）のときだけ待ってリトライ
+      if (res.status === 429 && attempt < RATE_LIMIT_RETRIES) {
+        console.warn('[lib/email/client] rate limited, retrying...', {
+          to: input.to,
+          subject: input.subject,
+          attempt: attempt + 1,
+        });
+        await sleep(RATE_LIMIT_WAIT_MS * (attempt + 1));
+        continue;
+      }
+      break;
+    }
+
+    if (!res) {
+      return { ok: false, error: 'network_error', detail: 'no_response' };
+    }
 
     if (!res.ok) {
       const errMsg =

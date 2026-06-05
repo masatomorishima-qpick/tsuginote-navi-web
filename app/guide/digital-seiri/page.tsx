@@ -38,6 +38,13 @@ const articles = [
     description:
       'どこに登録したか思い出せなくても大丈夫。使っていない登録サービスの洗い出し方から、退会のコツと注意点までを解説します。',
   },
+  {
+    href: '/guide/digital-seiri/sumaho-kakin-seiri',
+    category: '課金・サブスク整理',
+    title: 'スマホの有料サービス・課金を整理する方法｜確認から解約までの全手順',
+    description:
+      'アプリストアのサブスク、キャリア決済、有料オプションまで「4つの種類」に分けて確認・解約。気づかず払っているお金が見つかります。',
+  },
 ];
 
 export default function DigitalSeiriIndexPage() {

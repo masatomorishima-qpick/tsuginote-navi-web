@@ -486,6 +486,17 @@ export default function DigitalDansyariPage() {
                 会員登録・アカウント整理のやり方｜探し方と退会の全手順 &rsaquo;
               </Link>
             </li>
+            <li>
+              <p className="text-xs font-medium text-slate-500">
+                スマホの課金・サブスクを徹底的に見直したい方
+              </p>
+              <Link
+                href="/guide/digital-seiri/sumaho-kakin-seiri"
+                className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
+              >
+                スマホの有料サービス・課金を整理する方法 &rsaquo;
+              </Link>
+            </li>
           </ul>
         </section>
       </div>

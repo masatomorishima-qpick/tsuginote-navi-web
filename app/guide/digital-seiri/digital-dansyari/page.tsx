@@ -399,14 +399,7 @@ export default function DigitalDansyariPage() {
             もし、あなたが急に入院したら。事故や病気で、しばらくスマホを触れなくなったら。あなたの家族は、整理されたその情報に、たどり着けるでしょうか。
           </p>
           <p>
-            ネット銀行やネット証券は紙の通知が届きません。サブスクは解約しない限り請求が続きます（実際、
-            <Link
-              href="/guide/ihinseiri/digitalihin-003"
-              className="text-blue-600 hover:underline"
-            >
-              家族が亡くなった人のサブスクを解約できず困るケース
-            </Link>
-            は少なくありません）。スマホにロックがかかっていれば、家族は中身にアクセスできません。
+            ネット銀行やネット証券は紙の通知が届きません。サブスクは解約しない限り請求が続きます（実際、家族が解約できずに困るケースは少なくありません）。スマホにロックがかかっていれば、家族は中身にアクセスできません。
             <strong>整理された情報ほど、本人以外には「存在しないのと同じ」になりやすい</strong>
             ——これがデジタル断捨離の、最後の盲点です。
           </p>
@@ -464,12 +457,17 @@ export default function DigitalDansyariPage() {
           </p>
           <div className="mt-6">
             <Link
-              href="/"
+              href="/signup?next=/digital"
               className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
             >
-              つぎの手ナビ デジタル資産を見てみる（無料で始められます）
+              無料で始める（新規登録）
             </Link>
           </div>
+          <p className="mt-4 text-sm">
+            <Link href="/" className="text-blue-600 hover:underline">
+              サービスの詳しい紹介を見る &rsaquo;
+            </Link>
+          </p>
         </section>
 
         <section className="mt-14">
@@ -479,24 +477,13 @@ export default function DigitalDansyariPage() {
           <ul className="mt-5 space-y-5">
             <li>
               <p className="text-xs font-medium text-slate-500">
-                放置されたサブスクがどうなるか気になる方
+                アカウントと会員登録を本格的に減らしたい方
               </p>
               <Link
-                href="/guide/ihinseiri/digitalihin-003"
+                href="/guide/digital-seiri/account-seiri"
                 className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
               >
-                亡くなった人のサブスクを解約できないときは？ &rsaquo;
-              </Link>
-            </li>
-            <li>
-              <p className="text-xs font-medium text-slate-500">
-                スマホのロックが家族の壁になる実例を知りたい方
-              </p>
-              <Link
-                href="/guide/ihinseiri/digitalihin-008"
-                className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
-              >
-                故人のスマホを見る方法は？ロック解除を急ぐ前に確認したいこと &rsaquo;
+                会員登録・アカウント整理のやり方｜探し方と退会の全手順 &rsaquo;
               </Link>
             </li>
           </ul>

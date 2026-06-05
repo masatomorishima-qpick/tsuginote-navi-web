@@ -31,6 +31,13 @@ const articles = [
     description:
       '写真・アプリ・サブスク・アカウント・メールの5つのステップに分けて、デジタル断捨離の手順を解説します。',
   },
+  {
+    href: '/guide/digital-seiri/account-seiri',
+    category: 'アカウント整理',
+    title: 'スマホの会員登録・アカウント整理のやり方｜不要な登録の探し方と退会の全手順',
+    description:
+      'どこに登録したか思い出せなくても大丈夫。使っていない登録サービスの洗い出し方から、退会のコツと注意点までを解説します。',
+  },
 ];
 
 export default function DigitalSeiriIndexPage() {
@@ -95,12 +102,17 @@ export default function DigitalSeiriIndexPage() {
           </p>
           <div className="mt-6">
             <Link
-              href="/"
+              href="/signup?next=/digital"
               className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
             >
-              サービスを見てみる（無料で始められます）
+              無料で始める（新規登録）
             </Link>
           </div>
+          <p className="mt-4 text-sm">
+            <Link href="/" className="text-blue-600 hover:underline">
+              サービスの詳しい紹介を見る &rsaquo;
+            </Link>
+          </p>
         </section>
       </div>
 

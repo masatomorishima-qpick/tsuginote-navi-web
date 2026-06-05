@@ -10,6 +10,7 @@
  *   const { data: { user } } = await supabase.auth.getUser();
  */
 
+import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 
@@ -49,3 +50,25 @@ export async function createDigitalServerClient() {
     },
   });
 }
+
+/**
+ * 同一リクエスト内で Supabase クライアント生成＋ getUser() を 1 回に共有する
+ * キャッシュ付きヘルパー。
+ *
+ * layout.tsx と page.tsx がそれぞれ getUser() を呼ぶと、1 画面の表示で
+ * Supabase Auth サーバーへの問い合わせが複数回発生してしまう。
+ * React の cache() でラップすることで、同じリクエストのレンダリング中は
+ * 最初の 1 回だけ実行され、2 回目以降は結果を使い回す（リクエストを跨いだ
+ * キャッシュはされないため、セキュリティ上の確認は毎リクエスト必ず行われる）。
+ *
+ * 使用例（Server Component 専用）：
+ *   const { supabase, user } = await getDigitalSession();
+ *   if (!user) redirect('/login');
+ */
+export const getDigitalSession = cache(async () => {
+  const supabase = await createDigitalServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return { supabase, user };
+});

@@ -9,7 +9,7 @@
  */
 
 import { redirect } from 'next/navigation';
-import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
+import { getDigitalSession } from '@/lib/supabase/digitalServer';
 import DigitalHeader from '@/components/digital/DigitalHeader';
 import SiteFooter from '@/components/SiteFooter';
 
@@ -18,11 +18,7 @@ export default async function DigitalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createDigitalServerClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await getDigitalSession();
 
   if (!user) {
     redirect('/login');

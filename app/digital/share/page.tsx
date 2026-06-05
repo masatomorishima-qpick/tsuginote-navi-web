@@ -12,7 +12,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ShieldCheck, FileDown, UserRoundPlus } from 'lucide-react';
-import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
+import { getDigitalSession } from '@/lib/supabase/digitalServer';
 import { listAssets } from '@/lib/digital/assets';
 import {
   listInvitationsByOwner,
@@ -34,10 +34,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function SharePage() {
-  const supabase = await createDigitalServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getDigitalSession();
 
   if (!user) {
     redirect('/login?next=/digital/share');

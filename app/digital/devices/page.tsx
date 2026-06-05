@@ -8,7 +8,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Plus, ShieldCheck } from 'lucide-react';
-import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
+import { getDigitalSession } from '@/lib/supabase/digitalServer';
 import { listDevicesWithPinFlag } from '@/lib/digital/devices';
 import type { DigitalDeviceWithPinFlag } from '@/types/digital';
 import DeviceList from '@/components/digital/DeviceList';
@@ -23,11 +23,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function DevicesPage() {
-  const supabase = await createDigitalServerClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getDigitalSession();
 
   if (!user) {
     redirect('/login?next=/digital/devices');

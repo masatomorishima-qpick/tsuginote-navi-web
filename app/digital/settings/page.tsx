@@ -24,7 +24,7 @@ import {
   Trash2,
   Users,
 } from 'lucide-react';
-import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
+import { getDigitalSession } from '@/lib/supabase/digitalServer';
 import { getOwnSubscription } from '@/lib/digital/subscriptions';
 import { effectivePlan } from '@/lib/digital/subscriptionUtils';
 import { getOrInitReminderSettings } from '@/lib/digital/reminders';
@@ -43,20 +43,17 @@ const ROW_CLASS =
   'flex items-center justify-between gap-3 px-4 py-4 text-left border-b border-gray-100 last:border-b-0 active:opacity-70 min-h-[56px]';
 
 export default async function DigitalSettingsPage() {
-  const supabase = await createDigitalServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getDigitalSession();
   if (!user) {
     redirect('/login?next=/digital/settings');
   }
 
-  // プラン状態
-  const subscription = await getOwnSubscription(supabase, user.id);
+  // プラン状態・通知設定（互いに独立なので並列取得）
+  const [subscription, reminder] = await Promise.all([
+    getOwnSubscription(supabase, user.id),
+    getOrInitReminderSettings(supabase, user.id),
+  ]);
   const planLabel = effectivePlan(subscription) === 'standard' ? 'STANDARD' : 'フリー';
-
-  // 通知設定
-  const reminder = await getOrInitReminderSettings(supabase, user.id);
   const notifLabel = reminder.reminder_enabled
     ? `${reminder.reminder_interval}日`
     : 'OFF';

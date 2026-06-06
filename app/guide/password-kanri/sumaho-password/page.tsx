@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
@@ -23,11 +24,19 @@ export const metadata: Metadata = {
     siteName: 'つぎの手ナビ',
     type: 'article',
     locale: 'ja_JP',
+    images: [
+      {
+        url: `${SITE_URL}/images/guide/password-kanri/sumaho-password-main.webp`,
+        width: 1600,
+        height: 900,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: PAGE_TITLE,
     description: PAGE_DESCRIPTION,
+    images: [`${SITE_URL}/images/guide/password-kanri/sumaho-password-main.webp`],
   },
 };
 
@@ -72,6 +81,7 @@ const jsonLd = {
       '@type': 'Article',
       headline: PAGE_TITLE,
       description: PAGE_DESCRIPTION,
+      image: `${SITE_URL}/images/guide/password-kanri/sumaho-password-main.webp`,
       mainEntityOfPage: `${SITE_URL}${PAGE_PATH}`,
       datePublished: '2026-06-05',
       dateModified: '2026-06-05',
@@ -99,15 +109,16 @@ const jsonLd = {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'ホーム', item: SITE_URL },
+        { '@type': 'ListItem', position: 2, name: '役立ちガイド', item: `${SITE_URL}/guide` },
         {
           '@type': 'ListItem',
-          position: 2,
+          position: 3,
           name: 'パスワード・認証管理',
           item: `${SITE_URL}/guide/password-kanri`,
         },
         {
           '@type': 'ListItem',
-          position: 3,
+          position: 4,
           name: 'スマホのパスワード管理',
           item: `${SITE_URL}${PAGE_PATH}`,
         },
@@ -180,6 +191,12 @@ export default function SumahoPasswordPage() {
             </li>
             <li aria-hidden="true">/</li>
             <li>
+              <Link href="/guide" className="text-blue-600 hover:underline">
+                役立ちガイド
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li>
               <Link href="/guide/password-kanri" className="text-blue-600 hover:underline">
                 パスワード・認証管理
               </Link>
@@ -206,6 +223,17 @@ export default function SumahoPasswordPage() {
           忘れっぽい人ほど、この記事の方法が向いています。
           ここでは、なぜ危険な保管法がダメなのかを手短に確認したうえで、忘れっぽくても安全に管理できる現実的なやり方を、順番に解説します。
         </p>
+
+        <div className="mt-8 overflow-hidden rounded-2xl">
+          <Image
+            src="/images/guide/password-kanri/sumaho-password-main.webp"
+            alt="リビングのソファでスマホを指紋認証や顔認証で解除し、パスワードを安全に管理する人"
+            width={1600}
+            height={900}
+            priority
+            className="h-auto w-full"
+          />
+        </div>
 
         <nav className="mt-10 rounded-2xl bg-slate-50 p-6" aria-label="目次">
           <h2 className="text-sm font-semibold text-slate-900">目次</h2>

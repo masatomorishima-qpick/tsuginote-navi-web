@@ -11,8 +11,8 @@ export default function SiteFooter() {
             <Link href="/login?next=/digital" className="hover:text-slate-700">
               デジタル資産の整理
             </Link>
-            <Link href="/guide/digital-seiri" className="hover:text-slate-700">
-              役立ち情報
+            <Link href="/guide" className="hover:text-slate-700">
+              役立ちガイド
             </Link>
             <Link href="/privacy" className="hover:text-slate-700">
               プライバシーポリシー

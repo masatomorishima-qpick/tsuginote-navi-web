@@ -47,6 +47,12 @@ export default function PasswordKanriIndexPage() {
               </Link>
             </li>
             <li aria-hidden="true">/</li>
+            <li>
+              <Link href="/guide" className="text-blue-600 hover:underline">
+                役立ちガイド
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
             <li className="text-slate-700">パスワード・認証管理</li>
           </ol>
         </nav>

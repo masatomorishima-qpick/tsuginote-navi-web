@@ -44,13 +44,9 @@ const nextConfig: NextConfig = {
         destination: "/",
         permanent: true,
       },
-      // 5. /guide トップ（実家片付け・遺品整理の混合インデックス、相続文脈なので / へ集約）
-      //    ※ /guide/ihinseiri/digitalihin-* は残置（後段の has 条件で除外）
-      {
-        source: "/guide",
-        destination: "/",
-        permanent: true,
-      },
+      // 5.（2026-06-06 解除）/guide は「役立ちガイドTOP」として復活。
+      //    新方針カテゴリ（digital-seiri / password-kanri 等）のハブページ。
+      //    旧・相続混在インデックスは廃止し、app/guide/page.tsx を新TOPに差し替え済み。
       // 5a. 実家片付けガイド（/guide/jikka-kataduke/...）
       {
         source: "/guide/jikka-kataduke/:path*",

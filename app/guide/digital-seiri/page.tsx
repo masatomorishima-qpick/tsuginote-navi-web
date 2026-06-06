@@ -61,6 +61,12 @@ export default function DigitalSeiriIndexPage() {
               </Link>
             </li>
             <li aria-hidden="true">/</li>
+            <li>
+              <Link href="/guide" className="text-blue-600 hover:underline">
+                役立ちガイド
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
             <li className="text-slate-700">デジタル整理術</li>
           </ol>
         </nav>

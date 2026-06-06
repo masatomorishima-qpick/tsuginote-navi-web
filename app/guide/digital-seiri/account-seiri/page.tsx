@@ -107,15 +107,16 @@ const jsonLd = {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'ホーム', item: SITE_URL },
+        { '@type': 'ListItem', position: 2, name: '役立ちガイド', item: `${SITE_URL}/guide` },
         {
           '@type': 'ListItem',
-          position: 2,
+          position: 3,
           name: 'デジタル整理術',
           item: `${SITE_URL}/guide/digital-seiri`,
         },
         {
           '@type': 'ListItem',
-          position: 3,
+          position: 4,
           name: '会員登録・アカウント整理のやり方',
           item: `${SITE_URL}${PAGE_PATH}`,
         },
@@ -171,6 +172,12 @@ export default function AccountSeiriPage() {
             <li>
               <Link href="/" className="text-blue-600 hover:underline">
                 ホーム
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li>
+              <Link href="/guide" className="text-blue-600 hover:underline">
+                役立ちガイド
               </Link>
             </li>
             <li aria-hidden="true">/</li>

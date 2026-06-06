@@ -1,104 +1,239 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 
+const SITE_URL = 'https://www.tsuginotenavi.jp';
+
 export const metadata: Metadata = {
-  title: '役立ち情報｜相続・死亡後手続き・遺品整理のガイド一覧|つぎの手ナビ',
+  title: '役立ちガイド｜デジタル整理・パスワード管理・もしもの備え | つぎの手ナビ',
   description:
-    'つぎの手ナビの役立ち情報ページです。相続、死亡後の手続き、遺品整理、実家片付け、デジタル遺品など、家族が亡くなった後に確認したい情報を整理しています。',
+    'スマホ・パソコンのデジタル整理から、パスワードの安全な管理、もしものときに家族が困らない備えまで。暮らしを整えながら大切な人への準備ができる、つぎの手ナビの役立ちガイドです。',
+  alternates: {
+    canonical: `${SITE_URL}/guide`,
+  },
+  openGraph: {
+    title: '役立ちガイド｜つぎの手ナビ',
+    description:
+      'スマホ・パソコンのデジタル整理から、パスワードの安全な管理、もしものときに家族が困らない備えまで。',
+    url: `${SITE_URL}/guide`,
+    siteName: 'つぎの手ナビ',
+    type: 'website',
+    locale: 'ja_JP',
+    images: [
+      {
+        url: `${SITE_URL}/images/guide/guide-top-hero.webp`,
+        width: 1600,
+        height: 900,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '役立ちガイド｜つぎの手ナビ',
+    description:
+      'スマホ・パソコンのデジタル整理から、パスワードの安全な管理、もしものときに家族が困らない備えまで。',
+    images: [`${SITE_URL}/images/guide/guide-top-hero.webp`],
+  },
 };
 
-const categories = [
+// 新着記事（公開日の新しい順。記事を追加したら先頭に足す）
+const latestArticles = [
   {
-    title: '遺品整理・実家片付け',
-    description:
-      '実家の片付け、遺品整理、スマホやパソコンなどのデジタル遺品まで、何から進めるべきかを整理したい方へ。',
-    href: '/guide/ihinseiri',
+    href: '/guide/password-kanri/sumaho-password',
+    category: 'パスワード・認証管理',
+    title: 'スマホのパスワード管理｜「メモは危険」と言われても、忘れっぽい人はどうすればいい？',
+    date: '2026-06-05',
   },
   {
-    title: "実家片付け",
-    description:
-      "親が亡くなった後の実家の片付けで、何から始めるか、捨ててはいけないもの、自分でやるか業者に頼むかを整理したい方へ。",
-    href: "/guide/jikka-kataduke",
+    href: '/guide/digital-seiri/sumaho-kakin-seiri',
+    category: 'デジタル整理術',
+    title: 'スマホの有料サービス・課金を整理する方法｜確認から解約までの全手順',
+    date: '2026-06-05',
+  },
+  {
+    href: '/guide/digital-seiri/account-seiri',
+    category: 'デジタル整理術',
+    title: 'スマホの会員登録・アカウント整理のやり方｜不要な登録の探し方と退会の全手順',
+    date: '2026-06-05',
+  },
+  {
+    href: '/guide/digital-seiri/digital-dansyari',
+    category: 'デジタル整理術',
+    title: 'デジタル断捨離のやり方｜スマホ・アカウント・サブスクをスッキリ整理する全手順',
+    date: '2026-06-05',
   },
 ];
 
-function BrandHeader() {
-  return (
-    <header className="border-b border-slate-200 bg-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 sm:py-5">
-        <Link href="/" className="flex items-center">
-          <Image
-            src="/images/tsuginote-logo.png"
-            alt="つぎの手ナビ"
-            width={754}
-            height={201}
-            priority
-            className="h-12 w-auto sm:h-14"
-          />
-        </Link>
-      </div>
-    </header>
-  );
-}
+// カテゴリ（ジャンル）。記事が増えたカテゴリを追加していく
+const categories = [
+  {
+    href: '/guide/digital-seiri',
+    name: 'デジタル整理術',
+    description:
+      'スマホ・パソコンのデータ、アプリ、サブスク、アカウントをスッキリ整理する手順。',
+    articles: [
+      {
+        href: '/guide/digital-seiri/digital-dansyari',
+        title: 'デジタル断捨離のやり方｜スッキリ整理する全手順',
+      },
+      {
+        href: '/guide/digital-seiri/account-seiri',
+        title: '会員登録・アカウント整理のやり方｜探し方と退会の全手順',
+      },
+      {
+        href: '/guide/digital-seiri/sumaho-kakin-seiri',
+        title: 'スマホの有料サービス・課金を整理する方法',
+      },
+    ],
+  },
+  {
+    href: '/guide/password-kanri',
+    name: 'パスワード・認証管理',
+    description: 'パスワードを「覚えない仕組み」で安全に管理する方法。二段階認証・パスキーまで。',
+    articles: [
+      {
+        href: '/guide/password-kanri/sumaho-password',
+        title: 'スマホのパスワード管理｜忘れっぽい人でも安全な方法',
+      },
+    ],
+  },
+];
 
-export default function GuideIndexPage() {
-  return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
-      <BrandHeader />
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: '役立ちガイド｜つぎの手ナビ',
+  description:
+    'スマホ・パソコンのデジタル整理から、パスワードの安全な管理、もしものときに家族が困らない備えまで。',
+  url: `${SITE_URL}/guide`,
+  inLanguage: 'ja',
+};
 
-      <div className="mx-auto max-w-5xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+export default function GuideTopPage() {
+  return (
+    <main className="bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <GuideHeader />
+
+      <div className="mx-auto max-w-4xl px-5 pb-20 pt-8 sm:px-8">
         <nav className="text-sm text-slate-500">
           <ol className="flex flex-wrap items-center gap-2">
             <li>
-              <Link href="/" className="hover:text-slate-700 hover:underline">
+              <Link href="/" className="text-blue-600 hover:underline">
                 ホーム
               </Link>
             </li>
-            <li>/</li>
-            <li className="text-slate-700">役立ち情報</li>
+            <li aria-hidden="true">/</li>
+            <li className="text-slate-700">役立ちガイド</li>
           </ol>
         </nav>
 
-        <header className="mt-6 rounded-3xl bg-white p-6 ring-1 ring-slate-200 sm:p-8">
-          <div className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-            役立ち情報
-          </div>
+        <h1 className="mt-8 text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
+          役立ちガイド
+        </h1>
+        <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600">
+          スマホ・パソコンのデジタル整理から、パスワードの安全な管理、もしものときに大切な人が困らない備えまで。暮らしを整えながら、前向きに準備できる記事をお届けします。
+        </p>
 
-          <h1 className="mt-4 text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
-            相続・死亡後手続き・遺品整理の
-            <br className="hidden sm:block" />
-            役立ち情報
-          </h1>
+        <div className="mt-8 overflow-hidden rounded-3xl">
+          <Image
+            src="/images/guide/guide-top-hero.webp"
+            alt="明るいリビングで、家族が穏やかに暮らしの準備について話している様子"
+            width={1600}
+            height={900}
+            priority
+            className="h-auto w-full"
+          />
+        </div>
 
-          <p className="mt-5 max-w-3xl text-base leading-8 text-slate-700">
-            ご家族が亡くなった後に確認したい、相続、死亡後の手続き、遺品整理、
-            実家片付け、デジタル遺品などの情報をまとめています。
-            「何から始めればよいか分からない」ときに、状況ごとに確認しやすいよう整理しています。
-          </p>
-        </header>
+        {/* 新着記事 */}
+        <section className="mt-14">
+          <h2 className="border-b border-slate-200 pb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            新着記事
+          </h2>
+          <ul className="divide-y divide-slate-200">
+            {latestArticles.map((article) => (
+              <li key={article.href} className="py-6">
+                <div className="flex items-baseline gap-3">
+                  <span className="shrink-0 text-xs font-medium text-slate-500">
+                    {article.category}
+                  </span>
+                  <time className="shrink-0 text-xs text-slate-400">{article.date}</time>
+                </div>
+                <h3 className="mt-2 text-lg font-semibold leading-snug">
+                  <Link href={article.href} className="text-blue-600 hover:underline">
+                    {article.title}
+                  </Link>
+                </h3>
+              </li>
+            ))}
+          </ul>
+        </section>
 
-        <section className="mt-8">
-          <h2 className="text-2xl font-bold text-slate-900">カテゴリから探す</h2>
-
-          <div className="mt-6 grid gap-6 md:grid-cols-2">
-            {categories.map((category) => (
-              <Link
-                key={category.href}
-                href={category.href}
-                className="rounded-3xl bg-white p-6 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:bg-slate-50"
-              >
-                <h3 className="text-xl font-bold text-slate-900">{category.title}</h3>
-                <p className="mt-4 text-[15px] leading-8 text-slate-700">
-                  {category.description}
+        {/* カテゴリ別 */}
+        <section className="mt-16">
+          <h2 className="border-b border-slate-200 pb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            カテゴリから探す
+          </h2>
+          <div className="mt-6 space-y-10">
+            {categories.map((cat) => (
+              <div key={cat.href}>
+                <h3 className="text-xl font-semibold text-slate-900">
+                  <Link href={cat.href} className="text-blue-600 hover:underline">
+                    {cat.name}
+                  </Link>
+                </h3>
+                <p className="mt-2 text-[15px] leading-7 text-slate-600">{cat.description}</p>
+                <ul className="mt-4 space-y-2.5">
+                  {cat.articles.map((a) => (
+                    <li key={a.href} className="flex items-start gap-3 text-[15px] leading-7">
+                      <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
+                      <Link href={a.href} className="text-blue-600 hover:underline">
+                        {a.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-3">
+                  <Link
+                    href={cat.href}
+                    className="text-sm font-medium text-blue-600 hover:underline"
+                  >
+                    {cat.name}の記事一覧 &rsaquo;
+                  </Link>
                 </p>
-                <p className="mt-5 text-sm font-semibold text-slate-600">
-                  詳しく見る →
-                </p>
-              </Link>
+              </div>
             ))}
           </div>
+        </section>
+
+        {/* CTA */}
+        <section className="mt-16 rounded-3xl bg-slate-50 p-8 text-center sm:p-10">
+          <h2 className="text-xl font-semibold text-slate-900">
+            整理した情報を、もしものときに届く形で残す
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-8 text-slate-600">
+            「つぎの手ナビ
+            デジタル資産」は、整理したデジタル情報を、見られたくないものは伏せたまま、もしものときだけ大切な人へ引き継ぐ準備ができるサービスです。資産の登録・PDF出力・定期リマインドは無料で使えます。
+          </p>
+          <div className="mt-6">
+            <Link
+              href="/signup?next=/digital"
+              className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+            >
+              無料で始める（新規登録）
+            </Link>
+          </div>
+          <p className="mt-4 text-sm">
+            <Link href="/" className="text-blue-600 hover:underline">
+              サービスの詳しい紹介を見る &rsaquo;
+            </Link>
+          </p>
         </section>
       </div>
 

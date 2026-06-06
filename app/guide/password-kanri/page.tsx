@@ -6,17 +6,17 @@ import SiteFooter from '@/components/SiteFooter';
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 
 export const metadata: Metadata = {
-  title: 'デジタル整理術ガイド｜スマホ・アカウント・サブスクの整理 | つぎの手ナビ',
+  title: 'パスワード・認証管理ガイド｜安全な管理と二段階認証 | つぎの手ナビ',
   description:
-    'スマホ・パソコンの中のデータ、アプリ、サブスク、アカウント、パスワードをスッキリ整理するためのガイド記事一覧。デジタル断捨離のやり方から、整理した情報の安全な残し方まで。',
+    'スマホのパスワードを安全に管理するためのガイド記事一覧。メモ帳保管の危険性、忘れっぽい人でもできるパスワード管理アプリの始め方、二段階認証・パスキーまで。',
   alternates: {
-    canonical: `${SITE_URL}/guide/digital-seiri`,
+    canonical: `${SITE_URL}/guide/password-kanri`,
   },
   openGraph: {
-    title: 'デジタル整理術ガイド｜つぎの手ナビ',
+    title: 'パスワード・認証管理ガイド｜つぎの手ナビ',
     description:
-      'スマホ・パソコンの中のデータ、アプリ、サブスク、アカウント、パスワードをスッキリ整理するためのガイド記事一覧。',
-    url: `${SITE_URL}/guide/digital-seiri`,
+      'スマホのパスワードを安全に管理するためのガイド記事一覧。メモ帳保管の危険性、管理アプリの始め方、二段階認証・パスキーまで。',
+    url: `${SITE_URL}/guide/password-kanri`,
     siteName: 'つぎの手ナビ',
     type: 'website',
     locale: 'ja_JP',
@@ -25,29 +25,15 @@ export const metadata: Metadata = {
 
 const articles = [
   {
-    href: '/guide/digital-seiri/digital-dansyari',
-    category: 'デジタル断捨離',
-    title: 'デジタル断捨離のやり方｜スマホ・アカウント・サブスクをスッキリ整理する全手順',
+    href: '/guide/password-kanri/sumaho-password',
+    category: 'パスワード管理',
+    title: 'スマホのパスワード管理｜「メモは危険」と言われても、忘れっぽい人はどうすればいい？',
     description:
-      '写真・アプリ・サブスク・アカウント・メールの5つのステップに分けて、デジタル断捨離の手順を解説します。',
-  },
-  {
-    href: '/guide/digital-seiri/account-seiri',
-    category: 'アカウント整理',
-    title: 'スマホの会員登録・アカウント整理のやり方｜不要な登録の探し方と退会の全手順',
-    description:
-      'どこに登録したか思い出せなくても大丈夫。使っていない登録サービスの洗い出し方から、退会のコツと注意点までを解説します。',
-  },
-  {
-    href: '/guide/digital-seiri/sumaho-kakin-seiri',
-    category: '課金・サブスク整理',
-    title: 'スマホの有料サービス・課金を整理する方法｜確認から解約までの全手順',
-    description:
-      'アプリストアのサブスク、キャリア決済、有料オプションまで「4つの種類」に分けて確認・解約。気づかず払っているお金が見つかります。',
+      '危険な保管法の見分け方から、忘れっぽい人でもできるパスワード管理アプリの始め方、二段階認証・パスキーまでを解説します。',
   },
 ];
 
-export default function DigitalSeiriIndexPage() {
+export default function PasswordKanriIndexPage() {
   return (
     <main className="bg-white">
       <GuideHeader />
@@ -61,15 +47,15 @@ export default function DigitalSeiriIndexPage() {
               </Link>
             </li>
             <li aria-hidden="true">/</li>
-            <li className="text-slate-700">デジタル整理術</li>
+            <li className="text-slate-700">パスワード・認証管理</li>
           </ol>
         </nav>
 
         <h1 className="mt-10 text-center text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
-          デジタル整理術ガイド
+          パスワード・認証管理ガイド
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-center text-base leading-8 text-slate-600">
-          スマホ・パソコンの中に溜まったデータ、アプリ、サブスク、アカウント、パスワードをスッキリ整理するためのガイドです。「減らす・整える」の実用的な手順から、整理した情報を安全に残す方法までを扱います。
+          スマホのパスワードを「覚えない仕組み」で安全に管理するためのガイドです。危険な保管法の見分け方から、忘れっぽい人でもできる管理アプリの始め方、二段階認証・パスキーまでを扱います。
         </p>
 
         <section className="mt-14">
@@ -104,9 +90,9 @@ export default function DigitalSeiriIndexPage() {
             関連ガイド
           </h2>
           <p className="mt-5 text-[15px] leading-8 text-slate-700">
-            パスワードを安全に管理する方法は
-            <Link href="/guide/password-kanri" className="text-blue-600 hover:underline">
-              パスワード・認証管理ガイド
+            スマホ全体の整理は
+            <Link href="/guide/digital-seiri" className="text-blue-600 hover:underline">
+              デジタル整理術ガイド
             </Link>
             もあわせてどうぞ。
           </p>
@@ -114,7 +100,7 @@ export default function DigitalSeiriIndexPage() {
 
         <section className="mt-16 rounded-3xl bg-slate-50 p-8 text-center sm:p-10">
           <h2 className="text-xl font-semibold text-slate-900">
-            整理した情報を、もしものときに届く形で残す
+            すべての鍵を握る「在りか」を、もしものときに届く形で残す
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-[15px] leading-8 text-slate-600">
             「つぎの手ナビ

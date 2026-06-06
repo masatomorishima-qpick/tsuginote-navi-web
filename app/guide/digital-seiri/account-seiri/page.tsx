@@ -365,7 +365,7 @@ export default function AccountSeiriPage() {
             ステップ1で作った「自分がどこに登録しているかの一覧」。整理を経て、それはあなたのデジタル生活の正確な地図になりました。でもその地図の存在を知っているのは、おそらくあなた一人です。
           </p>
           <p>
-            もし、あなたが急に入院したら。事故や病気で、しばらくスマホを触れなくなったら。家族は、どのサービスに何があるのか、どこから手をつければいいのか、知るすべがありません。ネット銀行やネット証券は紙の通知が届かず、有料サービスは止めない限り請求が続きます。
+            もし、あなたが急に入院したら。事故や病気で、しばらくスマホを触れなくなったら。家族は、どのサービスに何があるのか、どこから手をつければいいのか、知るすべがありません。ネット銀行やネット証券は紙の通知が届かず、有料サービスは止めない限り請求が続きます。実際、大切な方を亡くした人の約7割が「生前に整理してくれていたら助かった」と答えています（2025年 BlueAdventures調べ）。
           </p>
           <p>
             せっかく作った地図です。
@@ -461,6 +461,17 @@ export default function AccountSeiriPage() {
                 className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
               >
                 スマホの有料サービス・課金を整理する方法 &rsaquo;
+              </Link>
+            </li>
+            <li>
+              <p className="text-xs font-medium text-slate-500">
+                残すアカウントのパスワードを安全に管理したい方
+              </p>
+              <Link
+                href="/guide/password-kanri/sumaho-password"
+                className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
+              >
+                スマホのパスワード管理｜忘れっぽい人でも安全な方法 &rsaquo;
               </Link>
             </li>
           </ul>

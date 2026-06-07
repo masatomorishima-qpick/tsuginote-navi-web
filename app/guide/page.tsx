@@ -41,6 +41,12 @@ export const metadata: Metadata = {
 // 新着記事（公開日の新しい順。記事を追加したら先頭に足す）
 const latestArticles = [
   {
+    href: '/guide/kazoku-kyoyu/password-account-kyoyu',
+    category: '家族間の情報共有',
+    title: '家族とのパスワード・アカウント共有｜どこまで共有する？安全なやり方と線引き',
+    date: '2026-06-06',
+  },
+  {
     href: '/guide/password-kanri/sumaho-password',
     category: 'パスワード・認証管理',
     title: 'スマホのパスワード管理｜「メモは危険」と言われても、忘れっぽい人はどうすればいい？',
@@ -96,6 +102,18 @@ const categories = [
       {
         href: '/guide/password-kanri/sumaho-password',
         title: 'スマホのパスワード管理｜忘れっぽい人でも安全な方法',
+      },
+    ],
+  },
+  {
+    href: '/guide/kazoku-kyoyu',
+    name: '家族間の情報共有',
+    description:
+      '家族とのパスワード・アカウント共有の安全なやり方と「どこまで共有するか」の線引き。',
+    articles: [
+      {
+        href: '/guide/kazoku-kyoyu/password-account-kyoyu',
+        title: '家族とのパスワード・アカウント共有｜安全なやり方と線引き',
       },
     ],
   },

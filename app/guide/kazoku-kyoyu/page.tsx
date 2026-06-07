@@ -6,17 +6,17 @@ import SiteFooter from '@/components/SiteFooter';
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 
 export const metadata: Metadata = {
-  title: 'パスワード・認証管理ガイド｜安全な管理と二段階認証 | つぎの手ナビ',
+  title: '家族間の情報共有ガイド｜パスワード・アカウントの共有と線引き | つぎの手ナビ',
   description:
-    'スマホのパスワードを安全に管理するためのガイド記事一覧。メモ帳保管の危険性、忘れっぽい人でもできるパスワード管理アプリの始め方、二段階認証・パスキーまで。',
+    '家族とのパスワード・アカウント共有の安全なやり方と「どこまで共有するか」の線引きを解説するガイド記事一覧。日常の共有から、もしものときの備えまで。',
   alternates: {
-    canonical: `${SITE_URL}/guide/password-kanri`,
+    canonical: `${SITE_URL}/guide/kazoku-kyoyu`,
   },
   openGraph: {
-    title: 'パスワード・認証管理ガイド｜つぎの手ナビ',
+    title: '家族間の情報共有ガイド｜つぎの手ナビ',
     description:
-      'スマホのパスワードを安全に管理するためのガイド記事一覧。メモ帳保管の危険性、管理アプリの始め方、二段階認証・パスキーまで。',
-    url: `${SITE_URL}/guide/password-kanri`,
+      '家族とのパスワード・アカウント共有の安全なやり方と「どこまで共有するか」の線引きを解説するガイド記事一覧。',
+    url: `${SITE_URL}/guide/kazoku-kyoyu`,
     siteName: 'つぎの手ナビ',
     type: 'website',
     locale: 'ja_JP',
@@ -25,15 +25,15 @@ export const metadata: Metadata = {
 
 const articles = [
   {
-    href: '/guide/password-kanri/sumaho-password',
-    category: 'パスワード管理',
-    title: 'スマホのパスワード管理｜「メモは危険」と言われても、忘れっぽい人はどうすればいい？',
+    href: '/guide/kazoku-kyoyu/password-account-kyoyu',
+    category: '家族間の情報共有',
+    title: '家族とのパスワード・アカウント共有｜どこまで共有する？安全なやり方と線引き',
     description:
-      '危険な保管法の見分け方から、忘れっぽい人でもできるパスワード管理アプリの始め方、二段階認証・パスキーまでを解説します。',
+      '何を共有してよくて、何は個人に留めるべきか。線引きの考え方から、Apple・Google・管理アプリの安全な共有手順までを解説します。',
   },
 ];
 
-export default function PasswordKanriIndexPage() {
+export default function KazokuKyoyuIndexPage() {
   return (
     <main className="bg-white">
       <GuideHeader />
@@ -53,15 +53,15 @@ export default function PasswordKanriIndexPage() {
               </Link>
             </li>
             <li aria-hidden="true">/</li>
-            <li className="text-slate-700">パスワード・認証管理</li>
+            <li className="text-slate-700">家族間の情報共有</li>
           </ol>
         </nav>
 
         <h1 className="mt-10 text-center text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
-          パスワード・認証管理ガイド
+          家族間の情報共有ガイド
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-center text-base leading-8 text-slate-600">
-          スマホのパスワードを「覚えない仕組み」で安全に管理するためのガイドです。危険な保管法の見分け方から、忘れっぽい人でもできる管理アプリの始め方、二段階認証・パスキーまでを扱います。
+          家族とのパスワードやアカウントの共有を、安全に・気持ちよく続けるためのガイドです。「どこまで共有するか」の線引きから、暗号化された共有の仕組み、もしものときの備えまでを扱います。
         </p>
 
         <section className="mt-14">
@@ -96,9 +96,9 @@ export default function PasswordKanriIndexPage() {
             関連ガイド
           </h2>
           <p className="mt-5 text-[15px] leading-8 text-slate-700">
-            家族との共有の線引きは
-            <Link href="/guide/kazoku-kyoyu" className="text-blue-600 hover:underline">
-              家族間の情報共有ガイド
+            パスワードそのものの安全な管理は
+            <Link href="/guide/password-kanri" className="text-blue-600 hover:underline">
+              パスワード・認証管理ガイド
             </Link>
             、スマホ全体の整理は
             <Link href="/guide/digital-seiri" className="text-blue-600 hover:underline">
@@ -110,11 +110,11 @@ export default function PasswordKanriIndexPage() {
 
         <section className="mt-16 rounded-3xl bg-slate-50 p-8 text-center sm:p-10">
           <h2 className="text-xl font-semibold text-slate-900">
-            すべての鍵を握る「在りか」を、もしものときに届く形で残す
+            生きている間は見せず、もしものときだけ届く備えを
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-[15px] leading-8 text-slate-600">
             「つぎの手ナビ
-            デジタル資産」は、整理したデジタル情報を、見られたくないものは伏せたまま、もしものときだけ大切な人へ引き継ぐ準備ができるサービスです。
+            デジタル資産」は、日常の共有とは別に、もしものときだけ大切な人へ情報が届く準備ができるサービスです。資産の登録・PDF出力・定期リマインドは無料で使えます。
           </p>
           <div className="mt-6">
             <Link

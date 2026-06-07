@@ -108,5 +108,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    // 家族間の情報共有（本命ジャンル）
+    {
+      url: `${baseUrl}/guide/kazoku-kyoyu`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/guide/kazoku-kyoyu/password-account-kyoyu`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
   ];
 }

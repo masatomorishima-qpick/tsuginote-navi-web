@@ -483,6 +483,17 @@ export default function SumahoPasswordPage() {
           <ul className="mt-5 space-y-5">
             <li>
               <p className="text-xs font-medium text-slate-500">
+                家族とのパスワード共有の線引きに迷っている方
+              </p>
+              <Link
+                href="/guide/kazoku-kyoyu/password-account-kyoyu"
+                className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
+              >
+                家族とのパスワード・アカウント共有｜安全なやり方と線引き &rsaquo;
+              </Link>
+            </li>
+            <li>
+              <p className="text-xs font-medium text-slate-500">
                 写真・アプリ・サブスクも含めて丸ごと片付けたい方
               </p>
               <Link

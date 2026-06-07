@@ -121,5 +121,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    // 資産・お金の管理
+    {
+      url: `${baseUrl}/guide/shisan-kanri`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/guide/shisan-kanri/hoken-ichiran-excel`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
   ];
 }

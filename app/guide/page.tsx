@@ -41,6 +41,12 @@ export const metadata: Metadata = {
 // 新着記事（公開日の新しい順。記事を追加したら先頭に足す）
 const latestArticles = [
   {
+    href: '/guide/shisan-kanri/hoken-ichiran-excel',
+    category: '資産・お金の管理',
+    title: '保険契約の一覧表をエクセルで作る方法｜無料テンプレート付き・書く項目はこれだけ',
+    date: '2026-06-06',
+  },
+  {
     href: '/guide/kazoku-kyoyu/password-account-kyoyu',
     category: '家族間の情報共有',
     title: '家族とのパスワード・アカウント共有｜どこまで共有する？安全なやり方と線引き',
@@ -114,6 +120,17 @@ const categories = [
       {
         href: '/guide/kazoku-kyoyu/password-account-kyoyu',
         title: '家族とのパスワード・アカウント共有｜安全なやり方と線引き',
+      },
+    ],
+  },
+  {
+    href: '/guide/shisan-kanri',
+    name: '資産・お金の管理',
+    description: '保険・口座・契約など、家庭のお金まわりを「把握できている状態」にする整理術。',
+    articles: [
+      {
+        href: '/guide/shisan-kanri/hoken-ichiran-excel',
+        title: '保険契約の一覧表をエクセルで作る方法｜無料テンプレート付き',
       },
     ],
   },

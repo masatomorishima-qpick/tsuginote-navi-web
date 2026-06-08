@@ -25,6 +25,13 @@ export const metadata: Metadata = {
 
 const articles = [
   {
+    href: '/guide/shisan-kanri/toshi-kazoku',
+    category: '投資と家族',
+    title: '投資、家族に知らせる？知らせない？｜内緒のままで大丈夫か、もしものときどうなるか',
+    description:
+      'なぜ家族に投資を言わない人が多いのか、知らせる/知らせないの考え方、伝え方のコツ。そして「知らせないまま、もしものとき家族が口座にたどり着けない」問題と備え方まで。',
+  },
+  {
     href: '/guide/shisan-kanri/hoken-ichiran-excel',
     category: '契約の整理',
     title: '保険契約の一覧表をエクセルで作る方法｜無料テンプレート付き・書く項目はこれだけ',

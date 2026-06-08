@@ -427,6 +427,17 @@ export default function HokenIchiranExcelPage() {
           <ul className="mt-5 space-y-5">
             <li>
               <p className="text-xs font-medium text-slate-500">
+                投資を家族に知らせるか迷っている方
+              </p>
+              <Link
+                href="/guide/shisan-kanri/toshi-kazoku"
+                className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
+              >
+                投資、家族に知らせる？知らせない？｜もしものときどうなるか &rsaquo;
+              </Link>
+            </li>
+            <li>
+              <p className="text-xs font-medium text-slate-500">
                 サブスクなど毎月の支払いも棚卸ししたい方
               </p>
               <Link

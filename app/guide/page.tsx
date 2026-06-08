@@ -41,6 +41,12 @@ export const metadata: Metadata = {
 // 新着記事（公開日の新しい順。記事を追加したら先頭に足す）
 const latestArticles = [
   {
+    href: '/guide/shisan-kanri/toshi-kazoku',
+    category: '資産・お金の管理',
+    title: '投資、家族に知らせる？知らせない？｜内緒のままで大丈夫か、もしものときどうなるか',
+    date: '2026-06-07',
+  },
+  {
     href: '/guide/shisan-kanri/hoken-ichiran-excel',
     category: '資産・お金の管理',
     title: '保険契約の一覧表をエクセルで作る方法｜無料テンプレート付き・書く項目はこれだけ',
@@ -126,11 +132,15 @@ const categories = [
   {
     href: '/guide/shisan-kanri',
     name: '資産・お金の管理',
-    description: '保険・口座・契約など、家庭のお金まわりを「把握できている状態」にする整理術。',
+    description: '保険・口座・契約・投資など、家庭のお金まわりを「把握できている状態」にする整理術。',
     articles: [
       {
         href: '/guide/shisan-kanri/hoken-ichiran-excel',
         title: '保険契約の一覧表をエクセルで作る方法｜無料テンプレート付き',
+      },
+      {
+        href: '/guide/shisan-kanri/toshi-kazoku',
+        title: '投資、家族に知らせる？知らせない？｜もしものときどうなるか',
       },
     ],
   },

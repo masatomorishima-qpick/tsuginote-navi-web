@@ -48,9 +48,9 @@ export default async function SignupPage({ searchParams }: Props) {
           <div className="mb-6 text-center">
             <h1 className="text-2xl font-bold text-slate-900">新規登録</h1>
             <p className="mt-2 text-sm text-slate-600">
-              30 日以内に STANDARDプランの登録がない場合は
+              30 日間無料でお試しいただけます。
               <br className="sm:hidden" />
-              FREEプランへ自動切り替えとなります
+              クレジットカードの登録は不要です。
             </p>
           </div>
 

@@ -19,6 +19,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Loader2, Mail, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { createDigitalBrowserClient } from '@/lib/supabase/digitalBrowser';
+import GoogleAuthButton from './GoogleAuthButton';
 
 type SignupFormProps = {
   nextPath: string;
@@ -180,7 +181,17 @@ export default function SignupForm({ nextPath }: SignupFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <div className="space-y-5">
+      {/* Google で続ける（新規/ログイン共通の入口。Google は登録・ログインの区別なし） */}
+      <GoogleAuthButton nextPath={nextPath} disabled={submitting} />
+
+      <div className="flex items-center gap-3">
+        <div className="h-px flex-1 bg-slate-200" />
+        <span className="text-xs text-slate-400">または メールで登録</span>
+        <div className="h-px flex-1 bg-slate-200" />
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
       <div>
         <label htmlFor="signup-email" className="block text-sm font-medium text-slate-700">
           メールアドレス
@@ -335,6 +346,7 @@ export default function SignupForm({ nextPath }: SignupFormProps) {
           ログイン
         </Link>
       </p>
-    </form>
+      </form>
+    </div>
   );
 }

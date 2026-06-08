@@ -33,7 +33,7 @@ export default async function LoginPage({ searchParams }: Props) {
             ログイン
           </h2>
           <p className="mb-6 text-center text-sm text-slate-600">
-            登録済みのメールアドレスとパスワードでログインしてください
+            Google アカウント、または登録済みのメールアドレスでログインしてください
           </p>
 
           {deleted === '1' && (

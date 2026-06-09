@@ -31,6 +31,13 @@ const articles = [
     description:
       '何を共有してよくて、何は個人に留めるべきか。線引きの考え方から、Apple・Google・管理アプリの安全な共有手順までを解説します。',
   },
+  {
+    href: '/guide/kazoku-kyoyu/joho-kyoyu-hikaku',
+    category: '方法の比較',
+    title: 'パスワードや大事な情報、エクセル管理は危険？家族に残す・共有する方法の比較',
+    description:
+      'エクセル／スプレッドシート／パスワード管理アプリ／専用サービスを中立比較。自分に合う方法を選ぶ4つの判断軸まで。',
+  },
 ];
 
 export default function KazokuKyoyuIndexPage() {

@@ -391,7 +391,7 @@ export default function SumahoPasswordPage() {
             </strong>
           </p>
           <p>
-            パスワード管理アプリのマスターパスワード、各サービスの強固なパスワード、二段階認証のスマホ——これらは「本人以外に開けない」ように設計されています。それがセキュリティの本質です。でも裏を返せば、もしあなたが急に入院したら、事故や病気でスマホを触れなくなったら、家族はネット銀行にもサブスクにも、何ひとつたどり着けません。実際、大切な方を亡くした人がデジタル関連で最も困ったのは「スマホ・パソコンのパスワードが分からない」ことでした（2025年 BlueAdventures調べ）。
+            パスワード管理アプリのマスターパスワード、各サービスの強固なパスワード、二段階認証のスマホ——これらは「本人以外に開けない」ように設計されています。それがセキュリティの本質です。でも裏を返せば、もしあなたが急に入院したら、事故や病気でスマホを触れなくなったら、家族はネット銀行にもサブスクにも、何ひとつたどり着けません。実際、大切な方を亡くした人がデジタル関連で最も困ったのは「スマホ・パソコンのパスワードが分からない」ことでした（2026年 BlueAdventures調べ）。
           </p>
           <p>
             しかも、すべての入り口を守っているマスターパスワードは、いちばん教えたくない情報でもあります。生きている間に家族へ渡すのは、現実的ではありません。
@@ -420,8 +420,14 @@ export default function SumahoPasswordPage() {
                 key={faq.q}
                 className={index === faqs.length - 1 ? '' : 'border-b border-slate-200 pb-6'}
               >
-                <h3 className="text-base font-semibold text-slate-900">{faq.q}</h3>
-                <p className="mt-3 text-[15px] leading-8 text-slate-700">{faq.a}</p>
+                <h3 className="flex gap-2 text-base font-semibold text-slate-900">
+                  <span aria-hidden="true" className="shrink-0 font-bold text-rose-600">Q</span>
+                  <span>{faq.q}</span>
+                </h3>
+                <p className="mt-3 flex gap-2 text-[15px] leading-8 text-slate-700">
+                  <span aria-hidden="true" className="shrink-0 font-bold text-blue-600">A</span>
+                  <span>{faq.a}</span>
+                </p>
               </div>
             ))}
           </div>

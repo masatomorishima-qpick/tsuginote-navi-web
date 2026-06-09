@@ -95,6 +95,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: `${baseUrl}/guide/digital-seiri/sumaho-shashin-seiri`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // パスワード・認証管理
     {
       url: `${baseUrl}/guide/password-kanri`,
@@ -117,6 +123,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/guide/kazoku-kyoyu/password-account-kyoyu`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/guide/kazoku-kyoyu/joho-kyoyu-hikaku`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.7,

@@ -41,6 +41,18 @@ export const metadata: Metadata = {
 // 新着記事（公開日の新しい順。記事を追加したら先頭に足す）
 const latestArticles = [
   {
+    href: '/guide/kazoku-kyoyu/joho-kyoyu-hikaku',
+    category: '家族間の情報共有',
+    title: 'パスワードや大事な情報、エクセル管理は危険？家族に残す・共有する方法の比較',
+    date: '2026-06-07',
+  },
+  {
+    href: '/guide/digital-seiri/sumaho-shashin-seiri',
+    category: 'デジタル整理術',
+    title: 'スマホの写真整理のやり方｜減らす・分類・バックアップの全手順【iPhone/Android】',
+    date: '2026-06-07',
+  },
+  {
     href: '/guide/shisan-kanri/toshi-kazoku',
     category: '資産・お金の管理',
     title: '投資、家族に知らせる？知らせない？｜内緒のままで大丈夫か、もしものときどうなるか',
@@ -104,6 +116,10 @@ const categories = [
         href: '/guide/digital-seiri/sumaho-kakin-seiri',
         title: 'スマホの有料サービス・課金を整理する方法',
       },
+      {
+        href: '/guide/digital-seiri/sumaho-shashin-seiri',
+        title: 'スマホの写真整理のやり方｜減らす・分類・バックアップの全手順',
+      },
     ],
   },
   {
@@ -126,6 +142,10 @@ const categories = [
       {
         href: '/guide/kazoku-kyoyu/password-account-kyoyu',
         title: '家族とのパスワード・アカウント共有｜安全なやり方と線引き',
+      },
+      {
+        href: '/guide/kazoku-kyoyu/joho-kyoyu-hikaku',
+        title: 'パスワード・情報管理の方法の比較｜エクセル管理は危険？',
       },
     ],
   },

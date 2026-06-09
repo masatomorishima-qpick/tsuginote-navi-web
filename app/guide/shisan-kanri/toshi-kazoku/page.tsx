@@ -326,7 +326,7 @@ export default function ToshiKazokuPage() {
           <p>
             結果として、
             <strong>持ち主に何かあった口座は、家族に気づかれないまま宙に浮きます。</strong>{' '}
-            これは「投資を知られたくない」気持ちとは別の、純粋に実務的な問題です。実際、大切な方を亡くした人がデジタル関連で最も困ったのは「スマホ・パソコンのパスワードが分からない」ことで、約7割が「生前に整理してくれていたら助かった」と答えています（2025年
+            これは「投資を知られたくない」気持ちとは別の、純粋に実務的な問題です。実際、大切な方を亡くした人がデジタル関連で最も困ったのは「スマホ・パソコンのパスワードが分からない」ことで、約7割が「生前に整理してくれていたら助かった」と答えています（2026年
             BlueAdventures調べ）。
           </p>
           <p>
@@ -357,8 +357,14 @@ export default function ToshiKazokuPage() {
                 key={faq.q}
                 className={index === faqs.length - 1 ? '' : 'border-b border-slate-200 pb-6'}
               >
-                <h3 className="text-base font-semibold text-slate-900">{faq.q}</h3>
-                <p className="mt-3 text-[15px] leading-8 text-slate-700">{faq.a}</p>
+                <h3 className="flex gap-2 text-base font-semibold text-slate-900">
+                  <span aria-hidden="true" className="shrink-0 font-bold text-rose-600">Q</span>
+                  <span>{faq.q}</span>
+                </h3>
+                <p className="mt-3 flex gap-2 text-[15px] leading-8 text-slate-700">
+                  <span aria-hidden="true" className="shrink-0 font-bold text-blue-600">A</span>
+                  <span>{faq.a}</span>
+                </p>
               </div>
             ))}
           </div>

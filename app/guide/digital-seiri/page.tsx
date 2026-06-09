@@ -45,6 +45,13 @@ const articles = [
     description:
       'アプリストアのサブスク、キャリア決済、有料オプションまで「4つの種類」に分けて確認・解約。気づかず払っているお金が見つかります。',
   },
+  {
+    href: '/guide/digital-seiri/sumaho-shashin-seiri',
+    category: '写真整理',
+    title: 'スマホの写真整理のやり方｜減らす・分類・バックアップの全手順【iPhone/Android】',
+    description:
+      '数千枚の写真を「減らす→分類→バックアップ→溜めない」で整理。最後に「整理した写真を家族が取り出せるか」という視点まで。',
+  },
 ];
 
 export default function DigitalSeiriIndexPage() {

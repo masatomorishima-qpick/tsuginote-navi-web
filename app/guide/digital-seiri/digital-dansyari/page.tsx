@@ -406,7 +406,7 @@ export default function DigitalDansyariPage() {
             もし、あなたが急に入院したら。事故や病気で、しばらくスマホを触れなくなったら。あなたの家族は、整理されたその情報に、たどり着けるでしょうか。
           </p>
           <p>
-            ネット銀行やネット証券は紙の通知が届きません。サブスクは解約しない限り請求が続きます。スマホにロックがかかっていれば、家族は中身にアクセスできません。実際、大切な方を亡くした人の約6割がデジタル関連で困ったと答え、その最多が「スマホ・パソコンのパスワードが分からない」ことでした（2025年 BlueAdventures調べ）。
+            ネット銀行やネット証券は紙の通知が届きません。サブスクは解約しない限り請求が続きます。スマホにロックがかかっていれば、家族は中身にアクセスできません。実際、大切な方を亡くした人の約6割がデジタル関連で困ったと答え、その最多が「スマホ・パソコンのパスワードが分からない」ことでした（2026年 BlueAdventures調べ）。
             <strong>整理された情報ほど、本人以外には「存在しないのと同じ」になりやすい</strong>
             ——これがデジタル断捨離の、最後の盲点です。
           </p>
@@ -438,8 +438,14 @@ export default function DigitalDansyariPage() {
                 key={faq.q}
                 className={index === faqs.length - 1 ? '' : 'border-b border-slate-200 pb-6'}
               >
-                <h3 className="text-base font-semibold text-slate-900">{faq.q}</h3>
-                <p className="mt-3 text-[15px] leading-8 text-slate-700">{faq.a}</p>
+                <h3 className="flex gap-2 text-base font-semibold text-slate-900">
+                  <span aria-hidden="true" className="shrink-0 font-bold text-rose-600">Q</span>
+                  <span>{faq.q}</span>
+                </h3>
+                <p className="mt-3 flex gap-2 text-[15px] leading-8 text-slate-700">
+                  <span aria-hidden="true" className="shrink-0 font-bold text-blue-600">A</span>
+                  <span>{faq.a}</span>
+                </p>
               </div>
             ))}
           </div>
@@ -502,6 +508,17 @@ export default function DigitalDansyariPage() {
                 className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
               >
                 スマホの有料サービス・課金を整理する方法 &rsaquo;
+              </Link>
+            </li>
+            <li>
+              <p className="text-xs font-medium text-slate-500">
+                数千枚の写真をスッキリ整理したい方
+              </p>
+              <Link
+                href="/guide/digital-seiri/sumaho-shashin-seiri"
+                className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
+              >
+                スマホの写真整理のやり方｜減らす・分類・バックアップの全手順 &rsaquo;
               </Link>
             </li>
           </ul>

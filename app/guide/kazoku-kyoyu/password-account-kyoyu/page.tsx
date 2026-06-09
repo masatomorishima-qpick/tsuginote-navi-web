@@ -371,7 +371,7 @@ export default function PasswordAccountKyoyuPage() {
             事故や病気で、スマホを操作できなくなったら？
           </p>
           <p>
-            家族がいちばん必要とするのは、まさにその③の情報です。実際、大切な方を亡くした人がデジタル関連で最も困ったのは「スマホ・パソコンのパスワードが分からない」ことでした（2025年
+            家族がいちばん必要とするのは、まさにその③の情報です。実際、大切な方を亡くした人がデジタル関連で最も困ったのは「スマホ・パソコンのパスワードが分からない」ことでした（2026年
             BlueAdventures調べ）。日常の共有グループには入れていないのだから、当然、家族はたどり着けません。
           </p>
           <p>
@@ -407,8 +407,14 @@ export default function PasswordAccountKyoyuPage() {
                 key={faq.q}
                 className={index === faqs.length - 1 ? '' : 'border-b border-slate-200 pb-6'}
               >
-                <h3 className="text-base font-semibold text-slate-900">{faq.q}</h3>
-                <p className="mt-3 text-[15px] leading-8 text-slate-700">{faq.a}</p>
+                <h3 className="flex gap-2 text-base font-semibold text-slate-900">
+                  <span aria-hidden="true" className="shrink-0 font-bold text-rose-600">Q</span>
+                  <span>{faq.q}</span>
+                </h3>
+                <p className="mt-3 flex gap-2 text-[15px] leading-8 text-slate-700">
+                  <span aria-hidden="true" className="shrink-0 font-bold text-blue-600">A</span>
+                  <span>{faq.a}</span>
+                </p>
               </div>
             ))}
           </div>
@@ -488,6 +494,17 @@ export default function PasswordAccountKyoyuPage() {
                 className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
               >
                 会員登録・アカウント整理のやり方｜探し方と退会の全手順 &rsaquo;
+              </Link>
+            </li>
+            <li>
+              <p className="text-xs font-medium text-slate-500">
+                エクセル等の管理方法と比べて検討したい方
+              </p>
+              <Link
+                href="/guide/kazoku-kyoyu/joho-kyoyu-hikaku"
+                className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
+              >
+                パスワードや大事な情報、エクセル管理は危険？方法の比較 &rsaquo;
               </Link>
             </li>
           </ul>

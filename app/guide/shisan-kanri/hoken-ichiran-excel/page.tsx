@@ -345,7 +345,7 @@ export default function HokenIchiranExcelPage() {
             <strong>その一覧表の存在と保存場所を、家族は知っているでしょうか。</strong>
           </p>
           <p>
-            保険は「もしものとき」のための備えです。でも、もしあなたが急に入院したら、家族が最初に困るのは「そもそも何の保険に入っているか分からない」こと。せっかく作った一覧表も、パソコンの中のどこかに眠っていたら、家族にとっては存在しないのと同じです。実際、大切な方を亡くした人の約7割が「生前に整理してくれていたら助かった」と答えています（2025年
+            保険は「もしものとき」のための備えです。でも、もしあなたが急に入院したら、家族が最初に困るのは「そもそも何の保険に入っているか分からない」こと。せっかく作った一覧表も、パソコンの中のどこかに眠っていたら、家族にとっては存在しないのと同じです。実際、大切な方を亡くした人の約7割が「生前に整理してくれていたら助かった」と答えています（2026年
             BlueAdventures調べ）。
           </p>
           <p>
@@ -364,8 +364,14 @@ export default function HokenIchiranExcelPage() {
                 key={faq.q}
                 className={index === faqs.length - 1 ? '' : 'border-b border-slate-200 pb-6'}
               >
-                <h3 className="text-base font-semibold text-slate-900">{faq.q}</h3>
-                <p className="mt-3 text-[15px] leading-8 text-slate-700">{faq.a}</p>
+                <h3 className="flex gap-2 text-base font-semibold text-slate-900">
+                  <span aria-hidden="true" className="shrink-0 font-bold text-rose-600">Q</span>
+                  <span>{faq.q}</span>
+                </h3>
+                <p className="mt-3 flex gap-2 text-[15px] leading-8 text-slate-700">
+                  <span aria-hidden="true" className="shrink-0 font-bold text-blue-600">A</span>
+                  <span>{faq.a}</span>
+                </p>
               </div>
             ))}
           </div>

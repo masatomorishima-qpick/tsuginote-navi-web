@@ -378,7 +378,7 @@ export default function SumahoKakinSeiriPage() {
             整理を終えたあなたの手元には、「何に、いくら、どこ経由で払っているか」の正確な一覧があります。でも、その一覧の存在も中身も、知っているのはあなた一人です。
           </p>
           <p>
-            もし、あなたが急に入院したら。事故や病気で、しばらくスマホを触れなくなったら。サブスクもキャリアオプションも、解約されない限り請求が続きます。家族は「何を契約しているか」を知らないので、止めようがありません。ネット銀行やネット証券と同じで、スマホの中の契約は、本人以外には見えないのです。実際、デジタル関連で困った経験のある遺族は約6割にのぼり、その最多が「パスワードが分からず手が出せない」ことでした（2025年 BlueAdventures調べ）。
+            もし、あなたが急に入院したら。事故や病気で、しばらくスマホを触れなくなったら。サブスクもキャリアオプションも、解約されない限り請求が続きます。家族は「何を契約しているか」を知らないので、止めようがありません。ネット銀行やネット証券と同じで、スマホの中の契約は、本人以外には見えないのです。実際、デジタル関連で困った経験のある遺族は約6割にのぼり、その最多が「パスワードが分からず手が出せない」ことでした（2026年 BlueAdventures調べ）。
           </p>
           <p>
             だから、整理の仕上げにもう一手。
@@ -396,8 +396,14 @@ export default function SumahoKakinSeiriPage() {
                 key={faq.q}
                 className={index === faqs.length - 1 ? '' : 'border-b border-slate-200 pb-6'}
               >
-                <h3 className="text-base font-semibold text-slate-900">{faq.q}</h3>
-                <p className="mt-3 text-[15px] leading-8 text-slate-700">{faq.a}</p>
+                <h3 className="flex gap-2 text-base font-semibold text-slate-900">
+                  <span aria-hidden="true" className="shrink-0 font-bold text-rose-600">Q</span>
+                  <span>{faq.q}</span>
+                </h3>
+                <p className="mt-3 flex gap-2 text-[15px] leading-8 text-slate-700">
+                  <span aria-hidden="true" className="shrink-0 font-bold text-blue-600">A</span>
+                  <span>{faq.a}</span>
+                </p>
               </div>
             ))}
           </div>

@@ -52,6 +52,13 @@ const articles = [
     description:
       '数千枚の写真を「減らす→分類→バックアップ→溜めない」で整理。最後に「整理した写真を家族が取り出せるか」という視点まで。',
   },
+  {
+    href: '/guide/digital-seiri/mail-seiri',
+    category: 'メール整理',
+    title: 'メールの整理術｜あふれた受信トレイをスッキリさせる手順',
+    description:
+      '不要メルマガの解除→フィルタで自動振り分け→受信トレイを空に保つ手順。最後に「メールは全アカウントの鍵」という視点も。',
+  },
 ];
 
 export default function DigitalSeiriIndexPage() {

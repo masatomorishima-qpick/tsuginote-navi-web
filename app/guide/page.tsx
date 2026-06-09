@@ -41,6 +41,24 @@ export const metadata: Metadata = {
 // 新着記事（公開日の新しい順。記事を追加したら先頭に足す）
 const latestArticles = [
   {
+    href: '/guide/moshimo-sonae/kyu-nyuin-sonae',
+    category: 'もしもの備え',
+    title: '急な入院に備えて、家族に伝えておく情報リスト｜持ち物だけでは足りない',
+    date: '2026-06-09',
+  },
+  {
+    href: '/guide/password-kanri/nidankai-ninsho',
+    category: 'パスワード・認証管理',
+    title: 'スマホの二段階認証とは？設定のやり方と“もしも”の落とし穴',
+    date: '2026-06-09',
+  },
+  {
+    href: '/guide/digital-seiri/mail-seiri',
+    category: 'デジタル整理術',
+    title: 'メールの整理術｜あふれた受信トレイをスッキリさせる手順',
+    date: '2026-06-09',
+  },
+  {
     href: '/guide/kazoku-kyoyu/joho-kyoyu-hikaku',
     category: '家族間の情報共有',
     title: 'パスワードや大事な情報、エクセル管理は危険？家族に残す・共有する方法の比較',
@@ -120,6 +138,10 @@ const categories = [
         href: '/guide/digital-seiri/sumaho-shashin-seiri',
         title: 'スマホの写真整理のやり方｜減らす・分類・バックアップの全手順',
       },
+      {
+        href: '/guide/digital-seiri/mail-seiri',
+        title: 'メールの整理術｜あふれた受信トレイをスッキリさせる手順',
+      },
     ],
   },
   {
@@ -130,6 +152,10 @@ const categories = [
       {
         href: '/guide/password-kanri/sumaho-password',
         title: 'スマホのパスワード管理｜忘れっぽい人でも安全な方法',
+      },
+      {
+        href: '/guide/password-kanri/nidankai-ninsho',
+        title: 'スマホの二段階認証とは？設定のやり方と“もしも”の落とし穴',
       },
     ],
   },
@@ -161,6 +187,17 @@ const categories = [
       {
         href: '/guide/shisan-kanri/toshi-kazoku',
         title: '投資、家族に知らせる？知らせない？｜もしものときどうなるか',
+      },
+    ],
+  },
+  {
+    href: '/guide/moshimo-sonae',
+    name: 'もしもの備え',
+    description: '急な入院やもしものときに、家族が困らないための前向きな備え。',
+    articles: [
+      {
+        href: '/guide/moshimo-sonae/kyu-nyuin-sonae',
+        title: '急な入院に備えて、家族に伝えておく情報リスト',
       },
     ],
   },

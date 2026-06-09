@@ -6,17 +6,15 @@ import SiteFooter from '@/components/SiteFooter';
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 
 export const metadata: Metadata = {
-  title: 'パスワード・認証管理ガイド｜安全な管理と二段階認証 | つぎの手ナビ',
+  title: 'もしもの備えガイド｜急な入院・もしものときに家族が困らない準備 | つぎの手ナビ',
   description:
-    'スマホのパスワードを安全に管理するためのガイド記事一覧。メモ帳保管の危険性、忘れっぽい人でもできるパスワード管理アプリの始め方、二段階認証・パスキーまで。',
-  alternates: {
-    canonical: `${SITE_URL}/guide/password-kanri`,
-  },
+    '急な入院や、もしものときに家族が困らないための「前向きな備え」をまとめたガイド記事一覧。持ち物だけでなく、連絡先や情報の在りかの残し方まで。',
+  alternates: { canonical: `${SITE_URL}/guide/moshimo-sonae` },
   openGraph: {
-    title: 'パスワード・認証管理ガイド｜つぎの手ナビ',
+    title: 'もしもの備えガイド｜つぎの手ナビ',
     description:
-      'スマホのパスワードを安全に管理するためのガイド記事一覧。メモ帳保管の危険性、管理アプリの始め方、二段階認証・パスキーまで。',
-    url: `${SITE_URL}/guide/password-kanri`,
+      '急な入院や、もしものときに家族が困らないための「前向きな備え」をまとめたガイド記事一覧。',
+    url: `${SITE_URL}/guide/moshimo-sonae`,
     siteName: 'つぎの手ナビ',
     type: 'website',
     locale: 'ja_JP',
@@ -25,22 +23,15 @@ export const metadata: Metadata = {
 
 const articles = [
   {
-    href: '/guide/password-kanri/sumaho-password',
-    category: 'パスワード管理',
-    title: 'スマホのパスワード管理｜「メモは危険」と言われても、忘れっぽい人はどうすればいい？',
+    href: '/guide/moshimo-sonae/kyu-nyuin-sonae',
+    category: '入院の備え',
+    title: '急な入院に備えて、家族に伝えておく情報リスト｜持ち物だけでは足りない',
     description:
-      '危険な保管法の見分け方から、忘れっぽい人でもできるパスワード管理アプリの始め方、二段階認証・パスキーまでを解説します。',
-  },
-  {
-    href: '/guide/password-kanri/nidankai-ninsho',
-    category: '二段階認証',
-    title: 'スマホの二段階認証とは？設定のやり方と“もしも”の落とし穴',
-    description:
-      '二段階認証の仕組みと設定手順（SMS・認証アプリ・パスキー）、リカバリーコードや機種変更の注意点までを解説します。',
+      '持ち物だけでなく、本人が動けない間に家族が代わりに動くための「情報の備え」を解説。連絡先・保険の場所・スマホのロックまで。',
   },
 ];
 
-export default function PasswordKanriIndexPage() {
+export default function MoshimoSonaeIndexPage() {
   return (
     <main className="bg-white">
       <GuideHeader />
@@ -60,15 +51,15 @@ export default function PasswordKanriIndexPage() {
               </Link>
             </li>
             <li aria-hidden="true">/</li>
-            <li className="text-slate-700">パスワード・認証管理</li>
+            <li className="text-slate-700">もしもの備え</li>
           </ol>
         </nav>
 
         <h1 className="mt-10 text-center text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
-          パスワード・認証管理ガイド
+          もしもの備えガイド
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-center text-base leading-8 text-slate-600">
-          スマホのパスワードを「覚えない仕組み」で安全に管理するためのガイドです。危険な保管法の見分け方から、忘れっぽい人でもできる管理アプリの始め方、二段階認証・パスキーまでを扱います。
+          急な入院や、もしものときに大切な人が困らないための「前向きな備え」をまとめたガイドです。持ち物だけでなく、連絡先や情報の在りかの残し方までを扱います。
         </p>
 
         <section className="mt-14">
@@ -103,13 +94,13 @@ export default function PasswordKanriIndexPage() {
             関連ガイド
           </h2>
           <p className="mt-5 text-[15px] leading-8 text-slate-700">
-            家族との共有の線引きは
+            保険・契約の整理は
+            <Link href="/guide/shisan-kanri" className="text-blue-600 hover:underline">
+              資産・お金の管理ガイド
+            </Link>
+            、家族との情報共有は
             <Link href="/guide/kazoku-kyoyu" className="text-blue-600 hover:underline">
               家族間の情報共有ガイド
-            </Link>
-            、スマホ全体の整理は
-            <Link href="/guide/digital-seiri" className="text-blue-600 hover:underline">
-              デジタル整理術ガイド
             </Link>
             もあわせてどうぞ。
           </p>
@@ -117,11 +108,11 @@ export default function PasswordKanriIndexPage() {
 
         <section className="mt-16 rounded-3xl bg-slate-50 p-8 text-center sm:p-10">
           <h2 className="text-xl font-semibold text-slate-900">
-            すべての鍵を握る「在りか」を、もしものときに届く形で残す
+            情報の「在りか」を、もしものときに届く形で残す
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-[15px] leading-8 text-slate-600">
             「つぎの手ナビ
-            デジタル資産」は、整理したデジタル情報を、見られたくないものは伏せたまま、もしものときだけ大切な人へ引き継ぐ準備ができるサービスです。
+            デジタル資産」は、連絡先や資産・アカウントの在りかを、生きている間は誰にも見せず、もしものときだけ大切な人へ届ける準備ができるサービスです。
           </p>
           <div className="mt-6">
             <Link

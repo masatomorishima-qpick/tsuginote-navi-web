@@ -101,6 +101,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: `${baseUrl}/guide/digital-seiri/mail-seiri`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // パスワード・認証管理
     {
       url: `${baseUrl}/guide/password-kanri`,
@@ -110,6 +116,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/guide/password-kanri/sumaho-password`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/guide/password-kanri/nidankai-ninsho`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.7,
@@ -148,6 +160,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/guide/shisan-kanri/toshi-kazoku`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    // もしもの備え
+    {
+      url: `${baseUrl}/guide/moshimo-sonae`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/guide/moshimo-sonae/kyu-nyuin-sonae`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.7,

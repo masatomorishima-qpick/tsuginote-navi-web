@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import GuideCtaLink from '@/components/guide/GuideCtaLink';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 
@@ -141,12 +142,12 @@ export default function DigitalSeiriIndexPage() {
             デジタル資産」は、整理したデジタル情報を、見られたくないものは伏せたまま、もしものときだけ大切な人へ引き継ぐ準備ができるサービスです。
           </p>
           <div className="mt-6">
-            <Link
+            <GuideCtaLink
               href="/signup?next=/digital"
               className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
             >
               無料で始める（新規登録）
-            </Link>
+            </GuideCtaLink>
           </div>
           <p className="mt-4 text-sm">
             <Link href="/" className="text-blue-600 hover:underline">

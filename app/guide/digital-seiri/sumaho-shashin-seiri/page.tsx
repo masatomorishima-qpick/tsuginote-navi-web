@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import GuideCtaLink from '@/components/guide/GuideCtaLink';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 
@@ -436,12 +437,12 @@ export default function SumahoShashinSeiriPage() {
             デジタル資産」は、整理した写真やアカウントの“在りか”を、もしものときだけ大切な人へ届ける準備ができるサービスです。資産の登録・PDF出力・定期リマインドは無料で使えます。
           </p>
           <div className="mt-6">
-            <Link
+            <GuideCtaLink
               href="/signup?next=/digital"
               className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
             >
               無料で始める（新規登録）
-            </Link>
+            </GuideCtaLink>
           </div>
           <p className="mt-4 text-sm">
             <Link href="/" className="text-blue-600 hover:underline">

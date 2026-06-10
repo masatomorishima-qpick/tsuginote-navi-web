@@ -17,7 +17,9 @@ export type GA4EventName =
   | 'digital_sign_up'          // 会員登録完了（オンボーディング完了時）
   | 'digital_invite_sent'      // 大切な方への招待送信
   | 'digital_invite_approved'  // 連携承認（課金につながる行動）
-  | 'digital_checkout_start';  // Stripe Checkout への遷移（カード登録開始）
+  | 'digital_checkout_start'   // Stripe Checkout への遷移（カード登録開始）
+  // ---- 役立ちガイド（SEO流入）の転換計測（2026-06-10 追加）----
+  | 'guide_cta_click';         // ガイド記事内の「無料で始める」CTAクリック（記事→登録の入口）
 
 export type GA4EventParams = {
   area?: string;

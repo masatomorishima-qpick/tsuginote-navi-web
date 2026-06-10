@@ -7,7 +7,7 @@ import SiteFooter from '@/components/SiteFooter';
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 
 export const metadata: Metadata = {
-  title: 'もしもの備えガイド｜急な入院・もしものときに家族が困らない準備 | つぎの手ナビ',
+  title: 'もしもの備えガイド｜急な入院・もしものときに家族が困らない準備 | つぎの手ナビ デジタル資産',
   description:
     '急な入院や、もしものときに家族が困らないための「前向きな備え」をまとめたガイド記事一覧。持ち物だけでなく、連絡先や情報の在りかの残し方まで。',
   alternates: { canonical: `${SITE_URL}/guide/moshimo-sonae` },

@@ -8,7 +8,7 @@ import SiteFooter from '@/components/SiteFooter';
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 
 export const metadata: Metadata = {
-  title: '役立ちガイド｜デジタル整理・パスワード管理・もしもの備え | つぎの手ナビ',
+  title: '役立ちガイド｜デジタル整理・パスワード管理・もしもの備え | つぎの手ナビ デジタル資産',
   description:
     'スマホ・パソコンのデジタル整理から、パスワードの安全な管理、もしものときに家族が困らない備えまで。暮らしを整えながら大切な人への準備ができる、つぎの手ナビの役立ちガイドです。',
   alternates: {

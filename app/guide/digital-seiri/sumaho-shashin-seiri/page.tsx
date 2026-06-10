@@ -13,7 +13,7 @@ const PAGE_DESCRIPTION =
   'スマホの写真整理のやり方を「減らす→分類→バックアップ→溜めない」の手順で解説。iPhone・Android両対応、無料の容量や重複削除のコツも。最後に、多くの人が見落とす「整理した写真を、もしものとき家族が取り出せるか」という視点まで。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,

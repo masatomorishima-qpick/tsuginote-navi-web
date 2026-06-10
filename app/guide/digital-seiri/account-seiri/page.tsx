@@ -13,7 +13,7 @@ const PAGE_DESCRIPTION =
   '増えすぎた会員登録・アカウントの整理方法を解説。使っていない登録サービスの洗い出し方（メール検索・パスワード保存一覧・ログイン連携など5つ）から、退会のコツと注意点、残すアカウントの安全な管理まで、この1記事で全手順が分かります。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,

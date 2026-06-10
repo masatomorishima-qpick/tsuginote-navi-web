@@ -7,7 +7,7 @@ import SiteFooter from '@/components/SiteFooter';
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 
 export const metadata: Metadata = {
-  title: '家族間の情報共有ガイド｜パスワード・アカウントの共有と線引き | つぎの手ナビ',
+  title: '家族間の情報共有ガイド｜パスワード・アカウントの共有と線引き | つぎの手ナビ デジタル資産',
   description:
     '家族とのパスワード・アカウント共有の安全なやり方と「どこまで共有するか」の線引きを解説するガイド記事一覧。日常の共有から、もしものときの備えまで。',
   alternates: {

@@ -13,7 +13,7 @@ const PAGE_DESCRIPTION =
   '投資を家族に知らせていない・反対されている人へ。なぜ家族に言わない人が多いのか、知らせる/知らせないの考え方、伝え方のコツを中立に解説。そして多くの解説が触れない「知らせないまま、もしものとき家族が口座にたどり着けない」問題と、その備え方まで。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,

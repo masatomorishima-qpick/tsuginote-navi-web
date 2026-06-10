@@ -7,7 +7,7 @@ import SiteFooter from '@/components/SiteFooter';
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 
 export const metadata: Metadata = {
-  title: 'デジタル整理術ガイド｜スマホ・アカウント・サブスクの整理 | つぎの手ナビ',
+  title: 'デジタル整理術ガイド｜スマホ・アカウント・サブスクの整理 | つぎの手ナビ デジタル資産',
   description:
     'スマホ・パソコンの中のデータ、アプリ、サブスク、アカウント、パスワードをスッキリ整理するためのガイド記事一覧。デジタル断捨離のやり方から、整理した情報の安全な残し方まで。',
   alternates: {

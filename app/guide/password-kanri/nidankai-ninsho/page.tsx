@@ -13,7 +13,7 @@ const PAGE_DESCRIPTION =
   'スマホの二段階認証とは何か、設定のやり方（SMS・認証アプリ・パスキー）、機種変更やリカバリーコードの注意点まで解説。最後に、強くするほど見落とす「もしものとき家族が入れない」問題と備え方も。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: { canonical: `${SITE_URL}${PAGE_PATH}` },
   openGraph: {

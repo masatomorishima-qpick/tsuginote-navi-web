@@ -7,7 +7,7 @@ import SiteFooter from '@/components/SiteFooter';
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 
 export const metadata: Metadata = {
-  title: '親・家族のケアガイド｜親のデジタル・お金まわりを前向きに備える | つぎの手ナビ',
+  title: '親・家族のケアガイド｜親のデジタル・お金まわりを前向きに備える | つぎの手ナビ デジタル資産',
   description:
     '親のネット銀行・スマホ・契約まわりを、プライバシーに踏み込まずに「在りか」の共有で前向きに備えるためのガイド記事一覧。元気な今だからこそできる、穏やかな親子の備えを扱います。',
   alternates: { canonical: `${SITE_URL}/guide/oya-care` },

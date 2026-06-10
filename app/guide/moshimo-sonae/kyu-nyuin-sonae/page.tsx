@@ -14,7 +14,7 @@ const PAGE_DESCRIPTION =
   '急な入院に備えて準備しておくことを、持ち物だけでなく「家族が代わりに動けるための情報」まで解説。連絡先・保険証券の場所・口座やスマホのロックなど、本人が動けないときに家族が困らない備えのリスト。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: { canonical: `${SITE_URL}${PAGE_PATH}` },
   openGraph: {

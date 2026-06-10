@@ -14,7 +14,7 @@ const PAGE_DESCRIPTION =
   '通帳がないネット銀行は、もしものとき家族から「見えない」資産になりがち。親が元気な今、残高もパスワードも聞かずに「在りか」だけを共有する前向きな備え方を3ステップで解説します。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,

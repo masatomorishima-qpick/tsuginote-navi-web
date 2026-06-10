@@ -7,7 +7,7 @@ import SiteFooter from '@/components/SiteFooter';
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 
 export const metadata: Metadata = {
-  title: 'パスワード・認証管理ガイド｜安全な管理と二段階認証 | つぎの手ナビ',
+  title: 'パスワード・認証管理ガイド｜安全な管理と二段階認証 | つぎの手ナビ デジタル資産',
   description:
     'スマホのパスワードを安全に管理するためのガイド記事一覧。メモ帳保管の危険性、忘れっぽい人でもできるパスワード管理アプリの始め方、二段階認証・パスキーまで。',
   alternates: {

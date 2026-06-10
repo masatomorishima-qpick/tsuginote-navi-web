@@ -13,7 +13,7 @@ const PAGE_DESCRIPTION =
   'パスワードや大事な情報をエクセル・スプレッドシートで管理するのは危険？という疑問に中立で答えます。エクセル／スプレッドシート／パスワード管理アプリ／専用サービスの4つを正直に比較し、自分に合う方法を選ぶための判断軸（時間の制御・暗号化・本体ロック・情報の鮮度）まで。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,

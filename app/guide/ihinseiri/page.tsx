@@ -4,7 +4,7 @@ import Link from 'next/link';
 import SiteFooter from '@/components/SiteFooter';
 
 export const metadata: Metadata = {
-  title: '遺品整理・実家片付け 役立ち情報一覧 | つぎの手ナビ',
+  title: '遺品整理・実家片付け 役立ち情報一覧 | つぎの手ナビ デジタル資産',
   description:
     '遺品整理、実家片付け、デジタル遺品に関する役立ち情報の一覧ページです。家族が亡くなった後に、スマホ、ネット銀行、サブスク、片付けを何から進めるべきかを整理しています。',
 };

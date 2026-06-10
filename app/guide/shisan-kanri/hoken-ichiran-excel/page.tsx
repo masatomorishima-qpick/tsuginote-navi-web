@@ -13,7 +13,7 @@ const PAGE_DESCRIPTION =
   '保険契約の一覧表をエクセルで作る方法を解説。そのまま使える無料テンプレート（登録不要）付き。書くべき項目と書いてはいけないもの、保険証券や控除証明書からの拾い方、年1回の見直しのコツまで、この1記事で完成します。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,

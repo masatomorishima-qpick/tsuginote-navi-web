@@ -13,7 +13,7 @@ const PAGE_DESCRIPTION =
   'デジタル断捨離のやり方を5つのステップ（写真・アプリ・サブスク・アカウント・メール）に分けて全手順で解説。スマホ・パソコンが軽くなり、無駄な出費も減らせます。最後に、多くの人が見落とす「整理した情報の残し方」まで紹介。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,

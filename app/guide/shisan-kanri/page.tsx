@@ -7,7 +7,7 @@ import SiteFooter from '@/components/SiteFooter';
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 
 export const metadata: Metadata = {
-  title: '資産・お金の管理ガイド｜契約・口座・保険の整理と家族の把握 | つぎの手ナビ',
+  title: '資産・お金の管理ガイド｜契約・口座・保険の整理と家族の把握 | つぎの手ナビ デジタル資産',
   description:
     '保険契約の一覧化、口座や契約の整理など、家庭のお金まわりを「把握できている状態」にするためのガイド記事一覧。家族がいざというとき困らない整理の仕方まで。',
   alternates: {

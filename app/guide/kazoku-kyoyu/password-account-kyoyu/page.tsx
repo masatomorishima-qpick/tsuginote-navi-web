@@ -13,7 +13,7 @@ const PAGE_DESCRIPTION =
   '家族とのパスワード・アカウント共有の安全なやり方を解説。何を共有してよくて、何は個人に留めるべきかの「線引き」から、Apple・Google・管理アプリの共有手順、LINEやメモで送ってはいけない理由まで。夫婦でも全部は見せたくない人のための考え方も。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,

@@ -13,7 +13,7 @@ const PAGE_DESCRIPTION =
   'スマホの有料サービス・課金の整理方法を解説。アプリストアのサブスク、アプリ内課金、キャリア決済、キャリアの有料オプションまで「4つの種類」に分けて確認・解約する全手順。気づかず払い続けているお金が見つかります。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,

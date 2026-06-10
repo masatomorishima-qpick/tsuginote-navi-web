@@ -13,7 +13,7 @@ const PAGE_DESCRIPTION =
   'パスワードをメモ帳に書くのは危険？という疑問に答え、忘れっぽい人でも安全に管理できる方法を解説。危険な保管法の見分け方、パスワード管理アプリの始め方、二段階認証・パスキーまで、難しい知識なしで今日から実践できます。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,

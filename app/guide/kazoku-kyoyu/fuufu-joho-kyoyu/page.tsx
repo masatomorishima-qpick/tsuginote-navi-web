@@ -14,7 +14,7 @@ const PAGE_DESCRIPTION =
   '夫婦の情報共有のやり方を、スケジュール・家計・連絡先などの「日常の共有」（アプリ活用）から、見落としがちな「もしものときの備え」まで解説。何を共有し、何は見せずに“在りか”だけ残すか、プライバシーと両立する方法も。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,

@@ -13,7 +13,7 @@ const PAGE_DESCRIPTION =
   'あふれた受信トレイを整理する手順を、Gmail・Outlook対応で解説。不要メルマガの解除から自動振り分け（フィルタ）、受信トレイを空に保つコツまで。最後に、見落としがちな「メールは全アカウントの鍵」という視点も。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
   description: PAGE_DESCRIPTION,
   alternates: { canonical: `${SITE_URL}${PAGE_PATH}` },
   openGraph: {

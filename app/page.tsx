@@ -9,8 +9,9 @@
  *   - 各セクションは1〜2フレーズまで、視覚的に区切る
  *
  * セクション構成:
- *   1. Hero（写真 + コピー + CTA）
- *   2. こんな方におすすめ（4項目）
+ *   1. Hero（写真 + コピー + CTA）※2026-06 キーメッセージ改訂（動画⑤⑥⑦と統一）
+ *   1.5 なぜ、いま備えるのか（突然性のファクト2点 → 前向き着地）
+ *   2. こんな方におすすめ（5項目）
  *   3. できること（4機能）
  *   4. プラン（FREE / STANDARD）
  *   5. ご利用の流れ（5ステップ: 登録 → 整理 → 招待 → 連携 → 完全削除）+ 退会について
@@ -61,6 +62,7 @@ export default async function HomePage() {
       <Header />
       <main className="flex-1">
         <Hero />
+        <WhyNow />
         <Audience />
         <Features />
         <Plans />
@@ -132,17 +134,17 @@ function Hero() {
         </div>
 
         <h1 className="text-3xl font-bold leading-snug tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
-          もしもの時、
+          スマホ・パソコン のパスワード、
           <br />
-          大切な方が困らない準備を
+          <span className="text-emerald-700">亡くなったあとだけ</span>、大切な方に届く
         </h1>
 
         <p className="mx-auto mt-6 max-w-md text-base leading-relaxed text-slate-600 sm:text-lg">
-          スマホ・パソコン のパスワードと、
+          生前は、誰にも見せません。
           <br />
-          デジタル情報の引き継ぎを、
+          もしものときだけ、あなたが選んだ方へ。
           <br className="sm:hidden" />
-          いまから整える場所
+          準備は、いまから数分で。
         </p>
 
         <div className="mt-10 flex justify-center">
@@ -163,11 +165,76 @@ function Hero() {
 }
 
 // =============================================================================
+// 1.5 なぜ、いま備えるのか（突然性のファクト → 前向きな着地）
+//   訴求の土台 §2 STEP1-2 / §6 の方針を実装。
+//   注意: 2つの数字は母集団が異なるため合算せず「並べて」見せる（土台 §7）。
+//   恐怖訴求にしない: 事実を静かに提示し、出口は前向きに。
+// =============================================================================
+function WhyNow() {
+  const facts = [
+    {
+      figure: '約 4 分の 1',
+      label: '突然訪れうる死因の割合',
+      body:
+        '年間約 160 万人が亡くなる中で、心疾患・脳血管疾患・不慮の事故など「ある日突然訪れうる死因」は約 4 分の 1 を占めます。',
+      source: '2024年 人口動態統計をもとに試算',
+    },
+    {
+      figure: '約 10 年',
+      label: '健康寿命と平均寿命の差',
+      body:
+        '人生の最後には、「自分で全部は管理しきれない」期間が平均で約 10 年あります。伝えられるのは、元気なうちだけです。',
+      source: '厚生労働省の統計より',
+    },
+  ];
+
+  return (
+    <section className="bg-white px-5 py-20 sm:px-8 sm:py-24">
+      <div className="mx-auto max-w-3xl text-center">
+        <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
+          なぜ、いま備えるのか
+        </h2>
+        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-slate-700 sm:text-xl">
+          「いつか、元気なうちに」——
+          <br className="sm:hidden" />
+          その“いつか”は、来ないかもしれません。
+        </p>
+
+        <div className="mt-12 grid gap-5 sm:grid-cols-2">
+          {facts.map((f, i) => (
+            <div
+              key={i}
+              className="rounded-2xl border border-slate-200 bg-slate-50/60 p-6 text-center sm:p-8"
+            >
+              <p className="text-4xl font-bold text-emerald-700 sm:text-5xl">{f.figure}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-800 sm:text-base">
+                {f.label}
+              </p>
+              <p className="mt-4 text-sm leading-relaxed text-slate-600 sm:text-base">
+                {f.body}
+              </p>
+              <p className="mt-3 text-xs text-slate-400">{f.source}</p>
+            </div>
+          ))}
+        </div>
+
+        <p className="mx-auto mt-10 max-w-xl text-base leading-relaxed text-slate-700 sm:text-lg">
+          だから、重い終活ではなく、<b>数分の準備</b>を。
+          <br className="sm:hidden" />
+          それだけで、大切な方が困らずに済みます。
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// =============================================================================
 // 2. こんな方におすすめ
 // =============================================================================
 function Audience() {
   const items = [
     '親の相続でスマートフォン・PC のパスワードに困った経験がある',
+    'エンディングノートを書いたが、デジタル・パスワードの章が空欄のまま',
     '健康診断や入院で「もしも」を意識したことがある',
     '退職や老後を見据えたデジタル資産の整理に興味がある',
     '大切な方にデジタル情報を残しておきたい',
@@ -288,6 +355,13 @@ function Plans() {
           初回登録から 30 日間、STANDARDプランを無料でお試し。
           <br className="sm:hidden" />
           その後は FREEプランで続けてご利用いただけます。
+        </p>
+        <p className="mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-slate-700 sm:text-lg">
+          起きなければ、使いません。それでも備えるのは、
+          <br className="sm:hidden" />
+          起きたら取り返しがつかないから。
+          <br />
+          ¥110/月で、その安心を持ち続けられます。
         </p>
 
         <div className="mt-12 space-y-5 sm:space-y-6">
@@ -605,6 +679,11 @@ function Trust() {
 // =============================================================================
 function FAQ() {
   const faqs = [
+    {
+      q: '元気なうちに、自分で大切な方に伝えればいいのでは？',
+      a:
+        '「やれる状態」は、予告なく終わることがあります。突然の病気や事故では、伝える時間がありません。だからこそ、元気ないまのうちに整えておくことに価値があります。つぎの手ナビなら、生前は誰にも見せないまま、もしものときだけ、選んだ方に届けられます。',
+    },
     {
       q: '連携先の方は、登録した情報をどうやって受け取れますか？',
       a:

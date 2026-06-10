@@ -42,6 +42,12 @@ export const metadata: Metadata = {
 // 新着記事（公開日の新しい順。記事を追加したら先頭に足す）
 const latestArticles = [
   {
+    href: '/guide/oya-care/oya-netbank',
+    category: '親・家族のケア',
+    title: '親がネット銀行を使っているなら｜もしものとき家族が困らない「在りか」の備え方',
+    date: '2026-06-10',
+  },
+  {
     href: '/guide/kazoku-kyoyu/fuufu-joho-kyoyu',
     category: '家族間の情報共有',
     title: '夫婦の情報共有のやり方｜日常のすれ違い解消から“もしも”の備えまで',
@@ -198,6 +204,18 @@ const categories = [
       {
         href: '/guide/shisan-kanri/toshi-kazoku',
         title: '投資、家族に知らせる？知らせない？｜もしものときどうなるか',
+      },
+    ],
+  },
+  {
+    href: '/guide/oya-care',
+    name: '親・家族のケア',
+    description:
+      '親のネット銀行・スマホ・契約まわりを、プライバシーに踏み込まずに「在りか」の共有で備える。',
+    articles: [
+      {
+        href: '/guide/oya-care/oya-netbank',
+        title: '親がネット銀行を使っているなら｜「在りか」の備え方',
       },
     ],
   },

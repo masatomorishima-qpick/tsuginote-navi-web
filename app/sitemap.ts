@@ -170,6 +170,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    // 親・家族のケア
+    {
+      url: `${baseUrl}/guide/oya-care`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/guide/oya-care/oya-netbank`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // もしもの備え
     {
       url: `${baseUrl}/guide/moshimo-sonae`,

@@ -41,6 +41,12 @@ export const metadata: Metadata = {
 // 新着記事（公開日の新しい順。記事を追加したら先頭に足す）
 const latestArticles = [
   {
+    href: '/guide/kazoku-kyoyu/fuufu-joho-kyoyu',
+    category: '家族間の情報共有',
+    title: '夫婦の情報共有のやり方｜日常のすれ違い解消から“もしも”の備えまで',
+    date: '2026-06-10',
+  },
+  {
     href: '/guide/moshimo-sonae/kyu-nyuin-sonae',
     category: 'もしもの備え',
     title: '急な入院に備えて、家族に伝えておく情報リスト｜持ち物だけでは足りない',
@@ -165,6 +171,10 @@ const categories = [
     description:
       '家族とのパスワード・アカウント共有の安全なやり方と「どこまで共有するか」の線引き。',
     articles: [
+      {
+        href: '/guide/kazoku-kyoyu/fuufu-joho-kyoyu',
+        title: '夫婦の情報共有のやり方｜日常のすれ違い解消からもしもの備えまで',
+      },
       {
         href: '/guide/kazoku-kyoyu/password-account-kyoyu',
         title: '家族とのパスワード・アカウント共有｜安全なやり方と線引き',

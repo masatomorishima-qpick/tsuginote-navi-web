@@ -7,7 +7,7 @@ import SiteFooter from '@/components/SiteFooter';
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 const PAGE_PATH = '/guide/password-kanri/sumaho-password';
 const PAGE_TITLE =
-  'スマホのパスワード管理｜「メモは危険」と言われても、忘れっぽい人はどうすればいい？';
+  'パスワードをメモ帳で管理するのは危険？スマホでも忘れず安全に管理する方法';
 const PAGE_DESCRIPTION =
   'パスワードをメモ帳に書くのは危険？という疑問に答え、忘れっぽい人でも安全に管理できる方法を解説。危険な保管法の見分け方、パスワード管理アプリの始め方、二段階認証・パスキーまで、難しい知識なしで今日から実践できます。';
 
@@ -41,7 +41,6 @@ export const metadata: Metadata = {
 };
 
 const toc = [
-  { id: 'locked', label: 'いまパスワードが分からず開けないときは' },
   { id: 'check', label: 'まず確認｜「危険な保管法」になっていないか' },
   { id: 'why', label: 'なぜメモ帳保管が危ないのか' },
   { id: 'solution', label: '解決策｜忘れっぽい人こそ管理アプリ' },
@@ -51,14 +50,19 @@ const toc = [
   { id: 'tips', label: '忘れっぽい人向け｜つまずきと対策' },
   { id: 'blindspot', label: 'ここまでの整理と、最後の盲点' },
   { id: 'finish', label: '仕上げ｜「鍵の在りか」を残す' },
+  { id: 'locked', label: 'いまパスワードが分からず開けないときは（応急処置）' },
   { id: 'faq', label: 'よくある質問' },
   { id: 'summary', label: 'まとめ' },
 ];
 
 const faqs = [
   {
+    q: 'スマホのメモアプリ自体に「ロック（鍵）」をかければ安全ですか？',
+    a: 'のぞき見対策としては、ロックなしのメモより安全です。ただし、ログイン画面でパスワードを自動入力できないため毎回コピー＆ペーストの手間がかかり、スマホの故障時やアカウントのパスワード自体を忘れたときに取り出しにくい、という弱点が残ります。利便性と安全性の両面から、やはり標準のパスワード管理機能を使うのがおすすめです。',
+  },
+  {
     q: 'パスワードを紙に書いて管理するのは、結局アリですか？',
-    a: '「使い回さず、サービスごとに違うパスワードにする」なら、紙のノートに書いて自宅の安全な場所に保管するのも一つの方法です。スマホのメモ帳より安全なこともあります。ただし数が増えると管理が大変なので、多くの人にはパスワード管理アプリのほうが現実的です。',
+    a: '「使い回さず、サービスごとに違うパスワードにする」なら、スマホのメモ帳と違ってネットにつながらない紙のノートに書いて自宅の安全な場所に保管するのも一つの方法です。さらに「IDとパスワードを同じノートに書かない」「末尾の2文字はあえて書かず自分の頭の中のルールにしておく」といった工夫をすれば、万一ノートを落としたときの危険性を大きく減らせます。ただし数が増えると管理が大変なので、多くの人にはパスワード管理アプリのほうが現実的です。',
   },
   {
     q: 'パスワード管理アプリは、逆に危なくないですか？（1か所にまとめる不安）',
@@ -84,7 +88,7 @@ const jsonLd = {
       image: `${SITE_URL}/images/guide/password-kanri/sumaho-password-main.webp`,
       mainEntityOfPage: `${SITE_URL}${PAGE_PATH}`,
       datePublished: '2026-06-05',
-      dateModified: '2026-06-05',
+      dateModified: '2026-06-10',
       inLanguage: 'ja',
       author: {
         '@type': 'Organization',
@@ -210,9 +214,9 @@ export default function SumahoPasswordPage() {
           役立ち情報｜パスワード・認証管理
         </p>
         <h1 className="mt-3 text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
-          スマホのパスワード管理
+          パスワードをメモ帳で管理するのは危険？
           <span className="mt-2 block text-xl font-medium leading-snug text-slate-600 sm:text-2xl">
-            「メモは危険」と言われても、忘れっぽい人はどうすればいい？
+            スマホでも忘れず安全に管理する方法
           </span>
         </h1>
 
@@ -235,6 +239,14 @@ export default function SumahoPasswordPage() {
           />
         </div>
 
+        <p className="mt-8 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-slate-700">
+          ※ いま画面ロックやログインが解除できず困っている方は、先に
+          <a href="#locked" className="font-medium text-blue-600 hover:underline">
+            「開けないときの応急処置」
+          </a>
+          をご覧ください。
+        </p>
+
         <nav className="mt-10 rounded-2xl bg-slate-50 p-6" aria-label="目次">
           <h2 className="text-sm font-semibold text-slate-900">目次</h2>
           <ol className="mt-4 space-y-2.5 text-[15px] leading-7">
@@ -247,27 +259,6 @@ export default function SumahoPasswordPage() {
             ))}
           </ol>
         </nav>
-
-        <Section id="locked" title="いまパスワードが分からず開けないときは（応急処置）">
-          <p>
-            「将来のために整えたい」のではなく、
-            <strong>今まさにロックが解除できなくて困っている</strong>
-            ——そんな人は、まずこちらから。落ち着いて、次の順で試してください。
-          </p>
-          <div className="rounded-2xl bg-amber-50 p-6">
-            <DotList
-              items={[
-                'スマホ本体のパスコードを忘れた：何度か間違えてロックがかかっても、Apple ID（iPhone）やGoogleアカウント（Android）でサインインできれば復旧できる場合があります。慌てて連続入力せず、画面の案内に沿って進めます',
-                'アプリやサービスのパスワードを忘れた：ログイン画面の「パスワードをお忘れですか？」から、登録メールアドレスやSMSで再設定できます。多くの場合これで解決します',
-                '登録メールアドレスも分からない：iPhoneの「設定→パスワード」、Android／Chromeの「Googleパスワードマネージャー」に、過去に保存したログイン情報が残っていないか確認します',
-                'どうしても開けず初期化を考える前に：初期化すると中のデータは消えます。クラウド（iCloud／Googleアカウント）にバックアップがあるか、先に必ず確認してください',
-              ]}
-            />
-          </div>
-          <p>
-            今回の困りごとが片付いたら、同じことを繰り返さないために、このあとの「覚えない仕組み」づくりに進みましょう。
-          </p>
-        </Section>
 
         <Section id="check" title="まず確認｜「危険な保管法」になっていないか">
           <p>
@@ -293,8 +284,21 @@ export default function SumahoPasswordPage() {
             メモ帳が危ないのは、「暗号化されていないから」です。パスワード管理アプリは、保存した内容を端末の中で暗号化し、マスターパスワードでしか開けないようにします。一方、ふつうのメモ帳は中身がそのまま文字で残るので、スマホにアクセスできる人なら誰でも読めてしまいます。
           </p>
           <p>
+            さらに見落としがちなのが「クラウドとの同期」です。スマホのメモ帳は自動でネット上（iCloudなど）にバックアップされるものが多く、万一そのアカウントが乗っ取られると、スマホが手元にあっても、メモに書いたパスワードがまとめて盗まれるおそれがあります。
+          </p>
+          <p>
             つまり問題は「書いて残すこと」ではなく、「暗号化せずに残すこと」。書いて管理すること自体は、むしろ必要です。要は、
             <strong>安全な金庫に入れるか、机に置きっぱなしにするか</strong>の違いです。
+          </p>
+          <p>
+            なお、エクセルやスプレッドシートでの管理が気になる方は、
+            <Link
+              href="/guide/kazoku-kyoyu/joho-kyoyu-hikaku"
+              className="text-blue-600 hover:underline"
+            >
+              パスワード・情報管理の方法の比較（エクセル管理は危険？）
+            </Link>
+            もあわせてご覧ください。
           </p>
         </Section>
 
@@ -352,7 +356,7 @@ export default function SumahoPasswordPage() {
           <p>
             <strong>② サービスごとに「一部だけ」変える</strong>
             <br />
-            土台のパスフレーズは同じでも、サービスごとに頭か末尾を少し変えれば、使い回しを避けられます。ルールは自分の頭の中だけに置き、メモには書かないのが安全です。
+            土台のパスフレーズは同じでも、サービスごとに頭か末尾を少し変えれば、使い回しを避けられます。ルールは自分の頭の中だけに置き、スマホのメモ帳には書かないのが安全です。
           </p>
           <p>
             この方法でも、数が増えると管理は大変になります。負担を感じ始めたら、無理せずパスワード管理アプリへ移行するのが結局ラクです。
@@ -410,6 +414,26 @@ export default function SumahoPasswordPage() {
           </p>
           <p>
             今日、パスワードを安全にしたなら、その勢いで「在りかを残す」ところまで。それだけで、毎日の安全が、家族のための安心にまで延びます。
+          </p>
+        </Section>
+
+        <Section id="locked" title="いまパスワードが分からず開けないときは（応急処置）">
+          <p>
+            <strong>今まさにロックが解除できなくて困っている</strong>
+            ——そんなときは、落ち着いて、次の順で試してください。
+          </p>
+          <div className="rounded-2xl bg-amber-50 p-6">
+            <DotList
+              items={[
+                'スマホ本体のパスコードを忘れた：何度か間違えてロックがかかっても、Apple ID（iPhone）やGoogleアカウント（Android）でサインインできれば復旧できる場合があります。慌てて連続入力せず、画面の案内に沿って進めます',
+                'アプリやサービスのパスワードを忘れた：ログイン画面の「パスワードをお忘れですか？」から、登録メールアドレスやSMSで再設定できます。多くの場合これで解決します',
+                '登録メールアドレスも分からない：iPhoneの「設定→パスワード」、Android／Chromeの「Googleパスワードマネージャー」に、過去に保存したログイン情報が残っていないか確認します',
+                'どうしても開けず初期化を考える前に：初期化すると中のデータは消えます。クラウド（iCloud／Googleアカウント）にバックアップがあるか、先に必ず確認してください',
+              ]}
+            />
+          </div>
+          <p>
+            落ち着いて対処できたら、同じことを繰り返さないために、上で紹介した「覚えない仕組み」を整えておきましょう。
           </p>
         </Section>
 

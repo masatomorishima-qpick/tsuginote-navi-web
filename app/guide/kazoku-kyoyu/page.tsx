@@ -25,6 +25,13 @@ export const metadata: Metadata = {
 
 const articles = [
   {
+    href: '/guide/kazoku-kyoyu/fuufu-joho-kyoyu',
+    category: '夫婦の情報共有',
+    title: '夫婦の情報共有のやり方｜日常のすれ違い解消から“もしも”の備えまで',
+    description:
+      '予定・家計・連絡先などの「日常の共有」をアプリで仕組み化し、見落としがちな「もしものとき」の備えまで。プライバシーを守りながら共有するコツも。',
+  },
+  {
     href: '/guide/kazoku-kyoyu/password-account-kyoyu',
     category: '家族間の情報共有',
     title: '家族とのパスワード・アカウント共有｜どこまで共有する？安全なやり方と線引き',

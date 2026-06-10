@@ -134,6 +134,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
     {
+      url: `${baseUrl}/guide/kazoku-kyoyu/fuufu-joho-kyoyu`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/guide/kazoku-kyoyu/password-account-kyoyu`,
       lastModified: now,
       changeFrequency: "monthly",

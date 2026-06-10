@@ -133,18 +133,17 @@ function Hero() {
           />
         </div>
 
-        <h1 className="text-3xl font-bold leading-snug tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
-          スマホ・パソコン のパスワード、
-          <br />
-          <span className="text-emerald-700">亡くなったあとだけ</span>、大切な方に届く
+        {/* モバイルは画面幅追従(6vw)＋各行nowrapで必ず2行に収める。sm以上は固定サイズ */}
+        <h1 className="text-[6vw] font-bold leading-snug tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
+          <span className="block whitespace-nowrap">スマホ・パソコンのパスワード</span>
+          <span className="block whitespace-nowrap">
+            <span className="text-emerald-700">亡くなった後</span>に大切な方へ
+          </span>
         </h1>
 
         <p className="mx-auto mt-6 max-w-md text-base leading-relaxed text-slate-600 sm:text-lg">
-          生前は、誰にも見せません。
-          <br />
-          もしものときだけ、あなたが選んだ方へ。
-          <br className="sm:hidden" />
-          準備は、いまから数分で。
+          <span className="block">生前は誰にも見せません</span>
+          <span className="block">届くのは選んだ方だけ</span>
         </p>
 
         <div className="mt-10 flex justify-center">
@@ -195,9 +194,8 @@ function WhyNow() {
           なぜ、いま備えるのか
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-slate-700 sm:text-xl">
-          「いつか、元気なうちに」——
-          <br className="sm:hidden" />
-          その“いつか”は、来ないかもしれません。
+          <span className="block">「いつか、元気なうちに」</span>
+          <span className="block">その“いつか”は、来ないかもしれません</span>
         </p>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2">
@@ -352,16 +350,7 @@ function Plans() {
           プラン
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-center text-base text-slate-600 sm:text-lg">
-          初回登録から 30 日間、STANDARDプランを無料でお試し。
-          <br className="sm:hidden" />
-          その後は FREEプランで続けてご利用いただけます。
-        </p>
-        <p className="mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-slate-700 sm:text-lg">
-          起きなければ、使いません。それでも備えるのは、
-          <br className="sm:hidden" />
-          起きたら取り返しがつかないから。
-          <br />
-          ¥110/月で、その安心を持ち続けられます。
+          初回登録から 30 日間 STANDARDプランを無料でお試し。その後は FREEプランでそのまま続けられます。
         </p>
 
         <div className="mt-12 space-y-5 sm:space-y-6">

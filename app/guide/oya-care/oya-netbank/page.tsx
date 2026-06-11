@@ -400,7 +400,14 @@ export default function OyaNetbankPage() {
             >
               急な入院に備えて、家族に伝えておく情報リスト
             </Link>
-            にまとめています。
+            にまとめています。また、ネット銀行やサブスクの契約がなぜ家族から「見えなくなる」のか、仕組みの側から知りたい方はコラム
+            <Link
+              href="/guide/column/subsuku-kaiyaku-riyu"
+              className="text-blue-600 hover:underline"
+            >
+              サブスクは全部、死ぬまでに解約しておかなければならない3つの理由
+            </Link>
+            もどうぞ。
           </p>
         </Section>
 

@@ -316,6 +316,16 @@ export default function SabusukuKanriPage() {
             管理の仕上げは、「自分が把握する」の一歩先、
             <strong>「もしものとき、家族も把握できる」</strong>ところまでです。
           </p>
+          <p>
+            なぜそこまで必要なのか——サブスクという仕組みの性質から知りたい方は、コラム
+            <Link
+              href="/guide/column/subsuku-kaiyaku-riyu"
+              className="text-blue-600 hover:underline"
+            >
+              サブスクは全部、死ぬまでに解約しておかなければならない3つの理由
+            </Link>
+            をどうぞ。
+          </p>
         </Section>
 
         <Section id="finish" title="仕上げ｜一覧の「在りか」ごと、届く形で残す">

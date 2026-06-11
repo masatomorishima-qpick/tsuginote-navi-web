@@ -42,6 +42,12 @@ export const metadata: Metadata = {
 // 新着記事（公開日の新しい順。記事を追加したら先頭に足す）
 const latestArticles = [
   {
+    href: '/guide/column/subsuku-kaiyaku-riyu',
+    category: 'コラム',
+    title: 'サブスクは全部、死ぬまでに解約しておかなければならない3つの理由',
+    date: '2026-06-12',
+  },
+  {
     href: '/guide/digital-seiri/sabusuku-kanri',
     category: 'デジタル整理術',
     title: 'サブスク管理アプリの選び方と使い方｜契約の見える化から“もしもの備え”まで',
@@ -237,6 +243,17 @@ const categories = [
       {
         href: '/guide/moshimo-sonae/kyu-nyuin-sonae',
         title: '急な入院に備えて、家族に伝えておく情報リスト',
+      },
+    ],
+  },
+  {
+    href: '/guide/column',
+    name: 'コラム',
+    description: '暮らしを支えるデジタルの仕組みに隠れた、知られていない性質を解き明かす読み物。',
+    articles: [
+      {
+        href: '/guide/column/subsuku-kaiyaku-riyu',
+        title: 'サブスクは全部、死ぬまでに解約しておかなければならない3つの理由',
       },
     ],
   },

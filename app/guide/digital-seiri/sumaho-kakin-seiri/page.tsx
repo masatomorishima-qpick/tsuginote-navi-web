@@ -388,6 +388,16 @@ export default function SumahoKakinSeiriPage() {
             </strong>{' '}
             それだけで、今日の節約が、家族を困らせない備えにもなります。
           </p>
+          <p>
+            サブスクの請求が本人以外に止められない仕組みについては、コラム
+            <Link
+              href="/guide/column/subsuku-kaiyaku-riyu"
+              className="text-blue-600 hover:underline"
+            >
+              サブスクは全部、死ぬまでに解約しておかなければならない3つの理由
+            </Link>
+            で、公的機関の実例とともに詳しく解説しています。
+          </p>
         </Section>
 
         <Section id="faq" title="よくある質問">

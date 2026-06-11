@@ -107,6 +107,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: `${baseUrl}/guide/digital-seiri/sabusuku-kanri`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // パスワード・認証管理
     {
       url: `${baseUrl}/guide/password-kanri`,

@@ -42,6 +42,12 @@ export const metadata: Metadata = {
 // 新着記事（公開日の新しい順。記事を追加したら先頭に足す）
 const latestArticles = [
   {
+    href: '/guide/digital-seiri/sabusuku-kanri',
+    category: 'デジタル整理術',
+    title: 'サブスク管理アプリの選び方と使い方｜契約の見える化から“もしもの備え”まで',
+    date: '2026-06-11',
+  },
+  {
     href: '/guide/oya-care/oya-netbank',
     category: '親・家族のケア',
     title: '親がネット銀行を使っているなら｜もしものとき家族が困らない「在りか」の備え方',
@@ -154,6 +160,10 @@ const categories = [
       {
         href: '/guide/digital-seiri/mail-seiri',
         title: 'メールの整理術｜あふれた受信トレイをスッキリさせる手順',
+      },
+      {
+        href: '/guide/digital-seiri/sabusuku-kanri',
+        title: 'サブスク管理アプリの選び方と使い方｜見える化からもしもの備えまで',
       },
     ],
   },

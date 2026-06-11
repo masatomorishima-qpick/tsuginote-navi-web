@@ -28,7 +28,7 @@ const articles = [
   {
     href: '/guide/password-kanri/sumaho-password',
     category: 'パスワード管理',
-    title: 'スマホのパスワード管理｜「メモは危険」と言われても、忘れっぽい人はどうすればいい？',
+    title: 'パスワードをメモ帳で管理するのは危険？スマホでも忘れず安全に管理する方法【iPhone/Android】',
     description:
       '危険な保管法の見分け方から、忘れっぽい人でもできるパスワード管理アプリの始め方、二段階認証・パスキーまでを解説します。',
   },

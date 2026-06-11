@@ -8,9 +8,9 @@ import SiteFooter from '@/components/SiteFooter';
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 const PAGE_PATH = '/guide/password-kanri/sumaho-password';
 const PAGE_TITLE =
-  'パスワードをメモ帳で管理するのは危険？スマホでも忘れず安全に管理する方法';
+  'パスワードをメモ帳で管理するのは危険？スマホでも忘れず安全に管理する方法【iPhone/Android】';
 const PAGE_DESCRIPTION =
-  'パスワードをメモ帳に書くのは危険？という疑問に答え、忘れっぽい人でも安全に管理できる方法を解説。危険な保管法の見分け方、パスワード管理アプリの始め方、二段階認証・パスキーまで、難しい知識なしで今日から実践できます。';
+  'パスワードをメモ帳に書くのは危険？という疑問に答え、忘れっぽい人でも安全に管理できる方法を解説。危険な保管法の見分け方、パスワード管理アプリの始め方、二段階認証・パスキー、忘れたときのiPhone・Android別の対処まで、難しい知識なしで今日から実践できます。';
 
 export const metadata: Metadata = {
   title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
@@ -51,7 +51,7 @@ const toc = [
   { id: 'tips', label: '忘れっぽい人向け｜つまずきと対策' },
   { id: 'blindspot', label: 'ここまでの整理と、最後の盲点' },
   { id: 'finish', label: '仕上げ｜「鍵の在りか」を残す' },
-  { id: 'locked', label: 'いまパスワードが分からず開けないときは（応急処置）' },
+  { id: 'locked', label: '忘れて開けないときの対処｜iPhone・Android別' },
   { id: 'faq', label: 'よくある質問' },
   { id: 'summary', label: 'まとめ' },
 ];
@@ -74,6 +74,10 @@ const faqs = [
     a: 'スマホやパソコン本体にロック（パスコード・指紋・顔認証）をかけていれば、ブラウザ／OSの保存機能は実用的で安全です。逆に、本体にロックがない状態での保存は避けてください。',
   },
   {
+    q: 'パスコードを何度も間違えると、どうなりますか？',
+    a: 'iPhoneでは一定回数間違えると一時的に入力できなくなり、さらに続けると復旧に初期化が必要になる場合があります。Androidも機種によって入力制限がかかります。慌てて連続入力せず、画面の案内と公式サポートの手順に沿って対処してください。バックアップがあれば、初期化してもデータは戻せます。',
+  },
+  {
     q: '全部のパスワードを今すぐ変えないとダメですか？',
     a: 'いいえ。まず「使い回している重要なアカウント（メール・銀行・決済）」だけ先に変えれば、リスクは大きく下がります。残りはログインのたびに少しずつで大丈夫です。',
   },
@@ -89,7 +93,7 @@ const jsonLd = {
       image: `${SITE_URL}/images/guide/password-kanri/sumaho-password-main.webp`,
       mainEntityOfPage: `${SITE_URL}${PAGE_PATH}`,
       datePublished: '2026-06-05',
-      dateModified: '2026-06-10',
+      dateModified: '2026-06-11',
       inLanguage: 'ja',
       author: {
         '@type': 'Organization',
@@ -418,15 +422,46 @@ export default function SumahoPasswordPage() {
           </p>
         </Section>
 
-        <Section id="locked" title="いまパスワードが分からず開けないときは（応急処置）">
+        <Section id="locked" title="忘れて開けないときの対処｜iPhone・Android別（応急処置）">
           <p>
-            <strong>今まさにロックが解除できなくて困っている</strong>
-            ——そんなときは、落ち着いて、次の順で試してください。
+            <strong>今まさにパスワードが分からなくて困っている</strong>
+            ——そんなときは、落ち着いて対処しましょう。最初に押さえたいのは、スマホのパスワードには2種類あることです。
+          </p>
+          <DotList
+            items={[
+              '①スマホ本体のロック（パスコード・画面ロック）——端末そのものを開ける鍵',
+              '②アカウントのパスワード（iPhoneならApple ID、AndroidならGoogleアカウント）——データやサービスの鍵',
+            ]}
+          />
+          <p>
+            <strong>iPhoneの場合</strong>
           </p>
           <div className="rounded-2xl bg-amber-50 p-6">
             <DotList
               items={[
-                'スマホ本体のパスコードを忘れた：何度か間違えてロックがかかっても、Apple ID（iPhone）やGoogleアカウント（Android）でサインインできれば復旧できる場合があります。慌てて連続入力せず、画面の案内に沿って進めます',
+                'パスコードを忘れた：慌てて連続入力しないこと。一定回数間違えると入力が制限され、復旧に初期化が必要になる場合があります。画面の案内に従い、最新の手順はApple公式サポートで確認を',
+                '初期化が必要になっても、iCloudバックアップがあればデータは復元できます',
+                'Apple IDのパスワードを忘れた：Apple公式の「パスワードのリセット」手順から、登録した電話番号や信頼できるデバイスで再設定できます',
+              ]}
+            />
+          </div>
+          <p>
+            <strong>Androidの場合</strong>
+          </p>
+          <div className="rounded-2xl bg-amber-50 p-6">
+            <DotList
+              items={[
+                '画面ロックを忘れた：多くの場合、「スマートフォンを探す」からのリモート初期化→Googleアカウントのバックアップで復元、という流れになります。機種・OSのバージョンで手順が異なるため、メーカーの公式サポートで確認を',
+                'Googleアカウントのパスワードを忘れた：Google公式の「アカウント復元」から、登録した電話番号・メールアドレスで再設定できます',
+              ]}
+            />
+          </div>
+          <p>
+            <strong>機種を問わず共通</strong>
+          </p>
+          <div className="rounded-2xl bg-amber-50 p-6">
+            <DotList
+              items={[
                 'アプリやサービスのパスワードを忘れた：ログイン画面の「パスワードをお忘れですか？」から、登録メールアドレスやSMSで再設定できます。多くの場合これで解決します',
                 '登録メールアドレスも分からない：iPhoneの「設定→パスワード」、Android／Chromeの「Googleパスワードマネージャー」に、過去に保存したログイン情報が残っていないか確認します',
                 'どうしても開けず初期化を考える前に：初期化すると中のデータは消えます。クラウド（iCloud／Googleアカウント）にバックアップがあるか、先に必ず確認してください',
@@ -434,7 +469,7 @@ export default function SumahoPasswordPage() {
             />
           </div>
           <p>
-            落ち着いて対処できたら、同じことを繰り返さないために、上で紹介した「覚えない仕組み」を整えておきましょう。
+            落ち着いて対処できたら、同じことを繰り返さないために、上で紹介した「覚えない仕組み」を整えておきましょう。そしてもう一歩——自分が開けられないより深刻なのは、もしものとき<strong>家族の誰も開けられない</strong>事態です。その備えは、前の章の「在りかを残す」から始められます。
           </p>
         </Section>
 

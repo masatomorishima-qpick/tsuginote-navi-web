@@ -104,7 +104,7 @@ const latestArticles = [
   {
     href: '/guide/password-kanri/sumaho-password',
     category: 'パスワード・認証管理',
-    title: 'スマホのパスワード管理｜「メモは危険」と言われても、忘れっぽい人はどうすればいい？',
+    title: 'パスワードをメモ帳で管理するのは危険？スマホでも忘れず安全に管理する方法【iPhone/Android】',
     date: '2026-06-05',
   },
   {

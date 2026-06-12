@@ -24,6 +24,13 @@ export const metadata: Metadata = {
 
 const articles = [
   {
+    href: '/guide/column/okane-kanri-kichinto',
+    category: 'お金の管理の死角',
+    title: 'お金の管理がきちんとしている人ほど、家族を困らせてしまう3つの理由',
+    description:
+      'ネット銀行・NISA・ペーパーレス——正しい管理ほど、家族からは「見えない資産」になる。きちんとしている人だけに起きる副作用と、金額もパスワードも書かない「資産の地図」という備え方。',
+  },
+  {
     href: '/guide/column/subsuku-kaiyaku-riyu',
     category: 'サブスクの仕組み',
     title: 'サブスクは全部、死ぬまでに解約しておかなければならない3つの理由',

@@ -24,6 +24,13 @@ export const metadata: Metadata = {
 
 const articles = [
   {
+    href: '/guide/column/saifu-hikidashi-5sen',
+    category: '時代の変化の答え合わせ',
+    title: 'この5年で、財布と引き出しから消えたもの5選',
+    description:
+      '現金、ポイントカード、通帳、印鑑、アルバム。消えた5つには共通点があります——全部、あなたにしか開けられない場所へ引っ越しただけ。公的な数字で振り返る大変化の話。',
+  },
+  {
     href: '/guide/column/okane-kanri-kichinto',
     category: 'お金の管理の死角',
     title: 'お金の管理がきちんとしている人ほど、家族を困らせてしまう3つの理由',

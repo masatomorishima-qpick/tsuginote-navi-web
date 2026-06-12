@@ -42,6 +42,12 @@ export const metadata: Metadata = {
 // 新着記事（公開日の新しい順。記事を追加したら先頭に足す）
 const latestArticles = [
   {
+    href: '/guide/column/saifu-hikidashi-5sen',
+    category: 'コラム',
+    title: 'この5年で、財布と引き出しから消えたもの5選',
+    date: '2026-06-12',
+  },
+  {
     href: '/guide/column/okane-kanri-kichinto',
     category: 'コラム',
     title: 'お金の管理がきちんとしている人ほど、家族を困らせてしまう3つの理由',
@@ -257,6 +263,10 @@ const categories = [
     name: 'コラム',
     description: '暮らしを支えるデジタルの仕組みに隠れた、知られていない性質を解き明かす読み物。',
     articles: [
+      {
+        href: '/guide/column/saifu-hikidashi-5sen',
+        title: 'この5年で、財布と引き出しから消えたもの5選',
+      },
       {
         href: '/guide/column/okane-kanri-kichinto',
         title: 'お金の管理がきちんとしている人ほど、家族を困らせてしまう3つの理由',

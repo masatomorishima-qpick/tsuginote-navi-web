@@ -400,6 +400,20 @@ export default function GuideTopPage() {
           </div>
         </section>
 
+        {/* 調査データ */}
+        <section className="mt-16">
+          <h2 className="border-b border-slate-200 pb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            調査データ
+          </h2>
+          <p className="mt-5 text-[15px] leading-8 text-slate-700">
+            記事で引用している自社調査の一次データは
+            <Link href="/guide/research" className="text-blue-600 hover:underline">
+              デジタル遺品に関する意識調査（2026年4月・BlueAdventures調べ）
+            </Link>
+            にまとめています。困った経験60.9%、最多の困りごとは「スマホ・パソコンのパスワードが分からない」。出典明記のうえ自由に引用いただけます。
+          </p>
+        </section>
+
         {/* CTA */}
         <section className="mt-16 rounded-3xl bg-slate-50 p-8 text-center sm:p-10">
           <h2 className="text-xl font-semibold text-slate-900">

@@ -58,6 +58,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.7,
     },
+    // 調査データ（一次ソース・被引用の核）
+    {
+      url: `${baseUrl}/guide/research`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
     {
       url: `${baseUrl}/guide/ihinseiri`,
       lastModified: now,

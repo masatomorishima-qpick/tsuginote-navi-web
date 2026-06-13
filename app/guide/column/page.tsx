@@ -24,6 +24,13 @@ export const metadata: Metadata = {
 
 const articles = [
   {
+    href: '/guide/column/kodomo-omoide-5shukan',
+    category: '子どもの思い出を残す',
+    title: '子どもの思い出を一生ものにする5つの習慣',
+    description:
+      'スマホに何千枚——私たちは人類史上いちばん子どもを撮っている親です。でも「撮る」と「残る」は別の話。共有・二重保管・フォトブック・声の記録、そして見落とされがちな「鍵の引き継ぎ」まで、思い出を一生ものにする5つの習慣。',
+  },
+  {
     href: '/guide/column/saifu-hikidashi-5sen',
     category: '時代の変化の答え合わせ',
     title: 'この5年で、財布と引き出しから消えたもの5選',

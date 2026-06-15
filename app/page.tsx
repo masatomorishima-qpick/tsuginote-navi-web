@@ -26,7 +26,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { redirect } from 'next/navigation';
 import {
   Lock,
   Check,
@@ -37,7 +36,6 @@ import {
   ShieldCheck,
   Trash2,
 } from 'lucide-react';
-import { createDigitalServerClient } from '@/lib/supabase/digitalServer';
 
 export const metadata: Metadata = {
   title: 'つぎの手ナビ デジタル資産｜大切な方へのデジタル引き継ぎ',
@@ -45,17 +43,11 @@ export const metadata: Metadata = {
     'スマホ・パソコン のパスワードや、ご利用中のサブスク・SNS を大切な方に引き継ぐ準備ができるサービスです。メール登録だけですぐに始められ、FREEプランはずっと無料です。',
 };
 
-export const dynamic = 'force-dynamic';
-
-export default async function HomePage() {
-  const supabase = await createDigitalServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (user) {
-    redirect('/digital');
-  }
-
+// TOP は未ログイン向けの静的 LP。広告流入（ほぼ未ログイン）で毎回 Supabase 認証
+// 通信が走ると LCP/FCP を大きく悪化させるため、サーバー認証は行わず静的生成する。
+// 「ログイン済みユーザー→/digital」への誘導は middleware の Cookie 判定で行う
+// （ネットワーク往復なし）。これにより TOP は CDN キャッシュ可能になる。
+export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col bg-white text-slate-900 antialiased">
       <Header />
@@ -127,6 +119,7 @@ function Hero() {
             width={576}
             height={576}
             priority
+            sizes="(max-width: 640px) 224px, 288px"
             className="h-full w-full object-cover"
           />
         </div>

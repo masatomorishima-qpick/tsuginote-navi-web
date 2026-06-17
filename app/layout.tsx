@@ -36,6 +36,8 @@ const siteJsonLd = {
       name: "つぎの手ナビ デジタル資産",
       alternateName: "つぎの手ナビ",
       url: SITE_URL,
+      logo: `${SITE_URL}/logo.png`,
+      image: `${SITE_URL}/logo.png`,
       email: "info@blueadventures.jp",
       description:
         "デジタル資産やパスワードの「在りか」を、生きている間は誰にも見せず、もしものとき（入院・事故・死亡など）だけ、指定した大切な人へ届ける準備ができるサービス。資産の登録・PDF出力・定期リマインドは無料。運営：BlueAdventures。",

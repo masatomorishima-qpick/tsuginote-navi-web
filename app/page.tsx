@@ -43,6 +43,46 @@ export const metadata: Metadata = {
     'スマホ・パソコン のパスワードや、ご利用中のサブスク・SNS を大切な方に引き継ぐ準備ができるサービスです。メール登録だけですぐに始められ、FREEプランはずっと無料です。',
 };
 
+const SITE_URL = 'https://www.tsuginotenavi.jp';
+
+// サービスLP向け構造化データ（GEO/AI検索の理解精度向上）。
+// 価格・無料範囲はページ表示（Plans セクション）と一致させること。
+const serviceJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  '@id': `${SITE_URL}/#service`,
+  name: 'つぎの手ナビ デジタル資産',
+  serviceType: 'デジタル資産の整理・引き継ぎサービス',
+  url: SITE_URL,
+  description:
+    'スマホ・パソコンのパスワードや、利用中のサブスク・SNS・ネット銀行などのデジタル資産を整理し、もしものときに選んだ大切な方へ届ける準備ができるサービス。FREEプラン（登録・PDF出力・定期リマインド）は無料。',
+  provider: { '@id': `${SITE_URL}/#organization` },
+  areaServed: { '@type': 'Country', name: '日本' },
+  offers: [
+    {
+      '@type': 'Offer',
+      name: 'FREE',
+      price: '0',
+      priceCurrency: 'JPY',
+      description:
+        'デジタル資産・サービスの登録（無制限）、大切な方に共有（PDF出力）、定期リマインド',
+    },
+    {
+      '@type': 'Offer',
+      name: 'STANDARD',
+      priceCurrency: 'JPY',
+      description:
+        '初回登録から30日間無料でお試し。スマホ・パソコンのパスワード保管、連携アカウント（最大10名）など。料金は連携するお一人につき月額¥110（税込）。',
+      priceSpecification: {
+        '@type': 'UnitPriceSpecification',
+        price: '110',
+        priceCurrency: 'JPY',
+        unitText: '月（税込）／お一人',
+      },
+    },
+  ],
+};
+
 // TOP は未ログイン向けの静的 LP。広告流入（ほぼ未ログイン）で毎回 Supabase 認証
 // 通信が走ると LCP/FCP を大きく悪化させるため、サーバー認証は行わず静的生成する。
 // 「ログイン済みユーザー→/digital」への誘導は middleware の Cookie 判定で行う
@@ -50,6 +90,10 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col bg-white text-slate-900 antialiased">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
+      />
       <Header />
       <main className="flex-1">
         <Hero />
@@ -629,6 +673,21 @@ function FAQ() {
 
   return (
     <section id="faq" className="bg-slate-50 px-5 py-20 sm:px-8 sm:py-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            '@id': `${SITE_URL}/#faq`,
+            mainEntity: faqs.map((faq) => ({
+              '@type': 'Question',
+              name: faq.q,
+              acceptedAnswer: { '@type': 'Answer', text: faq.a },
+            })),
+          }),
+        }}
+      />
       <div className="mx-auto max-w-2xl">
         <h2 className="text-center text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
           よくある質問

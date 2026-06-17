@@ -58,6 +58,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.7,
     },
+    // デジタル資産ピラー（整理・引き継ぎハブ）
+    {
+      url: `${baseUrl}/guide/digital-shisan`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 調査データ（一次ソース・被引用の核）
     {
       url: `${baseUrl}/guide/research`,

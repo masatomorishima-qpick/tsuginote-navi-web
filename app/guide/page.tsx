@@ -339,6 +339,21 @@ export default function GuideTopPage() {
           />
         </div>
 
+        {/* ピラー：デジタル資産の基本 */}
+        <section className="mt-10 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-6 sm:p-7">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+            まずはここから
+          </p>
+          <h2 className="mt-2 text-lg font-semibold leading-snug text-slate-900 sm:text-xl">
+            <Link href="/guide/digital-shisan" className="text-blue-600 hover:underline">
+              デジタル資産の整理と引き継ぎ｜種類の一覧と、家族が困らない備え方
+            </Link>
+          </h2>
+          <p className="mt-2 text-[15px] leading-7 text-slate-600">
+            「デジタル資産」とは何か、種類の一覧、整理のやり方、もしものときの引き継ぎまでをまとめた基本ガイドです。各テーマの記事への入口にもなっています。
+          </p>
+        </section>
+
         {/* 新着記事 */}
         <section className="mt-14">
           <h2 className="border-b border-slate-200 pb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">

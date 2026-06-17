@@ -113,6 +113,19 @@ export default function ColumnIndexPage() {
 
         <section className="mt-12">
           <h2 className="border-b border-slate-200 pb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            デジタル資産の基本
+          </h2>
+          <p className="mt-5 text-[15px] leading-8 text-slate-700">
+            デジタル資産の種類や、整理・引き継ぎの全体像は
+            <Link href="/guide/digital-shisan" className="text-blue-600 hover:underline">
+              デジタル資産の整理と引き継ぎ
+            </Link>
+            にまとめています。各テーマの入口としてもどうぞ。
+          </p>
+        </section>
+
+        <section className="mt-12">
+          <h2 className="border-b border-slate-200 pb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
             関連ガイド
           </h2>
           <p className="mt-5 text-[15px] leading-8 text-slate-700">

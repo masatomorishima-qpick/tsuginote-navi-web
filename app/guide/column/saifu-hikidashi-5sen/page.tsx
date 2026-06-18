@@ -433,9 +433,9 @@ export default function SaifuHikidashi5senPage() {
             になりました。財布と引き出しが黙ってやってくれていた仕事を、いまは誰かが意識して肩代わりする必要があるのです。
           </p>
           <p>
-            ここには、セキュリティの宿命とも言えるパラドックスがあります。昔の暮らしの鍵は、家の鍵が1本と、銀行印が1本。いまは、数えきれないIDとパスワード、顔と指紋。
+            ここには、避けられない皮肉があります。昔の暮らしの鍵は、家の鍵が1本と、銀行印が1本。いまは、数えきれないIDとパスワード、顔と指紋。
             <strong>守りを強くすればするほど、本人以外には開けられなくなる</strong>
-            ——あなたを守る仕組みの強さが、そのまま、家族の前に立つ壁の高さになるのです。これは誰の落ち度でもなく、デジタル化という正しい進化の、構造上の宿題です。
+            ——あなたを守る仕組みの強さが、そのまま、家族の前に立つ壁の高さになるのです。これは誰の落ち度でもなく、デジタル化という正しい進化が残した、構造上の課題です。
           </p>
           <p>
             実際、私たちBlueAdventuresが2026年に行った調査では、大切な方を亡くした経験のある人の60.9%が「デジタル関係で困った経験がある」と答えています。困りごとの第1位は「スマホ・パソコンのパスワードが分からない」。引っ越し先の扉が、最初の一枚から開かないのです。
@@ -470,11 +470,11 @@ export default function SaifuHikidashi5senPage() {
           <p>
             足すべきものは、ひとつだけ。
             <strong>
-              「どこに・何があるか」を本人以外にも分かるようにしておく「地図」の習慣
+              「どこに・何があるか」を本人以外にも分かるようにしておく「在りかの一覧」の習慣
             </strong>
             です。
           </p>
-          <p>この記事の5選に沿って書くなら、地図はこれだけで足ります。</p>
+          <p>この記事の5選に沿って書くなら、一覧はこれだけで足ります。</p>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-[15px] leading-7">
               <thead>
@@ -486,7 +486,7 @@ export default function SaifuHikidashi5senPage() {
                     引っ越し先
                   </th>
                   <th className="border border-slate-200 px-4 py-3 font-semibold text-slate-900">
-                    地図に書く1行
+                    一覧に書く1行
                   </th>
                 </tr>
               </thead>
@@ -522,7 +522,7 @@ export default function SaifuHikidashi5senPage() {
             をどうぞ。
           </p>
           <p>
-            うれしい副産物もあります。書き出してみると、使っていないポイントアプリ、ほぼ残高ゼロの口座、忘れていたサブスクがたいてい1つや2つ見つかります。地図づくりは、将来の備えであると同時に、財布と暮らしをもう一段身軽にする整理でもあるのです。
+            うれしい副産物もあります。書き出してみると、使っていないポイントアプリ、ほぼ残高ゼロの口座、忘れていたサブスクがたいてい1つや2つ見つかります。一覧づくりは、将来の備えであると同時に、財布と暮らしをもう一段身軽にする整理でもあるのです。
           </p>
           <p>
             紙に書いて引き出しに入れておくだけでも、ないよりずっと良い。ただ、紙には「内容がすぐ古くなる」「家族がその存在を知らなければ見つからない」という2つの弱点が残ります。こうした口座や契約、写真の在りかといった「デジタル資産」を、ふだんは誰にも見せず、もしものときにだけ選んだ家族へ引き継げるようにする専用のサービスもあります。私たちが運営する
@@ -530,13 +530,13 @@ export default function SaifuHikidashi5senPage() {
             もそのひとつで、登録・一覧のPDF出力・見直しの定期リマインドまでは無料で使えます。
           </p>
           <p>
-            この5年で、私たちの持ち物は史上いちばん身軽になりました。あとは、その身軽さに地図を1枚足すだけ。財布と引き出しが黙ってやってくれていた仕事は、それでぜんぶ取り戻せます。もう、考えなくて大丈夫です。
+            この5年で、私たちの持ち物は史上いちばん身軽になりました。あとは、その身軽さに在りかの一覧を1枚足すだけ。財布と引き出しが黙ってやってくれていた仕事は、それでぜんぶ取り戻せます。もう、考えなくて大丈夫です。
           </p>
         </Section>
 
         <section className="mt-14 rounded-3xl bg-slate-50 p-8 text-center sm:p-10">
           <h2 className="text-xl font-semibold text-slate-900">
-            「地図」を、もしものときだけ届く形で残すなら
+            「どこに何があるか」を、もしものときだけ届く形で残すなら
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-[15px] leading-8 text-slate-600">
             「つぎの手ナビ
@@ -559,12 +559,41 @@ export default function SaifuHikidashi5senPage() {
 
         <section className="mt-14">
           <h2 className="border-b border-slate-200 pb-3 text-xl font-semibold text-slate-900">
+            動画でも見る（約20秒）
+          </h2>
+          <p className="mt-5 text-[15px] leading-8 text-slate-700">
+            この記事の内容を、約20秒のショート動画にまとめています。通勤や家事の合間にどうぞ。
+          </p>
+          <div className="mx-auto mt-5 aspect-[9/16] w-full max-w-[320px] overflow-hidden rounded-2xl bg-slate-100">
+            <iframe
+              src="https://www.youtube.com/embed/rdU7vuuq5B4"
+              title="この5年で、財布と引き出しから消えたもの5選（ショート動画）"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className="h-full w-full"
+            />
+          </div>
+          <p className="mt-3 text-center text-sm">
+            <a
+              href="https://youtube.com/shorts/rdU7vuuq5B4"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              YouTube で見る &rsaquo;
+            </a>
+          </p>
+        </section>
+
+        <section className="mt-14">
+          <h2 className="border-b border-slate-200 pb-3 text-xl font-semibold text-slate-900">
             あわせて確認したい記事
           </h2>
           <ul className="mt-5 space-y-5">
             <li>
               <p className="text-xs font-medium text-slate-500">
-                資産の「地図」の作り方を詳しく知りたい方
+                資産の在りかの一覧の作り方を詳しく知りたい方
               </p>
               <Link
                 href="/guide/column/okane-kanri-kichinto"

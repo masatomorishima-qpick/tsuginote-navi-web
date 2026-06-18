@@ -51,7 +51,7 @@ const toc = [
 const faqs = [
   {
     q: '子どもにスマホのパスコードを教えておけば、それで十分では？',
-    a: '良い備えですが、それは「玄関の鍵」を1本渡しただけの状態です。スマホが開いても、写真がみてねにあるのか、iCloudにあるのか、別のクラウドにあるのかは、開けた人が一つずつ探さなければ分かりません。さらに、パスコードは機種変更や再設定で変わります。必要なのは1本の鍵そのものより、「どこに何があるか」の地図のほうです。',
+    a: '良い備えですが、それは「玄関の鍵」を1本渡しただけの状態です。スマホが開いても、写真がみてねにあるのか、iCloudにあるのか、別のクラウドにあるのかは、開けた人が一つずつ探さなければ分かりません。さらに、パスコードは機種変更や再設定で変わります。必要なのは1本の鍵そのものより、「どこに何があるか」の一覧のほうです。',
   },
   {
     q: 'まだ子どもが小さいのに、もしもの話なんて早すぎませんか？',
@@ -149,7 +149,7 @@ const summaryRows = [
   { habit: '②二重に持つ', todo: 'クラウド＋年1回、ポータブルSSDにコピー', time: '年1回30分' },
   { habit: '③紙に戻す', todo: '年1冊、ベストだけフォトブックに', time: '年1回30分' },
   { habit: '④声を残す', todo: '月に数本の短い動画・ボイスメモ', time: '毎月数分' },
-  { habit: '⑤鍵を引き継ぐ', todo: 'ありかの地図＋公式機能の設定', time: '15分' },
+  { habit: '⑤鍵を引き継ぐ', todo: 'ありかの一覧＋公式機能の設定', time: '15分' },
 ];
 
 const sources = [
@@ -447,7 +447,7 @@ export default function KodomoOmoide5ShukanPage() {
             items={[
               <>
                 <strong>思い出のありかを一覧にする。</strong>{' '}
-                写真はみてねとiCloud、動画はGoogleフォト、フォトブックは本棚の左から3段目——という「地図」を1枚作っておきます。パスワードそのものを紙に書き散らす必要はありません。「どこにあるか」が分かることが、半分以上の備えになります。地図の作り方そのものは
+                写真はみてねとiCloud、動画はGoogleフォト、フォトブックは本棚の左から3段目——という「一覧」を1枚作っておきます。パスワードそのものを紙に書き散らす必要はありません。「どこにあるか」が分かることが、半分以上の備えになります。一覧の作り方そのものは
                 <Link href="/guide/column/okane-kanri-kichinto" className="text-blue-600 hover:underline">
                   お金の管理がきちんとしている人ほど、家族を困らせてしまう3つの理由
                 </Link>
@@ -569,7 +569,7 @@ export default function KodomoOmoide5ShukanPage() {
               </Link>
             </li>
             <li>
-              <p className="text-xs font-medium text-slate-500">在りかの「地図」の作り方</p>
+              <p className="text-xs font-medium text-slate-500">在りかの一覧の作り方</p>
               <Link
                 href="/guide/column/okane-kanri-kichinto"
                 className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"

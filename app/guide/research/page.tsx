@@ -212,7 +212,7 @@ export default function ResearchPage() {
               <strong>手間をかけずに「在りか」を残し、もしものときだけ家族へ届く仕組み</strong>
               です。具体的な備え方は、
               <Link href="/guide/column/okane-kanri-kichinto" className="text-blue-600 hover:underline">
-                資産の「地図」の作り方
+                資産の在りかの一覧の作り方
               </Link>
               や
               <Link href="/guide/moshimo-sonae/kyu-nyuin-sonae" className="text-blue-600 hover:underline">

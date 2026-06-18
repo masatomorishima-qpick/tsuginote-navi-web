@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 
 const toc = [
   { id: 'problem', label: 'サブスク、いくつ契約しているか言えますか？' },
-  { id: 'tanaoroshi', label: 'まず棚卸しから' },
+  { id: 'tanaoroshi', label: 'まず書き出しから' },
   { id: 'app', label: 'サブスク管理アプリでできること' },
   { id: 'select', label: '選び方の4つの軸' },
   { id: 'noapp', label: 'アプリを使わない管理法' },
@@ -199,7 +199,7 @@ export default function SabusukuKanriPage() {
         <p className="mt-7 text-base leading-8 text-slate-700">
           動画に音楽、クラウド、アプリの月額課金——「サブスク、全部でいくつ契約してる？」と聞かれて、即答できる人は多くありません。1つひとつは数百円でも、合計すると毎月数千円。しかも自動更新なので、使っていなくても引き落としは続きます。
           この記事では、
-          <strong>棚卸しが終わったあとのサブスクを「把握できている状態」に保つ方法</strong>
+          <strong>書き出しが終わったあとのサブスクを「把握できている状態」に保つ方法</strong>
           を解説します。サブスク管理アプリでできること・選び方から、アプリを使わない管理法、そして多くの解説が触れない「自分しか一覧を知らない」という管理の盲点まで。読み終えるころには、わが家に合った管理の仕組みが決められるはずです。
         </p>
 
@@ -243,7 +243,7 @@ export default function SabusukuKanriPage() {
           </p>
         </Section>
 
-        <Section id="tanaoroshi" title="まず棚卸しから（このひと手間だけ先に）">
+        <Section id="tanaoroshi" title="まず書き出しから（このひと手間だけ先に）">
           <p>
             管理の仕組みを作る前に、今契約しているサブスクの洗い出しが必要です。スマホの課金履歴・カード明細からの確認手順と、不要なものの解約のやり方は、
             <Link
@@ -252,7 +252,7 @@ export default function SabusukuKanriPage() {
             >
               スマホの有料サービス・課金を整理する方法
             </Link>
-            で全手順を解説しています。本記事は「棚卸しが終わったあと、二度と散らからないようにする」パートです。
+            で全手順を解説しています。本記事は「書き出しが終わったあと、二度と散らからないようにする」パートです。
           </p>
         </Section>
 
@@ -371,7 +371,7 @@ export default function SabusukuKanriPage() {
               href="/guide/digital-seiri/sumaho-kakin-seiri"
               className="text-blue-600 hover:underline"
             >
-              棚卸しで現状を洗い出し
+              書き出しで現状を洗い出し
             </Link>
             、②「ここを見れば全部わかる」場所を1か所に決め（アプリ・メモ・紙のどれでも）、③月額・年額と更新日を見える状態に保つ——この3段階で散らからなくなります。
           </p>
@@ -420,7 +420,7 @@ export default function SabusukuKanriPage() {
           <ul className="mt-5 space-y-5">
             <li>
               <p className="text-xs font-medium text-slate-500">
-                まずサブスクの棚卸し・解約から始めたい方
+                まずサブスクの見直し・解約から始めたい方
               </p>
               <Link
                 href="/guide/digital-seiri/sumaho-kakin-seiri"

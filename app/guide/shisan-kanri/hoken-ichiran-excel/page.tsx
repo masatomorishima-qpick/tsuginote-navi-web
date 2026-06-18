@@ -445,7 +445,7 @@ export default function HokenIchiranExcelPage() {
             </li>
             <li>
               <p className="text-xs font-medium text-slate-500">
-                サブスクなど毎月の支払いも棚卸ししたい方
+                サブスクなど毎月の支払いも見直したい方
               </p>
               <Link
                 href="/guide/digital-seiri/sumaho-kakin-seiri"

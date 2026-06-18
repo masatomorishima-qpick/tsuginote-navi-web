@@ -24,6 +24,13 @@ export const metadata: Metadata = {
 
 const articles = [
   {
+    href: '/guide/column/sumaho-shuyaku-5sen',
+    category: '時代の変化の答え合わせ',
+    title: 'この5年で、スマホ1台に集約された機能5選',
+    description:
+      'お金、きっぷ、診察券、身分証、そして家の鍵まで。この5年でスマホ1台に集まった5つの機能を公的な数字で振り返り、便利さの裏で「家族が代わりに開けられなくなった」という変化を解き明かします。',
+  },
+  {
     href: '/guide/column/kodomo-omoide-5shukan',
     category: '子どもの思い出を残す',
     title: '子どもの思い出を一生ものにする5つの習慣',

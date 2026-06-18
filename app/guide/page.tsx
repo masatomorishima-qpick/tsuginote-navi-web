@@ -42,6 +42,12 @@ export const metadata: Metadata = {
 // 新着記事（公開日の新しい順。記事を追加したら先頭に足す）
 const latestArticles = [
   {
+    href: '/guide/column/pet-omoide-5shukan',
+    category: 'コラム',
+    title: 'ペットの思い出を一生ものにする5つの習慣',
+    date: '2026-06-18',
+  },
+  {
     href: '/guide/column/sumaho-shuyaku-5sen',
     category: 'コラム',
     title: 'この5年で、スマホ1台に集約された機能5選',
@@ -275,6 +281,10 @@ const categories = [
     name: 'コラム',
     description: '暮らしを支えるデジタルの仕組みに隠れた、知られていない性質を解き明かす読み物。',
     articles: [
+      {
+        href: '/guide/column/pet-omoide-5shukan',
+        title: 'ペットの思い出を一生ものにする5つの習慣',
+      },
       {
         href: '/guide/column/sumaho-shuyaku-5sen',
         title: 'この5年で、スマホ1台に集約された機能5選',

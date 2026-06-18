@@ -24,6 +24,13 @@ export const metadata: Metadata = {
 
 const articles = [
   {
+    href: '/guide/column/pet-omoide-5shukan',
+    category: 'ペットの思い出を残す',
+    title: 'ペットの思い出を一生ものにする5つの習慣',
+    description:
+      'スマホに何百枚——私たちは史上いちばんペットを撮っている飼い主かもしれません。でも「撮る」と「残る」は別の話。共有・二重保管・フォトブック・鳴き声の記録、そして見落とされがちな「鍵の引き継ぎ」まで、思い出を一生ものにする5つの習慣。',
+  },
+  {
     href: '/guide/column/sumaho-shuyaku-5sen',
     category: '時代の変化の答え合わせ',
     title: 'この5年で、スマホ1台に集約された機能5選',

@@ -381,7 +381,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                       デバイスのパスワードを保管
                     </p>
                     <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
-                      STANDARDプラン
+                     有料プラン
                     </span>
                   </div>
                   <p className="mt-0.5 text-xs text-muted-foreground">
@@ -404,7 +404,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   <div className="flex items-baseline gap-2 flex-wrap">
                     <p className="font-medium text-foreground">大切な方を招待</p>
                     <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
-                      STANDARDプラン
+                     有料プラン
                     </span>
                   </div>
                   <p className="mt-0.5 text-xs text-muted-foreground">

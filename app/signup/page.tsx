@@ -58,7 +58,7 @@ export default async function SignupPage({ searchParams }: Props) {
         </div>
 
         <p className="mt-6 text-center text-xs text-slate-500">
-          ※ クレジットカード登録不要 / 30 日後 FREEプランへ自動切替
+          ※ クレジットカード登録不要 / 30 日後無料プランへ自動切替
         </p>
       </main>
       <SiteFooter />

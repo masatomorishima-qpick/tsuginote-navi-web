@@ -248,7 +248,7 @@ export default function PinRegisterForm({ deviceId, deviceName }: Props) {
         } else if (json?.error === 'plan_required') {
           setGeneralError(
             json.detail ??
-              'スマホ・パソコン のパスワード保管機能は STANDARDプランのみご利用いただけます。'
+              'スマホ・パソコン のパスワード保管機能は有料プランのみご利用いただけます。'
           );
         } else {
           setGeneralError(

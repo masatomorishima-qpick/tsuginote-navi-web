@@ -79,7 +79,7 @@ export default function DashboardNew({
         <div className="flex flex-col items-start py-6">
           <div className="min-w-0 w-full">
             <p className="text-2xl font-bold text-gray-900 tracking-tight sm:text-3xl">
-              {isStandard ? 'STANDARDプラン' : 'フリープラン'}
+              {isStandard ? '有料プラン' : '無料プラン'}
             </p>
             {isStandard &&
               (() => {
@@ -130,7 +130,7 @@ export default function DashboardNew({
               onClick={() => router.push('/digital/settings/plan')}
               className="mt-2 text-sm text-emerald-600 font-medium flex-shrink-0"
             >
-              STANDARDプランにアップグレード →
+             有料プランにアップグレード →
             </button>
           ) : (
             <button

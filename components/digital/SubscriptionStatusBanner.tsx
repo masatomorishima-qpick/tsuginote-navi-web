@@ -48,7 +48,7 @@ export default function SubscriptionStatusBanner({
               {formatJpDate(subscription.current_period_end)} で解約予定
             </p>
             <p className="mt-0.5 text-xs leading-relaxed text-amber-800/80">
-              連携先がいないため、期間終了時に FREEプランに切り替わります。
+              連携先がいないため、期間終了時に無料プランに切り替わります。
             </p>
           </div>
         </div>
@@ -80,7 +80,7 @@ export default function SubscriptionStatusBanner({
               {formatJpDate(subscription.current_period_end)} で解約予定
             </p>
             <p className="mt-0.5 text-xs leading-relaxed text-amber-800/80">
-              期間終了後、FREEプランに切り替わります。
+              期間終了後、無料プランに切り替わります。
             </p>
           </div>
         </div>

@@ -53,7 +53,7 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
 
   const hasPin = await deviceHasPin(supabase, user.id, id);
 
-  // STANDARDプランかどうか（PIN 保管機能を表示するか）
+  //有料プランかどうか（PIN 保管機能を表示するか）
   const subscription = await getOwnSubscription(supabase, user.id);
   const canStorePin = PLAN_LIMITS[effectivePlan(subscription)].canStorePin;
 
@@ -112,7 +112,7 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
             <p className="mt-1 text-emerald-900/90">
               {canStorePin
                 ? '次に、このデバイスのパスワードを保管しましょう。下のボタンから登録できます。'
-                : 'デバイス情報の登録が完了しました。STANDARDプランにアップグレードすると、デバイス・パスワードの保管機能もご利用いただけます。'}
+                : 'デバイス情報の登録が完了しました。有料プランにアップグレードすると、デバイス・パスワードの保管機能もご利用いただけます。'}
             </p>
           </div>
         </div>
@@ -147,7 +147,7 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
         </div>
       )}
 
-      {/* PIN 未登録 & FREEプラン：アップグレード誘導 */}
+      {/* PIN 未登録 &無料プラン：アップグレード誘導 */}
       {!hasPin && !canStorePin && (
         <div className="mb-4 flex items-start gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
           <ShieldOff
@@ -155,7 +155,7 @@ export default async function EditDevicePage({ params, searchParams }: Props) {
             aria-hidden="true"
           />
           <p>
-            デバイス・パスワードの保管は STANDARDプラン限定の機能です。
+            デバイス・パスワードの保管は有料プラン限定の機能です。
             <Link
               href="/digital/settings/plan"
               className="ml-1 font-semibold text-emerald-700 hover:underline"

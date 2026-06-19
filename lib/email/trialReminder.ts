@@ -54,11 +54,11 @@ export async function sendTrialWarningEmail(
 
 無料トライアル期間が、あと ${input.daysLeft} 日（${exp} まで）で終了いたします。
 
-引き続き STANDARDプランの機能（スマホ・パソコン のパスワード保管、大切な方への連携アカウント等）をご利用いただくには、クレジットカードのご登録をお願いいたします。
+引き続き有料プランの機能（スマホ・パソコン のパスワード保管、大切な方への連携アカウント等）をご利用いただくには、クレジットカードのご登録をお願いいたします。
 
   ${input.upgradeUrl}
 
-カードを登録されない場合は、トライアル終了後に自動的に FREEプランへ切り替わり、STANDARDプラン限定機能（パスワード保管など）はご利用いただけなくなります。
+カードを登録されない場合は、トライアル終了後に自動的に無料プランへ切り替わり、有料プラン限定機能（パスワード保管など）はご利用いただけなくなります。
 ご登録いただいたデジタル資産情報は失われずに保持されます。
 
 ご不明な点がございましたら、お気軽にお問い合わせください。
@@ -87,7 +87,7 @@ https://tsuginotenavi.jp
       </p>
       <section style="margin:24px 0;padding:16px 20px;background:#fef3c7;border-left:4px solid #f59e0b;border-radius:8px;">
         <p style="margin:0;font-size:13px;line-height:1.7;color:#78350f;">
-          引き続き STANDARDプランの機能（スマホ・パソコン のパスワード保管、大切な方への連携アカウント等）をご利用いただくには、クレジットカードのご登録をお願いいたします。
+          引き続き有料プランの機能（スマホ・パソコン のパスワード保管、大切な方への連携アカウント等）をご利用いただくには、クレジットカードのご登録をお願いいたします。
         </p>
       </section>
 
@@ -99,7 +99,7 @@ https://tsuginotenavi.jp
       </div>
 
       <p style="margin:16px 0 0;font-size:12px;line-height:1.7;color:#64748b;">
-        カードを登録されない場合は、トライアル終了後に自動的に FREEプランへ切り替わり、STANDARDプラン限定機能はご利用いただけなくなります。<strong>ご登録いただいた情報は失われずに保持されます。</strong>
+        カードを登録されない場合は、トライアル終了後に自動的に無料プランへ切り替わり、有料プラン限定機能はご利用いただけなくなります。<strong>ご登録いただいた情報は失われずに保持されます。</strong>
       </p>
     </div>
     <div style="margin-top:24px;text-align:center;font-size:11px;color:#94a3b8;line-height:1.6;">
@@ -143,7 +143,7 @@ export async function sendTrialFinalReminderEmail(
 
   const text = `無料トライアルは明日（${exp}）で終了します。
 
-このままクレジットカードのご登録がないと、トライアル終了とともに次の機能がご利用いただけなくなり、自動的に FREEプランへ切り替わります。
+このままクレジットカードのご登録がないと、トライアル終了とともに次の機能がご利用いただけなくなり、自動的に無料プランへ切り替わります。
 
 ・スマホ・パソコンのパスワード保管
 ・大切な方への連携（あなたにもしものことがあったとき、ご家族へ情報を引き継ぐ仕組み）
@@ -154,7 +154,7 @@ export async function sendTrialFinalReminderEmail(
 
   ${input.upgradeUrl}
 
-※ ご登録いただいたデジタル資産情報は、FREEプランでも失われずに保持されます。いつでも再開できます。
+※ ご登録いただいたデジタル資産情報は、無料プランでも失われずに保持されます。いつでも再開できます。
 
 ──
 つぎの手ナビ デジタル資産
@@ -178,7 +178,7 @@ https://tsuginotenavi.jp
         無料トライアルが <span style="color:#b91c1c;">明日（${escapeHtml(exp)}）</span>で終了します
       </h1>
       <p style="margin:0 0 16px;font-size:14px;line-height:1.8;color:#374151;">
-        このままクレジットカードのご登録がないと、トライアル終了とともに次の機能がご利用いただけなくなり、自動的に FREEプランへ切り替わります。
+        このままクレジットカードのご登録がないと、トライアル終了とともに次の機能がご利用いただけなくなり、自動的に無料プランへ切り替わります。
       </p>
 
       <section style="margin:0 0 20px;padding:16px 20px;background:#fef2f2;border-left:4px solid #ef4444;border-radius:8px;">
@@ -206,7 +206,7 @@ https://tsuginotenavi.jp
       </div>
 
       <p style="margin:16px 0 0;font-size:12px;line-height:1.7;color:#94a3b8;">
-        ※ ご登録いただいたデジタル資産情報は、FREEプランでも失われずに保持されます。いつでも再開できます。
+        ※ ご登録いただいたデジタル資産情報は、無料プランでも失われずに保持されます。いつでも再開できます。
       </p>
     </div>
     <div style="margin-top:24px;text-align:center;font-size:11px;color:#94a3b8;line-height:1.6;">
@@ -240,7 +240,7 @@ export async function sendTrialEndedEmail(
   const text = `つぎの手ナビ デジタル資産 をご利用いただきありがとうございます。
 
 本日（${ended}）をもって、無料トライアル期間が終了いたしました。
-クレジットカードのご登録がございませんでしたので、自動的に FREEプランへ切り替わりました。
+クレジットカードのご登録がございませんでしたので、自動的に無料プランへ切り替わりました。
 
 【ご利用いただけなくなった機能】
 ・スマホ・パソコン のパスワード保管
@@ -252,7 +252,7 @@ export async function sendTrialEndedEmail(
 ・定期リマインダー
 
 ご登録いただいたすべての情報は失われずに保持されています。
-STANDARDプランの再開をご希望の場合は、下記からクレジットカードのご登録をお願いします。
+有料プランの再開をご希望の場合は、下記からクレジットカードのご登録をお願いします。
 
   ${input.upgradeUrl}
 
@@ -276,7 +276,7 @@ https://tsuginotenavi.jp
       </h1>
       <p style="margin:0 0 16px;font-size:14px;line-height:1.7;">
         本日（<b>${escapeHtml(ended)}</b>）をもって、無料トライアル期間が終了いたしました。<br>
-        クレジットカードのご登録がございませんでしたので、自動的に FREEプランへ切り替わりました。
+        クレジットカードのご登録がございませんでしたので、自動的に無料プランへ切り替わりました。
       </p>
 
       <section style="margin:24px 0;padding:16px 20px;background:#fef2f2;border-left:4px solid #ef4444;border-radius:8px;">
@@ -302,13 +302,13 @@ https://tsuginotenavi.jp
 
       <p style="margin:24px 0 0;font-size:13px;line-height:1.7;">
         ご登録いただいたすべての情報は失われずに保持されています。<br>
-        STANDARDプランの再開をご希望の場合は、下記からクレジットカードのご登録をお願いします。
+       有料プランの再開をご希望の場合は、下記からクレジットカードのご登録をお願いします。
       </p>
 
       <div style="margin:24px 0;text-align:center;">
         <a href="${input.upgradeUrl}"
            style="display:inline-block;padding:14px 32px;background:#059669;color:#ffffff;text-decoration:none;border-radius:9999px;font-weight:600;font-size:15px;">
-          STANDARDプランを再開する
+         有料プランを再開する
         </a>
       </div>
     </div>

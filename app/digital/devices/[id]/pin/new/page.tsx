@@ -74,7 +74,7 @@ export default async function NewPinPage({ params }: Props) {
           <PinRegisterForm deviceId={device.id} deviceName={device.device_name} />
         </section>
       ) : (
-        // FREEプラン用：STANDARD アップグレード案内
+        //無料プラン用：STANDARD アップグレード案内
         <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 sm:p-6">
           <div className="flex items-start gap-3">
             <Crown
@@ -83,10 +83,10 @@ export default async function NewPinPage({ params }: Props) {
             />
             <div className="flex-1">
               <h2 className="text-lg font-bold text-emerald-900">
-                スマホ・パソコン のパスワード保管は STANDARDプラン限定の機能です
+                スマホ・パソコン のパスワード保管は有料プラン限定の機能です
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-emerald-900/90">
-                デバイス・パスワードを暗号化して安全に保管する機能は、STANDARDプランでご利用いただけます。
+                デバイス・パスワードを暗号化して安全に保管する機能は、有料プランでご利用いただけます。
                 30 日間の無料トライアルを使い切った方も、アップグレードでいつでも再開できます。
               </p>
               <ul className="mt-4 space-y-1 text-sm text-emerald-900/90">
@@ -100,7 +100,7 @@ export default async function NewPinPage({ params }: Props) {
                   href="/digital/settings/plan"
                   className="inline-flex items-center justify-center gap-1.5 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
                 >
-                  STANDARDプランにアップグレード
+                 有料プランにアップグレード
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
                 <Link

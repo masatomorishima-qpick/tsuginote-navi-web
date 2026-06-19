@@ -11,7 +11,7 @@
  *   - active + 解約予定        : STANDARD（解約予定）+ 期間終了日 + 支払い管理
  *   - canceled                : 同上
  *   - past_due                : STANDARD（支払い確認中）+ 警告 + 支払い管理
- *   - free                    : FREEプラン + 招待で STANDARD 開始の案内
+ *   - free                    :無料プラン + 招待で STANDARD 開始の案内
  */
 
 import type { Metadata } from 'next';
@@ -141,7 +141,7 @@ export default async function SettingsPlanPage({ searchParams }: Props) {
             )}
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isStandard ? 'STANDARDプラン' : 'FREEプラン'}
+            {isStandard ? '有料プラン' : '無料プラン'}
           </p>
           {statusBadge && (
             <p className="mt-1 text-sm text-gray-500">{statusBadge}</p>
@@ -235,7 +235,7 @@ export default async function SettingsPlanPage({ searchParams }: Props) {
               </p>
             )}
             <p className="mt-3 text-xs leading-relaxed text-gray-500">
-              ※ ご登録がない場合は、期間終了後に自動でFREEプランへ切り替わります。
+              ※ ご登録がない場合は、期間終了後に自動で無料プランへ切り替わります。
             </p>
           </section>
         )}
@@ -310,7 +310,7 @@ export default async function SettingsPlanPage({ searchParams }: Props) {
                   {formatDate(subscription.current_period_end)} まで利用可能
                 </p>
                 <p className="mt-1 text-amber-800/90">
-                  期間終了後、自動的に FREEプランに切り替わります。
+                  期間終了後、自動的に無料プランに切り替わります。
                 </p>
               </div>
             </div>
@@ -343,7 +343,7 @@ export default async function SettingsPlanPage({ searchParams }: Props) {
         {isFree && (
           <section className="bg-white rounded-2xl border border-gray-100 p-5">
             <p className="text-sm leading-relaxed text-gray-700">
-              大切な方を招待すると、STANDARDプランが自動で始まります。
+              大切な方を招待すると、有料プランが自動で始まります。
               <br />
               最初の招待から 30 日間は無料でお試しいただけます。
             </p>

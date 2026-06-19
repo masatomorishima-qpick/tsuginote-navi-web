@@ -718,13 +718,13 @@ export default function FamilyInvitePanel({
           title="最後の連携相手を解除しますか？"
           description={[
             `${dialog.recipientName ? `「${dialog.recipientName}」` : 'この方'} は最後の連携相手です。`,
-            '解除すると、現在のご契約期間の終了時に STANDARDプランが終了し、FREEプランに切り替わります。期間中はサービスを引き続きご利用いただけます。',
-            'また、期間中に新しい連携先を招待・承認いただくと、自動的に STANDARDプランを継続できます。',
+            '解除すると、現在のご契約期間の終了時に有料プランが終了し、無料プランに切り替わります。期間中はサービスを引き続きご利用いただけます。',
+            'また、期間中に新しい連携先を招待・承認いただくと、自動的に有料プランを継続できます。',
           ]}
           confirmLabel="解除する"
           cancelLabel="キャンセル"
           variant="warning"
-          requireAcknowledge="現在の期間終了で STANDARDプランが終了することを理解しました"
+          requireAcknowledge="現在の期間終了で有料プランが終了することを理解しました"
           onClose={() => setDialog({ type: 'none' })}
           onConfirm={() => executeRevokeLink(dialog.linkId)}
         />

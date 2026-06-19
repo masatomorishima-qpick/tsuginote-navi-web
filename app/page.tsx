@@ -12,7 +12,7 @@
  *   1. Hero（写真 + コピー + CTA）
  *   2. こんな方におすすめ（4項目）
  *   3. できること（4機能）
- *   4. プラン（無料プラン / 有料プラン）
+ *   4. プラン（無料プラン /有料プラン）
  *   5. ご利用の流れ（5ステップ: 登録 → 整理 → 招待 → 連携 → 完全削除）+ 退会について
  *   6. 数値バンド（中間CTA）
  *   7. 安心・安全へのこだわり（3項目）
@@ -262,7 +262,7 @@ function Audience() {
 // =============================================================================
 function Features() {
   // 2026-05 改訂：機能の羅列ではなく「得られる価値」を 3 つに集約。
-  //   有料プランで提供される主要機能であることを見出しに明示。
+  //  有料プランで提供される主要機能であることを見出しに明示。
   const items = [
     {
       iconSrc: '/images/icons/shield-check.png',
@@ -325,7 +325,7 @@ function Features() {
         </div>
 
         <p className="mt-8 text-center text-sm text-slate-500 sm:text-base">
-          ※ 無料プランでも、デジタル資産の登録と PDF 出力はご利用いただけます。
+          ※無料プランでも、デジタル資産の登録と PDF 出力はご利用いただけます。
         </p>
       </div>
     </section>
@@ -347,7 +347,7 @@ function Plans() {
         </p>
 
         <div className="mt-12 space-y-5 sm:space-y-6">
-          {/* 無料プラン */}
+          {/*無料プラン */}
           <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
             <div className="flex items-baseline justify-between gap-4">
               <h3 className="text-xl font-bold text-slate-900 sm:text-2xl">無料プラン</h3>
@@ -364,14 +364,14 @@ function Plans() {
             </ul>
           </div>
 
-          {/* 有料プラン（共有 ID 単位の従量課金） */}
+          {/*有料プラン（共有 ID 単位の従量課金） */}
           <div className="relative rounded-2xl border-2 border-emerald-500 bg-white p-6 shadow-lg sm:p-8">
             <span className="absolute -top-3 left-6 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white sm:left-8">
               おすすめ
             </span>
             <div className="flex items-baseline justify-between gap-3">
               <h3 className="whitespace-nowrap text-xl font-bold text-slate-900 sm:text-2xl">
-                有料プラン
+               有料プラン
               </h3>
               <p className="whitespace-nowrap text-right">
                 <span className="text-2xl font-bold text-slate-900 sm:text-3xl">¥110</span>

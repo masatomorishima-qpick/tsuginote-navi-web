@@ -168,10 +168,9 @@ function Hero() {
           />
         </div>
 
-        <h1 className="text-3xl font-bold leading-snug tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
-          あなたにもしもがあったら、
-          <br />
-          家族のために何ができる？
+        <h1 className="text-2xl font-bold leading-tight tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
+          <span className="inline-block">あなたにもしもがあったら、</span>
+          <span className="inline-block">家族のために何ができる？</span>
         </h1>
 
         <p className="mx-auto mt-6 max-w-md text-base leading-relaxed text-slate-600 sm:text-lg">
@@ -224,9 +223,9 @@ function Audience() {
         </h2>
 
         <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg">
-          スマホやパソコンの中には、いまや大切な情報がぎっしり。連絡先、写真、お金まわり、契約やサブスク——。もしものとき、それらに
+          スマホやパソコンには、連絡先・写真・お金まわり・契約まで大切な情報がぎっしり。もしものとき、それらに
           <b className="font-bold text-slate-800">家族がたどり着けるのは、あなたが準備していた場合だけ</b>
-          です。そして「もしも」は、年齢にも予定にも関係なく、ある日訪れることがあります。
+          です。
         </p>
 
         <ul className="mt-12 space-y-4">
@@ -268,31 +267,33 @@ function Features() {
     {
       iconSrc: '/images/icons/shield-check.png',
       iconAlt: '盾とチェックマークのアイコン',
-      title: 'もしものとき、大切な方へ情報を確実に連携',
+      title: '大切な方へ情報を確実に連携',
       body:
-        'ご逝去の事実を運営が確認し、14 日間の異議申立期間を経たうえで、登録された情報をご指定の連携先（最大 10 名）へ連携します。',
+        'ご逝去を運営が確認し、14 日間の異議申立期間を経て、登録情報をご指定の連携先（最大 10 名）へ連携します。',
     },
     {
       iconSrc: '/images/icons/password.png',
       iconAlt: '盾と鍵のアイコン',
-      title: 'スマホ・パソコン のパスワードも安全に引き継げる',
+      title: 'スマホ・パソコンのパスワードも安全に引き継ぎ',
       body:
-        '端末内で暗号化してから保管されるため、運営にもデータベースにも平文では見えません。生前はあなたのマスターコードで保護され、もしものときは連携先が「連携の合言葉」で取り出せます。',
+        '端末内で暗号化して保管するため、運営にも平文では見えません。生前はあなたのマスターコードで守られ、連携先は「連携の合言葉」でのみ受け取れます。',
     },
     {
       iconSrc: '/images/icons/wishes.png',
       iconAlt: '封筒とハートのアイコン',
-      title: '「どうしてほしいか」もまとめて伝えられる',
+      title: '「どうしてほしいか」も伝えられる',
       body:
-        '解約してほしい・引き継いでほしい・追悼にしたい ── 各サービスごとに、生前のあなたの意思を残せます。',
+        '解約・引き継ぎ・追悼 ── サービスごとに、あなたの意思を残せます。',
     },
   ];
 
   return (
     <section className="bg-emerald-50/50 px-5 py-20 sm:px-8 sm:py-24">
       <div className="mx-auto max-w-3xl">
-        <h2 className="text-center text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
-          もしもの安心を、3 つのかたちで。
+        <h2 className="text-center text-2xl font-bold leading-snug text-slate-900 sm:text-3xl md:text-4xl">
+          もしもの安心を、
+          <br />
+          3 つのかたちで。
           <span className="mt-2 block text-sm font-medium text-slate-500 sm:text-base md:text-lg">
             （有料プラン）
           </span>
@@ -341,10 +342,8 @@ function Plans() {
         <h2 className="text-center text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
           プラン
         </h2>
-        <p className="mx-auto mt-4 max-w-xl text-center text-base text-slate-600 sm:text-lg">
-          初回登録から 30 日間、有料プランを無料でお試し。
-          <br className="sm:hidden" />
-          その後は無料プランで続けてご利用いただけます。
+        <p className="mx-auto mt-4 max-w-xl text-center text-base leading-relaxed text-slate-600 sm:text-lg">
+          ※ 登録は無料。30 日間の無料お試し後、有料プランの登録がなければ、自動で無料プランに切り替わります。
         </p>
 
         <div className="mt-12 space-y-5 sm:space-y-6">
@@ -359,8 +358,9 @@ function Plans() {
               <PlanRow ok>デジタル資産・サービスの登録（無制限）</PlanRow>
               <PlanRow ok>大切な方に共有（PDF 出力）</PlanRow>
               <PlanRow ok>定期リマインド</PlanRow>
-              <PlanRow>スマホ・パソコン のパスワード保管</PlanRow>
-              <PlanRow>連携アカウントでの常時共有</PlanRow>
+              <PlanRow>スマホ・パソコンのパスワード保管</PlanRow>
+              <PlanRow>大切な方への連携アカウント（最大 10 名）</PlanRow>
+              <PlanRow>操作履歴</PlanRow>
             </ul>
           </div>
 
@@ -383,10 +383,12 @@ function Plans() {
             </p>
 
             <ul className="mt-6 space-y-3 text-base text-slate-700 sm:text-lg">
-              <PlanRow ok strong>デジタル資産・サービスの登録（無制限）</PlanRow>
-              <PlanRow ok strong>スマホ・パソコン のパスワード保管</PlanRow>
+              <PlanRow ok>デジタル資産・サービスの登録（無制限）</PlanRow>
+              <PlanRow ok>大切な方に共有（PDF 出力）</PlanRow>
+              <PlanRow ok>定期リマインド</PlanRow>
+              <PlanRow ok strong>スマホ・パソコンのパスワード保管</PlanRow>
               <PlanRow ok strong>大切な方への連携アカウント（最大 10 名）</PlanRow>
-              <PlanRow ok>PDF 出力 / 定期リマインド / 操作履歴</PlanRow>
+              <PlanRow ok strong>操作履歴</PlanRow>
             </ul>
           </div>
         </div>

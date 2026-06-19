@@ -12,7 +12,7 @@
  *   1. Hero（写真 + コピー + CTA）
  *   2. こんな方におすすめ（4項目）
  *   3. できること（4機能）
- *   4. プラン（FREE / STANDARD）
+ *   4. プラン（無料プラン / 有料プラン）
  *   5. ご利用の流れ（5ステップ: 登録 → 整理 → 招待 → 連携 → 完全削除）+ 退会について
  *   6. 数値バンド（中間CTA）
  *   7. 安心・安全へのこだわり（3項目）
@@ -40,7 +40,7 @@ import {
 export const metadata: Metadata = {
   title: 'つぎの手ナビ デジタル資産｜大切な方へのデジタル引き継ぎ',
   description:
-    'スマホ・パソコン のパスワードや、ご利用中のサブスク・SNS を大切な方に引き継ぐ準備ができるサービスです。メール登録だけですぐに始められ、FREEプランはずっと無料です。',
+    'スマホ・パソコン のパスワードや、ご利用中のサブスク・SNS を大切な方に引き継ぐ準備ができるサービスです。メール登録だけですぐに始められ、無料プランはずっと無料です。',
 };
 
 const SITE_URL = 'https://www.tsuginotenavi.jp';
@@ -55,13 +55,13 @@ const serviceJsonLd = {
   serviceType: 'デジタル資産の整理・引き継ぎサービス',
   url: SITE_URL,
   description:
-    'スマホ・パソコンのパスワードや、利用中のサブスク・SNS・ネット銀行などのデジタル資産を整理し、もしものときに選んだ大切な方へ届ける準備ができるサービス。FREEプラン（登録・PDF出力・定期リマインド）は無料。',
+    'スマホ・パソコンのパスワードや、利用中のサブスク・SNS・ネット銀行などのデジタル資産を整理し、もしものときに選んだ大切な方へ届ける準備ができるサービス。無料プラン（登録・PDF出力・定期リマインド）は無料。',
   provider: { '@id': `${SITE_URL}/#organization` },
   areaServed: { '@type': 'Country', name: '日本' },
   offers: [
     {
       '@type': 'Offer',
-      name: 'FREE',
+      name: '無料プラン',
       price: '0',
       priceCurrency: 'JPY',
       description:
@@ -69,7 +69,7 @@ const serviceJsonLd = {
     },
     {
       '@type': 'Offer',
-      name: 'STANDARD',
+      name: '有料プラン',
       priceCurrency: 'JPY',
       description:
         '初回登録から30日間無料でお試し。スマホ・パソコンのパスワード保管、連携アカウント（最大10名）など。料金は連携するお一人につき月額¥110（税込）。',
@@ -169,17 +169,13 @@ function Hero() {
         </div>
 
         <h1 className="text-3xl font-bold leading-snug tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
-          もしもの時、
+          あなたにもしもがあったら、
           <br />
-          大切な方が困らない準備を
+          家族のために何ができる？
         </h1>
 
         <p className="mx-auto mt-6 max-w-md text-base leading-relaxed text-slate-600 sm:text-lg">
-          スマホ・パソコン のパスワードと、
-          <br />
-          デジタル情報の引き継ぎを、
-          <br className="sm:hidden" />
-          いまから整える場所
+          今できるのは家族を&ldquo;困らせない準備&rdquo;。スマホ・パソコンのパスワードや大切なデジタル情報を、生前は誰にも見せず、もしもの時だけ大切な人へ。
         </p>
 
         <div className="mt-10 flex justify-center">
@@ -191,8 +187,8 @@ function Hero() {
           </Link>
         </div>
 
-        <p className="mt-4 text-sm text-slate-500 sm:text-base">
-          ※ メール登録だけで今すぐ始められます（FREEプランはずっと無料）
+        <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-slate-500 sm:text-base">
+          ※ 登録は無料。30 日間の無料お試し後、有料プランの登録がなければ、自動で無料プランに切り替わります。
         </p>
       </div>
     </section>
@@ -200,36 +196,63 @@ function Hero() {
 }
 
 // =============================================================================
-// 2. こんな方におすすめ
+// 2. 自分ごと化セクション（旧「こんな方におすすめ」を作り直し）
 // =============================================================================
 function Audience() {
-  const items = [
-    '親の相続でスマートフォン・PC のパスワードに困った経験がある',
-    '健康診断や入院で「もしも」を意識したことがある',
-    '退職や老後を見据えたデジタル資産の整理に興味がある',
-    '大切な方にデジタル情報を残しておきたい',
+  const points = [
+    {
+      title: 'スマホ・パソコンが開けないと、家族は手が出せない',
+      body: 'いちばん困るのは、本体のパスワードが分からないこと。',
+    },
+    {
+      title: 'もしもは、ある日突然かもしれない',
+      body: '年齢に関係なく、備える時間が予告なく終わることもあります。',
+    },
+    {
+      title: 'だから、元気な今こそ',
+      body: '必要なのは重い手続きではなく、数分の準備。',
+    },
   ];
 
   return (
     <section className="px-5 py-20 sm:px-8 sm:py-24">
       <div className="mx-auto max-w-2xl">
-        <h2 className="text-center text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
-          こんな方におすすめ
+        <h2 className="text-center text-2xl font-bold leading-snug text-slate-900 sm:text-3xl md:text-4xl">
+          その「もしも」は、
+          <br className="sm:hidden" />
+          いつ訪れるか分かりません。
         </h2>
 
+        <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg">
+          スマホやパソコンの中には、いまや大切な情報がぎっしり。連絡先、写真、お金まわり、契約やサブスク——。もしものとき、それらに
+          <b className="font-bold text-slate-800">家族がたどり着けるのは、あなたが準備していた場合だけ</b>
+          です。そして「もしも」は、年齢にも予定にも関係なく、ある日訪れることがあります。
+        </p>
+
         <ul className="mt-12 space-y-4">
-          {items.map((it, i) => (
+          {points.map((p, i) => (
             <li
               key={i}
-              className="flex items-center gap-4 rounded-2xl bg-emerald-50 px-6 py-5 sm:px-8 sm:py-6"
+              className="flex items-start gap-4 rounded-2xl bg-emerald-50 px-6 py-5 sm:px-8 sm:py-6"
             >
               <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-600 sm:h-10 sm:w-10">
                 <Check className="h-4 w-4 text-white sm:h-5 sm:w-5" aria-hidden="true" />
               </span>
-              <span className="text-base font-medium text-slate-800 sm:text-lg">{it}</span>
+              <span className="text-base text-slate-800 sm:text-lg">
+                <b className="font-bold">{p.title}</b>
+                <span className="mt-1 block text-sm text-slate-600 sm:text-base">
+                  {p.body}
+                </span>
+              </span>
             </li>
           ))}
         </ul>
+
+        <p className="mx-auto mt-10 max-w-xl text-center text-base font-medium leading-relaxed text-slate-700 sm:text-lg">
+          あなたの「もしも」に備えることは、
+          <br className="sm:hidden" />
+          残された人への、いちばんやさしい思いやりです。
+        </p>
       </div>
     </section>
   );
@@ -240,7 +263,7 @@ function Audience() {
 // =============================================================================
 function Features() {
   // 2026-05 改訂：機能の羅列ではなく「得られる価値」を 3 つに集約。
-  //   STANDARDプランで提供される主要機能であることを見出しに明示。
+  //   有料プランで提供される主要機能であることを見出しに明示。
   const items = [
     {
       iconSrc: '/images/icons/shield-check.png',
@@ -269,14 +292,11 @@ function Features() {
     <section className="bg-emerald-50/50 px-5 py-20 sm:px-8 sm:py-24">
       <div className="mx-auto max-w-3xl">
         <h2 className="text-center text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
-          できること
+          もしもの安心を、3 つのかたちで。
           <span className="mt-2 block text-sm font-medium text-slate-500 sm:text-base md:text-lg">
-            （STANDARDプラン）
+            （有料プラン）
           </span>
         </h2>
-        <p className="mt-4 text-center text-base text-slate-600 sm:text-lg">
-          もしもの安心を、3 つのかたちで。
-        </p>
 
         <div className="mt-12 space-y-5">
           {items.map((it, i) => (
@@ -304,7 +324,7 @@ function Features() {
         </div>
 
         <p className="mt-8 text-center text-sm text-slate-500 sm:text-base">
-          ※ FREEプランでも、デジタル資産の登録と PDF 出力はご利用いただけます。
+          ※ 無料プランでも、デジタル資産の登録と PDF 出力はご利用いただけます。
         </p>
       </div>
     </section>
@@ -322,16 +342,16 @@ function Plans() {
           プラン
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-center text-base text-slate-600 sm:text-lg">
-          初回登録から 30 日間、STANDARDプランを無料でお試し。
+          初回登録から 30 日間、有料プランを無料でお試し。
           <br className="sm:hidden" />
-          その後は FREEプランで続けてご利用いただけます。
+          その後は無料プランで続けてご利用いただけます。
         </p>
 
         <div className="mt-12 space-y-5 sm:space-y-6">
-          {/* FREE */}
+          {/* 無料プラン */}
           <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
             <div className="flex items-baseline justify-between gap-4">
-              <h3 className="text-xl font-bold text-slate-900 sm:text-2xl">FREE</h3>
+              <h3 className="text-xl font-bold text-slate-900 sm:text-2xl">無料プラン</h3>
               <p className="text-2xl font-bold text-slate-900 sm:text-3xl">¥0</p>
             </div>
 
@@ -344,13 +364,13 @@ function Plans() {
             </ul>
           </div>
 
-          {/* STANDARD（新モデル：共有 ID 単位の従量課金） */}
+          {/* 有料プラン（共有 ID 単位の従量課金） */}
           <div className="relative rounded-2xl border-2 border-emerald-500 bg-white p-6 shadow-lg sm:p-8">
             <span className="absolute -top-3 left-6 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white sm:left-8">
               おすすめ
             </span>
             <div className="flex items-baseline justify-between gap-4">
-              <h3 className="text-xl font-bold text-slate-900 sm:text-2xl">STANDARD</h3>
+              <h3 className="text-xl font-bold text-slate-900 sm:text-2xl">有料プラン</h3>
               <p className="text-right">
                 <span className="text-2xl font-bold text-slate-900 sm:text-3xl">¥110</span>
                 <span className="ml-1 text-sm font-normal text-slate-500">
@@ -359,7 +379,7 @@ function Plans() {
               </p>
             </div>
             <p className="mt-2 text-xs text-slate-500 sm:text-sm">
-              例：妻に共有 = ¥110/月、妻+お子様 2 人 = ¥330/月
+              例：妻に連携 = ¥110/月、妻+お子様 2 人 = ¥330/月
             </p>
 
             <ul className="mt-6 space-y-3 text-base text-slate-700 sm:text-lg">
@@ -546,9 +566,9 @@ function StatsCTA() {
     <section className="bg-emerald-700 px-5 py-16 text-white sm:px-8 sm:py-20">
       <div className="mx-auto max-w-3xl text-center">
         <h2 className="text-2xl font-bold leading-snug sm:text-3xl md:text-4xl">
-          大切な方の死後、
+          大切な方を亡くした後、
           <br className="sm:hidden" />
-          困った経験のある方は
+          デジタル関連で困った経験のある人は
         </h2>
 
         <div className="mx-auto mt-8 max-w-md rounded-2xl bg-emerald-600/40 px-8 py-8 sm:py-10">
@@ -556,7 +576,7 @@ function StatsCTA() {
           <p className="mt-3 text-sm text-emerald-50 sm:text-base">
             最多の困りごとは
             <br />
-            <b className="text-white">「スマホ・パソコン のパスワード不明」</b>
+            <b className="text-white">「スマホ・パソコンのパスワードが分からない」</b>
           </p>
           <p className="mt-2 text-xs text-emerald-100 sm:text-sm">
             2026 年 BlueAdventures 調べ
@@ -564,9 +584,9 @@ function StatsCTA() {
         </div>
 
         <p className="mt-8 text-base leading-relaxed text-emerald-50 sm:text-lg">
-          つぎの手ナビなら、スマホ・パソコン のパスワードを
+          あなたの家族を、この 60.9% にしないために。
           <br className="sm:hidden" />
-          安全に保管し、必要なときに大切な方に届けられます。
+          スマホ・パソコンのパスワードを安全に保管し、必要なときだけ大切な人へ届けられます。
         </p>
 
         <div className="mt-10 flex justify-center">
@@ -590,17 +610,17 @@ function Trust() {
     {
       title: '見られるのはご本人だけ',
       body:
-        'スマホ・パソコン のパスワードは、ご本人が決めた合言葉（マスターコード）で守られており、ご本人とご指定の連携先以外は見ることができません。生前の情報共有はあなた自身で決められます。（生前はデジタル資産のみ共有可能です）',
+        'スマホ・パソコンのパスワードは、ご本人が決めた合言葉（マスターコード）で守られ、ご本人とご指定の連携先以外は見られません。',
     },
     {
       title: '強いセキュリティで大切に保管',
       body:
-        'あなたのパスワードは、お使いの端末（スマホ・パソコン）の中で「強いセキュリティ」をかけてから保管されます。万が一情報が漏れても、そのセキュリティを解除するマスターコードがないと中身を見ることはできません。',
+        '端末内で AES-256 暗号化してから保管します。マスターコードがなければ中身は見られません。',
     },
     {
       title: '1 年後の完全削除',
       body:
-        'もしものときの情報連携を終えた後、お預かりしたすべての情報を 1 年後に完全削除します。最後まで責任を持って守ります。',
+        'もしものときの連携を終えた後、すべての情報を 1 年後に完全削除します。',
     },
   ];
 
@@ -656,9 +676,9 @@ function FAQ() {
       a: 'マスターコードは当社でも復元できない設計です。お客様自身で安全に保管をお願いします。万一忘れた場合は、保存したパスワードを削除して、新しいマスターコードで再登録していただきます。',
     },
     {
-      q: 'STANDARDプランからFREEプランに戻したら、サービスの登録情報はどうなりますか？',
+      q: '有料プランから無料プランに戻したら、サービスの登録情報はどうなりますか？',
       a:
-        'すべての情報は保持されます。デジタル資産・サービスの登録はFREEプランでも無制限にご利用いただけます。STANDARDプラン限定の機能（スマホ・パソコン のパスワード保管 等）のみご利用いただけなくなりますが、登録した資産情報は引き続き閲覧・編集できます。',
+        'すべての情報は保持されます。デジタル資産・サービスの登録は無料プランでも無制限にご利用いただけます。有料プラン限定の機能（スマホ・パソコンのパスワード保管 等）のみご利用いただけなくなりますが、登録した資産情報は引き続き閲覧・編集できます。',
     },
     {
       q: 'どんな決済方法に対応していますか？',
@@ -737,10 +757,14 @@ function FinalCTA() {
         </div>
 
         <h2 className="text-2xl font-bold leading-snug text-slate-900 sm:text-3xl md:text-4xl">
-          大切な方への、
+          あなたにできる、
           <br className="sm:hidden" />
-          いちばん最初の贈り物を
+          家族への思いやりを。
         </h2>
+
+        <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg">
+          もしものときの「どこに何があるか分からない」を、いまのうちに無くしておく。それが、大切な人への最初の贈り物になります。
+        </p>
 
         <div className="mt-10 flex justify-center">
           <Link

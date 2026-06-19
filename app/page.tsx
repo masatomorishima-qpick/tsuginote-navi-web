@@ -342,9 +342,6 @@ function Plans() {
         <h2 className="text-center text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
           プラン
         </h2>
-        <p className="mx-auto mt-4 max-w-xl text-center text-base leading-relaxed text-slate-600 sm:text-lg">
-          ※ 登録は無料。30 日間の無料お試し後、有料プランの登録がなければ、自動で無料プランに切り替わります。
-        </p>
 
         <div className="mt-12 space-y-5 sm:space-y-6">
           {/*無料プラン */}
@@ -394,6 +391,21 @@ function Plans() {
             </ul>
           </div>
         </div>
+
+        {/* プラン直下の会員登録 CTA（離脱前の主要導線） */}
+        <div className="mt-10 flex justify-center">
+          <Link
+            href="/signup?next=/digital"
+            className="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-8 py-5 text-lg font-bold text-white shadow-lg transition hover:scale-[1.02] hover:bg-emerald-700 sm:w-auto sm:text-xl"
+          >
+            無料ではじめる
+            <ArrowRight className="h-5 w-5" aria-hidden="true" />
+          </Link>
+        </div>
+
+        <p className="mt-4 text-center text-sm text-slate-500 sm:text-base">
+          ※ 初回登録から 30 日間は有料プランを無料でお試し。
+        </p>
 
         {/* PDF 内容に関する補足 */}
         <p className="mx-auto mt-6 max-w-xl text-center text-xs leading-relaxed text-slate-500 sm:text-sm">

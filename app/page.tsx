@@ -367,7 +367,6 @@ function Plans() {
               <PlanRow ok strong>スマホ・パソコン のパスワード保管</PlanRow>
               <PlanRow ok strong>大切な方への連携アカウント（最大 10 名）</PlanRow>
               <PlanRow ok>PDF 出力 / 定期リマインド / 操作履歴</PlanRow>
-              <PlanRow ok>見守り通知（後日リリース）</PlanRow>
             </ul>
           </div>
         </div>

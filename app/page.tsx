@@ -369,17 +369,19 @@ function Plans() {
             <span className="absolute -top-3 left-6 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white sm:left-8">
               おすすめ
             </span>
-            <div className="flex items-baseline justify-between gap-4">
-              <h3 className="text-xl font-bold text-slate-900 sm:text-2xl">有料プラン</h3>
-              <p className="text-right">
+            <div className="flex items-baseline justify-between gap-3">
+              <h3 className="whitespace-nowrap text-xl font-bold text-slate-900 sm:text-2xl">
+                有料プラン
+              </h3>
+              <p className="whitespace-nowrap text-right">
                 <span className="text-2xl font-bold text-slate-900 sm:text-3xl">¥110</span>
-                <span className="ml-1 text-sm font-normal text-slate-500">
-                  / 月（税込）/ お一人
-                </span>
+                <span className="ml-1 text-sm font-normal text-slate-500">/ 月</span>
               </p>
             </div>
-            <p className="mt-2 text-xs text-slate-500 sm:text-sm">
-              例：妻に連携 = ¥110/月、妻+お子様 2 人 = ¥330/月
+            <p className="mt-2 text-xs leading-relaxed text-slate-500 sm:text-sm">
+              税込・連携するお一人につき。
+              <br className="sm:hidden" />
+              例：妻に連携 = ¥110/月、妻＋お子様 2 人 = ¥330/月
             </p>
 
             <ul className="mt-6 space-y-3 text-base text-slate-700 sm:text-lg">

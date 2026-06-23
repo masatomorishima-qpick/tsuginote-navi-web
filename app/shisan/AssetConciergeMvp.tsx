@@ -20,7 +20,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 /* ===== 定数 ===== */
 const RET_AGE = 65;
 const REFI_BASE = 0.7; // 借り換え試算の内部基準金利(%)・画面に明示・手動更新可
-const KEY = "shisan_loan_mvp_v1";
+// v2: 入力単位を円に統一（2026-06-23）。旧 v1 の万円キャッシュを誤読しないよう改番。
+const KEY = "shisan_loan_mvp_v2";
 const EDU_PLANS = { kokukou: 400, shibun: 550, shiri: 700 } as const; // 万円・文科省データ等を典拠とする目安
 type EduPlan = keyof typeof EDU_PLANS;
 
@@ -133,7 +134,7 @@ const chip = "px-3 py-1.5 rounded-full text-sm font-semibold border transition";
 export default function AssetConciergeMvp() {
   // MVPは入力フォームから開始（入口フック=画面0は重複のためスキップ。コードは将来のA/Bテスト用に残置）
   const [screen, setScreen] = useState<"hook" | "input" | "dash" | "exit">("input");
-  const [form, setForm] = useState<Record<string, string>>({ target: "2000", r: "3", eduPlan: "shibun", mType: "変動" });
+  const [form, setForm] = useState<Record<string, string>>({ target: "20000000", r: "3", eduPlan: "shibun", mType: "変動" });
   const [hasMortgage, setHasMortgage] = useState(true);
   const [childCount, setChildCount] = useState(0);
   const [childAges, setChildAges] = useState<string[]>([]);
@@ -195,6 +196,14 @@ export default function AssetConciergeMvp() {
   };
   const num = (k: string) => parseFloat(form[k]) || 0;
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  // 金額入力用：内部は数字のみ（カンマ無し）で保持し、表示時にカンマ区切りを付ける。
+  // type="number" はカンマ表示できないため、金額欄は type="text" + inputMode="numeric" にする。
+  const comma = (v?: string) => {
+    const digits = (v ?? "").replace(/[^\d]/g, "");
+    return digits === "" ? "" : Number(digits).toLocaleString("ja-JP");
+  };
+  const setNum = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((f) => ({ ...f, [k]: e.target.value.replace(/[^\d]/g, "") }));
 
   /* 子の人数→年齢入力欄 */
   const onChildCount = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -249,11 +258,11 @@ export default function AssetConciergeMvp() {
     const r = inputs.r / 100;
     const i = inputs.mRate / 100;
     const S = inputs.surplus;                 // 毎月の余力
-    const assetsYen = inputs.assets * 10000;
+    const assetsYen = inputs.assets;          // 円入力（2026-06-23 単位を円に統一）
     const livingTarget = inputs.living * 6;   // 生活防衛資金の目安
 
     // ブロック1：毎月生まれたゆとり（借換で手取り純増。＋のみ）
-    const refi = inputs.hasMortgage ? refinance(inputs.mBal * 10000, inputs.mRate, inputs.mYears) : null;
+    const refi = inputs.hasMortgage ? refinance(inputs.mBal, inputs.mRate, inputs.mYears) : null;
     const yutori = decisions.refi?.choice === "進める" && refi ? Math.round(refi.dMonthly) : 0;
 
     // ブロック2：毎月の余力の使い道（優先カスケードで自動推定・符号なし配置）
@@ -291,7 +300,7 @@ export default function AssetConciergeMvp() {
       grow(toushi, r) +
       grow(kuriage, i) +
       (bei + edu + mihai) * 12 * n;
-    const achieve = Math.min(999, Math.round((future / (inputs.target * 10000)) * 100));
+    const achieve = Math.min(999, Math.round((future / inputs.target) * 100));
 
     // 教育費（＋備え）で余力を使い切り、繰上げ/投資・未配分が0＝トレードオフが顕在化した状態
     const eduCrowdsOut = edu > 0 && kuriage === 0 && toushi === 0 && mihai === 0;
@@ -364,12 +373,12 @@ export default function AssetConciergeMvp() {
         <div className={card}>
           <div className="flex gap-2.5">
             <div className="flex-1"><label className={label}>年齢<input type="number" className={inputCls} value={form.age ?? ""} onChange={set("age")} placeholder="42" /></label></div>
-            <div className="flex-1"><label className={label}>額面年収 <span className={hint}>万円</span><input type="number" className={inputCls} value={form.income ?? ""} onChange={set("income")} placeholder="700" /></label></div>
+            <div className="flex-1"><label className={label}>額面年収 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.income)} onChange={setNum("income")} placeholder="7,000,000" /></label></div>
           </div>
-          <label className={label}>金融資産（ざっくり） <span className={hint}>万円・現預金＋投資</span><input type="number" className={inputCls} value={form.assets ?? ""} onChange={set("assets")} placeholder="1000" /></label>
+          <label className={label}>金融資産（ざっくり） <span className={hint}>円・現預金＋投資</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.assets)} onChange={setNum("assets")} placeholder="10,000,000" /></label>
           <div className="flex gap-2.5">
-            <div className="flex-1"><label className={label}>毎月の投資・貯蓄余力 <span className={hint}>円</span><input type="number" className={inputCls} value={form.surplus ?? ""} onChange={set("surplus")} placeholder="60000" /></label></div>
-            <div className="flex-1"><label className={label}>毎月の生活費 <span className={hint}>円</span><input type="number" className={inputCls} value={form.living ?? ""} onChange={set("living")} placeholder="250000" /></label></div>
+            <div className="flex-1"><label className={label}>毎月の投資・貯蓄余力 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.surplus)} onChange={setNum("surplus")} placeholder="60,000" /></label></div>
+            <div className="flex-1"><label className={label}>毎月の生活費 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.living)} onChange={setNum("living")} placeholder="250,000" /></label></div>
           </div>
         </div>
 
@@ -381,9 +390,9 @@ export default function AssetConciergeMvp() {
           {hasMortgage && (
             <>
               <div className="flex gap-2.5 mt-1">
-                <div className="flex-1"><label className={label}>残高 <span className={hint}>万円</span><input type="number" className={inputCls} value={form.mBal ?? ""} onChange={set("mBal")} placeholder="3000" /></label></div>
-                <div className="flex-1"><label className={label}>残年数<input type="number" className={inputCls} value={form.mYears ?? ""} onChange={set("mYears")} placeholder="28" /></label></div>
-                <div className="flex-1"><label className={label}>金利 <span className={hint}>%</span><input type="number" step="0.01" className={inputCls} value={form.mRate ?? ""} onChange={set("mRate")} placeholder="1.0" /></label></div>
+                <div className="flex-[2]"><label className={label}>残高 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.mBal)} onChange={setNum("mBal")} placeholder="30,000,000" /></label></div>
+                <div className="w-[72px] flex-shrink-0"><label className={label}>残年数<input type="number" className={inputCls} value={form.mYears ?? ""} onChange={set("mYears")} placeholder="28" /></label></div>
+                <div className="w-[72px] flex-shrink-0"><label className={label}>金利 <span className={hint}>%</span><input type="number" step="0.01" className={inputCls} value={form.mRate ?? ""} onChange={set("mRate")} placeholder="1.0" /></label></div>
               </div>
               <div className="flex gap-2 mt-2">
                 {["変動", "固定"].map((t) => (
@@ -411,7 +420,7 @@ export default function AssetConciergeMvp() {
         </div>
 
         <div className={card}>
-          <label className={label}>65歳での目標額 <span className={hint}>万円・変更可</span><input type="number" className={inputCls} value={form.target ?? "2000"} onChange={set("target")} /></label>
+          <label className={label}>65歳での目標額 <span className={hint}>円・変更可</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.target)} onChange={setNum("target")} placeholder="20,000,000" /></label>
         </div>
 
         <button className={btn} onClick={submit}>診断する →</button>
@@ -615,11 +624,11 @@ function BucketPanel({ id, inputs, n, onDecide, onSetR }: { id: BucketId; inputs
   }
 
   if (id === "refi") {
-    const refi = refinance(inputs.mBal * 10000, inputs.mRate, inputs.mYears);
+    const refi = refinance(inputs.mBal, inputs.mRate, inputs.mYears);
     return (<>
       <div className={box}>
         <div className="text-[11px] text-slate-500 mb-1">この試算は基準金利 {REFI_BASE}% を前提にしています（内部目安）。</div>
-        現在 <b>{inputs.mRate}%</b> → 基準 <b>{REFI_BASE}%</b> に借り換えた場合（残高¥{man(inputs.mBal * 10000)}万・残{inputs.mYears}年）：<br />
+        現在 <b>{inputs.mRate}%</b> → 基準 <b>{REFI_BASE}%</b> に借り換えた場合（残高¥{man(inputs.mBal)}万・残{inputs.mYears}年）：<br />
         {refi && refi.dMonthly > 0 ? (<>
           ・月々の返済：<b>¥{yen(refi.dMonthly)}/月 減</b><br />
           ・総支払利息：<b>約¥{man(refi.dInterest)}万 減</b><br />
@@ -636,7 +645,7 @@ function BucketPanel({ id, inputs, n, onDecide, onSetR }: { id: BucketId; inputs
 
   if (id === "prepay") {
     const i = inputs.mRate, r = inputs.r;
-    const comp = prepayCompression(inputs.mBal * 10000, inputs.mRate, inputs.mYears, inputs.surplus * 12);
+    const comp = prepayCompression(inputs.mBal, inputs.mRate, inputs.mYears, inputs.surplus * 12);
     const invFuture = inputs.surplus * 12 * annFactor(n, r / 100);
     return (<>
       <div className={box}>

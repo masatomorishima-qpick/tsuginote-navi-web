@@ -18,7 +18,6 @@ function SiteHeader() {
       <div className="mx-auto flex max-w-2xl items-center px-4 py-3">
         <div className="flex min-w-0 items-baseline gap-1.5 sm:gap-2">
           <span className="whitespace-nowrap text-base font-bold text-slate-900 sm:text-lg">つぎの手ナビ</span>
-          <span className="hidden whitespace-nowrap text-xs text-slate-500 sm:inline sm:text-sm">デジタル資産</span>
         </div>
       </div>
     </header>

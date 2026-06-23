@@ -1,0 +1,689 @@
+"use client";
+
+/**
+ * 住宅ローン最適配分コンシェルジュ MVP（テストLP・確定版設計に準拠）
+ * 設計：ダッシュボード設計_住宅ローン最適配分_確定版_20260622.md
+ *
+ * 思想：システムは「あなたの配分が正しいか」を判定しない。
+ *      「自分の数字を見た上で、各論点について意思決定を完了したか」を測る（完了率モデル）。
+ * - 主役メーター＝意思決定の完了スコア（該当バケツのみ・各バケツ0/1・「しない」も完了）。
+ * - 補助メーター＝改善額（"事実の結果"のみ。推奨にしない。教育費は載せない）。
+ * - 中立性：助言しない／商品名を出さない／繰上げvs投資は両論併記・断定しない／
+ *           想定リターンrはユーザーが置く／借換の内部基準金利を画面明示／A層は別出口。
+ * - 計測：GA4（既存 G-YOGL1PWXZH）＋Clarity継承。再訪はlocalStorage＋GA4クライアントID。
+ * - 配色：つぎの手ナビ本体に合わせた emerald＋slate。
+ * - 金利変動シナリオは次フェーズ（rを変数化しておき後付け可能）。
+ */
+
+import { useEffect, useMemo, useRef, useState } from "react";
+
+/* ===== 定数 ===== */
+const RET_AGE = 65;
+const REFI_BASE = 0.7; // 借り換え試算の内部基準金利(%)・画面に明示・手動更新可
+const KEY = "shisan_loan_mvp_v1";
+const EDU_PLANS = { kokukou: 400, shibun: 550, shiri: 700 } as const; // 万円・文科省データ等を典拠とする目安
+type EduPlan = keyof typeof EDU_PLANS;
+
+/* ===== 型 ===== */
+interface Inputs {
+  age: number; income: number; assets: number;
+  surplus: number;   // 毎月の投資・貯蓄余力（円）
+  living: number;    // 毎月の生活費ざっくり（円）
+  hasMortgage: boolean; mBal: number; mYears: number; mRate: number; mType: string;
+  childAges: number[];
+  eduPlan: EduPlan;
+  target: number;    // 65歳での目標額（万円）
+  r: number;         // 想定リターン（%）ユーザーが置く
+}
+type BucketId = "liq" | "edu" | "refi" | "prepay" | "nisa";
+interface Decision { choice: string; }
+interface Store {
+  inputs: Inputs | null;
+  decisions: Partial<Record<BucketId, Decision>>;
+  firstVisit: number;
+  lastVisit: number | null;
+}
+
+// 注：window.gtag の型は lib/analytics/ga4.ts のグローバル宣言を使う
+// （ここで再宣言すると型不一致 TS2717 になるため宣言しない）。
+declare global {
+  interface Window {
+    clarity?: (...args: unknown[]) => void;
+  }
+}
+
+/* ===== 計算 ===== */
+const yen = (n: number) => Math.round(n).toLocaleString("ja-JP");
+const man = (n: number) => Math.round(n / 10000).toLocaleString("ja-JP");
+const annFactor = (n: number, rate: number) => (rate === 0 ? n : (Math.pow(1 + rate, n) - 1) / rate);
+
+function loanPayment(B: number, ratePct: number, years: number): number {
+  const i = ratePct / 100 / 12, N = years * 12;
+  if (N <= 0) return 0;
+  if (i === 0) return B / N;
+  return (B * i) / (1 - Math.pow(1 + i, -N));
+}
+function totalInterest(B: number, ratePct: number, years: number): number {
+  return loanPayment(B, ratePct, years) * years * 12 - B;
+}
+function prepayCompression(B: number, ratePct: number, years: number, prepay: number): number {
+  const i = ratePct / 100 / 12;
+  if (i === 0 || years <= 0 || B <= 0) return 0;
+  const payment = loanPayment(B, ratePct, years);
+  const newBal = B - prepay;
+  if (newBal <= 0) return totalInterest(B, ratePct, years);
+  const newN = -Math.log(1 - (newBal * i) / payment) / Math.log(1 + i);
+  if (!isFinite(newN) || newN <= 0) return 0;
+  const after = payment * newN - newBal;
+  return Math.max(0, totalInterest(B, ratePct, years) - after);
+}
+function refinance(B: number, curRate: number, years: number) {
+  if (B <= 0 || years <= 0) return null;
+  const mNow = loanPayment(B, curRate, years);
+  const mNew = loanPayment(B, REFI_BASE, years);
+  const dMonthly = Math.max(0, mNow - mNew);
+  const dInterest = Math.max(0, totalInterest(B, curRate, years) - totalInterest(B, REFI_BASE, years));
+  const cost = Math.round(B * 0.022 + 100000); // 諸費用概算（事務手数料2.2%＋登記等10万）
+  const months = dMonthly > 0 ? Math.ceil(cost / dMonthly) : Infinity;
+  return { mNow, mNew, dMonthly, dInterest, cost, months };
+}
+function eduMonthly(ages: number[], plan: EduPlan): number {
+  const cost = EDU_PLANS[plan] * 10000;
+  let sum = 0;
+  ages.forEach((a) => { const m = Math.max(0, 18 - a) * 12; if (m > 0) sum += cost / m; });
+  return Math.round(sum);
+}
+
+/* ===== 計測 ===== */
+function track(name: string, params?: Record<string, unknown>) {
+  if (typeof window === "undefined") return;
+  try {
+    window.gtag?.("event", name, params ?? {});
+    window.clarity?.("event", name);
+  } catch { /* no-op */ }
+}
+
+/* ===== カウントアップ ===== */
+function CountUp({ value }: { value: number }) {
+  const [disp, setDisp] = useState(value);
+  const prev = useRef(value);
+  useEffect(() => {
+    const from = prev.current, to = value, start = performance.now(), dur = 500;
+    let raf = 0;
+    const step = (t: number) => {
+      const p = Math.min(1, (t - start) / dur);
+      setDisp(Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(step); else prev.current = to;
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return <>{disp.toLocaleString("ja-JP")}</>;
+}
+
+/* ===== UIクラス ===== */
+const card = "bg-white border border-slate-200 rounded-2xl shadow-sm p-5 mb-4";
+const inputCls = "w-full px-3 py-2.5 border border-slate-200 rounded-xl text-[15px] focus:outline-none focus:ring-2 focus:ring-emerald-600";
+const label = "block text-[13px] font-semibold mt-3 mb-1 text-slate-700";
+const hint = "font-normal text-slate-400 text-xs";
+const btn = "w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-base font-bold transition";
+const btnSm = "px-3.5 py-2 rounded-lg text-sm font-bold transition";
+const chip = "px-3 py-1.5 rounded-full text-sm font-semibold border transition";
+
+export default function AssetConciergeMvp() {
+  // MVPは入力フォームから開始（入口フック=画面0は重複のためスキップ。コードは将来のA/Bテスト用に残置）
+  const [screen, setScreen] = useState<"hook" | "input" | "dash" | "exit">("input");
+  const [form, setForm] = useState<Record<string, string>>({ target: "2000", r: "3", eduPlan: "shibun", mType: "変動" });
+  const [hasMortgage, setHasMortgage] = useState(true);
+  const [childCount, setChildCount] = useState(0);
+  const [childAges, setChildAges] = useState<string[]>([]);
+  const [inputs, setInputs] = useState<Inputs | null>(null);
+  const [decisions, setDecisions] = useState<Partial<Record<BucketId, Decision>>>({});
+  const [openBucket, setOpenBucket] = useState<BucketId | null>(null);
+  const [toast, setToast] = useState("");
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoOpened = useRef(false);
+
+  /* 復元＋再訪判定 */
+  useEffect(() => {
+    let s: Store | null = null;
+    try { s = JSON.parse(localStorage.getItem(KEY) || "null"); } catch { s = null; }
+    if (s?.inputs) {
+      setInputs(s.inputs); setDecisions(s.decisions || {}); setScreen("dash");
+      if (s.lastVisit) {
+        const prev = new Date(s.lastVisit), now = new Date();
+        const monthsApart = (now.getFullYear() - prev.getFullYear()) * 12 + (now.getMonth() - prev.getMonth());
+        if (monthsApart >= 1) track("shisan_return", { months_apart: monthsApart });
+      }
+    }
+    const next: Store = {
+      inputs: s?.inputs ?? null, decisions: s?.decisions ?? {},
+      firstVisit: s?.firstVisit ?? Date.now(), lastVisit: Date.now(),
+    };
+    localStorage.setItem(KEY, JSON.stringify(next));
+    track("shisan_start");
+  }, []);
+
+  const persist = (patch: Partial<Store>) => {
+    let cur: Store; try { cur = JSON.parse(localStorage.getItem(KEY) || "null") || ({} as Store); } catch { cur = {} as Store; }
+    localStorage.setItem(KEY, JSON.stringify({ ...cur, ...patch }));
+  };
+  const showToast = (m: string) => { setToast(m); if (toastTimer.current) clearTimeout(toastTimer.current); toastTimer.current = setTimeout(() => setToast(""), 2400); };
+
+  // 再訪のための保存（バックエンド不要・個人情報を取得しない）
+  const copyUrl = () => {
+    if (typeof window === "undefined") return;
+    navigator.clipboard?.writeText(window.location.href);
+    track("shisan_copy_url");
+    showToast("URLをコピーしました。ブックマークや保存にどうぞ。");
+  };
+  const emailSelf = () => {
+    if (typeof window === "undefined") return;
+    const url = window.location.href;
+    const subject = encodeURIComponent("つぎの手ナビ 資産づくり｜診断の続き");
+    const body = encodeURIComponent(`このURLから、いつでも診断の続きに戻れます：\n${url}\n\n※入力内容はご利用の端末（ブラウザ）に保存されています。`);
+    track("shisan_email_self");
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+  const recommend = () => {
+    if (typeof window === "undefined") return;
+    const url = window.location.href;
+    const subject = encodeURIComponent("お金の判断、これで整理できたよ");
+    const body = encodeURIComponent(`繰り上げ・投資・借り換え・教育費を、自分の数字で整理できる無料ツールです：\n${url}`);
+    track("shisan_share_intent");
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+  const num = (k: string) => parseFloat(form[k]) || 0;
+  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  /* 子の人数→年齢入力欄 */
+  const onChildCount = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const c = Math.max(0, Math.min(6, parseInt(e.target.value) || 0));
+    setChildCount(c);
+    setChildAges((prev) => Array.from({ length: c }, (_, i) => prev[i] ?? ""));
+  };
+
+  const submit = () => {
+    if (!num("age") || !num("income") || !num("assets")) { showToast("年齢・年収・金融資産を入力してください"); return; }
+    const surplus = num("surplus");
+    const i: Inputs = {
+      age: num("age"), income: num("income"), assets: num("assets"),
+      surplus, living: num("living"),
+      hasMortgage, mBal: num("mBal"), mYears: num("mYears"), mRate: num("mRate"), mType: form.mType || "変動",
+      childAges: childAges.map((a) => parseFloat(a) || 0),
+      eduPlan: (form.eduPlan as EduPlan) || "shibun",
+      target: num("target") || 2000, r: num("r") || 3,
+    };
+    setInputs(i); persist({ inputs: i }); track("shisan_input_complete");
+    // A層判定：毎月の余力が極小＝困窮の可能性 → 別出口
+    if (surplus <= 0) { track("shisan_a_layer_exit"); setScreen("exit"); window.scrollTo(0, 0); return; }
+    setScreen("dash"); window.scrollTo(0, 0);
+  };
+
+  /* 該当バケツ */
+  const buckets = useMemo<BucketId[]>(() => {
+    if (!inputs) return [];
+    const b: BucketId[] = ["liq"];
+    if (inputs.childAges.length > 0) b.push("edu");
+    if (inputs.hasMortgage && inputs.mBal > 0) { b.push("refi"); if (inputs.surplus > 0) b.push("prepay"); }
+    if (inputs.surplus > 0) b.push("nisa");
+    return b;
+  }, [inputs]);
+
+  const decidedCount = buckets.filter((b) => decisions[b]).length;
+  const score = buckets.length ? Math.round((decidedCount / buckets.length) * 100) : 0;
+  const allDone = buckets.length > 0 && decidedCount === buckets.length;
+
+  /* 初回ダッシュボード表示時、最初の未決カードを自動で開く */
+  useEffect(() => {
+    if (screen === "dash" && !autoOpened.current && buckets.length) {
+      setOpenBucket(buckets.find((b) => !decisions[b]) ?? null);
+      autoOpened.current = true;
+    }
+  }, [screen, buckets, decisions]);
+
+  /* 試算結果（A'案：生む／配分／65歳見込みの3ブロック） */
+  const result = useMemo(() => {
+    if (!inputs) return null;
+    const n = Math.max(0, RET_AGE - inputs.age);
+    const r = inputs.r / 100;
+    const i = inputs.mRate / 100;
+    const S = inputs.surplus;                 // 毎月の余力
+    const assetsYen = inputs.assets * 10000;
+    const livingTarget = inputs.living * 6;   // 生活防衛資金の目安
+
+    // ブロック1：毎月生まれたゆとり（借換で手取り純増。＋のみ）
+    const refi = inputs.hasMortgage ? refinance(inputs.mBal * 10000, inputs.mRate, inputs.mYears) : null;
+    const yutori = decisions.refi?.choice === "進める" && refi ? Math.round(refi.dMonthly) : 0;
+
+    // ブロック2：毎月の余力の使い道（優先カスケードで自動推定・符号なし配置）
+    const pool = S + yutori;
+    let remaining = pool;
+    let bei = 0;
+    if (decisions.liq && decisions.liq.choice !== "今は見送る") {
+      const gap = Math.max(0, livingTarget - assetsYen);
+      bei = gap > 0 ? Math.min(remaining, Math.round(gap / 12)) : 0; // 約1年で確保／既に充足なら0
+    }
+    remaining -= bei;
+    let edu = 0;
+    if (decisions.edu) {
+      const need = eduMonthly(inputs.childAges, inputs.eduPlan);
+      if (decisions.edu.choice === "必要額を積む") edu = Math.min(remaining, need);
+      else if (decisions.edu.choice === "一部を積む") edu = Math.min(remaining, Math.round(need / 2));
+    }
+    remaining -= edu;
+    let kuriage = 0, toushi = 0;
+    if (decisions.prepay) {
+      const amt = remaining;
+      if (decisions.prepay.choice === "繰上げ中心") kuriage = amt;
+      else if (decisions.prepay.choice === "投資中心") toushi = amt;
+      else if (decisions.prepay.choice === "両方に分ける") { kuriage = Math.round(amt / 2); toushi = amt - kuriage; }
+    }
+    remaining -= (kuriage + toushi);
+    const mihai = Math.max(0, remaining); // 未配分（まだ自由に使えるお金）
+    const nisaUsed = decisions.nisa?.choice === "枠を使う";
+
+    // ブロック3：65歳見込み（配分反映・目安）
+    // 投資→想定リターンr／繰上げ→ローン金利i（債務圧縮の利回り）／備え・教育・未配分→元本（運用しない）
+    const grow = (m: number, rate: number) => m * 12 * annFactor(n, rate);
+    const future =
+      assetsYen * Math.pow(1 + r, n) +
+      grow(toushi, r) +
+      grow(kuriage, i) +
+      (bei + edu + mihai) * 12 * n;
+    const achieve = Math.min(999, Math.round((future / (inputs.target * 10000)) * 100));
+
+    // 教育費（＋備え）で余力を使い切り、繰上げ/投資・未配分が0＝トレードオフが顕在化した状態
+    const eduCrowdsOut = edu > 0 && kuriage === 0 && toushi === 0 && mihai === 0;
+
+    return { n, yutori, pool, bei, edu, kuriage, toushi, mihai, nisaUsed, future, achieve, eduCrowdsOut };
+  }, [inputs, decisions]);
+
+  const setR = (v: number) => {
+    if (!inputs) return;
+    const ni = { ...inputs, r: v };
+    setInputs(ni); persist({ inputs: ni });
+    track("shisan_set_return", { r: v });
+  };
+
+  const decide = (b: BucketId, choice: string) => {
+    const next = { ...decisions, [b]: { choice } };
+    setDecisions(next); persist({ decisions: next }); setOpenBucket(null);
+    track("shisan_task_execute", { task_id: b, choice });
+    const willAll = buckets.every((x) => next[x]);
+    if (willAll) track("shisan_decision_complete", { buckets: buckets.length });
+    showToast("意思決定を記録しました（結論の中身は評価しません）");
+  };
+
+  const editAgain = () => {
+    if (inputs) {
+      setForm({
+        age: String(inputs.age), income: String(inputs.income), assets: String(inputs.assets),
+        surplus: String(inputs.surplus), living: String(inputs.living),
+        mBal: String(inputs.mBal), mYears: String(inputs.mYears), mRate: String(inputs.mRate),
+        mType: inputs.mType, eduPlan: inputs.eduPlan, target: String(inputs.target), r: String(inputs.r),
+      });
+      setHasMortgage(inputs.hasMortgage); setChildCount(inputs.childAges.length);
+      setChildAges(inputs.childAges.map(String));
+    }
+    setScreen("input"); window.scrollTo(0, 0);
+  };
+
+  /* ============ 画面0：入口フック（断定しない） ============ */
+  if (screen === "hook") {
+    return (
+      <main className="max-w-2xl mx-auto px-4 pt-10 pb-24 text-slate-800">
+        <h1 className="text-2xl font-bold mb-2">繰り上げ返済 vs 投資、<br />あなたの金利だと数字の出発点はどちら？</h1>
+        <p className="text-slate-500 text-sm mb-6">まず住宅ローンの金利を入れると、判断の出発点になる数字を出します。<br />（どちらが正解かは断定しません。続けて、教育費・借り換えも含めた家計全体の「段取り」まで一気に見られます）</p>
+        <div className={card}>
+          <label className={label}>住宅ローンの金利 <span className={hint}>%・変動/固定どちらでも</span>
+            <input type="number" step="0.01" className={inputCls} value={form.mRate ?? ""} onChange={set("mRate")} placeholder="1.0" />
+          </label>
+          {num("mRate") > 0 && (
+            <div className="mt-3 p-3 rounded-xl bg-emerald-50 text-sm text-slate-700">
+              あなたの金利 <b>{num("mRate")}%</b> が、繰上げ／投資を比べるときの「出発点」です。<br />
+              想定リターンを何%と置くかで見え方が変わるので、次の画面であなた自身に置いてもらいます。
+            </div>
+          )}
+        </div>
+        <button className={btn} onClick={() => { setHasMortgage(num("mRate") > 0); setScreen("input"); window.scrollTo(0, 0); }}>
+          無料で診断する →
+        </button>
+        <p className="text-[11px] text-slate-400 mt-4">一般的な情報とあなたの数字による試算のみを提供します。特定の商品の推奨や投資助言は行いません。すべて目安です。</p>
+      </main>
+    );
+  }
+
+  /* ============ 画面1：入力 ============ */
+  if (screen === "input") {
+    return (
+      <main className="max-w-2xl mx-auto px-4 pt-6 pb-24 text-slate-800">
+        <h1 className="text-[20px] font-extrabold leading-tight mb-1">つぎの手ナビ 資産づくり<span className="text-[12px] font-bold text-slate-400 ml-2">β</span></h1>
+        <p className="text-slate-500 text-[13px] mb-4">あなたの数字を入れると、今月の“次の一手”が見えてきます（2〜3分）。</p>
+
+        <div className={card}>
+          <div className="flex gap-2.5">
+            <div className="flex-1"><label className={label}>年齢<input type="number" className={inputCls} value={form.age ?? ""} onChange={set("age")} placeholder="42" /></label></div>
+            <div className="flex-1"><label className={label}>額面年収 <span className={hint}>万円</span><input type="number" className={inputCls} value={form.income ?? ""} onChange={set("income")} placeholder="700" /></label></div>
+          </div>
+          <label className={label}>金融資産（ざっくり） <span className={hint}>万円・現預金＋投資</span><input type="number" className={inputCls} value={form.assets ?? ""} onChange={set("assets")} placeholder="1000" /></label>
+          <div className="flex gap-2.5">
+            <div className="flex-1"><label className={label}>毎月の投資・貯蓄余力 <span className={hint}>円</span><input type="number" className={inputCls} value={form.surplus ?? ""} onChange={set("surplus")} placeholder="60000" /></label></div>
+            <div className="flex-1"><label className={label}>毎月の生活費 <span className={hint}>円</span><input type="number" className={inputCls} value={form.living ?? ""} onChange={set("living")} placeholder="250000" /></label></div>
+          </div>
+        </div>
+
+        <div className={card}>
+          <div className="flex items-center gap-2">
+            <input type="checkbox" className="w-[18px] h-[18px]" checked={hasMortgage} onChange={(e) => setHasMortgage(e.target.checked)} id="mort" />
+            <label htmlFor="mort" className="text-[13px] font-semibold text-slate-700">住宅ローンあり</label>
+          </div>
+          {hasMortgage && (
+            <>
+              <div className="flex gap-2.5 mt-1">
+                <div className="flex-1"><label className={label}>残高 <span className={hint}>万円</span><input type="number" className={inputCls} value={form.mBal ?? ""} onChange={set("mBal")} placeholder="3000" /></label></div>
+                <div className="flex-1"><label className={label}>残年数<input type="number" className={inputCls} value={form.mYears ?? ""} onChange={set("mYears")} placeholder="28" /></label></div>
+                <div className="flex-1"><label className={label}>金利 <span className={hint}>%</span><input type="number" step="0.01" className={inputCls} value={form.mRate ?? ""} onChange={set("mRate")} placeholder="1.0" /></label></div>
+              </div>
+              <div className="flex gap-2 mt-2">
+                {["変動", "固定"].map((t) => (
+                  <button key={t} type="button" onClick={() => setForm((f) => ({ ...f, mType: t }))}
+                    className={`${chip} ${form.mType === t ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-300"}`}>{t}金利</button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className={card}>
+          <label className={label}>子の人数 <span className={hint}>0〜6</span><input type="number" min="0" max="6" className={inputCls} value={String(childCount)} onChange={onChildCount} /></label>
+          {childCount > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {childAges.map((a, idx) => (
+                <div key={idx} style={{ width: "30%" }}>
+                  <label className="text-xs text-slate-500">子{idx + 1}の年齢
+                    <input type="number" className={inputCls} value={a} onChange={(e) => setChildAges((p) => p.map((v, i) => (i === idx ? e.target.value : v)))} placeholder="8" />
+                  </label>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className={card}>
+          <label className={label}>65歳での目標額 <span className={hint}>万円・変更可</span><input type="number" className={inputCls} value={form.target ?? "2000"} onChange={set("target")} /></label>
+        </div>
+
+        <button className={btn} onClick={submit}>診断する →</button>
+        <p className="text-[11px] text-slate-400 border-t border-dashed border-slate-200 pt-3 mt-4">
+          すべて目安です。前提：インフレ未反映／借り換え試算の基準金利は{REFI_BASE}%（内部目安・手動更新）。特定の商品・サービスの推奨や投資助言は行いません。入力データはこの端末内（ブラウザ）にのみ保存され、サーバには送信されません。
+        </p>
+        {toast && <Toast msg={toast} />}
+      </main>
+    );
+  }
+
+  /* ============ 別出口：A層（余力が小さい） ============ */
+  if (screen === "exit") {
+    return (
+      <main className="max-w-2xl mx-auto px-4 pt-10 pb-24 text-slate-800">
+        <div className={card}>
+          <h1 className="text-xl font-bold mb-2">まずは家計の土台を整えるのが安心かもしれません</h1>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            入力いただいた毎月の余力が小さいようです。無理な資産形成より、固定費の見直しや、
+            <b>お住まいの自治体の生活相談窓口</b>など公的な支援の活用を先にご検討ください。
+            （具体的な窓口名は状況により変わるため、ここでは一般的なご案内に留めています）
+          </p>
+          <p className="text-xs text-slate-400 mt-3">本ツールは住宅ローンの返済余力がある方向けの試算です。状況が変わったら、いつでも戻ってきてください。</p>
+        </div>
+        <button className={`${btnSm} bg-slate-100 text-slate-700`} onClick={editAgain}>入力に戻る</button>
+      </main>
+    );
+  }
+
+  /* ============ 画面2：ダッシュボード ============ */
+  return (
+    <main className="max-w-2xl mx-auto px-4 pt-6 pb-24 text-slate-800">
+      <h1 className="text-[22px] font-extrabold leading-tight mb-1">診断結果</h1>
+      <p className="text-slate-500 text-[13px] mb-4">下の質問に答えるほど、結果がはっきりします（すべて目安）。</p>
+
+      {/* 診断結果コーナー（緑・A'案 3ブロック・全ブロック緑で統一） */}
+      <div className="rounded-2xl shadow-sm p-5 mb-5 text-white bg-gradient-to-br from-emerald-600 to-emerald-800">
+        <div className="flex items-center justify-end mb-1">
+          <div className="text-[13px] opacity-90">答えた質問 <b><CountUp value={decidedCount} /> / {buckets.length}</b></div>
+        </div>
+        <div className="h-2 bg-white/25 rounded-full overflow-hidden mb-5"><div className="h-full bg-white transition-all duration-500" style={{ width: `${score}%` }} /></div>
+
+        {/* ① 毎月生まれたゆとり */}
+        <div className="mb-5">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="w-5 h-5 rounded-full bg-white/25 text-[11px] font-bold flex items-center justify-center">1</span>
+            <span className="text-[14px] font-bold">毎月生まれたゆとり</span>
+          </div>
+          <div className="text-[28px] font-extrabold leading-tight">＋¥<CountUp value={result?.yutori ?? 0} /><span className="text-sm font-bold">/月</span></div>
+          <div className="text-[11px] opacity-80">借り換えなどで手取りが増えた分です。</div>
+        </div>
+
+        {/* ② 毎月の余力の使い道（緑上のバー行で統一） */}
+        <div className="mb-5">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="w-5 h-5 rounded-full bg-white/25 text-[11px] font-bold flex items-center justify-center">2</span>
+            <span className="text-[14px] font-bold">毎月の余力 ¥{result ? yen(result.pool) : 0} の使い道</span>
+          </div>
+          {result && [
+            { k: "備え", v: result.bei },
+            { k: "教育費", v: result.edu },
+            { k: "繰上げ", v: result.kuriage },
+            { k: result.nisaUsed ? "投資（NISA枠）" : "投資", v: result.toushi },
+            { k: "未配分（自由）", v: result.mihai },
+          ].filter((s) => s.v > 0).map((s) => (
+            <div key={s.k} className="flex items-center gap-2 mb-1.5">
+              <span className="text-[12px] w-24 shrink-0 opacity-90">{s.k}</span>
+              <div className="flex-1 h-2.5 bg-white/20 rounded-full overflow-hidden"><div className="h-full bg-white rounded-full" style={{ width: `${result.pool > 0 ? (s.v / result.pool) * 100 : 0}%` }} /></div>
+              <span className="text-[12px] font-bold w-20 text-right">¥{yen(s.v)}</span>
+            </div>
+          ))}
+          <div className="text-[11px] opacity-80 mt-1.5">配ったお金は減ったのではなく、目的が決まったお金です。</div>
+
+          {result?.eduCrowdsOut && inputs && (
+            <div className="mt-3 p-3 rounded-lg bg-white/15 text-[12px] leading-relaxed">
+              <div className="font-bold mb-1">今の余力では、教育費と投資の“両取り”は難しい状態です</div>
+              教育費の目標（¥{yen(eduMonthly(inputs.childAges, inputs.eduPlan))}/月）を満たすと、繰上げ・投資に回す分は残りません。投資が0なのは失敗ではなく「教育費を最優先に決めた」という意思決定です。
+              <div className="opacity-85 mt-1.5">投資にも回したいなら（どれも正解ではありません）：①教育費の目標を見直す ②余力を増やす（借換・固定費）③今は教育費を優先と決める。</div>
+            </div>
+          )}
+        </div>
+
+        {/* ③ 65歳の見込み */}
+        <div>
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="w-5 h-5 rounded-full bg-white/25 text-[11px] font-bold flex items-center justify-center">3</span>
+            <span className="text-[14px] font-bold">65歳の見込み（目安）</span>
+          </div>
+          <div className="flex justify-between items-end">
+            <div className="text-[28px] font-extrabold leading-tight">約¥<CountUp value={result ? Math.round(result.future / 10000) : 0} />万</div>
+            <div className="text-right"><span className="text-[12px] opacity-85">目標 ¥{inputs?.target}万</span><div className="text-[22px] font-extrabold leading-tight">{result?.achieve}%</div></div>
+          </div>
+          <div className="text-[11px] opacity-80 mt-1">想定リターン{inputs?.r}%の目安（備え・教育費は元本のまま反映）。</div>
+        </div>
+      </div>
+
+      {/* バケツ（意思決定フロー） */}
+      <h2 className="text-[15px] font-bold mt-6 mb-1">資産づくりの質問（{buckets.length}つ）</h2>
+      <p className="text-xs text-slate-400 mb-2.5">数字はこちらで計算します。中身を見て、自分で「こうする／しない」を選ぶだけ。</p>
+      {buckets.map((b, idx) => (
+        <BucketCard key={b} id={b} index={idx} inputs={inputs!} decision={decisions[b]} open={openBucket === b}
+          onToggle={() => setOpenBucket(openBucket === b ? null : b)} onDecide={(c) => decide(b, c)} onSetR={setR} />
+      ))}
+
+      {/* 保存して、また戻る（再訪導線・バックエンド不要） */}
+      <div className={`${card} border-emerald-300 bg-emerald-50`}>
+        <p className="font-bold mb-1">{allDone ? "🎉 5つすべて、自分で決めきりました。" : "途中まで診断できています。"}</p>
+        <p className="text-sm text-slate-600 mb-3">
+          入力はこの端末（ブラウザ）に保存されています。<b>URLを保存しておくと、いつでも続きから戻れます。</b>
+          {!allDone && "残りの質問も、あとで診断できます。"}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <button className={`${btnSm} bg-emerald-600 text-white hover:bg-emerald-700`} onClick={copyUrl}>URLをコピー</button>
+          <button className={`${btnSm} bg-white border border-slate-300 text-slate-700`} onClick={emailSelf}>自分にメールで送る</button>
+        </div>
+        {allDone && (
+          <button className="text-xs text-emerald-700 underline mt-3" onClick={recommend}>同じように迷っている人にもすすめる</button>
+        )}
+      </div>
+
+      <button className={`${btnSm} bg-slate-100 text-slate-700`} onClick={editAgain}>入力を修正する</button>
+      <p className="text-[11px] text-slate-400 border-t border-dashed border-slate-200 pt-3 mt-4">
+        一般的な情報とあなたの数字による試算のみを提供します。繰り上げ返済と投資のどちらが有利かは状況により異なり、特定の金融商品・保険・サービスの推奨や投資助言は行いません。借り換え試算の基準金利は{REFI_BASE}%（内部目安）。すべて目安です。
+      </p>
+      {toast && <Toast msg={toast} />}
+    </main>
+  );
+}
+
+/* ===== バケツカード ===== */
+function BucketCard({ id, index, inputs, decision, open, onToggle, onDecide, onSetR }: {
+  id: BucketId; index: number; inputs: Inputs; decision?: Decision; open: boolean; onToggle: () => void; onDecide: (c: string) => void; onSetR: (v: number) => void;
+}) {
+  const done = !!decision;
+  const n = Math.max(0, RET_AGE - inputs.age);
+  const meta: Record<BucketId, { title: string; preview: string }> = {
+    liq: { title: "もしもの備えは足りてる？", preview: "急な出費や収入減に備えるお金。生活費6ヶ月分で目安を計算します。" },
+    edu: { title: "教育費、毎月いくら貯めれば間に合う？", preview: "大学入学までの期間から、必要な毎月の積立額を逆算します。" },
+    refi: { title: "住宅ローンを借り換えたら、いくら変わる？", preview: "今の金利を基準と比べ、諸費用を何ヶ月で回収できるかを計算します。" },
+    prepay: { title: "余ったお金、繰り上げ返済と投資どっち？", preview: "あなたのローン金利と想定リターンを並べて比べます。正解は決めつけません。" },
+    nisa: { title: "NISAの非課税枠、どれくらい使える？", preview: "年間360万円の枠に対し、あなたの余力がどれくらいかを見ます。" },
+  };
+
+  return (
+    <div className={`border rounded-xl mb-2.5 transition ${done ? "bg-emerald-50 border-emerald-500" : "border-slate-200"}`}>
+      <button className="w-full flex justify-between items-start gap-3 p-3.5 text-left" onClick={onToggle}>
+        <div className="flex gap-3">
+          <span className="flex-none w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center mt-0.5">{index + 1}</span>
+          <div>
+            <div className="font-bold text-[15px] leading-snug">{meta[id].title}</div>
+            <div className="text-xs text-slate-500 mt-1 leading-relaxed">{meta[id].preview}</div>
+            <div className="text-xs mt-1.5 font-semibold" style={{ color: done ? "#059669" : "#0d9488" }}>{done ? `✓ 決めた：${decision!.choice}` : (open ? "下で数字を見て決める" : "タップして数字を見る →")}</div>
+          </div>
+        </div>
+        <span className="text-slate-400 text-xs flex-none mt-1">{open ? "閉じる" : "開く"}</span>
+      </button>
+      {open && (
+        <div className="px-3.5 pb-4 border-t border-slate-100 pt-3">
+          <BucketPanel id={id} inputs={inputs} n={n} onDecide={onDecide} onSetR={onSetR} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ===== バケツ別の数字パネル＋意思決定 ===== */
+function BucketPanel({ id, inputs, n, onDecide, onSetR }: { id: BucketId; inputs: Inputs; n: number; onDecide: (c: string) => void; onSetR: (v: number) => void; }) {
+  const box = "p-3 rounded-xl bg-slate-50 text-sm text-slate-700 leading-relaxed mb-3";
+  const note = "text-[11px] text-slate-400 mb-3";
+  const choices = "flex flex-wrap gap-2";
+  const cbtn = `${btnSm} bg-white border border-emerald-600 text-emerald-700 hover:bg-emerald-600 hover:text-white`;
+  const cbtnGray = `${btnSm} bg-white border border-slate-300 text-slate-600 hover:bg-slate-100`;
+
+  if (id === "liq") {
+    const target = inputs.living * 6;
+    return (<>
+      <div className={box}>生活防衛資金の目安＝生活費6ヶ月分＝<b>¥{yen(target)}</b>。<br />一般に「投資や繰上げより先に確保」と言われますが、決めるのはあなたです。</div>
+      <div className={choices}>
+        <button className={cbtn} onClick={() => onDecide("確保している/する")}>確保している / する</button>
+        <button className={cbtnGray} onClick={() => onDecide("今は見送る")}>今は見送る</button>
+      </div>
+    </>);
+  }
+
+  if (id === "edu") {
+    const planLabel: Record<EduPlan, string> = { kokukou: "国公立(400万)", shibun: "私立文系(550万)", shiri: "私立理系(700万)" };
+    const monthly = eduMonthly(inputs.childAges, inputs.eduPlan);
+    return (<>
+      <div className={box}>
+        想定する進路：<b>{planLabel[inputs.eduPlan]}</b>（子1人あたり・文科省データ等の目安）。<br />
+        子{inputs.childAges.length}人ぶんを大学入学（18歳）までに用意するには、<b>約¥{yen(monthly)}/月</b>の積立が必要（目安）。<br />
+        ＝必要額 ÷ 入学までの残月数。<b>いくら積むかを決めてください。</b>
+      </div>
+      <p className={note}>※「いくら必要か・いつまでか」だけを出します。どの商品で積むか（学資保険など）には踏み込みません。</p>
+      <div className={choices}>
+        <button className={cbtn} onClick={() => onDecide("必要額を積む")}>必要額（¥{yen(monthly)}/月）を積む</button>
+        <button className={cbtn} onClick={() => onDecide("一部を積む")}>一部を積む</button>
+        <button className={cbtnGray} onClick={() => onDecide("今は積まない")}>今は積まない</button>
+      </div>
+    </>);
+  }
+
+  if (id === "refi") {
+    const refi = refinance(inputs.mBal * 10000, inputs.mRate, inputs.mYears);
+    return (<>
+      <div className={box}>
+        <div className="text-[11px] text-slate-500 mb-1">この試算は基準金利 {REFI_BASE}% を前提にしています（内部目安）。</div>
+        現在 <b>{inputs.mRate}%</b> → 基準 <b>{REFI_BASE}%</b> に借り換えた場合（残高¥{man(inputs.mBal * 10000)}万・残{inputs.mYears}年）：<br />
+        {refi && refi.dMonthly > 0 ? (<>
+          ・月々の返済：<b>¥{yen(refi.dMonthly)}/月 減</b><br />
+          ・総支払利息：<b>約¥{man(refi.dInterest)}万 減</b><br />
+          ・諸費用：約¥{man(refi.cost)}万 → <b>{isFinite(refi.months) ? refi.months : "—"}ヶ月で回収</b>
+        </>) : "現在の金利は基準より低く、借り換えの余地は小さいようです。"}
+      </div>
+      <p className={note}>※「得/損」は判定しません。事実（いくら減り、諸費用を何ヶ月で回収するか）だけを出します。金利が下がっても必ず得とは限りません。</p>
+      <div className={choices}>
+        <button className={cbtn} onClick={() => onDecide("進める")}>借り換えを進める</button>
+        <button className={cbtnGray} onClick={() => onDecide("しない")}>しない</button>
+      </div>
+    </>);
+  }
+
+  if (id === "prepay") {
+    const i = inputs.mRate, r = inputs.r;
+    const comp = prepayCompression(inputs.mBal * 10000, inputs.mRate, inputs.mYears, inputs.surplus * 12);
+    const invFuture = inputs.surplus * 12 * annFactor(n, r / 100);
+    return (<>
+      <div className={box}>
+        <div className="text-[11px] text-slate-500 mb-1">この比較は想定リターン <b>{r}%</b> を前提にしています（あなたが置いた値）。</div>
+        数字の大小：ローン金利 <b>{i}%</b> ／ 想定リターン <b>{r}%</b>。<br />
+        {i > r ? "数字上は繰上げ側が出発点。" : i < r ? "数字上は投資側が出発点。" : "ほぼ拮抗。"}
+        <div className="mt-2 text-[13px]">
+          ・余力（年¥{man(inputs.surplus * 12)}万）を<b>繰上げ</b>に回すと利息 <b>約¥{man(comp)}万</b> 圧縮（確定）。<br />
+          ・同じ額を<b>投資</b>に回すと65歳で <b>約¥{man(invFuture)}万</b>（想定{r}%・不確実）。
+        </div>
+      </div>
+      <p className={note}>※これは数字の大小であって正解ではありません。繰上げ＝確実・無リスク・流動性低下／投資＝期待値は高いが不確実。どちらを重視するかはあなた次第。方向は評価しません。</p>
+      <div className="flex items-center gap-2 mb-3 text-sm flex-wrap">
+        <span className="text-slate-500 text-xs">想定リターンは自分で置く：</span>
+        {[1, 3, 5].map((v) => (
+          <button key={v} type="button" onClick={() => onSetR(v)}
+            className={`${chip} ${inputs.r === v ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-300"}`}>{v}%</button>
+        ))}
+        <span className="text-[11px] text-slate-400">押すと上の数字が変わります</span>
+      </div>
+      <div className={choices}>
+        <button className={cbtn} onClick={() => onDecide("繰上げ中心")}>繰上げ中心で決めた</button>
+        <button className={cbtn} onClick={() => onDecide("投資中心")}>投資中心で決めた</button>
+        <button className={cbtn} onClick={() => onDecide("両方に分ける")}>両方に分ける</button>
+      </div>
+    </>);
+  }
+
+  // nisa
+  const annualInvest = inputs.surplus * 12;
+  const used = Math.min(100, Math.round((annualInvest / 3600000) * 100));
+  return (<>
+    <div className={box}>
+      新NISAの年間非課税枠は <b>360万円</b>（つみたて投資枠＋成長投資枠）。<br />
+      あなたの毎月の投資・貯蓄余力 ¥{yen(inputs.surplus)} を年換算すると ¥{man(annualInvest)}万（枠の約{used}%）。<br />
+      枠を使うか、今は使わないかを決めてください。
+    </div>
+    <p className={note}>※一般的な制度の説明のみ。特定の商品名や金融機関は出しません。</p>
+    <div className={choices}>
+      <button className={cbtn} onClick={() => onDecide("枠を使う")}>枠を使う</button>
+      <button className={cbtnGray} onClick={() => onDecide("今は使わない")}>今は使わない</button>
+    </div>
+  </>);
+}
+
+function Toast({ msg }: { msg: string }) {
+  return (
+    <div className="fixed left-1/2 bottom-6 -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded-full text-sm font-bold z-50 shadow-lg">{msg}</div>
+  );
+}

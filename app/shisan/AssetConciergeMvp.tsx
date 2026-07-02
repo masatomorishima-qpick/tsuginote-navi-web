@@ -15,7 +15,7 @@
  * - 金利変動シナリオは次フェーズ（rを変数化しておき後付け可能）。
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 /* ===== 定数 ===== */
 const RET_AGE = 65;
@@ -44,6 +44,28 @@ interface Store {
   firstVisit: number;
   lastVisit: number | null;
 }
+
+/* 打ち手カード（あなたの次の一手） */
+type ActionExternal = "expense" | "income" | "invest" | "refi";
+interface DualCell { label: string; value: string; note: string; }
+interface ActionCard {
+  id: string;                 // 計測用 action_id
+  title: string;              // 行動（商品名は出さない）
+  effect?: ReactNode;         // 効果の一行（数字 or 方向性＋理由）
+  dual?: { left: DualCell; right: DualCell }; // 繰上げvs投資の対等表示
+  bucket?: BucketId;          // タップで開く対応質問（段階3で結線）
+  external?: ActionExternal;  // 実行接点（段階4で送客リンク）
+}
+/* 実行接点（アフィリエイト送客）。URLは後入れ＝空でも枠と計測は動く（差し替え可能）。 */
+const AFFILIATE_LINKS: Record<ActionExternal, string> = {
+  expense: "", income: "", invest: "", refi: "",
+};
+const EXEC_LABEL: Record<ActionExternal, string> = {
+  expense: "固定費の見直しを調べる →",
+  income: "仕事・学びの選択肢を見る →",
+  invest: "口座の選択肢を見る →",
+  refi: "借り換えを調べる →",
+};
 
 // 注：window.gtag の型は lib/analytics/ga4.ts のグローバル宣言を使う
 // （ここで再宣言すると型不一致 TS2717 になるため宣言しない）。
@@ -98,6 +120,7 @@ function eduMonthly(ages: number[], plan: EduPlan): number {
 /* ===== 計測 ===== */
 function track(name: string, params?: Record<string, unknown>) {
   if (typeof window === "undefined") return;
+  if (location.search.includes("ga_debug")) console.log("[track]", name, params ?? {});
   try {
     window.gtag?.("event", name, params ?? {});
     window.clarity?.("event", name);
@@ -132,10 +155,11 @@ const btnSm = "px-3.5 py-2 rounded-lg text-sm font-bold transition";
 const chip = "px-3 py-1.5 rounded-full text-sm font-semibold border transition";
 
 export default function AssetConciergeMvp() {
-  // MVPは入力フォームから開始（入口フック=画面0は重複のためスキップ。コードは将来のA/Bテスト用に残置）
+  // 入力フォームから開始（従来フロー維持。別LP画面は挟まない）。
   const [screen, setScreen] = useState<"hook" | "input" | "dash" | "exit">("input");
   const [form, setForm] = useState<Record<string, string>>({ target: "20000000", r: "3", eduPlan: "shibun", mType: "変動" });
-  const [hasMortgage, setHasMortgage] = useState(true);
+  // 住宅ローンは「任意の一要素」。賃貸・完済層も対象に入るため既定オフ。
+  const [hasMortgage, setHasMortgage] = useState(false);
   const [childCount, setChildCount] = useState(0);
   const [childAges, setChildAges] = useState<string[]>([]);
   const [inputs, setInputs] = useState<Inputs | null>(null);
@@ -144,6 +168,7 @@ export default function AssetConciergeMvp() {
   const [toast, setToast] = useState("");
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoOpened = useRef(false);
+  const actionsViewed = useRef(false);
 
   /* 復元＋再訪判定 */
   useEffect(() => {
@@ -151,11 +176,14 @@ export default function AssetConciergeMvp() {
     try { s = JSON.parse(localStorage.getItem(KEY) || "null"); } catch { s = null; }
     if (s?.inputs) {
       setInputs(s.inputs); setDecisions(s.decisions || {}); setScreen("dash");
+      track("shisan_dashboard_view"); track("shisan_result_view");
       if (s.lastVisit) {
         const prev = new Date(s.lastVisit), now = new Date();
         const monthsApart = (now.getFullYear() - prev.getFullYear()) * 12 + (now.getMonth() - prev.getMonth());
         if (monthsApart >= 1) track("shisan_return", { months_apart: monthsApart });
       }
+    } else {
+      track("shisan_input_start");
     }
     const next: Store = {
       inputs: s?.inputs ?? null, decisions: s?.decisions ?? {},
@@ -226,6 +254,7 @@ export default function AssetConciergeMvp() {
     setInputs(i); persist({ inputs: i }); track("shisan_input_complete");
     // A層判定：毎月の余力が極小＝困窮の可能性 → 別出口
     if (surplus <= 0) { track("shisan_a_layer_exit"); setScreen("exit"); window.scrollTo(0, 0); return; }
+    track("shisan_dashboard_view"); track("shisan_result_view");
     setScreen("dash"); window.scrollTo(0, 0);
   };
 
@@ -243,6 +272,18 @@ export default function AssetConciergeMvp() {
   const score = buckets.length ? Math.round((decidedCount / buckets.length) * 100) : 0;
   const allDone = buckets.length > 0 && decidedCount === buckets.length;
 
+  /* シナリオ自動判定（A/B/C）
+   * 評価順序が優先順位：①C（余力が薄い）を最初に弾く → ②A（未成年の子あり）→ ③B（既定）。
+   * 0以下の余力は submit() で別画面(exit)へ除外済み。閾値3万は仮（実データで調整可）。
+   * ローンは分類を変えず、ありの時だけ A の切迫度を表示で強調する（loanBurden）。 */
+  const SURPLUS_THIN = 30000; // 円/月・余力が薄いライン（仮）
+  const scenario = useMemo<"A" | "B" | "C" | null>(() => {
+    if (!inputs) return null;
+    if (inputs.surplus <= 0) return null; // 余力0以下は別出口＝打ち手を出さない（復元経路の保険）
+    if (inputs.surplus < SURPLUS_THIN) return "C"; // ①最優先：余力薄ければ土台固め
+    if (inputs.childAges.some((a) => a < 18)) return "A"; // ②未成年の子あり
+    return "B"; // ③それ以外（子なし/全員独立）
+  }, [inputs]);
   /* 初回ダッシュボード表示時、最初の未決カードを自動で開く */
   useEffect(() => {
     if (screen === "dash" && !autoOpened.current && buckets.length) {
@@ -308,11 +349,112 @@ export default function AssetConciergeMvp() {
     return { n, yutori, pool, bei, edu, kuriage, toushi, mihai, nisaUsed, future, achieve, eduCrowdsOut };
   }, [inputs, decisions]);
 
+  /* 打ち手カード群「あなたの次の一手」（シナリオ別・推奨順・数字は既存関数流用） */
+  const actions = useMemo<ActionCard[]>(() => {
+    if (!inputs || !scenario) return [];
+    const n = Math.max(0, RET_AGE - inputs.age);
+    const hasLoan = inputs.hasMortgage && inputs.mBal > 0;
+    const invMan = man(inputs.surplus * 12 * annFactor(n, inputs.r / 100)); // 投資の65歳将来額
+    const refi = hasLoan ? refinance(inputs.mBal, inputs.mRate, inputs.mYears) : null;
+    const refiEffect: ReactNode = refi && refi.dMonthly > 0
+      ? <>月々 <b>¥{yen(refi.dMonthly)}</b> 軽くなる</>
+      : <>今の金利では下げ幅は小さめ</>;
+    const list: ActionCard[] = [];
+
+    if (scenario === "A") {
+      const cur = eduMonthly(inputs.childAges, inputs.eduPlan);
+      const save = Math.max(0, cur - eduMonthly(inputs.childAges, "kokukou"));
+      list.push({
+        id: "edu_review", bucket: "edu", title: "教育費の目標を見直す",
+        effect: save > 0
+          ? <>私立→国公立で、月 <b>約¥{yen(save)}</b> 軽くなる</>
+          : <>必要な積立は 月 <b>約¥{yen(cur)}</b></>,
+      });
+      if (inputs.surplus > 0) list.push({
+        id: "invest_more", bucket: "nisa", external: "invest", title: "積立を増やす",
+        effect: <>65歳で <b>＋約{invMan}万</b>（想定{inputs.r}%）</>,
+      });
+      list.push({
+        id: "income_up", external: "income", title: "収入を増やす",
+        effect: <>支出だけでは届きにくいとき効く</>,
+      });
+    }
+
+    if (scenario === "B") {
+      if (inputs.surplus > 0) list.push({
+        id: "invest_more", bucket: "nisa", external: "invest", title: "積立を増やす",
+        effect: <>65歳で <b>＋約{invMan}万</b>（想定{inputs.r}%）</>,
+      });
+      if (hasLoan && inputs.surplus > 0) {
+        const compMan = man(prepayCompression(inputs.mBal, inputs.mRate, inputs.mYears, inputs.surplus * 12));
+        list.push({
+          id: "prepay_vs_invest", bucket: "prepay", title: "繰上げ vs 投資",
+          dual: {
+            left: { label: "繰上げ", value: `利息 約${compMan}万圧縮`, note: "確実・無リスク" },
+            right: { label: "投資", value: `65歳 ＋約${invMan}万`, note: `想定${inputs.r}%・不確実` },
+          },
+        });
+      }
+      if (hasLoan) list.push({ id: "refi", bucket: "refi", external: "refi", title: "借り換え", effect: refiEffect });
+      if (!hasLoan && inputs.surplus > 0) {
+        const annualMan = man(inputs.surplus * 12);
+        const usedPct = Math.min(100, Math.round((inputs.surplus * 12 / 3600000) * 100));
+        list.push({
+          id: "nisa_fill", bucket: "nisa", external: "invest", title: "NISA枠を使い切る",
+          effect: <>年 <b>¥{annualMan}万</b>（枠360万の約{usedPct}%）</>,
+        });
+      }
+    }
+
+    if (scenario === "C") {
+      list.push({
+        id: "expense_cut", external: "expense", title: "固定費を見直す",
+        effect: <>通信や保険から、余力を生む</>,
+      });
+      if (hasLoan) list.push({ id: "refi", bucket: "refi", external: "refi", title: "借り換え", effect: refiEffect });
+      list.push({
+        id: "buffer", bucket: "liq", title: "もしもの備え",
+        effect: <>目安 <b>¥{man(inputs.living * 6)}万</b>（生活費6か月）</>,
+      });
+    }
+
+    return list;
+  }, [inputs, scenario]);
+
+  /* 打ち手ブロック表示時に一度だけ shisan_actions_view（GA・段階5） */
+  useEffect(() => {
+    if (screen === "dash" && actions.length > 0 && !actionsViewed.current) {
+      track("shisan_actions_view", { scenario, count: actions.length });
+      actionsViewed.current = true;
+    }
+  }, [screen, actions, scenario]);
+
   const setR = (v: number) => {
     if (!inputs) return;
     const ni = { ...inputs, r: v };
     setInputs(ni); persist({ inputs: ni });
     track("shisan_set_return", { r: v });
+  };
+
+  // 打ち手カード本体タップ → 対応する質問（バケツ）を開いてスクロール＋select計測（段階3/5）
+  // rank＝推奨順位（先頭=0）。仮説D（推奨先頭のまま/下位から選び直し）の検証データ。
+  const selectAction = (a: ActionCard, rank: number) => {
+    if (!a.bucket) return; // 送客のみのカードは executeAction 側
+    track("shisan_action_select", { action_id: a.id, rank });
+    setOpenBucket(a.bucket);
+    if (typeof document !== "undefined") {
+      const el = document.getElementById(`bucket-${a.bucket}`);
+      if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "start" }));
+    }
+  };
+
+  // 打ち手カード → 実行接点（送客・段階4/5）。select とは別イベント。URL未設定でも計測は動く。
+  const executeAction = (a: ActionCard, rank: number) => {
+    if (!a.external) return;
+    track("shisan_action_execute_click", { external: a.external, action_id: a.id, rank });
+    const url = AFFILIATE_LINKS[a.external];
+    if (url) window.open(url, "_blank", "noopener,noreferrer");
+    else showToast("ご案内を準備中です。");
   };
 
   const decide = (b: BucketId, choice: string) => {
@@ -338,27 +480,35 @@ export default function AssetConciergeMvp() {
     setScreen("input"); window.scrollTo(0, 0);
   };
 
-  /* ============ 画面0：入口フック（断定しない） ============ */
+  /* ============ 画面0：入口LP（老後・ライフプランフック・断定しない） ============ */
   if (screen === "hook") {
     return (
-      <main className="max-w-2xl mx-auto px-4 pt-10 pb-24 text-slate-800">
-        <h1 className="text-2xl font-bold mb-2">繰り上げ返済 vs 投資、<br />あなたの金利だと数字の出発点はどちら？</h1>
-        <p className="text-slate-500 text-sm mb-6">まず住宅ローンの金利を入れると、判断の出発点になる数字を出します。<br />（どちらが正解かは断定しません。続けて、教育費・借り換えも含めた家計全体の「段取り」まで一気に見られます）</p>
-        <div className={card}>
-          <label className={label}>住宅ローンの金利 <span className={hint}>%・変動/固定どちらでも</span>
-            <input type="number" step="0.01" className={inputCls} value={form.mRate ?? ""} onChange={set("mRate")} placeholder="1.0" />
-          </label>
-          {num("mRate") > 0 && (
-            <div className="mt-3 p-3 rounded-xl bg-emerald-50 text-sm text-slate-700">
-              あなたの金利 <b>{num("mRate")}%</b> が、繰上げ／投資を比べるときの「出発点」です。<br />
-              想定リターンを何%と置くかで見え方が変わるので、次の画面であなた自身に置いてもらいます。
-            </div>
-          )}
-        </div>
-        <button className={btn} onClick={() => { setHasMortgage(num("mRate") > 0); setScreen("input"); window.scrollTo(0, 0); }}>
+      <main className="max-w-2xl mx-auto px-4 pt-12 pb-24 text-slate-800">
+        <h1 className="text-[26px] font-extrabold leading-tight mb-3 sm:text-[30px]">
+          あなたの老後資金、
+          <br />
+          このままで足りる？
+        </h1>
+        <p className="text-slate-600 text-[15px] leading-relaxed mb-2">
+          人生で必要なお金を、あなたの数字で見える化。今の家計から、65 歳の見込みと「次の一手」まで。
+        </p>
+        <p className="text-slate-500 text-[13px] mb-8">
+          2〜3 分・登録不要・売らない中立診断。まずは現在地を知るところから。
+        </p>
+        <button
+          className={btn}
+          onClick={() => {
+            track("shisan_lp_cta_click");
+            track("shisan_input_start");
+            setScreen("input");
+            window.scrollTo(0, 0);
+          }}
+        >
           無料で診断する →
         </button>
-        <p className="text-[11px] text-slate-400 mt-4">一般的な情報とあなたの数字による試算のみを提供します。特定の商品の推奨や投資助言は行いません。すべて目安です。</p>
+        <p className="text-[11px] text-slate-400 mt-4">
+          一般的な情報とあなたの数字による試算のみを提供します。特定の商品の推奨や投資助言は行いません。すべて目安です。
+        </p>
       </main>
     );
   }
@@ -453,8 +603,7 @@ export default function AssetConciergeMvp() {
   /* ============ 画面2：ダッシュボード ============ */
   return (
     <main className="max-w-2xl mx-auto px-4 pt-6 pb-24 text-slate-800">
-      <h1 className="text-[22px] font-extrabold leading-tight mb-1">診断結果</h1>
-      <p className="text-slate-500 text-[13px] mb-4">下の質問に答えるほど、結果がはっきりします（すべて目安）。</p>
+      <h1 className="text-[22px] font-extrabold leading-tight mb-3">診断結果</h1>
 
       {/* 診断結果コーナー（緑・A'案 3ブロック・全ブロック緑で統一） */}
       <div className="rounded-2xl shadow-sm p-5 mb-5 text-white bg-gradient-to-br from-emerald-600 to-emerald-800">
@@ -511,15 +660,30 @@ export default function AssetConciergeMvp() {
           </div>
           <div className="flex justify-between items-end">
             <div className="text-[28px] font-extrabold leading-tight">約¥<CountUp value={result ? Math.round(result.future / 10000) : 0} />万</div>
-            <div className="text-right"><span className="text-[12px] opacity-85">目標 ¥{inputs?.target}万</span><div className="text-[22px] font-extrabold leading-tight">{result?.achieve}%</div></div>
+            <div className="text-right"><span className="text-[12px] opacity-85">目標 ¥{inputs ? man(inputs.target) : 0}万</span><div className="text-[22px] font-extrabold leading-tight">{result?.achieve}%</div></div>
           </div>
           <div className="text-[11px] opacity-80 mt-1">想定リターン{inputs?.r}%の目安（備え・教育費は元本のまま反映）。</div>
         </div>
       </div>
 
-      {/* バケツ（意思決定フロー） */}
-      <h2 className="text-[15px] font-bold mt-6 mb-1">資産づくりの質問（{buckets.length}つ）</h2>
-      <p className="text-xs text-slate-400 mb-2.5">数字はこちらで計算します。中身を見て、自分で「こうする／しない」を選ぶだけ。</p>
+      {/* あなたの次の一手（行動導線）＝面で囲って独立させ、肝を肝に見せる */}
+      {actions.length > 0 && (
+        <section className="mb-6 rounded-2xl bg-emerald-50 border border-emerald-100 p-4">
+          <h2 className="text-[20px] font-extrabold text-emerald-900 leading-tight mb-0.5">あなたの次の一手</h2>
+          <p className="text-[11px] text-slate-400 mb-3">いまのあなたに効く順に並べています。</p>
+          {actions.map((a, i) => (
+            <ActionCardView key={a.id} a={a} rank={i} primary={i === 0} onSelect={selectAction} onExecute={executeAction} />
+          ))}
+          <p className="text-[13px] mt-1">
+            <span className="font-bold text-emerald-800">できることは、ちゃんとあります。</span>
+            <span className="text-slate-500"> 正解はひとつじゃない。選ぶのはあなた。</span>
+          </p>
+        </section>
+      )}
+
+      {/* 資産づくりの質問（意思決定フロー）＝新コーナーの区切り（緑見出し＋上罫線） */}
+      <h2 className="text-[16px] font-extrabold text-emerald-700 border-t border-slate-200 pt-5 mt-6 mb-1">資産づくりの質問（{buckets.length}つ）</h2>
+      <p className="text-[13px] text-slate-500 mb-3">下の質問に答えると、診断結果が変わります。</p>
       {buckets.map((b, idx) => (
         <BucketCard key={b} id={b} index={idx} inputs={inputs!} decision={decisions[b]} open={openBucket === b}
           onToggle={() => setOpenBucket(openBucket === b ? null : b)} onDecide={(c) => decide(b, c)} onSetR={setR} />
@@ -565,7 +729,7 @@ function BucketCard({ id, index, inputs, decision, open, onToggle, onDecide, onS
   };
 
   return (
-    <div className={`border rounded-xl mb-2.5 transition ${done ? "bg-emerald-50 border-emerald-500" : "border-slate-200"}`}>
+    <div id={`bucket-${id}`} className={`scroll-mt-20 border rounded-xl mb-2.5 transition ${done ? "bg-emerald-50 border-emerald-500" : "border-slate-200"}`}>
       <button className="w-full flex justify-between items-start gap-3 p-3.5 text-left" onClick={onToggle}>
         <div className="flex gap-3">
           <span className="flex-none w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center mt-0.5">{index + 1}</span>
@@ -689,6 +853,61 @@ function BucketPanel({ id, inputs, n, onDecide, onSetR }: { id: BucketId; inputs
       <button className={cbtnGray} onClick={() => onDecide("今は使わない")}>今は使わない</button>
     </div>
   </>);
+}
+
+/* ===== 打ち手カード（行動名＋数字ひとつ） =====
+ * 本体タップ：バケツありカード＝select（質問を開く）／送客のみカード＝execute（送客）。
+ * バケツあり＋外部接点のカードは、本体=select・別リンク=execute の2導線（別イベントで区別）。 */
+function ActionCardView({ a, rank, primary, onSelect, onExecute }: {
+  a: ActionCard; rank: number; primary?: boolean;
+  onSelect?: (a: ActionCard, rank: number) => void;
+  onExecute?: (a: ActionCard, rank: number) => void;
+}) {
+  const bodyOpens = !!a.bucket && !!onSelect;                 // 本体＝質問を開く
+  const bodyExecs = !a.bucket && !!a.external && !!onExecute; // 本体＝送客（バケツなし）
+  const bodyClickable = bodyOpens || bodyExecs;
+  const showExecLink = !!a.bucket && !!a.external && !!onExecute; // 質問＋送客の2導線
+  const onBody = () => { if (bodyOpens) onSelect!(a, rank); else if (bodyExecs) onExecute!(a, rank); };
+  const body = (
+    <>
+      {primary && <div className="text-[10px] font-bold text-emerald-700 mb-1">まず、これ</div>}
+      <div className="flex items-center justify-between gap-2">
+        <div className="font-bold text-[15px] leading-snug">{a.title}</div>
+        {bodyClickable && <span className="text-slate-300 text-lg leading-none">›</span>}
+      </div>
+      {a.dual ? (
+        <div className="mt-2">
+          {/* 2つの数字は対等表示（同サイズ・同色・どちらも強調しない＝中立） */}
+          <div className="flex gap-2">
+            {[a.dual.left, a.dual.right].map((d, i) => (
+              <div key={i} className="flex-1 rounded-lg bg-slate-50 p-2.5 text-center">
+                <div className="text-[11px] text-slate-500">{d.label}</div>
+                <div className="text-[13px] font-bold text-slate-700 mt-0.5">{d.value}</div>
+                <div className="text-[10px] text-slate-400 mt-0.5">{d.note}</div>
+              </div>
+            ))}
+          </div>
+          <div className="text-[11px] text-slate-500 mt-1.5">性質が違います。</div>
+        </div>
+      ) : (
+        <div className="text-[13px] text-slate-600 leading-relaxed mt-0.5">{a.effect}</div>
+      )}
+    </>
+  );
+  const cls = `rounded-xl p-3.5 mb-2.5 ${primary ? "bg-emerald-100 border border-emerald-300 border-l-4 border-l-emerald-600" : "bg-white border border-slate-200"}`;
+  return (
+    <div className={cls}>
+      {bodyClickable
+        ? <button type="button" className="block w-full text-left" onClick={onBody}>{body}</button>
+        : <div>{body}</div>}
+      {showExecLink && (
+        <button type="button" onClick={() => onExecute!(a, rank)}
+          className="mt-2.5 text-[12px] font-semibold text-emerald-700 underline underline-offset-2">
+          {EXEC_LABEL[a.external!]}
+        </button>
+      )}
+    </div>
+  );
 }
 
 function Toast({ msg }: { msg: string }) {

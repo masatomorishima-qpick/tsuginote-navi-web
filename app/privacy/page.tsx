@@ -341,6 +341,50 @@ export default function PrivacyPage() {
                 <li>法令に基づき提出を求められた場合の対応（捜査機関等からの照会を含みます）</li>
               </ul>
             </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-slate-900">
+                14. 資産づくり診断（/shisan）における情報の取扱い
+              </h2>
+              <p className="mt-3">
+                資産づくり診断は登録不要でご利用いただけ、入力内容はご利用の端末（ブラウザ）内にのみ保存されます。
+                任意で診断内容の「保存」（メールアドレスの登録）をされた場合に限り、本機能では以下の情報を取得・保存します。
+                第1条〜第10条で「取得・保存しない」旨が記載されている箇所については、本条が優先します。
+              </p>
+
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                14-1. 取得する情報
+              </h3>
+              <ul className="mt-3 list-disc space-y-2 pl-6">
+                <li>メールアドレス</li>
+                <li>保存時点の診断内容（入力された年齢・収入・資産等の数値、各質問への意思決定の記録、診断の分類結果）</li>
+              </ul>
+
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                14-2. 利用目的
+              </h3>
+              <ul className="mt-3 list-disc space-y-2 pl-6">
+                <li>診断結果・意思決定内容の保存機能の提供</li>
+                <li>保存完了の通知メールの送信</li>
+                <li>見直し時期など、診断に関するご案内の送信</li>
+              </ul>
+
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                14-3. 保管先
+              </h3>
+              <p className="mt-3">
+                取得した情報は、Supabase（Supabase Inc. 提供）の東京リージョンのデータベースに、アクセス制御を施したうえで保管します。
+                通知メールの送信は Resend に委託しています。取得した情報を、法令に基づく場合を除き、ご本人の同意なく第三者に提供することはありません。
+              </p>
+
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                14-4. 削除のご請求
+              </h3>
+              <p className="mt-3">
+                登録されたデータ（メールアドレス・診断内容）の削除をご希望の場合は、
+                運営会社ページ記載の連絡先（第12条のお問い合わせ窓口）までご連絡ください。ご本人確認のうえ、速やかに削除します。
+              </p>
+            </section>
           </div>
         </div>
         </section>

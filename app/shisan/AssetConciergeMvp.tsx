@@ -215,29 +215,8 @@ export default function AssetConciergeMvp() {
   };
   const showToast = (m: string) => { setToast(m); if (toastTimer.current) clearTimeout(toastTimer.current); toastTimer.current = setTimeout(() => setToast(""), 2400); };
 
-  // 再訪のための保存（バックエンド不要・個人情報を取得しない）
-  const copyUrl = () => {
-    if (typeof window === "undefined") return;
-    navigator.clipboard?.writeText(window.location.href);
-    track("shisan_copy_url");
-    showToast("URLをコピーしました。ブックマークや保存にどうぞ。");
-  };
-  const emailSelf = () => {
-    if (typeof window === "undefined") return;
-    const url = window.location.href;
-    const subject = encodeURIComponent("つぎの手ナビ 資産づくり｜診断の続き");
-    const body = encodeURIComponent(`このURLから、いつでも診断の続きに戻れます：\n${url}\n\n※入力内容はご利用の端末（ブラウザ）に保存されています。`);
-    track("shisan_email_self");
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
-  };
-  const recommend = () => {
-    if (typeof window === "undefined") return;
-    const url = window.location.href;
-    const subject = encodeURIComponent("お金の判断、これで整理できたよ");
-    const body = encodeURIComponent(`繰り上げ・投資・借り換え・教育費を、自分の数字で整理できる無料ツールです：\n${url}`);
-    track("shisan_share_intent");
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
-  };
+  // 再訪導線の「URLコピー／自分にメール」コーナーは第一陣で削除
+  // （保存導線を会員登録ブロックに一本化・2026-07-03 ユーザー決定）
   const num = (k: string) => parseFloat(form[k]) || 0;
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }));
   // 金額入力用：内部は数字のみ（カンマ無し）で保持し、表示時にカンマ区切りを付ける。
@@ -286,7 +265,6 @@ export default function AssetConciergeMvp() {
 
   const decidedCount = buckets.filter((b) => decisions[b]).length;
   const score = buckets.length ? Math.round((decidedCount / buckets.length) * 100) : 0;
-  const allDone = buckets.length > 0 && decidedCount === buckets.length;
 
   /* シナリオ自動判定（A/B/C）
    * 評価順序が優先順位：①C（余力が薄い）を最初に弾く → ②A（未成年の子あり）→ ③B（既定）。
@@ -480,16 +458,15 @@ export default function AssetConciergeMvp() {
     track("shisan_task_execute", { task_id: b, choice });
     const willAll = buckets.every((x) => next[x]);
     if (willAll) track("shisan_decision_complete", { buckets: buckets.length });
-    showToast("意思決定を記録しました（結論の中身は評価しません）");
+    showToast("記録しました");
   };
 
   /* ===== 会員登録導線（第一陣・要件1）＋シェア（要件2） ===== */
-  // 表示位置：最後に意思決定したバケツカードの直下。復元時（リロード後）は
-  // 決定済みバケツのうち並び順で最後のものの直下（表示維持・常に1つだけ）。
-  const signupAnchor: BucketId | null =
-    lastDecided ?? [...buckets].reverse().find((b) => decisions[b]) ?? null;
+  // 表示位置：質問リストの一番下に固定（2026-07-03 ユーザー決定。リストを分断しない）。
+  // 表示開始は初回の意思決定後（decide済みバケツが1つ以上）・常に1つだけ。
+  const hasDecision = lastDecided !== null || buckets.some((b) => decisions[b]);
   const showSignup =
-    !!signupAnchor && !!scenario && !signupFlags.registered && !signupFlags.closed;
+    hasDecision && !!scenario && !signupFlags.registered && !signupFlags.closed;
 
   const onSignupView = () => {
     if (!signupViewed.current) {
@@ -512,6 +489,23 @@ export default function AssetConciergeMvp() {
     let s: Store | null = null;
     try { s = JSON.parse(localStorage.getItem(KEY) || "null"); } catch { s = null; }
     return { inputs, decisions, firstVisit: s?.firstVisit ?? null };
+  };
+  // 確認メール用サマリー（追加依頼_20260703）。既存の表示値をそのまま流用（新規計算なし）。
+  // 年収・資産の生値は含めない（結果値のみ）。
+  const signupSummary = () => {
+    if (!scenario || !result || !inputs) return null;
+    const DECISION_LABEL: Record<BucketId, string> = {
+      liq: "もしもの備え", edu: "教育費", refi: "借り換え",
+      prepay: "繰り上げ返済と投資", nisa: "NISAの非課税枠",
+    };
+    return {
+      phase: SCENARIO_PHASE[scenario],
+      poolYen: yen(result.pool),           // 画面②「毎月の余力 ¥X の使い道」と同じ値
+      future65Man: man(result.future),     // 画面③「約¥X万」と同じ値
+      r: inputs.r,
+      decisions: buckets.filter((b) => decisions[b])
+        .map((b) => ({ label: DECISION_LABEL[b], choice: decisions[b]!.choice })),
+    };
   };
 
   const shareToX = () => {
@@ -746,31 +740,15 @@ export default function AssetConciergeMvp() {
       <h2 className="text-[16px] font-extrabold text-emerald-700 border-t border-slate-200 pt-5 mt-6 mb-1">資産づくりの質問（{buckets.length}つ）</h2>
       <p className="text-[13px] text-slate-500 mb-3">下の質問に答えると、診断結果が変わります。</p>
       {buckets.map((b, idx) => (
-        <div key={b}>
-          <BucketCard id={b} index={idx} inputs={inputs!} decision={decisions[b]} open={openBucket === b}
-            onToggle={() => setOpenBucket(openBucket === b ? null : b)} onDecide={(c) => decide(b, c)} onSetR={setR} />
-          {b === signupAnchor && (showSignup || justRegistered) && (
-            <SignupBlock done={justRegistered} scenario={scenario!} snapshot={signupSnapshot}
-              onView={onSignupView} onClose={closeSignup} onRegistered={onSignupRegistered} />
-          )}
-        </div>
+        <BucketCard key={b} id={b} index={idx} inputs={inputs!} decision={decisions[b]} open={openBucket === b}
+          onToggle={() => setOpenBucket(openBucket === b ? null : b)} onDecide={(c) => decide(b, c)} onSetR={setR} />
       ))}
 
-      {/* 保存して、また戻る（再訪導線・バックエンド不要） */}
-      <div className={`${card} border-emerald-300 bg-emerald-50`}>
-        <p className="font-bold mb-1">{allDone ? "🎉 5つすべて、自分で決めきりました。" : "途中まで診断できています。"}</p>
-        <p className="text-sm text-slate-600 mb-3">
-          入力はこの端末（ブラウザ）に保存されています。<b>URLを保存しておくと、いつでも続きから戻れます。</b>
-          {!allDone && "残りの質問も、あとで診断できます。"}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <button className={`${btnSm} bg-emerald-600 text-white hover:bg-emerald-700`} onClick={copyUrl}>URLをコピー</button>
-          <button className={`${btnSm} bg-white border border-slate-300 text-slate-700`} onClick={emailSelf}>自分にメールで送る</button>
-        </div>
-        {allDone && (
-          <button className="text-xs text-emerald-700 underline mt-3" onClick={recommend}>同じように迷っている人にもすすめる</button>
-        )}
-      </div>
+      {/* 会員登録（質問リストの一番下に固定・初回の意思決定後に表示） */}
+      {(showSignup || justRegistered) && (
+        <SignupBlock done={justRegistered} scenario={scenario!} snapshot={signupSnapshot} summary={signupSummary}
+          onView={onSignupView} onClose={closeSignup} onRegistered={onSignupRegistered} />
+      )}
 
       <button className={`${btnSm} bg-slate-100 text-slate-700`} onClick={editAgain}>入力を修正する</button>
       <p className="text-[11px] text-slate-400 border-t border-dashed border-slate-200 pt-3 mt-4">
@@ -985,10 +963,11 @@ function ActionCardView({ a, rank, primary, onSelect, onExecute }: {
  * 初回の意思決定直後に、そのバケツカードの直下へインライン表示（モーダル禁止）。
  * メール1フィールドのみ。保存先は /api/shisan/signup（Supabase upsert＋完了メール）。
  * メールアドレスは GA・localStorage に入れない（PII禁止）。 */
-function SignupBlock({ done, scenario, snapshot, onView, onClose, onRegistered }: {
+function SignupBlock({ done, scenario, snapshot, summary, onView, onClose, onRegistered }: {
   done: boolean;
   scenario: "A" | "B" | "C";
   snapshot: () => Record<string, unknown>;
+  summary: () => Record<string, unknown> | null;
   onView: () => void;
   onClose: () => void;
   onRegistered: () => void;
@@ -1006,7 +985,7 @@ function SignupBlock({ done, scenario, snapshot, onView, onClose, onRegistered }
       const res = await fetch("/api/shisan/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: v, scenario, store: snapshot() }),
+        body: JSON.stringify({ email: v, scenario, store: snapshot(), summary: summary() }),
       });
       const json: { ok?: boolean } = await res.json().catch(() => ({}));
       if (res.ok && json.ok) { onRegistered(); }
@@ -1018,34 +997,33 @@ function SignupBlock({ done, scenario, snapshot, onView, onClose, onRegistered }
     }
   };
 
+  /* 濃緑パネル（診断結果カードと同トーン）＝白・薄緑の質問カードと明確に区別する独立コーナー */
+  const panel = "rounded-2xl shadow-sm text-white bg-gradient-to-br from-emerald-600 to-emerald-800 p-4 my-4";
   if (done) {
     return (
-      <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 mb-2.5 text-sm font-bold text-emerald-800">
+      <div className={`${panel} text-sm font-bold`}>
         ✅ 保存しました。
       </div>
     );
   }
   return (
-    <div className="relative rounded-xl border border-emerald-300 bg-emerald-50 p-4 mb-2.5">
+    <div className={`relative ${panel}`}>
       <button type="button" aria-label="閉じる" onClick={onClose}
-        className="absolute top-2 right-3 text-slate-400 hover:text-slate-600 text-xl leading-none">×</button>
-      <div className="font-bold text-[15px] text-emerald-900 pr-6">この結果と、決めた一手を保存する</div>
-      <p className="text-[13px] text-slate-600 mt-1 leading-relaxed">
-        保存しておくと、次に来たとき、あなたの一手がどれだけ効いたかを見届けられます。
-      </p>
-      <div className="flex gap-2 mt-2.5 flex-wrap">
+        className="absolute top-2 right-3 text-white/60 hover:text-white text-xl leading-none">×</button>
+      <div className="font-bold text-[16px] pr-6">この内容を保存する</div>
+      <div className="flex gap-2 mt-3 flex-wrap">
         <input type="email" inputMode="email" autoComplete="email"
-          className={`${inputCls} flex-1 min-w-[180px]`} placeholder="メールアドレス"
+          className="flex-1 min-w-[180px] px-3 py-2.5 rounded-xl text-[15px] bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white"
+          placeholder="メールアドレス"
           value={email} onChange={(e) => setEmail(e.target.value)} disabled={sending} />
         <button type="button" onClick={submit} disabled={sending}
-          className={`${btnSm} bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 whitespace-nowrap`}>
+          className={`${btnSm} bg-white text-emerald-700 hover:bg-emerald-50 disabled:opacity-60 whitespace-nowrap`}>
           {sending ? "保存中…" : "無料で保存する"}
         </button>
       </div>
-      {error && <p className="text-[12px] text-red-600 mt-1.5">{error}</p>}
-      <p className="text-[11px] text-slate-400 mt-2">
-        登録は無料。いつでも削除できます。
-        <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline ml-1">プライバシーポリシー</a>
+      {error && <p className="text-[12px] text-red-200 mt-1.5">{error}</p>}
+      <p className="text-[11px] mt-2">
+        <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline text-white/80">プライバシーポリシー</a>
       </p>
     </div>
   );

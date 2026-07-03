@@ -20,10 +20,44 @@ type SignupPayload = {
   email?: unknown;
   scenario?: unknown;
   store?: unknown;
+  summary?: unknown;
+};
+
+/* 確認メール用サマリー（追加依頼_20260703）。フロントの既存表示値をそのまま受け取り整形のみ行う。
+ * 年収・資産の生値は受け取らない設計（結果値のみ）。 */
+type MailSummary = {
+  phase: string;
+  poolYen: string;
+  future65Man: string;
+  r: number;
+  decisions: { label: string; choice: string }[];
 };
 
 function safeScenario(v: unknown): string | null {
   return v === "A" || v === "B" || v === "C" ? v : null;
+}
+
+function safeText(v: unknown, max: number): string {
+  return typeof v === "string" ? v.replace(/[<>]/g, "").trim().slice(0, max) : "";
+}
+
+function safeSummary(v: unknown): MailSummary | null {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return null;
+  const o = v as Record<string, unknown>;
+  const phase = safeText(o.phase, 40);
+  const poolYen = safeText(o.poolYen, 20);
+  const future65Man = safeText(o.future65Man, 20);
+  const r = typeof o.r === "number" && isFinite(o.r) && o.r >= 0 && o.r <= 100 ? o.r : 3;
+  if (!phase || !poolYen || !future65Man) return null;
+  const decisions = Array.isArray(o.decisions)
+    ? o.decisions.slice(0, 10).flatMap((d) => {
+        if (!d || typeof d !== "object") return [];
+        const label = safeText((d as Record<string, unknown>).label, 30);
+        const choice = safeText((d as Record<string, unknown>).choice, 40);
+        return label && choice ? [{ label, choice }] : [];
+      })
+    : [];
+  return { phase, poolYen, future65Man, r, decisions };
 }
 
 function safeStore(v: unknown): Record<string, unknown> | null {
@@ -53,6 +87,7 @@ export async function POST(req: NextRequest) {
 
   const scenario = safeScenario(payload.scenario);
   const store = safeStore(payload.store);
+  const summary = safeSummary(payload.summary);
 
   try {
     const supabase = createAdminSupabaseClient();
@@ -72,23 +107,54 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "save_failed" }, { status: 500 });
   }
 
-  // 保存完了メール（最小・失敗しても登録自体は成功として返す）
+  // 保存完了メール（診断内容入り・失敗しても登録自体は成功として返す）
+  // 実態のない約束は書かない。今できること（内容が手元のメールに残る）だけを伝える。
+  const summaryHtml = summary
+    ? [
+        `<p style="margin:16px 0 4px;color:#334155;font-weight:bold">── あなたの診断 ──</p>`,
+        `<p style="margin:0">いまのフェーズ：${summary.phase}<br/>`,
+        `毎月の余力：¥${summary.poolYen}<br/>`,
+        `65歳の見込み：約¥${summary.future65Man}万（想定リターン${summary.r}%の目安）</p>`,
+        ...(summary.decisions.length > 0
+          ? [
+              `<p style="margin:16px 0 4px;color:#334155;font-weight:bold">── 決めたこと ──</p>`,
+              `<p style="margin:0">${summary.decisions.map((d) => `・${d.label}：${d.choice}`).join("<br/>")}</p>`,
+            ]
+          : []),
+      ].join("")
+    : "";
+  const summaryText = summary
+    ? [
+        "",
+        "── あなたの診断 ──",
+        `いまのフェーズ：${summary.phase}`,
+        `毎月の余力：¥${summary.poolYen}`,
+        `65歳の見込み：約¥${summary.future65Man}万（想定リターン${summary.r}%の目安）`,
+        ...(summary.decisions.length > 0
+          ? ["", "── 決めたこと ──", ...summary.decisions.map((d) => `・${d.label}：${d.choice}`)]
+          : []),
+        "",
+      ].join("\n")
+    : "";
+
   const result = await sendEmail({
     to: email,
-    subject: "【つぎの手ナビ】診断結果と決めた一手を保存しました",
+    subject: "【つぎの手ナビ】診断結果と決めたことを保存しました",
     fromDisplayName: "つぎの手ナビ",
     html: [
       "<p>つぎの手ナビ 資産づくり（β）をご利用いただきありがとうございます。</p>",
-      "<p>あなたの診断結果と、決めた一手を保存しました。<br/>",
-      "次に診断へ戻ると、あなたの一手がどれだけ効いたかを見届けられます。</p>",
-      `<p><a href="${SITE_URL}/shisan">診断に戻る</a>（入力内容はご利用の端末（ブラウザ）にも保存されています）</p>`,
-      "<p style=\"color:#64748b;font-size:12px\">登録は無料です。削除をご希望の場合は、このメールに返信してお知らせください。</p>",
+      "<p>診断結果と、決めたことを保存しました。</p>",
+      summaryHtml,
+      `<p style="margin-top:16px;color:#64748b;font-size:12px">すべて目安です。特定の金融商品・保険・サービスの推奨や投資助言は行いません。</p>`,
+      `<p><a href="${SITE_URL}/shisan">つぎの手ナビ 資産づくり</a></p>`,
     ].join(""),
     text: [
       "つぎの手ナビ 資産づくり（β）をご利用いただきありがとうございます。",
-      "あなたの診断結果と、決めた一手を保存しました。",
-      `診断に戻る: ${SITE_URL}/shisan`,
-      "登録は無料です。削除をご希望の場合は、このメールに返信してお知らせください。",
+      "診断結果と、決めたことを保存しました。",
+      summaryText,
+      "すべて目安です。特定の金融商品・保険・サービスの推奨や投資助言は行いません。",
+      "",
+      `つぎの手ナビ 資産づくり: ${SITE_URL}/shisan`,
     ].join("\n"),
   });
 

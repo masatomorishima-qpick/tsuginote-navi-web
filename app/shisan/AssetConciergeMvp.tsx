@@ -43,7 +43,9 @@ interface Store {
   decisions: Partial<Record<BucketId, Decision>>;
   firstVisit: number;
   lastVisit: number | null;
+  signup?: SignupFlags; // 会員登録の状態（第一陣・開発依頼書_20260703）
 }
+interface SignupFlags { registered?: boolean; closed?: boolean; }
 
 /* 打ち手カード（あなたの次の一手） */
 type ActionExternal = "expense" | "income" | "invest" | "refi";
@@ -65,6 +67,14 @@ const EXEC_LABEL: Record<ActionExternal, string> = {
   income: "仕事・学びの選択肢を見る →",
   invest: "口座の選択肢を見る →",
   refi: "借り換えを調べる →",
+};
+
+/* シェア導線（第一陣・要件2）。金額・年齢・個人情報はシェア文言に一切含めない。 */
+const SHARE_URL = "https://www.tsuginotenavi.jp/shisan";
+const SCENARIO_PHASE: Record<"A" | "B" | "C", string> = {
+  A: "教育費と老後準備の両立フェーズ",
+  B: "準備を先に進めるフェーズ",
+  C: "家計の土台を固めるフェーズ",
 };
 
 // 注：window.gtag の型は lib/analytics/ga4.ts のグローバル宣言を使う
@@ -169,13 +179,18 @@ export default function AssetConciergeMvp() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoOpened = useRef(false);
   const actionsViewed = useRef(false);
+  /* 会員登録導線（第一陣・要件1） */
+  const signupViewed = useRef(false);
+  const [signupFlags, setSignupFlags] = useState<SignupFlags>({});
+  const [lastDecided, setLastDecided] = useState<BucketId | null>(null);
+  const [justRegistered, setJustRegistered] = useState(false);
 
   /* 復元＋再訪判定 */
   useEffect(() => {
     let s: Store | null = null;
     try { s = JSON.parse(localStorage.getItem(KEY) || "null"); } catch { s = null; }
     if (s?.inputs) {
-      setInputs(s.inputs); setDecisions(s.decisions || {}); setScreen("dash");
+      setInputs(s.inputs); setDecisions(s.decisions || {}); setSignupFlags(s.signup ?? {}); setScreen("dash");
       track("shisan_dashboard_view"); track("shisan_result_view");
       if (s.lastVisit) {
         const prev = new Date(s.lastVisit), now = new Date();
@@ -188,6 +203,7 @@ export default function AssetConciergeMvp() {
     const next: Store = {
       inputs: s?.inputs ?? null, decisions: s?.decisions ?? {},
       firstVisit: s?.firstVisit ?? Date.now(), lastVisit: Date.now(),
+      signup: s?.signup,
     };
     localStorage.setItem(KEY, JSON.stringify(next));
     track("shisan_start");
@@ -460,10 +476,50 @@ export default function AssetConciergeMvp() {
   const decide = (b: BucketId, choice: string) => {
     const next = { ...decisions, [b]: { choice } };
     setDecisions(next); persist({ decisions: next }); setOpenBucket(null);
+    setLastDecided(b); // 登録ブロックの表示位置（意思決定したバケツの直下・要件1）
     track("shisan_task_execute", { task_id: b, choice });
     const willAll = buckets.every((x) => next[x]);
     if (willAll) track("shisan_decision_complete", { buckets: buckets.length });
     showToast("意思決定を記録しました（結論の中身は評価しません）");
+  };
+
+  /* ===== 会員登録導線（第一陣・要件1）＋シェア（要件2） ===== */
+  // 表示位置：最後に意思決定したバケツカードの直下。復元時（リロード後）は
+  // 決定済みバケツのうち並び順で最後のものの直下（表示維持・常に1つだけ）。
+  const signupAnchor: BucketId | null =
+    lastDecided ?? [...buckets].reverse().find((b) => decisions[b]) ?? null;
+  const showSignup =
+    !!signupAnchor && !!scenario && !signupFlags.registered && !signupFlags.closed;
+
+  const onSignupView = () => {
+    if (!signupViewed.current) {
+      track("shisan_signup_view", { scenario });
+      signupViewed.current = true;
+    }
+  };
+  const closeSignup = () => {
+    const next = { ...signupFlags, closed: true };
+    setSignupFlags(next); persist({ signup: next });
+  };
+  const onSignupRegistered = () => {
+    const next = { ...signupFlags, registered: true };
+    setSignupFlags(next); persist({ signup: next });
+    setJustRegistered(true); // 直後は完了表示を見せる（リロード後は非表示）
+    track("shisan_signup_submit", { scenario });
+  };
+  // Supabase に保存するスナップショット（メールアドレスは localStorage / GA に入れない）
+  const signupSnapshot = () => {
+    let s: Store | null = null;
+    try { s = JSON.parse(localStorage.getItem(KEY) || "null"); } catch { s = null; }
+    return { inputs, decisions, firstVisit: s?.firstVisit ?? null };
+  };
+
+  const shareToX = () => {
+    if (!scenario) return;
+    track("shisan_share_click", { scenario });
+    const text = `老後資金の“次の一手”がわかる無料診断をやってみた。私のフェーズは【${SCENARIO_PHASE[scenario]}】でした。→`;
+    const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(SHARE_URL)}`;
+    window.open(intent, "_blank", "noopener,noreferrer");
   };
 
   const editAgain = () => {
@@ -678,6 +734,11 @@ export default function AssetConciergeMvp() {
             <span className="font-bold text-emerald-800">できることは、ちゃんとあります。</span>
             <span className="text-slate-500"> 正解はひとつじゃない。選ぶのはあなた。</span>
           </p>
+          {/* シェア導線（第一陣・要件2）：X intent・文言に金額/年齢は入れない */}
+          <button type="button" onClick={shareToX}
+            className="mt-3 w-full py-2.5 rounded-xl border border-emerald-600 bg-white text-emerald-700 text-sm font-bold hover:bg-emerald-600 hover:text-white transition">
+            この診断をシェアする
+          </button>
         </section>
       )}
 
@@ -685,8 +746,14 @@ export default function AssetConciergeMvp() {
       <h2 className="text-[16px] font-extrabold text-emerald-700 border-t border-slate-200 pt-5 mt-6 mb-1">資産づくりの質問（{buckets.length}つ）</h2>
       <p className="text-[13px] text-slate-500 mb-3">下の質問に答えると、診断結果が変わります。</p>
       {buckets.map((b, idx) => (
-        <BucketCard key={b} id={b} index={idx} inputs={inputs!} decision={decisions[b]} open={openBucket === b}
-          onToggle={() => setOpenBucket(openBucket === b ? null : b)} onDecide={(c) => decide(b, c)} onSetR={setR} />
+        <div key={b}>
+          <BucketCard id={b} index={idx} inputs={inputs!} decision={decisions[b]} open={openBucket === b}
+            onToggle={() => setOpenBucket(openBucket === b ? null : b)} onDecide={(c) => decide(b, c)} onSetR={setR} />
+          {b === signupAnchor && (showSignup || justRegistered) && (
+            <SignupBlock done={justRegistered} scenario={scenario!} snapshot={signupSnapshot}
+              onView={onSignupView} onClose={closeSignup} onRegistered={onSignupRegistered} />
+          )}
+        </div>
       ))}
 
       {/* 保存して、また戻る（再訪導線・バックエンド不要） */}
@@ -863,10 +930,14 @@ function ActionCardView({ a, rank, primary, onSelect, onExecute }: {
   onSelect?: (a: ActionCard, rank: number) => void;
   onExecute?: (a: ActionCard, rank: number) => void;
 }) {
-  const bodyOpens = !!a.bucket && !!onSelect;                 // 本体＝質問を開く
-  const bodyExecs = !a.bucket && !!a.external && !!onExecute; // 本体＝送客（バケツなし）
+  // 要件3（第一陣）：URL未設定（空文字）の送客導線は出さない。
+  // 送客のみカードはタップ無効＋押せる見た目なしの情報カードとして静置。
+  // AFFILIATE_LINKS にURLを入れるだけで、リンク表示・タップ・execute計測が自動復帰する。
+  const hasUrl = !!a.external && !!AFFILIATE_LINKS[a.external];
+  const bodyOpens = !!a.bucket && !!onSelect;                          // 本体＝質問を開く
+  const bodyExecs = !a.bucket && !!a.external && !!onExecute && hasUrl; // 本体＝送客（バケツなし・URL設定時のみ）
   const bodyClickable = bodyOpens || bodyExecs;
-  const showExecLink = !!a.bucket && !!a.external && !!onExecute; // 質問＋送客の2導線
+  const showExecLink = !!a.bucket && !!a.external && !!onExecute && hasUrl; // 質問＋送客の2導線（URL設定時のみ）
   const onBody = () => { if (bodyOpens) onSelect!(a, rank); else if (bodyExecs) onExecute!(a, rank); };
   const body = (
     <>
@@ -906,6 +977,76 @@ function ActionCardView({ a, rank, primary, onSelect, onExecute }: {
           {EXEC_LABEL[a.external!]}
         </button>
       )}
+    </div>
+  );
+}
+
+/* ===== 会員登録ブロック（第一陣・要件1） =====
+ * 初回の意思決定直後に、そのバケツカードの直下へインライン表示（モーダル禁止）。
+ * メール1フィールドのみ。保存先は /api/shisan/signup（Supabase upsert＋完了メール）。
+ * メールアドレスは GA・localStorage に入れない（PII禁止）。 */
+function SignupBlock({ done, scenario, snapshot, onView, onClose, onRegistered }: {
+  done: boolean;
+  scenario: "A" | "B" | "C";
+  snapshot: () => Record<string, unknown>;
+  onView: () => void;
+  onClose: () => void;
+  onRegistered: () => void;
+}) {
+  const [email, setEmail] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  useEffect(() => { onView(); }, [onView]); // 発火の一意性は親側の useRef で担保
+
+  const submit = async () => {
+    const v = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { setError("メールアドレスの形式をご確認ください。"); return; }
+    setError(""); setSending(true);
+    try {
+      const res = await fetch("/api/shisan/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: v, scenario, store: snapshot() }),
+      });
+      const json: { ok?: boolean } = await res.json().catch(() => ({}));
+      if (res.ok && json.ok) { onRegistered(); }
+      else { setError("保存に失敗しました。時間をおいてお試しください。"); }
+    } catch {
+      setError("通信に失敗しました。時間をおいてお試しください。");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 mb-2.5 text-sm font-bold text-emerald-800">
+        ✅ 保存しました。
+      </div>
+    );
+  }
+  return (
+    <div className="relative rounded-xl border border-emerald-300 bg-emerald-50 p-4 mb-2.5">
+      <button type="button" aria-label="閉じる" onClick={onClose}
+        className="absolute top-2 right-3 text-slate-400 hover:text-slate-600 text-xl leading-none">×</button>
+      <div className="font-bold text-[15px] text-emerald-900 pr-6">この結果と、決めた一手を保存する</div>
+      <p className="text-[13px] text-slate-600 mt-1 leading-relaxed">
+        保存しておくと、次に来たとき、あなたの一手がどれだけ効いたかを見届けられます。
+      </p>
+      <div className="flex gap-2 mt-2.5 flex-wrap">
+        <input type="email" inputMode="email" autoComplete="email"
+          className={`${inputCls} flex-1 min-w-[180px]`} placeholder="メールアドレス"
+          value={email} onChange={(e) => setEmail(e.target.value)} disabled={sending} />
+        <button type="button" onClick={submit} disabled={sending}
+          className={`${btnSm} bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 whitespace-nowrap`}>
+          {sending ? "保存中…" : "無料で保存する"}
+        </button>
+      </div>
+      {error && <p className="text-[12px] text-red-600 mt-1.5">{error}</p>}
+      <p className="text-[11px] text-slate-400 mt-2">
+        登録は無料。いつでも削除できます。
+        <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline ml-1">プライバシーポリシー</a>
+      </p>
     </div>
   );
 }

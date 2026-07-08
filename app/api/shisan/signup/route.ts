@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email/client";
+import { createToken, createLoginToken, createSessionToken, SESSION_COOKIE, sessionCookieOptions } from "@/lib/shisan/auth";
 
 const SITE_URL = "https://www.tsuginotenavi.jp";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -89,19 +90,51 @@ export async function POST(req: NextRequest) {
   const store = safeStore(payload.store);
   const summary = safeSummary(payload.summary);
 
+  /* 新規/既存の分岐（追加要件F）：
+   * 新規メール → 会員作成＋即セッション発行（診断→AIの間のメール往復の壁を除去）
+   * 既存メール → 即セッションなし・データ上書きなし・ログインリンク再送のみ
+   *   （なりすまし登録による既存会員データの閲覧・上書きを防ぐ） */
+  const host = req.headers.get("host") ?? "";
+  const base = host.startsWith("localhost") || host.startsWith("127.0.0.1") ? `http://${host}` : SITE_URL;
+
+  let signupId: string | null = null;
   try {
     const supabase = createAdminSupabaseClient();
-    const { error } = await supabase
+    const { data: existing } = await supabase
+      .from("shisan_signups").select("id").eq("email", email).maybeSingle();
+
+    if (existing?.id) {
+      // 既存会員：ログインリンクを再送して案内（本文は最小）
+      const relink = `${base}/api/shisan/auth?token=${encodeURIComponent(createLoginToken(existing.id))}`;
+      await sendEmail({
+        to: email,
+        subject: "【つぎの手ナビ】ログインリンク",
+        fromDisplayName: "つぎの手ナビ",
+        html: [
+          "<p>このメールアドレスはすでに登録されています。</p>",
+          `<p><a href="${relink}">ログインして続きへ</a>（有効期限：24時間）</p>`,
+          "<p style=\"color:#64748b;font-size:12px\">心当たりがない場合は、このメールを破棄してください。</p>",
+        ].join(""),
+        text: [
+          "このメールアドレスはすでに登録されています。",
+          `ログインして続きへ: ${relink}`,
+          "（有効期限：24時間）心当たりがない場合は、このメールを破棄してください。",
+        ].join("\n"),
+      });
+      return NextResponse.json({ ok: true, existing: true });
+    }
+
+    const { data, error } = await supabase
       .from("shisan_signups")
-      .upsert(
-        { email, scenario, store, updated_at: new Date().toISOString() },
-        { onConflict: "email" }
-      );
+      .insert({ email, scenario, store, updated_at: new Date().toISOString() })
+      .select("id")
+      .single();
 
     if (error) {
-      console.error("[api/shisan/signup] upsert failed", { message: error.message });
+      console.error("[api/shisan/signup] insert failed", { message: error.message });
       return NextResponse.json({ ok: false, error: "save_failed" }, { status: 500 });
     }
+    signupId = data?.id ?? null;
   } catch (err) {
     console.error("[api/shisan/signup] threw", err instanceof Error ? err.message : err);
     return NextResponse.json({ ok: false, error: "save_failed" }, { status: 500 });
@@ -137,6 +170,12 @@ export async function POST(req: NextRequest) {
       ].join("\n")
     : "";
 
+  // ログインリンク（Phase1 §3：確認メールから戻れるように。TTLは30日＝「次に来たとき」に応える。
+  // ログイン再送リンク（/api/shisan/login経由）は24hの短期トークンを使う）
+  const loginLink = signupId
+    ? `${base}/api/shisan/auth?token=${encodeURIComponent(createToken(signupId, 30 * 24 * 60 * 60 * 1000))}`
+    : `${base}/shisan/chat`;
+
   const result = await sendEmail({
     to: email,
     subject: "【つぎの手ナビ】診断結果と決めたことを保存しました",
@@ -145,6 +184,8 @@ export async function POST(req: NextRequest) {
       "<p>つぎの手ナビ 資産づくり（β）をご利用いただきありがとうございます。</p>",
       "<p>診断結果と、決めたことを保存しました。</p>",
       summaryHtml,
+      `<p style="margin-top:16px"><a href="${loginLink}">AIに相談を始める（ログイン）</a><br/>`,
+      `<span style="color:#64748b;font-size:12px">あなたの診断結果を知っているAIに、無料で相談できます。次に来たときもこのリンクから戻れます。</span></p>`,
       `<p style="margin-top:16px;color:#64748b;font-size:12px">すべて目安です。特定の金融商品・保険・サービスの推奨や投資助言は行いません。</p>`,
       `<p><a href="${SITE_URL}/shisan">つぎの手ナビ 資産づくり</a></p>`,
     ].join(""),
@@ -152,11 +193,18 @@ export async function POST(req: NextRequest) {
       "つぎの手ナビ 資産づくり（β）をご利用いただきありがとうございます。",
       "診断結果と、決めたことを保存しました。",
       summaryText,
-      "すべて目安です。特定の金融商品・保険・サービスの推奨や投資助言は行いません。",
+      `AIに相談を始める（ログイン）: ${loginLink}`,
+      "あなたの診断結果を知っているAIに、無料で相談できます。次に来たときもこのリンクから戻れます。",
       "",
+      "すべて目安です。特定の金融商品・保険・サービスの推奨や投資助言は行いません。",
       `つぎの手ナビ 資産づくり: ${SITE_URL}/shisan`,
     ].join("\n"),
   });
 
-  return NextResponse.json({ ok: true, emailSent: result.ok });
+  // 新規会員：即セッション発行（追加要件F。メールを開かずにAIへ進める）
+  const res = NextResponse.json({ ok: true, emailSent: result.ok, session: !!signupId });
+  if (signupId) {
+    res.cookies.set(SESSION_COOKIE, createSessionToken(signupId), sessionCookieOptions());
+  }
+  return res;
 }

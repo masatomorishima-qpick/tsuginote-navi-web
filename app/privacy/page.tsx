@@ -358,6 +358,8 @@ export default function PrivacyPage() {
               <ul className="mt-3 list-disc space-y-2 pl-6">
                 <li>メールアドレス</li>
                 <li>保存時点の診断内容（入力された年齢・収入・資産等の数値、各質問への意思決定の記録、診断の分類結果）</li>
+                <li>AI相談をご利用の場合：AIとの会話内容とAIの応答へのフィードバック</li>
+                <li>実行申告をご利用の場合：決めた打ち手の実行状況と、任意でご入力いただいた月あたりの改善額（概算）</li>
               </ul>
 
               <h3 className="mt-6 text-base font-semibold text-slate-900">
@@ -365,16 +367,22 @@ export default function PrivacyPage() {
               </h3>
               <ul className="mt-3 list-disc space-y-2 pl-6">
                 <li>診断結果・意思決定内容の保存機能の提供</li>
-                <li>保存完了の通知メールの送信</li>
+                <li>保存完了の通知メール・ログインリンクの送信</li>
+                <li>AI相談機能の提供（保存された診断内容をAIの応答生成に利用します）</li>
+                <li>AI相談の応答品質の改善（会話内容を運営担当者が確認・分析することがあります）</li>
+                <li>実行実態の統計分析（個人を特定しない形での集計・公表を含む）</li>
                 <li>見直し時期など、診断に関するご案内の送信</li>
               </ul>
 
               <h3 className="mt-6 text-base font-semibold text-slate-900">
-                14-3. 保管先
+                14-3. 保管先・委託先
               </h3>
               <p className="mt-3">
                 取得した情報は、Supabase（Supabase Inc. 提供）の東京リージョンのデータベースに、アクセス制御を施したうえで保管します。
-                通知メールの送信は Resend に委託しています。取得した情報を、法令に基づく場合を除き、ご本人の同意なく第三者に提供することはありません。
+                通知メールの送信は Resend に委託しています。
+                AI相談のご利用時は、応答の生成のため、会話内容と診断内容（数値）を Anthropic, PBC（米国）のAPIに送信します。
+                <strong>メールアドレスはAIには送信しません。</strong>
+                取得した情報を、法令に基づく場合を除き、ご本人の同意なく第三者に提供することはありません。
               </p>
 
               <h3 className="mt-6 text-base font-semibold text-slate-900">

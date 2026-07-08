@@ -16,28 +16,27 @@
  */
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+/* 計算エンジンは共有モジュール（Phase1 §6：クライアントとchat APIの両方から参照） */
+import {
+  RET_AGE, REFI_BASE, type EduPlan, SCENARIO_PHASE, BUCKET_LABEL,
+  type Inputs, type BucketId, type Decision,
+  yen, man, annFactor, prepayCompression, refinance, eduMonthly,
+  judgeScenario, deriveBuckets, computeResult,
+} from "@/lib/shisan/calc";
+import { track } from "@/lib/shisan/track";
+import { ExecuteReportPanel, type ExecReportProps, type ReportSaveResult } from "./ExecuteReportPanel";
 
 /* ===== 定数 ===== */
-const RET_AGE = 65;
-const REFI_BASE = 0.7; // 借り換え試算の内部基準金利(%)・画面に明示・手動更新可
 // v2: 入力単位を円に統一（2026-06-23）。旧 v1 の万円キャッシュを誤読しないよう改番。
 const KEY = "shisan_loan_mvp_v2";
-const EDU_PLANS = { kokukou: 400, shibun: 550, shiri: 700 } as const; // 万円・文科省データ等を典拠とする目安
-type EduPlan = keyof typeof EDU_PLANS;
+/* AI主導フロー転換（追加要件E・2026-07-06）：
+ * false＝質問アコーディオン・完了スコア・旧登録ブロックを非表示にし、AI大導線に一本化。
+ * true に戻すと従来型（画面内で質問に答える）に復元できる（比較検証用）。 */
+const SHOW_INLINE_QUESTIONS = false;
 
 /* ===== 型 ===== */
-interface Inputs {
-  age: number; income: number; assets: number;
-  surplus: number;   // 毎月の投資・貯蓄余力（円）
-  living: number;    // 毎月の生活費ざっくり（円）
-  hasMortgage: boolean; mBal: number; mYears: number; mRate: number; mType: string;
-  childAges: number[];
-  eduPlan: EduPlan;
-  target: number;    // 65歳での目標額（万円）
-  r: number;         // 想定リターン（%）ユーザーが置く
-}
-type BucketId = "liq" | "edu" | "refi" | "prepay" | "nisa";
-interface Decision { choice: string; }
 interface Store {
   inputs: Inputs | null;
   decisions: Partial<Record<BucketId, Decision>>;
@@ -71,71 +70,8 @@ const EXEC_LABEL: Record<ActionExternal, string> = {
 
 /* シェア導線（第一陣・要件2）。金額・年齢・個人情報はシェア文言に一切含めない。 */
 const SHARE_URL = "https://www.tsuginotenavi.jp/shisan";
-const SCENARIO_PHASE: Record<"A" | "B" | "C", string> = {
-  A: "教育費と老後準備の両立フェーズ",
-  B: "準備を先に進めるフェーズ",
-  C: "家計の土台を固めるフェーズ",
-};
 
-// 注：window.gtag の型は lib/analytics/ga4.ts のグローバル宣言を使う
-// （ここで再宣言すると型不一致 TS2717 になるため宣言しない）。
-declare global {
-  interface Window {
-    clarity?: (...args: unknown[]) => void;
-  }
-}
-
-/* ===== 計算 ===== */
-const yen = (n: number) => Math.round(n).toLocaleString("ja-JP");
-const man = (n: number) => Math.round(n / 10000).toLocaleString("ja-JP");
-const annFactor = (n: number, rate: number) => (rate === 0 ? n : (Math.pow(1 + rate, n) - 1) / rate);
-
-function loanPayment(B: number, ratePct: number, years: number): number {
-  const i = ratePct / 100 / 12, N = years * 12;
-  if (N <= 0) return 0;
-  if (i === 0) return B / N;
-  return (B * i) / (1 - Math.pow(1 + i, -N));
-}
-function totalInterest(B: number, ratePct: number, years: number): number {
-  return loanPayment(B, ratePct, years) * years * 12 - B;
-}
-function prepayCompression(B: number, ratePct: number, years: number, prepay: number): number {
-  const i = ratePct / 100 / 12;
-  if (i === 0 || years <= 0 || B <= 0) return 0;
-  const payment = loanPayment(B, ratePct, years);
-  const newBal = B - prepay;
-  if (newBal <= 0) return totalInterest(B, ratePct, years);
-  const newN = -Math.log(1 - (newBal * i) / payment) / Math.log(1 + i);
-  if (!isFinite(newN) || newN <= 0) return 0;
-  const after = payment * newN - newBal;
-  return Math.max(0, totalInterest(B, ratePct, years) - after);
-}
-function refinance(B: number, curRate: number, years: number) {
-  if (B <= 0 || years <= 0) return null;
-  const mNow = loanPayment(B, curRate, years);
-  const mNew = loanPayment(B, REFI_BASE, years);
-  const dMonthly = Math.max(0, mNow - mNew);
-  const dInterest = Math.max(0, totalInterest(B, curRate, years) - totalInterest(B, REFI_BASE, years));
-  const cost = Math.round(B * 0.022 + 100000); // 諸費用概算（事務手数料2.2%＋登記等10万）
-  const months = dMonthly > 0 ? Math.ceil(cost / dMonthly) : Infinity;
-  return { mNow, mNew, dMonthly, dInterest, cost, months };
-}
-function eduMonthly(ages: number[], plan: EduPlan): number {
-  const cost = EDU_PLANS[plan] * 10000;
-  let sum = 0;
-  ages.forEach((a) => { const m = Math.max(0, 18 - a) * 12; if (m > 0) sum += cost / m; });
-  return Math.round(sum);
-}
-
-/* ===== 計測 ===== */
-function track(name: string, params?: Record<string, unknown>) {
-  if (typeof window === "undefined") return;
-  if (location.search.includes("ga_debug")) console.log("[track]", name, params ?? {});
-  try {
-    window.gtag?.("event", name, params ?? {});
-    window.clarity?.("event", name);
-  } catch { /* no-op */ }
-}
+/* ===== 計測は lib/shisan/track.ts に共有化（Phase1）。冒頭でimport ===== */
 
 /* ===== カウントアップ ===== */
 function CountUp({ value }: { value: number }) {
@@ -184,12 +120,78 @@ export default function AssetConciergeMvp() {
   const [signupFlags, setSignupFlags] = useState<SignupFlags>({});
   const [lastDecided, setLastDecided] = useState<BucketId | null>(null);
   const [justRegistered, setJustRegistered] = useState(false);
+  /* ログイン状態＋実行申告（Phase1 §7-1。ログイン済み会員のみ表示） */
+  const [loggedIn, setLoggedIn] = useState(false);
+  /* 会員の再診断フロー（修正指示書_20260708・修正1）：
+   * マイページから ?reenter=1 で来た会員は、入力画面に直行（プリフィル）→確定でマイページへ戻る。 */
+  const [returnToMypage, setReturnToMypage] = useState(false);
+  const router = useRouter();
+  const [reports, setReports] = useState<Record<string, { status: string; monthly_amount: number | null }>>({});
+  useEffect(() => {
+    fetch("/api/shisan/me").then((r) => r.json()).then((me) => {
+      if (!me?.authenticated) return;
+      setLoggedIn(true);
+      fetch("/api/shisan/report").then((r) => r.json()).then((j) => { if (j?.ok) setReports(j.reports ?? {}); }).catch(() => {});
+    }).catch(() => {});
+  }, []);
+  /* 再診断とサーバーデータの同期（追加要件C・訴求の根幹）。
+   * ログイン済みなら、診断確定時とダッシュボード表示時に store をサーバーへ同期し、
+   * AIが常に最新の数字で話せるようにする（未ログインは次回ログイン中の表示時に追いつく）。 */
+  const syncServerStore = (inputsForSync?: Inputs | null, opts?: { force?: boolean }): Promise<unknown> | undefined => {
+    if (!loggedIn && !opts?.force) return; // 未ログインは対象外（次回ログイン中の表示時に追いつく）。再診断復帰は force で確実に同期
+    const i = inputsForSync ?? inputs;
+    if (!i) return;
+    let s: Store | null = null;
+    try { s = JSON.parse(localStorage.getItem(KEY) || "null"); } catch { s = null; }
+    return fetch("/api/shisan/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        scenario: judgeScenario(i),
+        store: { inputs: i, decisions: s?.decisions ?? decisions, firstVisit: s?.firstVisit ?? null },
+      }),
+    }).catch(() => { /* 未ログイン(401)・失敗は無音（次の機会に同期） */ });
+  };
+  useEffect(() => {
+    // ログイン確認後、表示中の診断データをサーバーへ追いつかせる
+    if (loggedIn && inputs) syncServerStore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loggedIn]);
+
+  const submitReport = async (b: BucketId, status: string, amount: number | null): Promise<ReportSaveResult> => {
+    try {
+      const res = await fetch("/api/shisan/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ actionId: b, status, monthlyAmount: amount }),
+      });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok || !j.ok) return { ok: false };
+      setReports((p) => ({ ...p, [b]: { status, monthly_amount: amount } }));
+      track("shisan_execute_report", { action_id: b, status, recalc: !!j.recalc });
+      return { ok: true, recalc: j.recalc, beforeMan: j.beforeMan, afterMan: j.afterMan };
+    } catch { return { ok: false }; }
+  };
 
   /* 復元＋再訪判定 */
   useEffect(() => {
     let s: Store | null = null;
     try { s = JSON.parse(localStorage.getItem(KEY) || "null"); } catch { s = null; }
-    if (s?.inputs) {
+    // 会員の再診断（?reenter=1）：診断結果ページを経由せず、入力画面に直行（プリフィル）→確定でマイページへ（修正1）
+    const reenter = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("reenter") === "1";
+    if (s?.inputs && reenter) {
+      setInputs(s.inputs); setDecisions(s.decisions || {}); setSignupFlags(s.signup ?? {});
+      setForm({
+        age: String(s.inputs.age), income: String(s.inputs.income), assets: String(s.inputs.assets),
+        surplus: String(s.inputs.surplus), living: String(s.inputs.living),
+        mBal: String(s.inputs.mBal), mYears: String(s.inputs.mYears), mRate: String(s.inputs.mRate),
+        mType: s.inputs.mType, eduPlan: s.inputs.eduPlan, target: String(s.inputs.target), r: String(s.inputs.r),
+      });
+      setHasMortgage(s.inputs.hasMortgage); setChildCount(s.inputs.childAges.length);
+      setChildAges(s.inputs.childAges.map(String));
+      setReturnToMypage(true); setScreen("input");
+      track("shisan_reenter");
+    } else if (s?.inputs) {
       setInputs(s.inputs); setDecisions(s.decisions || {}); setSignupFlags(s.signup ?? {}); setScreen("dash");
       track("shisan_dashboard_view"); track("shisan_result_view");
       if (s.lastVisit) {
@@ -235,7 +237,7 @@ export default function AssetConciergeMvp() {
     setChildAges((prev) => Array.from({ length: c }, (_, i) => prev[i] ?? ""));
   };
 
-  const submit = () => {
+  const submit = async () => {
     if (!num("age") || !num("income") || !num("assets")) { showToast("年齢・年収・金融資産を入力してください"); return; }
     const surplus = num("surplus");
     const i: Inputs = {
@@ -247,37 +249,29 @@ export default function AssetConciergeMvp() {
       target: num("target") || 2000, r: num("r") || 3,
     };
     setInputs(i); persist({ inputs: i }); track("shisan_input_complete");
+    // 会員の再診断復帰（修正1）：サーバーstoreを確実に同期してからマイページへ戻る（結果ページを経由しない）
+    if (returnToMypage) {
+      try { await syncServerStore(i, { force: true }); } catch { /* 失敗時もマイページで最新化を試みる */ }
+      track("shisan_reenter_complete");
+      router.push("/shisan/mypage");
+      return;
+    }
+    syncServerStore(i); // 再診断の確定をサーバーへ同期（追加要件C）
     // A層判定：毎月の余力が極小＝困窮の可能性 → 別出口
     if (surplus <= 0) { track("shisan_a_layer_exit"); setScreen("exit"); window.scrollTo(0, 0); return; }
     track("shisan_dashboard_view"); track("shisan_result_view");
     setScreen("dash"); window.scrollTo(0, 0);
   };
 
-  /* 該当バケツ */
-  const buckets = useMemo<BucketId[]>(() => {
-    if (!inputs) return [];
-    const b: BucketId[] = ["liq"];
-    if (inputs.childAges.length > 0) b.push("edu");
-    if (inputs.hasMortgage && inputs.mBal > 0) { b.push("refi"); if (inputs.surplus > 0) b.push("prepay"); }
-    if (inputs.surplus > 0) b.push("nisa");
-    return b;
-  }, [inputs]);
+  /* 該当バケツ（ロジックは lib/shisan/calc.ts に共有化） */
+  const buckets = useMemo<BucketId[]>(() => deriveBuckets(inputs), [inputs]);
 
   const decidedCount = buckets.filter((b) => decisions[b]).length;
   const score = buckets.length ? Math.round((decidedCount / buckets.length) * 100) : 0;
+  const allDone = buckets.length > 0 && decidedCount === buckets.length; // 全質問完了（Phase1 §2-2）
 
-  /* シナリオ自動判定（A/B/C）
-   * 評価順序が優先順位：①C（余力が薄い）を最初に弾く → ②A（未成年の子あり）→ ③B（既定）。
-   * 0以下の余力は submit() で別画面(exit)へ除外済み。閾値3万は仮（実データで調整可）。
-   * ローンは分類を変えず、ありの時だけ A の切迫度を表示で強調する（loanBurden）。 */
-  const SURPLUS_THIN = 30000; // 円/月・余力が薄いライン（仮）
-  const scenario = useMemo<"A" | "B" | "C" | null>(() => {
-    if (!inputs) return null;
-    if (inputs.surplus <= 0) return null; // 余力0以下は別出口＝打ち手を出さない（復元経路の保険）
-    if (inputs.surplus < SURPLUS_THIN) return "C"; // ①最優先：余力薄ければ土台固め
-    if (inputs.childAges.some((a) => a < 18)) return "A"; // ②未成年の子あり
-    return "B"; // ③それ以外（子なし/全員独立）
-  }, [inputs]);
+  /* シナリオ自動判定（A/B/C）。ロジックは lib/shisan/calc.ts の judgeScenario に共有化。 */
+  const scenario = useMemo<"A" | "B" | "C" | null>(() => judgeScenario(inputs), [inputs]);
   /* 初回ダッシュボード表示時、最初の未決カードを自動で開く */
   useEffect(() => {
     if (screen === "dash" && !autoOpened.current && buckets.length) {
@@ -286,62 +280,8 @@ export default function AssetConciergeMvp() {
     }
   }, [screen, buckets, decisions]);
 
-  /* 試算結果（A'案：生む／配分／65歳見込みの3ブロック） */
-  const result = useMemo(() => {
-    if (!inputs) return null;
-    const n = Math.max(0, RET_AGE - inputs.age);
-    const r = inputs.r / 100;
-    const i = inputs.mRate / 100;
-    const S = inputs.surplus;                 // 毎月の余力
-    const assetsYen = inputs.assets;          // 円入力（2026-06-23 単位を円に統一）
-    const livingTarget = inputs.living * 6;   // 生活防衛資金の目安
-
-    // ブロック1：毎月生まれたゆとり（借換で手取り純増。＋のみ）
-    const refi = inputs.hasMortgage ? refinance(inputs.mBal, inputs.mRate, inputs.mYears) : null;
-    const yutori = decisions.refi?.choice === "進める" && refi ? Math.round(refi.dMonthly) : 0;
-
-    // ブロック2：毎月の余力の使い道（優先カスケードで自動推定・符号なし配置）
-    const pool = S + yutori;
-    let remaining = pool;
-    let bei = 0;
-    if (decisions.liq && decisions.liq.choice !== "今は見送る") {
-      const gap = Math.max(0, livingTarget - assetsYen);
-      bei = gap > 0 ? Math.min(remaining, Math.round(gap / 12)) : 0; // 約1年で確保／既に充足なら0
-    }
-    remaining -= bei;
-    let edu = 0;
-    if (decisions.edu) {
-      const need = eduMonthly(inputs.childAges, inputs.eduPlan);
-      if (decisions.edu.choice === "必要額を積む") edu = Math.min(remaining, need);
-      else if (decisions.edu.choice === "一部を積む") edu = Math.min(remaining, Math.round(need / 2));
-    }
-    remaining -= edu;
-    let kuriage = 0, toushi = 0;
-    if (decisions.prepay) {
-      const amt = remaining;
-      if (decisions.prepay.choice === "繰上げ中心") kuriage = amt;
-      else if (decisions.prepay.choice === "投資中心") toushi = amt;
-      else if (decisions.prepay.choice === "両方に分ける") { kuriage = Math.round(amt / 2); toushi = amt - kuriage; }
-    }
-    remaining -= (kuriage + toushi);
-    const mihai = Math.max(0, remaining); // 未配分（まだ自由に使えるお金）
-    const nisaUsed = decisions.nisa?.choice === "枠を使う";
-
-    // ブロック3：65歳見込み（配分反映・目安）
-    // 投資→想定リターンr／繰上げ→ローン金利i（債務圧縮の利回り）／備え・教育・未配分→元本（運用しない）
-    const grow = (m: number, rate: number) => m * 12 * annFactor(n, rate);
-    const future =
-      assetsYen * Math.pow(1 + r, n) +
-      grow(toushi, r) +
-      grow(kuriage, i) +
-      (bei + edu + mihai) * 12 * n;
-    const achieve = Math.min(999, Math.round((future / inputs.target) * 100));
-
-    // 教育費（＋備え）で余力を使い切り、繰上げ/投資・未配分が0＝トレードオフが顕在化した状態
-    const eduCrowdsOut = edu > 0 && kuriage === 0 && toushi === 0 && mihai === 0;
-
-    return { n, yutori, pool, bei, edu, kuriage, toushi, mihai, nisaUsed, future, achieve, eduCrowdsOut };
-  }, [inputs, decisions]);
+  /* 試算結果（A'案3ブロック。ロジックは lib/shisan/calc.ts の computeResult に共有化） */
+  const result = useMemo(() => computeResult(inputs, decisions), [inputs, decisions]);
 
   /* 打ち手カード群「あなたの次の一手」（シナリオ別・推奨順・数字は既存関数流用） */
   const actions = useMemo<ActionCard[]>(() => {
@@ -427,18 +367,23 @@ export default function AssetConciergeMvp() {
     if (!inputs) return;
     const ni = { ...inputs, r: v };
     setInputs(ni); persist({ inputs: ni });
+    syncServerStore(ni); // 想定リターン変更もサーバーへ同期（追加要件C）
     track("shisan_set_return", { r: v });
   };
 
-  // 打ち手カード本体タップ → 対応する質問（バケツ）を開いてスクロール＋select計測（段階3/5）
-  // rank＝推奨順位（先頭=0）。仮説D（推奨先頭のまま/下位から選び直し）の検証データ。
+  // 打ち手カード本体タップ＋select計測（段階3/5）。rank＝推奨順位（先頭=0）。
+  // AI主導フロー（追加要件E-3）：質問アコーディオンが無いため、タップ先はAI大導線へのスクロールに変更。
   const selectAction = (a: ActionCard, rank: number) => {
     if (!a.bucket) return; // 送客のみのカードは executeAction 側
     track("shisan_action_select", { action_id: a.id, rank });
-    setOpenBucket(a.bucket);
-    if (typeof document !== "undefined") {
+    if (typeof document === "undefined") return;
+    if (SHOW_INLINE_QUESTIONS) {
+      setOpenBucket(a.bucket);
       const el = document.getElementById(`bucket-${a.bucket}`);
       if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "start" }));
+    } else {
+      const el = document.getElementById("ai-cta");
+      if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
     }
   };
 
@@ -454,6 +399,7 @@ export default function AssetConciergeMvp() {
   const decide = (b: BucketId, choice: string) => {
     const next = { ...decisions, [b]: { choice } };
     setDecisions(next); persist({ decisions: next }); setOpenBucket(null);
+    syncServerStore(); // 決めた一手もサーバーへ同期（AIのコンテキスト最新化・追加要件C）
     setLastDecided(b); // 登録ブロックの表示位置（意思決定したバケツの直下・要件1）
     track("shisan_task_execute", { task_id: b, choice });
     const willAll = buckets.every((x) => next[x]);
@@ -494,17 +440,13 @@ export default function AssetConciergeMvp() {
   // 年収・資産の生値は含めない（結果値のみ）。
   const signupSummary = () => {
     if (!scenario || !result || !inputs) return null;
-    const DECISION_LABEL: Record<BucketId, string> = {
-      liq: "もしもの備え", edu: "教育費", refi: "借り換え",
-      prepay: "繰り上げ返済と投資", nisa: "NISAの非課税枠",
-    };
     return {
       phase: SCENARIO_PHASE[scenario],
       poolYen: yen(result.pool),           // 画面②「毎月の余力 ¥X の使い道」と同じ値
       future65Man: man(result.future),     // 画面③「約¥X万」と同じ値
       r: inputs.r,
       decisions: buckets.filter((b) => decisions[b])
-        .map((b) => ({ label: DECISION_LABEL[b], choice: decisions[b]!.choice })),
+        .map((b) => ({ label: BUCKET_LABEL[b], choice: decisions[b]!.choice })),
     };
   };
 
@@ -653,14 +595,32 @@ export default function AssetConciergeMvp() {
   /* ============ 画面2：ダッシュボード ============ */
   return (
     <main className="max-w-2xl mx-auto px-4 pt-6 pb-24 text-slate-800">
-      <h1 className="text-[22px] font-extrabold leading-tight mb-3">診断結果</h1>
+      <div className="flex items-center justify-between mb-3">
+        <h1 className="text-[22px] font-extrabold leading-tight">診断結果</h1>
+        <div className="flex items-center gap-3">
+          {/* 会員が結果ページに来た場合の迷子救済（修正1-4）：マイページへ戻れる導線 */}
+          {loggedIn && (
+            <Link href="/shisan/mypage" className="text-[12px] font-semibold text-emerald-700 underline underline-offset-2">
+              マイページへ →
+            </Link>
+          )}
+          {/* 常設の小さいチャット入口（Phase1 §4-1。未登録はログイン案内画面に着地） */}
+          <Link href="/shisan/chat" className="text-[12px] font-semibold text-emerald-700 underline underline-offset-2"
+            onClick={() => track("shisan_chat_open_click")}>
+            AIに相談 →
+          </Link>
+        </div>
+      </div>
 
       {/* 診断結果コーナー（緑・A'案 3ブロック・全ブロック緑で統一） */}
       <div className="rounded-2xl shadow-sm p-5 mb-5 text-white bg-gradient-to-br from-emerald-600 to-emerald-800">
-        <div className="flex items-center justify-end mb-1">
-          <div className="text-[13px] opacity-90">答えた質問 <b><CountUp value={decidedCount} /> / {buckets.length}</b></div>
-        </div>
-        <div className="h-2 bg-white/25 rounded-full overflow-hidden mb-5"><div className="h-full bg-white transition-all duration-500" style={{ width: `${score}%` }} /></div>
+        {/* 完了スコアは質問前提のUIのためAI主導フローでは非表示（追加要件E-1） */}
+        {SHOW_INLINE_QUESTIONS && (<>
+          <div className="flex items-center justify-end mb-1">
+            <div className="text-[13px] opacity-90">答えた質問 <b><CountUp value={decidedCount} /> / {buckets.length}</b></div>
+          </div>
+          <div className="h-2 bg-white/25 rounded-full overflow-hidden mb-5"><div className="h-full bg-white transition-all duration-500" style={{ width: `${score}%` }} /></div>
+        </>)}
 
         {/* ① 毎月生まれたゆとり */}
         <div className="mb-5">
@@ -736,19 +696,41 @@ export default function AssetConciergeMvp() {
         </section>
       )}
 
-      {/* 資産づくりの質問（意思決定フロー）＝新コーナーの区切り（緑見出し＋上罫線） */}
-      <h2 className="text-[16px] font-extrabold text-emerald-700 border-t border-slate-200 pt-5 mt-6 mb-1">資産づくりの質問（{buckets.length}つ）</h2>
-      <p className="text-[13px] text-slate-500 mb-3">下の質問に答えると、診断結果が変わります。</p>
-      {buckets.map((b, idx) => (
-        <BucketCard key={b} id={b} index={idx} inputs={inputs!} decision={decisions[b]} open={openBucket === b}
-          onToggle={() => setOpenBucket(openBucket === b ? null : b)} onDecide={(c) => decide(b, c)} onSetR={setR} />
-      ))}
-
-      {/* 会員登録（質問リストの一番下に固定・初回の意思決定後に表示） */}
-      {(showSignup || justRegistered) && (
-        <SignupBlock done={justRegistered} scenario={scenario!} snapshot={signupSnapshot} summary={signupSummary}
-          onView={onSignupView} onClose={closeSignup} onRegistered={onSignupRegistered} />
+      {/* AIへの大導線（追加要件E-2）：主役級・登録もここに一本化。余力0（別出口）はactionsが無いため出ない */}
+      {actions.length > 0 && scenario && (
+        <AiCtaPanel loggedIn={loggedIn} registered={!!signupFlags.registered} scenario={scenario}
+          questionCount={buckets.length} snapshot={signupSnapshot} summary={signupSummary}
+          onView={onSignupView} onRegistered={onSignupRegistered} />
       )}
+
+      {/* ===== 従来型（画面内で質問に答える）＝比較検証用に温存（追加要件E-1） ===== */}
+      {SHOW_INLINE_QUESTIONS && (<>
+        <h2 className="text-[16px] font-extrabold text-emerald-700 border-t border-slate-200 pt-5 mt-6 mb-1">資産づくりの質問（{buckets.length}つ）</h2>
+        <p className="text-[13px] text-slate-500 mb-3">下の質問に答えると、診断結果が変わります。</p>
+        {buckets.map((b, idx) => (
+          <BucketCard key={b} id={b} index={idx} inputs={inputs!} decision={decisions[b]} open={openBucket === b}
+            onToggle={() => setOpenBucket(openBucket === b ? null : b)} onDecide={(c) => decide(b, c)} onSetR={setR}
+            execReport={loggedIn && decisions[b] ? { current: reports[b] ?? null, onSubmit: (s, a) => submitReport(b, s, a) } : undefined} />
+        ))}
+        {allDone && (
+          <section className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 my-4">
+            <h2 className="text-[17px] font-extrabold text-emerald-900 mb-1">おつかれさまでした。あなたの次の一手が決まりました。</h2>
+            <ul className="text-[13px] text-slate-700 mb-1">
+              {buckets.filter((b) => decisions[b]).map((b) => (
+                <li key={b}>・{BUCKET_LABEL[b]}：{decisions[b]!.choice}</li>
+              ))}
+            </ul>
+            <MemberCta registered={!!signupFlags.registered} justRegistered={justRegistered} showSignup={showSignup}
+              scenario={scenario} snapshot={signupSnapshot} summary={signupSummary}
+              onView={onSignupView} onClose={closeSignup} onRegistered={onSignupRegistered} />
+          </section>
+        )}
+        {!allDone && (
+          <MemberCta registered={!!signupFlags.registered} justRegistered={justRegistered} showSignup={showSignup}
+            scenario={scenario} snapshot={signupSnapshot} summary={signupSummary}
+            onView={onSignupView} onClose={closeSignup} onRegistered={onSignupRegistered} />
+        )}
+      </>)}
 
       <button className={`${btnSm} bg-slate-100 text-slate-700`} onClick={editAgain}>入力を修正する</button>
       <p className="text-[11px] text-slate-400 border-t border-dashed border-slate-200 pt-3 mt-4">
@@ -760,8 +742,9 @@ export default function AssetConciergeMvp() {
 }
 
 /* ===== バケツカード ===== */
-function BucketCard({ id, index, inputs, decision, open, onToggle, onDecide, onSetR }: {
+function BucketCard({ id, index, inputs, decision, open, onToggle, onDecide, onSetR, execReport }: {
   id: BucketId; index: number; inputs: Inputs; decision?: Decision; open: boolean; onToggle: () => void; onDecide: (c: string) => void; onSetR: (v: number) => void;
+  execReport?: ExecReportProps;
 }) {
   const done = !!decision;
   const n = Math.max(0, RET_AGE - inputs.age);
@@ -789,6 +772,12 @@ function BucketCard({ id, index, inputs, decision, open, onToggle, onDecide, onS
       {open && (
         <div className="px-3.5 pb-4 border-t border-slate-100 pt-3">
           <BucketPanel id={id} inputs={inputs} n={n} onDecide={onDecide} onSetR={onSetR} />
+        </div>
+      )}
+      {/* 実行申告（Phase1 §7-1）：意思決定済み＋ログイン済みの会員のみ */}
+      {done && execReport && (
+        <div className="px-3.5 pb-3.5">
+          <ExecuteReportPanel {...execReport} />
         </div>
       )}
     </div>
@@ -959,6 +948,123 @@ function ActionCardView({ a, rank, primary, onSelect, onExecute }: {
   );
 }
 
+/* ===== AIへの大導線（追加要件E-2/F）＝主役級・登録を内包して一本化 =====
+ * 未登録：メール入力→即セッション発行→チャット直行（メールを開かせない）
+ * 登録済み（未ログイン）：チャットへ（ログイン案内に着地）／ログイン済み：チャット直行 */
+function AiCtaPanel({ loggedIn, registered, scenario, questionCount, snapshot, summary, onView, onRegistered }: {
+  loggedIn: boolean;
+  registered: boolean;
+  scenario: "A" | "B" | "C";
+  questionCount: number;
+  snapshot: () => Record<string, unknown>;
+  summary: () => Record<string, unknown> | null;
+  onView: () => void;
+  onRegistered: () => void;
+}) {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const [existing, setExisting] = useState(false);
+  const isMember = loggedIn || registered;
+  useEffect(() => { if (!isMember) onView(); }, [onView, isMember]); // signup_view継続（1回ガードは親のref）
+
+  const panel = "rounded-2xl shadow-sm text-white bg-gradient-to-br from-emerald-600 to-emerald-800 p-4 mb-6";
+
+  const start = async () => {
+    const v = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { setError("メールアドレスの形式をご確認ください。"); return; }
+    setError(""); setSending(true);
+    try {
+      const res = await fetch("/api/shisan/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: v, scenario, store: snapshot(), summary: summary() }),
+      });
+      const json: { ok?: boolean; session?: boolean; existing?: boolean } = await res.json().catch(() => ({}));
+      if (res.ok && json.ok && json.session) {
+        onRegistered(); // registeredフラグ永続＋shisan_signup_submit
+        router.push("/shisan/chat"); // 即セッションでそのままAIへ（要件F）
+      } else if (res.ok && json.ok && json.existing) {
+        setExisting(true);
+      } else {
+        setError("登録に失敗しました。時間をおいてお試しください。");
+        setSending(false);
+      }
+    } catch {
+      setError("通信に失敗しました。時間をおいてお試しください。");
+      setSending(false);
+    }
+  };
+
+  return (
+    <div id="ai-cta" className={panel}>
+      <div className="font-extrabold text-[18px] leading-snug">診断結果をもとに、AIに相談する</div>
+      <p className="text-[13px] text-white/85 mt-1 leading-relaxed">
+        売り込みなし・無料（1日20回まで）。あなたの診断結果を知っているAIが、{questionCount}つの質問で一緒に決めます。
+      </p>
+      {isMember ? (
+        <Link href="/shisan/chat" onClick={() => track("shisan_ai_cta_click", { scenario })}
+          className="block w-full mt-3 py-3 rounded-xl text-center bg-white text-emerald-700 text-base font-bold hover:bg-emerald-50 transition">
+          {loggedIn ? "AIと続きへ →" : "AIに相談する（ログイン） →"}
+        </Link>
+      ) : existing ? (
+        <div className="mt-3 rounded-xl bg-white/15 p-3 text-[13px] leading-relaxed">
+          このメールアドレスは登録済みです。ログインリンクをお送りしたので、メールからお戻りください。
+        </div>
+      ) : (<>
+        <div className="flex gap-2 mt-3 flex-wrap">
+          <input type="email" inputMode="email" autoComplete="email"
+            className="flex-1 min-w-[180px] px-3 py-2.5 rounded-xl text-[15px] bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white"
+            placeholder="メールアドレス"
+            value={email} onChange={(e) => setEmail(e.target.value)} disabled={sending} />
+          <button type="button" disabled={sending}
+            onClick={() => { track("shisan_ai_cta_click", { scenario }); start(); }}
+            className={`${btnSm} bg-white text-emerald-700 hover:bg-emerald-50 disabled:opacity-60 whitespace-nowrap`}>
+            {sending ? "開始中…" : "無料ではじめる"}
+          </button>
+        </div>
+        {error && <p className="text-[12px] text-red-200 mt-1.5">{error}</p>}
+        <p className="text-[11px] mt-2">
+          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline text-white/80">プライバシーポリシー</a>
+        </p>
+      </>)}
+    </div>
+  );
+}
+
+/* ===== 会員CTA（Phase1 §2-2/2-3）＝登録状態に応じて出し分け =====
+ * 未登録：登録ブロック（SignupBlock）／登録直後：完了表示／登録済み：AIに相談ボタン */
+function MemberCta({ registered, justRegistered, showSignup, scenario, snapshot, summary, onView, onClose, onRegistered }: {
+  registered: boolean;
+  justRegistered: boolean;
+  showSignup: boolean;
+  scenario: "A" | "B" | "C" | null;
+  snapshot: () => Record<string, unknown>;
+  summary: () => Record<string, unknown> | null;
+  onView: () => void;
+  onClose: () => void;
+  onRegistered: () => void;
+}) {
+  if (justRegistered || (showSignup && scenario)) {
+    return (
+      <SignupBlock done={justRegistered} scenario={scenario ?? "B"} snapshot={snapshot} summary={summary}
+        onView={onView} onClose={onClose} onRegistered={onRegistered} />
+    );
+  }
+  if (registered) {
+    return (
+      <Link href="/shisan/chat"
+        className="block w-full my-4 py-3.5 rounded-2xl text-center text-white text-base font-bold shadow-sm bg-gradient-to-br from-emerald-600 to-emerald-800 hover:opacity-95 transition"
+        onClick={() => track("shisan_chat_open_click")}>
+        AIに相談する →
+        <span className="block text-[11px] font-normal text-white/80 mt-0.5">あなたの診断結果を知っています。売り込みはありません</span>
+      </Link>
+    );
+  }
+  return null;
+}
+
 /* ===== 会員登録ブロック（第一陣・要件1） =====
  * 初回の意思決定直後に、そのバケツカードの直下へインライン表示（モーダル禁止）。
  * メール1フィールドのみ。保存先は /api/shisan/signup（Supabase upsert＋完了メール）。
@@ -1001,8 +1107,9 @@ function SignupBlock({ done, scenario, snapshot, summary, onView, onClose, onReg
   const panel = "rounded-2xl shadow-sm text-white bg-gradient-to-br from-emerald-600 to-emerald-800 p-4 my-4";
   if (done) {
     return (
-      <div className={`${panel} text-sm font-bold`}>
-        ✅ 保存しました。
+      <div className={`${panel} text-sm`}>
+        <span className="font-bold">✅ 登録しました。</span>
+        <span className="block mt-1 text-white/85 text-[13px]">お送りしたメールの「AIに相談を始める」リンクから、相談を始められます。</span>
       </div>
     );
   }
@@ -1010,7 +1117,10 @@ function SignupBlock({ done, scenario, snapshot, summary, onView, onClose, onReg
     <div className={`relative ${panel}`}>
       <button type="button" aria-label="閉じる" onClick={onClose}
         className="absolute top-2 right-3 text-white/60 hover:text-white text-xl leading-none">×</button>
-      <div className="font-bold text-[16px] pr-6">この内容を保存する</div>
+      <div className="font-bold text-[16px] pr-6">迷ったら、いつでも相談できます</div>
+      <p className="text-[13px] text-white/85 mt-1 leading-relaxed">
+        あなたの診断結果を知っているAIに、無料で相談できます。売り込みは一切ありません。
+      </p>
       <div className="flex gap-2 mt-3 flex-wrap">
         <input type="email" inputMode="email" autoComplete="email"
           className="flex-1 min-w-[180px] px-3 py-2.5 rounded-xl text-[15px] bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white"
@@ -1018,7 +1128,7 @@ function SignupBlock({ done, scenario, snapshot, summary, onView, onClose, onReg
           value={email} onChange={(e) => setEmail(e.target.value)} disabled={sending} />
         <button type="button" onClick={submit} disabled={sending}
           className={`${btnSm} bg-white text-emerald-700 hover:bg-emerald-50 disabled:opacity-60 whitespace-nowrap`}>
-          {sending ? "保存中…" : "無料で保存する"}
+          {sending ? "送信中…" : "無料ではじめる"}
         </button>
       </div>
       {error && <p className="text-[12px] text-red-200 mt-1.5">{error}</p>}

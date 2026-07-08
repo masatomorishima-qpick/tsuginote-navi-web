@@ -289,7 +289,6 @@ function ChatInner() {
         </div>
         <div className="flex gap-3">
           <Link href="/shisan/mypage" className="text-[12px] text-emerald-700 underline">マイページへ</Link>
-          <Link href="/shisan" className="text-[12px] text-emerald-700 underline">診断結果へ</Link>
         </div>
       </div>
 

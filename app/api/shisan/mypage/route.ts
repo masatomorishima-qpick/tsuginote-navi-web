@@ -83,7 +83,8 @@ export async function GET() {
         if (!hasPlan && (b === "prepay" || b === "nisa") && mihai <= 0) return [];
         // 方針（次の一歩）未設定のタスクは、決定論の具体文言をサーバー生成（修正4）。¥は未配分額に連動
         const mihaiYen = yen(mihai);
-        let cta = "AIと次の一歩を決める";
+        // バケツ名を入れて区別（同じ「AIと次の一歩を決める」が複数並ぶ重複表示を防ぐ）
+        let cta = `${BUCKET_LABEL[b]}の次の一歩をAIと決める`;
         if (!hasPlan) {
           if (b === "prepay") cta = `残り¥${mihaiYen}の使い道を決める：繰り上げ返済と投資、あなたの場合の比較を見る`;
           else if (b === "nisa") cta = `NISAの月額を決める：月¥${mihaiYen}を積み立てた場合の65歳時点を見る`;

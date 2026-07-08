@@ -1,8 +1,9 @@
 "use client";
 
 /**
- * /shisan/mypage：会員マイページ（追加要件A・最小形）
- * 構成：①診断サマリー ②決めた一手と実行状況（申告UIの正） ③伴走AIへの導線
+ * /shisan/mypage：会員マイページ（実装指示書_20260708：3ブロック構成）
+ * 構成：①現在地（判定＋余力＋内訳等式） ②毎月の余力と配分（配分表） ③次にやること（next_step＋実行申告を統合）
+ * 「詳細：決めた一手と実行状況」コーナーは廃止し、実行申告は③に一本化。
  * ログイン必須（未ログインは共通のログイン案内）。データはサーバー保存値が正。
  */
 
@@ -159,18 +160,47 @@ function MypageInner() {
         </div>
       )}
 
-      {/* ブロック3「次にやること」＝③次に何をするか（チェック＝実行申告） */}
-      {data && data.tasks.length > 0 && data.remainingCount === 0 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 mb-4">
-          <h2 className="text-[15px] font-extrabold text-emerald-800 mb-2">次にやること</h2>
-          {data.tasks.map((task) => (
-            <TaskRow key={task.id} task={task}
-              onCheck={(amount) => submitReport(task.id, "done", amount)} />
-          ))}
-        </div>
-      )}
+      {/* ブロック3「次にやること」＝打ち手ごとに next_step＋実行申告を統合（実装指示書_20260708 修正1・2・3）。
+          詳細コーナーは廃止し、実行申告はここに一本化。 */}
+      {data && data.remainingCount === 0 && (() => {
+        const planned = data.tasks.filter((t) => t.nextStep);
+        const unplanned = data.tasks.filter((t) => !t.nextStep);
+        if (planned.length === 0 && unplanned.length === 0) {
+          return (
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 mb-4 text-[13px] text-slate-500">
+              決めた一手はまだありません。<Link href="/shisan/chat" className="underline text-emerald-700" onClick={() => track("shisan_chat_open_click")}>AIと決める →</Link>
+            </div>
+          );
+        }
+        return (
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 mb-4">
+            <h2 className="text-[15px] font-extrabold text-emerald-800 mb-1">次にやること</h2>
+            {planned.length > 0 && (
+              <p className="text-[12px] text-slate-500 mb-2">
+                内容を見直したいときは<Link href="/shisan/chat" className="underline text-emerald-700" onClick={() => track("shisan_chat_open_click")}>AIと見直す →</Link>
+              </p>
+            )}
+            {planned.map((task) => (
+              <PlannedTask key={task.id} task={task}
+                report={data.reports[task.id] ?? null}
+                refiMismatch={task.id === "refi" && data.refiMismatch}
+                onSubmit={(status, amount) => submitReport(task.id, status, amount)} />
+            ))}
+            {/* 次の一歩が未設定の打ち手は1導線に集約（同一文言を複数並べない＝修正2） */}
+            {unplanned.length > 0 && (
+              <div className="flex items-start gap-2 pt-2 text-[13px] text-slate-600">
+                <span className="text-slate-300 mt-[1px]">☐</span>
+                <Link href="/shisan/chat" onClick={() => track("shisan_chat_open_click")}
+                  className="underline text-emerald-700">
+                  次の一歩を決める：{unplanned.map((t) => t.label).join("・")} → AIと決める
+                </Link>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
-      {/* ② 出し分け（修正指示書_20260707 修正1-2）：未完了＝AIへ誘導／完了＝決めた一手＋実行申告 */}
+      {/* 未決定（方針の質問が残っている）＝AIへ誘導 */}
       {data && data.remainingCount > 0 && (
         <div className="rounded-2xl border border-emerald-300 bg-emerald-50 p-4 mb-4">
           <div className="font-bold text-[15px] text-emerald-900 mb-1">
@@ -184,51 +214,6 @@ function MypageInner() {
         </div>
       )}
 
-      <h2 className="text-[16px] font-extrabold text-emerald-700 mb-2">{data && data.remainingCount === 0 ? "詳細：決めた一手と実行状況" : "決めた一手"}</h2>
-      {data && data.remainingCount === 0 && data.decisions.length > 0 && (
-        <p className="text-[12px] text-slate-500 mb-2">
-          内容を見直したいときは<Link href="/shisan/chat" className="underline text-emerald-700">AIと見直す →</Link>
-        </p>
-      )}
-      {data && data.decisions.length > 0 ? (
-        data.decisions.map((d) => (
-          <div key={d.id} className="bg-white border border-slate-200 rounded-xl p-3.5 mb-2.5">
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="font-bold text-[14px]">{d.label}</span>
-              <span className="text-[12px] text-emerald-700 font-semibold">決めた：{d.choice}</span>
-            </div>
-            {/* あなたの方針（修正A：AIとの合意の固定。変更はAI経由のみ） */}
-            {data.plans[d.id] && (
-              <div className="mt-2 rounded-lg bg-emerald-50 border border-emerald-100 px-2.5 py-2 text-[12px] text-slate-700">
-                <div><span className="font-bold text-emerald-800">あなたの方針：</span>{data.plans[d.id].goal}</div>
-                <div><span className="font-bold text-emerald-800">次の一歩：</span>{data.plans[d.id].nextStep}</div>
-                <div className="text-[10px] text-slate-400 mt-0.5">
-                  {new Date(data.plans[d.id].updatedAt).toLocaleDateString("ja-JP", { month: "numeric", day: "numeric" })} AIと相談
-                </div>
-              </div>
-            )}
-            {/* 方針と実行の食い違い（Q3c：数字は調整せず、解消をAIへ） */}
-            {d.id === "refi" && data.refiMismatch && (
-              <div className="mt-2 rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-2 text-[12px] text-amber-800">
-                方針（進める）と実行状況（やめた）が食い違っています。
-                <Link href="/shisan/chat" className="underline font-bold ml-1">AIと見直しますか？ →</Link>
-              </div>
-            )}
-            {/* 実行申告は全問完了後のみ（未完了時は状態表示に徹する） */}
-            {data.remainingCount === 0 && (
-              <div className="mt-2">
-                <ExecuteReportPanel current={data.reports[d.id] ?? null}
-                  amountLabel={d.id === "refi" ? AMOUNT_LABEL_REFI : AMOUNT_LABEL_DEFAULT}
-                  memoNote={d.id !== "refi" ? "※余力には反映されない記録です" : undefined}
-                  onSubmit={(status, amount) => submitReport(d.id, status, amount)} />
-              </div>
-            )}
-          </div>
-        ))
-      ) : (
-        <p className="text-[13px] text-slate-500 mb-2">まだ決めた一手はありません。上の「AIと決める」から始められます。</p>
-      )}
-
       {/* ③ 伴走AIに相談 */}
       <Link href="/shisan/chat"
         className="block w-full mt-5 py-4 rounded-2xl text-center text-white text-base font-bold shadow-sm bg-gradient-to-br from-emerald-600 to-emerald-800 hover:opacity-95 transition"
@@ -240,74 +225,36 @@ function MypageInner() {
   );
 }
 
-/* ===== タスク行（ブロック3）：チェック＝実行申告。refiのみ金額入力（スキップ可＝Q3条件） ===== */
-function TaskRow({ task, onCheck }: {
-  task: { id: string; label: string; nextStep: string | null; done: boolean; cta: string };
-  onCheck: (amount: number | null) => Promise<ReportSaveResult>;
+/* ===== タスク行（ブロック3）：next_step（次の一歩）＋実行申告を1行に統合（実装指示書_20260708 修正1）。
+   実行申告UIは共用の ExecuteReportPanel（実行した/まだ/やめた＋改善額）。refiは食い違い警告＋差分反映。 ===== */
+function PlannedTask({ task, report, refiMismatch, onSubmit }: {
+  task: { id: string; label: string; nextStep: string | null };
+  report: { status: string; monthly_amount: number | null } | null;
+  refiMismatch: boolean;
+  onSubmit: (status: string, amount: number | null) => Promise<ReportSaveResult>;
 }) {
-  const [phase, setPhase] = useState<"idle" | "amount" | "saving" | "done">(task.done ? "done" : "idle");
-  const [amount, setAmount] = useState("");
-  const [fb, setFb] = useState<{ beforeMan: string; afterMan: string } | null>(null);
-  const [error, setError] = useState("");
-
-  const save = async (amt: number | null) => {
-    setPhase("saving"); setError("");
-    const res = await onCheck(amt);
-    if (res.ok) {
-      setFb(res.recalc && res.beforeMan && res.afterMan ? { beforeMan: res.beforeMan, afterMan: res.afterMan } : null);
-      setPhase("done");
-    } else { setError("記録に失敗しました。時間をおいてお試しください。"); setPhase("idle"); }
-  };
-
-  if (!task.nextStep) {
-    return (
-      <div className="flex items-start gap-2 py-1.5 border-b border-slate-50 text-[13px] text-slate-600">
-        <span className="text-slate-300 mt-[1px]">☐</span>
-        <Link href={`/shisan/chat?topic=${task.id}`} onClick={() => track("shisan_chat_open_click")}
-          className="underline text-emerald-700">{task.cta} →</Link>
-      </div>
-    );
-  }
-  if (phase === "done") {
-    return (
-      <div className="py-1.5 border-b border-slate-50 text-[13px]">
-        <span className="text-emerald-700 font-bold">✓ 済</span>
-        <span className="ml-2 text-slate-400 line-through">{task.nextStep}</span>
-        <span className="ml-1 text-[11px] text-slate-400">（{task.label}）</span>
-        {fb && <div className="text-[12px] text-emerald-700 mt-0.5">あなたの実行で、65歳の見込みが 約¥{fb.beforeMan}万 → 約¥{fb.afterMan}万 になりました。</div>}
-      </div>
-    );
-  }
-  if (phase === "amount") {
-    return (
-      <div className="py-1.5 border-b border-slate-50">
-        <div className="text-[13px] mb-1">☐ {task.nextStep} <span className="text-[11px] text-slate-400">（{task.label}）</span></div>
-        <div className="flex gap-2 items-center flex-wrap text-[12px]">
-          <span className="text-slate-600">月いくら変わりましたか？（任意）</span>
-          <input type="text" inputMode="numeric" value={amount}
-            onChange={(e) => setAmount(e.target.value.replace(/[^\d]/g, ""))}
-            className="w-24 px-2 py-1 border border-slate-200 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-emerald-600"
-            placeholder="5,000" />
-          <span className="text-slate-500">円/月</span>
-          <button type="button" className="px-2.5 py-1 rounded-lg text-[12px] font-bold bg-emerald-600 text-white"
-            onClick={() => save(amount ? parseInt(amount, 10) : null)}>記録する</button>
-          <button type="button" className="px-2.5 py-1 rounded-lg text-[12px] font-semibold border border-slate-300 text-slate-500"
-            onClick={() => save(null)}>あとで入力（見込み通りとして記録）</button>
-        </div>
-        {error && <p className="text-[11px] text-red-600 mt-1">{error}</p>}
-      </div>
-    );
-  }
+  const isDone = report?.status === "done";
   return (
-    <div className="py-1.5 border-b border-slate-50">
-      <button type="button" disabled={phase === "saving"}
-        onClick={() => (task.id === "refi" ? setPhase("amount") : save(null))}
-        className="flex items-start gap-2 text-left text-[13px] w-full hover:bg-slate-50 rounded-lg px-1 py-0.5">
-        <span className="text-emerald-600 font-bold mt-[1px]">☐</span>
-        <span>{task.nextStep} <span className="text-[11px] text-slate-400">（{task.label}）</span>
-          <span className="block text-[10px] text-slate-400">タップで「実行した」を記録</span></span>
-      </button>
-      {error && <p className="text-[11px] text-red-600 mt-1">{error}</p>}
+    <div className="py-2 border-b border-slate-50 last:border-b-0">
+      <div className="text-[13px] mb-1.5">
+        {isDone ? (
+          <><span className="text-emerald-700 font-bold">✓ 済</span> <span className="text-slate-400 line-through">{task.nextStep}</span></>
+        ) : (
+          <>☐ {task.nextStep}</>
+        )}
+        <span className="text-[11px] text-slate-400">（{task.label}）</span>
+      </div>
+      {/* 方針と実行の食い違い（refi：数字は調整せず解消をAIへ） */}
+      {refiMismatch && (
+        <div className="mb-1.5 rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-2 text-[12px] text-amber-800">
+          方針（進める）と実行状況（やめた）が食い違っています。
+          <Link href="/shisan/chat" className="underline font-bold ml-1">AIと見直しますか？ →</Link>
+        </div>
+      )}
+      <ExecuteReportPanel current={report}
+        amountLabel={task.id === "refi" ? AMOUNT_LABEL_REFI : AMOUNT_LABEL_DEFAULT}
+        memoNote={task.id !== "refi" ? "※余力には反映されない記録です" : undefined}
+        onSubmit={onSubmit} />
     </div>
   );
 }

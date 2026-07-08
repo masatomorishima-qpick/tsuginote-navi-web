@@ -128,11 +128,16 @@ export default function AssetConciergeMvp() {
   const router = useRouter();
   const [reports, setReports] = useState<Record<string, { status: string; monthly_amount: number | null }>>({});
   useEffect(() => {
+    // 役割分担：会員が /shisan に来たらマイページへ送る（非会員＝結果ページ、会員＝マイページ）。
+    // 再診断（?reenter=1）だけは入力画面を優先し、リダイレクトしない。
+    const reenter = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("reenter") === "1";
     fetch("/api/shisan/me").then((r) => r.json()).then((me) => {
       if (!me?.authenticated) return;
       setLoggedIn(true);
+      if (!reenter) { router.replace("/shisan/mypage"); return; }
       fetch("/api/shisan/report").then((r) => r.json()).then((j) => { if (j?.ok) setReports(j.reports ?? {}); }).catch(() => {});
     }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   /* 再診断とサーバーデータの同期（追加要件C・訴求の根幹）。
    * ログイン済みなら、診断確定時とダッシュボード表示時に store をサーバーへ同期し、

@@ -216,10 +216,9 @@ function MypageInner() {
 
       {/* ③ 伴走AIに相談 */}
       <Link href="/shisan/chat"
-        className="block w-full mt-5 py-4 rounded-2xl text-center text-white text-base font-bold shadow-sm bg-gradient-to-br from-emerald-600 to-emerald-800 hover:opacity-95 transition"
+        className="block w-full mt-5 py-4 rounded-2xl text-center text-white text-base font-bold shadow-md bg-amber-500 hover:bg-amber-600 transition"
         onClick={() => track("shisan_chat_open_click")}>
-        AIに相談する →
-        <span className="block text-[11px] font-normal text-white/80 mt-0.5">あなたの診断結果を知っています。売り込みはありません。直近の会話の続きから</span>
+        資産づくりAIに詳細を相談 →
       </Link>
     </main>
   );

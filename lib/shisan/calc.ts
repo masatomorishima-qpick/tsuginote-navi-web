@@ -158,6 +158,17 @@ export function deriveBuckets(inputs: Inputs | null): BucketId[] {
   return b;
 }
 
+/** GA計測用：月々の余力(円)を「帯」に丸める（PII＝生の金額は送らず区分のみ計測するため）。
+ *  新規の計算はせず、既存の surplus をカテゴリ文字列に変換するだけ。境界は SURPLUS_THIN(3万)と整合。 */
+export type SurplusBand = "le0" | "1_3man" | "3_5man" | "5_10man" | "over10man";
+export function surplusBand(surplus: number): SurplusBand {
+  if (surplus <= 0) return "le0";
+  if (surplus < 30000) return "1_3man";
+  if (surplus < 50000) return "3_5man";
+  if (surplus < 100000) return "5_10man";
+  return "over10man";
+}
+
 /* ===== 試算結果（A'案3ブロック。診断画面の表示値と同一ロジック） =====
  * 追加要件A（マイページ）でサーバー側からも同じ表示値を出すため、
  * AssetConciergeMvp.tsx の result useMemo から挙動不変で切り出したもの。 */

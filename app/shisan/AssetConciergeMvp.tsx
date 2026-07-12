@@ -23,7 +23,7 @@ import {
   RET_AGE, REFI_BASE, type EduPlan, SCENARIO_PHASE, BUCKET_LABEL,
   type Inputs, type BucketId, type Decision,
   yen, man, annFactor, prepayCompression, refinance, eduMonthly,
-  judgeScenario, deriveBuckets, computeResult,
+  judgeScenario, deriveBuckets, computeResult, surplusBand,
 } from "@/lib/shisan/calc";
 import { track } from "@/lib/shisan/track";
 import { ExecuteReportPanel, type ExecReportProps, type ReportSaveResult } from "./ExecuteReportPanel";
@@ -253,7 +253,14 @@ export default function AssetConciergeMvp() {
       eduPlan: (form.eduPlan as EduPlan) || "shibun",
       target: num("target") || 2000, r: num("r") || 3,
     };
-    setInputs(i); persist({ inputs: i }); track("shisan_input_complete");
+    setInputs(i); persist({ inputs: i });
+    // GA計測：非会員の家計属性を「帯」で計測（生の金額＝PIIは送らない・区分のみ）。
+    // scenario/bucketsは i から決定論的に導出（stateの反映を待たない）。
+    track("shisan_input_complete", {
+      surplus_band: surplusBand(surplus),
+      buckets_count: deriveBuckets(i).length,
+      scenario: judgeScenario(i) ?? "",
+    });
     // 会員の再診断復帰（修正1）：サーバーstoreを確実に同期してからマイページへ戻る（結果ページを経由しない）
     if (returnToMypage) {
       try { await syncServerStore(i, { force: true }); } catch { /* 失敗時もマイページで最新化を試みる */ }
@@ -363,10 +370,14 @@ export default function AssetConciergeMvp() {
   /* 打ち手ブロック表示時に一度だけ shisan_actions_view（GA・段階5） */
   useEffect(() => {
     if (screen === "dash" && actions.length > 0 && !actionsViewed.current) {
-      track("shisan_actions_view", { scenario, count: actions.length });
+      track("shisan_actions_view", {
+        scenario, count: actions.length,
+        surplus_band: inputs ? surplusBand(inputs.surplus) : "",
+        buckets_count: buckets.length,
+      });
       actionsViewed.current = true;
     }
-  }, [screen, actions, scenario]);
+  }, [screen, actions, scenario, inputs, buckets]);
 
   const setR = (v: number) => {
     if (!inputs) return;

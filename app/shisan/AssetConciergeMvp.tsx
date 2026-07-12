@@ -412,6 +412,15 @@ export default function AssetConciergeMvp() {
     else showToast("ご案内を準備中です。");
   };
 
+  // B案：不活性カード（bucket無し・送客URL空）のタップ → AI相談パネルへ誘導（Dead tap解消）。
+  // 専用イベントで独立計測（action_select/action_execute_click には混ぜない）。
+  const cardToAi = (a: ActionCard, rank: number) => {
+    track("shisan_card_to_ai_click", { action_id: a.id, rank });
+    if (typeof document === "undefined") return;
+    const el = document.getElementById("ai-cta");
+    if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
+  };
+
   const decide = (b: BucketId, choice: string) => {
     const next = { ...decisions, [b]: { choice } };
     setDecisions(next); persist({ decisions: next }); setOpenBucket(null);
@@ -698,7 +707,7 @@ export default function AssetConciergeMvp() {
           <h2 className="text-[20px] font-extrabold text-emerald-900 leading-tight mb-0.5">あなたの次の一手</h2>
           <p className="text-[11px] text-slate-400 mb-3">いまのあなたに効く順に並べています。</p>
           {actions.map((a, i) => (
-            <ActionCardView key={a.id} a={a} rank={i} primary={i === 0} onSelect={selectAction} onExecute={executeAction} />
+            <ActionCardView key={a.id} a={a} rank={i} primary={i === 0} onSelect={selectAction} onExecute={executeAction} onCardToAi={cardToAi} />
           ))}
           <p className="text-[13px] mt-1">
             <span className="font-bold text-emerald-800">できることは、ちゃんとあります。</span>
@@ -908,10 +917,11 @@ function BucketPanel({ id, inputs, n, onDecide, onSetR }: { id: BucketId; inputs
 /* ===== 打ち手カード（行動名＋数字ひとつ） =====
  * 本体タップ：バケツありカード＝select（質問を開く）／送客のみカード＝execute（送客）。
  * バケツあり＋外部接点のカードは、本体=select・別リンク=execute の2導線（別イベントで区別）。 */
-function ActionCardView({ a, rank, primary, onSelect, onExecute }: {
+function ActionCardView({ a, rank, primary, onSelect, onExecute, onCardToAi }: {
   a: ActionCard; rank: number; primary?: boolean;
   onSelect?: (a: ActionCard, rank: number) => void;
   onExecute?: (a: ActionCard, rank: number) => void;
+  onCardToAi?: (a: ActionCard, rank: number) => void;
 }) {
   // 要件3（第一陣）：URL未設定（空文字）の送客導線は出さない。
   // 送客のみカードはタップ無効＋押せる見た目なしの情報カードとして静置。
@@ -919,9 +929,17 @@ function ActionCardView({ a, rank, primary, onSelect, onExecute }: {
   const hasUrl = !!a.external && !!AFFILIATE_LINKS[a.external];
   const bodyOpens = !!a.bucket && !!onSelect;                          // 本体＝質問を開く
   const bodyExecs = !a.bucket && !!a.external && !!onExecute && hasUrl; // 本体＝送客（バケツなし・URL設定時のみ）
-  const bodyClickable = bodyOpens || bodyExecs;
+  // B案（Dead tap解消）：不活性カード（bucket無し かつ 送客URL空＝上のどちらでもない）は、
+  //   従来 <div> でタップ不能だった。これをタップ可能にし、AI相談パネル(#ai-cta)へ誘導する。
+  //   ID決め打ちではなく「bodyOpens でも bodyExecs でもない」条件で将来カードも自動で拾う。
+  const bodyToAi = !bodyOpens && !bodyExecs && !!onCardToAi;
+  const bodyClickable = bodyOpens || bodyExecs || bodyToAi;
   const showExecLink = !!a.bucket && !!a.external && !!onExecute && hasUrl; // 質問＋送客の2導線（URL設定時のみ）
-  const onBody = () => { if (bodyOpens) onSelect!(a, rank); else if (bodyExecs) onExecute!(a, rank); };
+  const onBody = () => {
+    if (bodyOpens) onSelect!(a, rank);
+    else if (bodyExecs) onExecute!(a, rank);
+    else if (bodyToAi) onCardToAi!(a, rank);
+  };
   const body = (
     <>
       {primary && <div className="text-[10px] font-bold text-emerald-700 mb-1">まず、これ</div>}

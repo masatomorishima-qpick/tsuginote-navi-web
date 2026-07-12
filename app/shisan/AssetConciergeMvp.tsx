@@ -629,11 +629,22 @@ export default function AssetConciergeMvp() {
               マイページへ →
             </Link>
           )}
-          {/* 常設の小さいチャット入口（Phase1 §4-1。未登録はログイン案内画面に着地） */}
-          <Link href="/shisan/chat" className="text-[12px] font-semibold text-emerald-700 underline underline-offset-2"
-            onClick={() => track("shisan_chat_open_click")}>
-            AIに相談 →
-          </Link>
+          {/* 常設の小さいチャット入口。会員は直行、非会員は中間ログイン画面に落とさず #ai-cta（メール欄）へ誘導（要因A対処） */}
+          {loggedIn ? (
+            <Link href="/shisan/chat" className="text-[12px] font-semibold text-emerald-700 underline underline-offset-2"
+              onClick={() => track("shisan_chat_open_click")}>
+              AIに相談 →
+            </Link>
+          ) : (
+            <button type="button" className="text-[12px] font-semibold text-emerald-700 underline underline-offset-2"
+              onClick={() => {
+                track("shisan_chat_open_click");
+                const el = document.getElementById("ai-cta");
+                if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
+              }}>
+              AIに相談 →
+            </button>
+          )}
         </div>
       </div>
 
@@ -724,7 +735,7 @@ export default function AssetConciergeMvp() {
       {/* AIへの大導線（追加要件E-2）：主役級・登録もここに一本化。余力0（別出口）はactionsが無いため出ない */}
       {actions.length > 0 && scenario && (
         <AiCtaPanel loggedIn={loggedIn} registered={!!signupFlags.registered} scenario={scenario}
-          questionCount={buckets.length} snapshot={signupSnapshot} summary={signupSummary}
+          snapshot={signupSnapshot} summary={signupSummary}
           onView={onSignupView} onRegistered={onSignupRegistered} />
       )}
 
@@ -985,11 +996,10 @@ function ActionCardView({ a, rank, primary, onSelect, onExecute, onCardToAi }: {
 /* ===== AIへの大導線（追加要件E-2/F）＝主役級・登録を内包して一本化 =====
  * 未登録：メール入力→即セッション発行→チャット直行（メールを開かせない）
  * 登録済み（未ログイン）：チャットへ（ログイン案内に着地）／ログイン済み：チャット直行 */
-function AiCtaPanel({ loggedIn, registered, scenario, questionCount, snapshot, summary, onView, onRegistered }: {
+function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView, onRegistered }: {
   loggedIn: boolean;
   registered: boolean;
   scenario: "A" | "B" | "C";
-  questionCount: number;
   snapshot: () => Record<string, unknown>;
   summary: () => Record<string, unknown> | null;
   onView: () => void;
@@ -1033,14 +1043,14 @@ function AiCtaPanel({ loggedIn, registered, scenario, questionCount, snapshot, s
 
   return (
     <div id="ai-cta" className={panel}>
-      <div className="font-extrabold text-[18px] leading-snug">診断結果をもとに、AIに相談する</div>
+      <div className="font-extrabold text-[18px] leading-snug">このままで、大丈夫？——あなたの数字で「次の一手」に答えを出す</div>
       <p className="text-[13px] text-white/85 mt-1 leading-relaxed">
-        売り込みなし・無料（1日20回まで）。あなたの診断結果を知っているAIが、{questionCount}つの質問で一緒に決めます。
+        診断結果を知っているAIが、あなたに合った次の一手を一緒に決めて、マイページに残る形にします。売り込みはありません。
       </p>
       {isMember ? (
         <Link href="/shisan/chat" onClick={() => track("shisan_ai_cta_click", { scenario })}
           className="block w-full mt-3 py-3 rounded-xl text-center bg-white text-emerald-700 text-base font-bold hover:bg-emerald-50 transition">
-          {loggedIn ? "AIと続きへ →" : "AIに相談する（ログイン） →"}
+          {loggedIn ? "AIと続きへ →" : "AIに相談する →"}
         </Link>
       ) : existing ? (
         <div className="mt-3 rounded-xl bg-white/15 p-3 text-[13px] leading-relaxed">
@@ -1055,9 +1065,10 @@ function AiCtaPanel({ loggedIn, registered, scenario, questionCount, snapshot, s
           <button type="button" disabled={sending}
             onClick={() => { track("shisan_ai_cta_click", { scenario }); start(); }}
             className={`${btnSm} bg-white text-emerald-700 hover:bg-emerald-50 disabled:opacity-60 whitespace-nowrap`}>
-            {sending ? "開始中…" : "無料ではじめる"}
+            {sending ? "開始中…" : "無料で相談開始"}
           </button>
         </div>
+        <p className="text-[11px] text-white/80 mt-1.5">メールアドレスは、AIとのやり取りを保存するために使います。次回も続きから相談できます。</p>
         {error && <p className="text-[12px] text-red-200 mt-1.5">{error}</p>}
         <p className="text-[11px] mt-2">
           <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline text-white/80">プライバシーポリシー</a>

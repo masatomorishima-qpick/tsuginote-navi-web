@@ -1034,6 +1034,7 @@ function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView,
       const json = await res.json().catch(() => ({})) as { ok?: boolean; answer?: string };
       if (res.ok && json.ok && json.answer) {
         setAnswer(json.answer);
+        setQuestion(""); // 続けて聞けるよう入力欄をクリア（会話を断ち切らない）
         track("shisan_answer_view", { scenario });
         if (!isMember && !viewFired.current) { onView(); viewFired.current = true; } // 保存パネル露出＝会員化の母数
       } else {
@@ -1075,63 +1076,68 @@ function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView,
 
   return (
     <div id="ai-cta" className={panel}>
-      <div className="font-extrabold text-[18px] leading-snug">あなたの数字で、次の一手のアクション案を出します</div>
-      <p className="text-[13px] text-white/85 mt-1 leading-relaxed">
-        気になることを書いて送信すると、診断結果をふまえたアクション案をその場でお返しします。売り込みはありません。
-      </p>
+      {/* 回答前のみ：見出し＋本文（修正3の文言） */}
+      {!answer && (<>
+        <div className="font-extrabold text-[18px] leading-snug">今、いちばん気になることは？</div>
+        <p className="text-[13px] text-white/85 mt-1 leading-relaxed">
+          わからないこと・迷っていることを、何でも書いてください。あなたの数字に合わせた次の一手を、その場でお返しします。
+        </p>
+      </>)}
 
-      {/* 1) 聞きたいことを書く（選択式は設けない＝生の悩みを一次情報に） */}
-      <textarea
-        className="w-full mt-3 px-3 py-2.5 rounded-xl text-[15px] bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white resize-none"
-        rows={3}
-        placeholder="例：教育費と老後資金どっちを優先すべき？ / NISAで何から始めればいい？ など、気になることを書いてください"
-        value={question} onChange={(e) => setQuestion(e.target.value)} disabled={asking} maxLength={2000} />
-      <button type="button" disabled={asking}
-        onClick={ask}
-        className={`${btnSm} w-full mt-2 bg-white text-emerald-700 hover:bg-emerald-50 disabled:opacity-60`}>
-        {asking ? "アクション案を作成中…" : (answer ? "もう一度きく" : "アクション案をもらう")}
-      </button>
-      {askError && <p className="text-[12px] text-red-200 mt-1.5">{askError}</p>}
-
-      {/* 2) アクション案の表示（メアド不要） */}
+      {/* 1) アクション案の表示（回答が最上部・メアド不要） */}
       {answer && (
-        <div className="mt-4 rounded-xl bg-white text-slate-800 p-3.5 text-[14px] leading-relaxed whitespace-pre-wrap">
+        <div className="rounded-xl bg-white text-slate-800 p-3.5 text-[14px] leading-relaxed whitespace-pre-wrap">
           {answer}
         </div>
       )}
 
-      {/* 3) 回答の下で保存＝会員化（価値体験後にメアド） */}
+      {/* 2) 入力欄（回答後は「続けて聞く」＝会話を断ち切らない） */}
+      <div className={answer ? "mt-4" : "mt-3"}>
+        {answer && <div className="text-[13px] font-bold mb-1.5">続けて聞きたいことがあれば書いてください</div>}
+        <textarea
+          className="w-full px-3 py-2.5 rounded-xl text-[15px] bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white resize-none"
+          rows={3}
+          placeholder="例：教育費と老後資金どっちを優先すべき？ / NISAで何から始めればいい？ など、気になることを書いてください"
+          value={question} onChange={(e) => setQuestion(e.target.value)} disabled={asking} maxLength={2000} />
+        <button type="button" disabled={asking}
+          onClick={ask}
+          className={`${btnSm} w-full mt-2 bg-white text-emerald-700 hover:bg-emerald-50 disabled:opacity-60`}>
+          {asking ? "送信中…" : "アドバイスをもらう"}
+        </button>
+        {askError && <p className="text-[12px] text-red-200 mt-1.5">{askError}</p>}
+      </div>
+
+      {/* 3) 保存＝会員化（回答後のみ・控えめに） */}
       {answer && (
         isMember ? (
           <Link href="/shisan/mypage"
-            className="block w-full mt-3 py-3 rounded-xl text-center bg-white text-emerald-700 text-base font-bold hover:bg-emerald-50 transition">
+            className="block w-full mt-4 py-2.5 rounded-xl text-center bg-white/90 text-emerald-700 text-[14px] font-bold hover:bg-white transition">
             マイページで見返す →
           </Link>
         ) : existing ? (
-          <div className="mt-3 rounded-xl bg-white/15 p-3 text-[13px] leading-relaxed">
+          <div className="mt-4 rounded-xl bg-white/15 p-3 text-[13px] leading-relaxed">
             このメールアドレスは登録済みです。ログインリンクをお送りしたので、メールからお戻りください。
           </div>
-        ) : (<>
-          <div className="mt-4 pt-3 border-t border-white/25">
-            <div className="text-[14px] font-bold">このアクション案を保存して、いつでも見返す</div>
-            <div className="flex gap-2 mt-2 flex-wrap">
+        ) : (
+          <div className="mt-4 pt-3 border-t border-white/20">
+            <div className="text-[12px] text-white/80">このアドバイスを保存して、いつでも見返す</div>
+            <div className="flex gap-2 mt-1.5 flex-wrap">
               <input type="email" inputMode="email" autoComplete="email"
-                className="flex-1 min-w-[180px] px-3 py-2.5 rounded-xl text-[15px] bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white"
+                className="flex-1 min-w-[160px] px-3 py-2 rounded-lg text-[14px] bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white"
                 placeholder="メールアドレス"
                 value={email} onChange={(e) => setEmail(e.target.value)} disabled={sending} />
               <button type="button" disabled={sending}
                 onClick={save}
-                className={`${btnSm} bg-white text-emerald-700 hover:bg-emerald-50 disabled:opacity-60 whitespace-nowrap`}>
-                {sending ? "保存中…" : "無料で保存"}
+                className={`${btnSm} bg-white/90 text-emerald-700 hover:bg-white disabled:opacity-60 whitespace-nowrap`}>
+                {sending ? "保存中…" : "マイページに保存"}
               </button>
             </div>
-            <p className="text-[11px] text-white/80 mt-1.5">メールアドレスは、アクション案を保存して次回も見返すために使います。</p>
             {error && <p className="text-[12px] text-red-200 mt-1.5">{error}</p>}
-            <p className="text-[11px] mt-2">
-              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline text-white/80">プライバシーポリシー</a>
+            <p className="text-[11px] mt-1.5">
+              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline text-white/70">プライバシーポリシー</a>
             </p>
           </div>
-        </>)
+        )
       )}
     </div>
   );

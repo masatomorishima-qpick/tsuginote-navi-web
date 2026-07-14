@@ -18,26 +18,30 @@ export async function POST(req: NextRequest) {
   const signupId = await getSessionSignupId();
   if (!signupId) return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
 
-  let question = "";
-  let answer = "";
+  // 単発 {question, answer} と、まとめ {items:[{question,answer}...]} の両方に対応（メール送信時に一括保存するため）
+  const clean = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+  let rows: { signup_id: string; question: string; answer: string }[] = [];
   try {
-    const body = (await req.json()) as { question?: unknown; answer?: unknown };
-    question = typeof body.question === "string" ? body.question.trim().slice(0, MAX_Q) : "";
-    answer = typeof body.answer === "string" ? body.answer.trim().slice(0, MAX_A) : "";
+    const body = (await req.json()) as {
+      question?: unknown; answer?: unknown;
+      items?: { question?: unknown; answer?: unknown }[];
+    };
+    const raw = Array.isArray(body.items)
+      ? body.items
+      : [{ question: body.question, answer: body.answer }];
+    rows = raw
+      .map((it) => ({ signup_id: signupId, question: clean(it.question, MAX_Q), answer: clean(it.answer, MAX_A) }))
+      .filter((r) => r.answer.length > 0);
   } catch {
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
-  if (!answer) return NextResponse.json({ ok: false, error: "empty" }, { status: 400 });
+  if (rows.length === 0) return NextResponse.json({ ok: false, error: "empty" }, { status: 400 });
 
   try {
     const supabase = createAdminSupabaseClient();
-    const { error } = await supabase.from("shisan_saved_answers").insert({
-      signup_id: signupId,
-      question,
-      answer,
-    });
+    const { error } = await supabase.from("shisan_saved_answers").insert(rows);
     if (error) throw new Error(error.message);
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, saved: rows.length });
   } catch (err) {
     console.error("[api/shisan/save-answer] threw", err instanceof Error ? err.message : err);
     return NextResponse.json({ ok: false, error: "save_failed" }, { status: 500 });

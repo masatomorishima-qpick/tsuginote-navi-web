@@ -1008,7 +1008,7 @@ function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView,
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [existing, setExisting] = useState(false);
-  const [answeredQuestion, setAnsweredQuestion] = useState(""); // 保存用：この回答のもとになった質問
+  const [qaHistory, setQaHistory] = useState<{ question: string; answer: string }[]>([]); // 保存用：このセッションのやりとり全部
   const isMember = loggedIn || registered;
   const viewFired = useRef(false);
 
@@ -1034,10 +1034,19 @@ function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView,
       });
       const json = await res.json().catch(() => ({})) as { ok?: boolean; answer?: string };
       if (res.ok && json.ok && json.answer) {
-        setAnswer(json.answer);
-        setAnsweredQuestion(q); // 保存用に、この回答のもとになった質問を保持
+        const a = json.answer;
+        setAnswer(a);
+        setQaHistory((h) => [...h, { question: q, answer: a }]); // やりとりを蓄積（表示用の最新回答＋保存用の履歴）
         setQuestion(""); // 続けて聞けるよう入力欄をクリア（会話を断ち切らない）
         track("shisan_answer_view", { scenario });
+        // 会員（ログイン済み）はボタンを介さず、この回答をその場で自動保存（best-effort）
+        if (isMember) {
+          fetch("/api/shisan/save-answer", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question: q, answer: a }),
+          }).catch(() => { /* 保存失敗は致命にしない */ });
+        }
         if (!isMember && !viewFired.current) { onView(); viewFired.current = true; } // 保存パネル露出＝会員化の母数
       } else {
         setAskError("うまく取得できませんでした。少し表現を変えてお試しください。");
@@ -1063,13 +1072,13 @@ function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView,
       const json: { ok?: boolean; session?: boolean; existing?: boolean } = await res.json().catch(() => ({}));
       if (res.ok && json.ok && json.session) {
         onRegistered();            // registeredフラグ永続＋shisan_signup_submit
-        // 表示中のアクション案を会員に紐付けて保存（修正3・best-effort。失敗してもマイページへ）
-        if (answer) {
+        // メール送信＝このセッションでやりとりした回答を全部まとめて保存（best-effort。失敗してもマイページへ）
+        if (qaHistory.length > 0) {
           try {
             await fetch("/api/shisan/save-answer", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ question: answeredQuestion, answer }),
+              body: JSON.stringify({ items: qaHistory }),
             });
           } catch { /* 保存失敗は致命にしない */ }
         }

@@ -629,22 +629,15 @@ export default function AssetConciergeMvp() {
               マイページへ →
             </Link>
           )}
-          {/* 常設の小さいチャット入口。会員は直行、非会員は中間ログイン画面に落とさず #ai-cta（メール欄）へ誘導（要因A対処） */}
-          {loggedIn ? (
-            <Link href="/shisan/chat" className="text-[12px] font-semibold text-emerald-700 underline underline-offset-2"
-              onClick={() => track("shisan_chat_open_click")}>
-              AIに相談 →
-            </Link>
-          ) : (
-            <button type="button" className="text-[12px] font-semibold text-emerald-700 underline underline-offset-2"
-              onClick={() => {
-                track("shisan_chat_open_click");
-                const el = document.getElementById("ai-cta");
-                if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
-              }}>
-              AIに相談 →
-            </button>
-          )}
+          {/* AI入口＝結果画面内のアクション案入力欄(#ai-cta)へスクロール（会員・非会員ともチャットへは遷移させない） */}
+          <button type="button" className="text-[12px] font-semibold text-emerald-700 underline underline-offset-2"
+            onClick={() => {
+              track("shisan_chat_open_click");
+              const el = document.getElementById("ai-cta");
+              if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
+            }}>
+            AIに聞く →
+          </button>
         </div>
       </div>
 
@@ -993,9 +986,10 @@ function ActionCardView({ a, rank, primary, onSelect, onExecute, onCardToAi }: {
   );
 }
 
-/* ===== AIへの大導線（追加要件E-2/F）＝主役級・登録を内包して一本化 =====
- * 未登録：メール入力→即セッション発行→チャット直行（メールを開かせない）
- * 登録済み（未ログイン）：チャットへ（ログイン案内に着地）／ログイン済み：チャット直行 */
+/* ===== AIへの大導線＝診断結果画面で「聞きたいことを書く→アクション案を返す」（AI導線の全面移行） =====
+ * 1) フリーテキスト入力→送信で /api/shisan/ask（未認証）がアクション案を生成（メアド不要・その場表示）
+ * 2) 回答の下で「保存して見返す」＝メアド入力＝即セッション発行（価値体験後に会員化）→ マイページへ
+ * ※ チャット画面(/shisan/chat)へは遷移させない（会員フローとは分離） */
 function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView, onRegistered }: {
   loggedIn: boolean;
   registered: boolean;
@@ -1006,16 +1000,54 @@ function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView,
   onRegistered: () => void;
 }) {
   const router = useRouter();
+  const [question, setQuestion] = useState("");
+  const [asking, setAsking] = useState(false);
+  const [askError, setAskError] = useState("");
+  const [answer, setAnswer] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [existing, setExisting] = useState(false);
   const isMember = loggedIn || registered;
-  useEffect(() => { if (!isMember) onView(); }, [onView, isMember]); // signup_view継続（1回ガードは親のref）
+  const viewFired = useRef(false);
 
   const panel = "rounded-2xl shadow-sm text-white bg-gradient-to-br from-emerald-600 to-emerald-800 p-4 mb-6";
 
-  const start = async () => {
+  // アクション案を取得（メアド不要・その場表示）
+  const ask = async () => {
+    const q = question.trim();
+    if (!q) { setAskError("聞きたいことを入力してください。"); return; }
+    const snap = snapshot();
+    const inputs = (snap as { inputs?: Inputs }).inputs ?? null;
+    track("shisan_ask_submit", {
+      scenario,
+      surplus_band: inputs ? surplusBand(inputs.surplus) : "",
+      buckets_count: deriveBuckets(inputs).length,
+    });
+    setAskError(""); setAsking(true);
+    try {
+      const res = await fetch("/api/shisan/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: q, store: snap }),
+      });
+      const json = await res.json().catch(() => ({})) as { ok?: boolean; answer?: string };
+      if (res.ok && json.ok && json.answer) {
+        setAnswer(json.answer);
+        track("shisan_answer_view", { scenario });
+        if (!isMember && !viewFired.current) { onView(); viewFired.current = true; } // 保存パネル露出＝会員化の母数
+      } else {
+        setAskError("うまく取得できませんでした。少し表現を変えてお試しください。");
+      }
+    } catch {
+      setAskError("通信に失敗しました。時間をおいてお試しください。");
+    } finally {
+      setAsking(false);
+    }
+  };
+
+  // アクション案を保存＝メアド登録（新規は即セッション→マイページ。既存はマジックリンク案内）
+  const save = async () => {
     const v = email.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { setError("メールアドレスの形式をご確認ください。"); return; }
     setError(""); setSending(true);
@@ -1027,12 +1059,12 @@ function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView,
       });
       const json: { ok?: boolean; session?: boolean; existing?: boolean } = await res.json().catch(() => ({}));
       if (res.ok && json.ok && json.session) {
-        onRegistered(); // registeredフラグ永続＋shisan_signup_submit
-        router.push("/shisan/chat"); // 即セッションでそのままAIへ（要件F）
+        onRegistered();            // registeredフラグ永続＋shisan_signup_submit
+        router.push("/shisan/mypage"); // 保存済み。チャットへは遷移させずマイページへ
       } else if (res.ok && json.ok && json.existing) {
         setExisting(true);
       } else {
-        setError("登録に失敗しました。時間をおいてお試しください。");
+        setError("保存に失敗しました。時間をおいてお試しください。");
         setSending(false);
       }
     } catch {
@@ -1043,37 +1075,64 @@ function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView,
 
   return (
     <div id="ai-cta" className={panel}>
-      <div className="font-extrabold text-[18px] leading-snug">このままで、大丈夫？——あなたの数字で「次の一手」に答えを出す</div>
+      <div className="font-extrabold text-[18px] leading-snug">あなたの数字で、次の一手のアクション案を出します</div>
       <p className="text-[13px] text-white/85 mt-1 leading-relaxed">
-        診断結果を知っているAIが、あなたに合った次の一手を一緒に決めて、マイページに残る形にします。売り込みはありません。
+        気になることを書いて送信すると、診断結果をふまえたアクション案をその場でお返しします。売り込みはありません。
       </p>
-      {isMember ? (
-        <Link href="/shisan/chat" onClick={() => track("shisan_ai_cta_click", { scenario })}
-          className="block w-full mt-3 py-3 rounded-xl text-center bg-white text-emerald-700 text-base font-bold hover:bg-emerald-50 transition">
-          {loggedIn ? "AIと続きへ →" : "AIに相談する →"}
-        </Link>
-      ) : existing ? (
-        <div className="mt-3 rounded-xl bg-white/15 p-3 text-[13px] leading-relaxed">
-          このメールアドレスは登録済みです。ログインリンクをお送りしたので、メールからお戻りください。
+
+      {/* 1) 聞きたいことを書く（選択式は設けない＝生の悩みを一次情報に） */}
+      <textarea
+        className="w-full mt-3 px-3 py-2.5 rounded-xl text-[15px] bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white resize-none"
+        rows={3}
+        placeholder="例：教育費と老後資金どっちを優先すべき？ / NISAで何から始めればいい？ など、気になることを書いてください"
+        value={question} onChange={(e) => setQuestion(e.target.value)} disabled={asking} maxLength={2000} />
+      <button type="button" disabled={asking}
+        onClick={ask}
+        className={`${btnSm} w-full mt-2 bg-white text-emerald-700 hover:bg-emerald-50 disabled:opacity-60`}>
+        {asking ? "アクション案を作成中…" : (answer ? "もう一度きく" : "アクション案をもらう")}
+      </button>
+      {askError && <p className="text-[12px] text-red-200 mt-1.5">{askError}</p>}
+
+      {/* 2) アクション案の表示（メアド不要） */}
+      {answer && (
+        <div className="mt-4 rounded-xl bg-white text-slate-800 p-3.5 text-[14px] leading-relaxed whitespace-pre-wrap">
+          {answer}
         </div>
-      ) : (<>
-        <div className="flex gap-2 mt-3 flex-wrap">
-          <input type="email" inputMode="email" autoComplete="email"
-            className="flex-1 min-w-[180px] px-3 py-2.5 rounded-xl text-[15px] bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white"
-            placeholder="メールアドレス"
-            value={email} onChange={(e) => setEmail(e.target.value)} disabled={sending} />
-          <button type="button" disabled={sending}
-            onClick={() => { track("shisan_ai_cta_click", { scenario }); start(); }}
-            className={`${btnSm} bg-white text-emerald-700 hover:bg-emerald-50 disabled:opacity-60 whitespace-nowrap`}>
-            {sending ? "開始中…" : "無料で相談開始"}
-          </button>
-        </div>
-        <p className="text-[11px] text-white/80 mt-1.5">メールアドレスは、AIとのやり取りを保存するために使います。次回も続きから相談できます。</p>
-        {error && <p className="text-[12px] text-red-200 mt-1.5">{error}</p>}
-        <p className="text-[11px] mt-2">
-          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline text-white/80">プライバシーポリシー</a>
-        </p>
-      </>)}
+      )}
+
+      {/* 3) 回答の下で保存＝会員化（価値体験後にメアド） */}
+      {answer && (
+        isMember ? (
+          <Link href="/shisan/mypage"
+            className="block w-full mt-3 py-3 rounded-xl text-center bg-white text-emerald-700 text-base font-bold hover:bg-emerald-50 transition">
+            マイページで見返す →
+          </Link>
+        ) : existing ? (
+          <div className="mt-3 rounded-xl bg-white/15 p-3 text-[13px] leading-relaxed">
+            このメールアドレスは登録済みです。ログインリンクをお送りしたので、メールからお戻りください。
+          </div>
+        ) : (<>
+          <div className="mt-4 pt-3 border-t border-white/25">
+            <div className="text-[14px] font-bold">このアクション案を保存して、いつでも見返す</div>
+            <div className="flex gap-2 mt-2 flex-wrap">
+              <input type="email" inputMode="email" autoComplete="email"
+                className="flex-1 min-w-[180px] px-3 py-2.5 rounded-xl text-[15px] bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white"
+                placeholder="メールアドレス"
+                value={email} onChange={(e) => setEmail(e.target.value)} disabled={sending} />
+              <button type="button" disabled={sending}
+                onClick={save}
+                className={`${btnSm} bg-white text-emerald-700 hover:bg-emerald-50 disabled:opacity-60 whitespace-nowrap`}>
+                {sending ? "保存中…" : "無料で保存"}
+              </button>
+            </div>
+            <p className="text-[11px] text-white/80 mt-1.5">メールアドレスは、アクション案を保存して次回も見返すために使います。</p>
+            {error && <p className="text-[12px] text-red-200 mt-1.5">{error}</p>}
+            <p className="text-[11px] mt-2">
+              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline text-white/80">プライバシーポリシー</a>
+            </p>
+          </div>
+        </>)
+      )}
     </div>
   );
 }
@@ -1099,11 +1158,11 @@ function MemberCta({ registered, justRegistered, showSignup, scenario, snapshot,
   }
   if (registered) {
     return (
-      <Link href="/shisan/chat"
+      <Link href="/shisan/mypage"
         className="block w-full my-4 py-3.5 rounded-2xl text-center text-white text-base font-bold shadow-sm bg-gradient-to-br from-emerald-600 to-emerald-800 hover:opacity-95 transition"
         onClick={() => track("shisan_chat_open_click")}>
-        AIに相談する →
-        <span className="block text-[11px] font-normal text-white/80 mt-0.5">あなたの診断結果を知っています。売り込みはありません</span>
+        マイページで見返す →
+        <span className="block text-[11px] font-normal text-white/80 mt-0.5">あなたの診断結果と決めたことが残っています</span>
       </Link>
     );
   }

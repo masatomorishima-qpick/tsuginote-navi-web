@@ -26,7 +26,7 @@ export async function GET() {
 
   try {
     const supabase = createAdminSupabaseClient();
-    const [{ data: signup }, { data: reportRows }, { data: planRows }] = await Promise.all([
+    const [{ data: signup }, { data: reportRows }, { data: planRows }, { data: savedRows }] = await Promise.all([
       supabase.from("shisan_signups").select("store").eq("id", signupId).maybeSingle(),
       supabase.from("shisan_action_reports")
         .select("action_id, status, monthly_amount, created_at")
@@ -35,6 +35,11 @@ export async function GET() {
       supabase.from("shisan_action_plans")
         .select("action_id, goal_text, next_step_text, monthly_yen, updated_at")
         .eq("signup_id", signupId),
+      // 保存したアドバイス（修正3・診断結果画面で保存したアクション案。配分数字とは非連動）
+      supabase.from("shisan_saved_answers")
+        .select("id, question, answer, created_at")
+        .eq("signup_id", signupId)
+        .order("created_at", { ascending: false }),
     ]);
     if (!signup) return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
 
@@ -103,6 +108,10 @@ export async function GET() {
       plans,
       total: buckets.length,
       remainingCount: buckets.filter((b) => !decisions[b]).length,
+      // 保存したアドバイス（修正3・全文表示用。配分数字とは非連動）
+      savedAnswers: (savedRows ?? []).map((r) => ({
+        id: r.id, question: r.question, answer: r.answer, createdAt: r.created_at,
+      })),
     });
   } catch (err) {
     console.error("[api/shisan/mypage] threw", err instanceof Error ? err.message : err);

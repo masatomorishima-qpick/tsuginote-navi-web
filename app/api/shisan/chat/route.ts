@@ -13,8 +13,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { getSessionSignupId } from "@/lib/shisan/auth";
 import { buildDiagnosisContext, buildOfficialSummary, SYSTEM_PROMPT, stripMarkdown, stripInternalTerms, type StoreSnapshot, type PlanRecord } from "@/lib/shisan/context";
-import { undecidedBuckets } from "@/lib/shisan/flow";
-import { BUCKET_LABEL, yen, computeRealloc, planAmountsFromMonthly, type ReportEntry } from "@/lib/shisan/calc";
+import { yen, computeRealloc, planAmountsFromMonthly, type ReportEntry } from "@/lib/shisan/calc";
 import { extractPlanProposal, extractRealloc } from "@/lib/shisan/plan";
 import { extractReallocFallback } from "@/lib/shisan/reallocExtract";
 import { dailyLimitFor } from "@/lib/shisan/limits";
@@ -128,31 +127,21 @@ export async function POST(req: NextRequest) {
     const official = buildOfficialSummary(store?.inputs ?? null, store?.decisions ?? {}, reports, plans);
     const poolCap = official.shown?.pool ?? undefined;
 
-    // 質問進行中の自由入力（修正指示書_20260707 修正3：逆質問禁止・完結回答・復帰宣言）
-    const undecided = undecidedBuckets(store?.inputs ?? null, store?.decisions ?? {});
-    const flowNote = undecided.length > 0
-      ? `\n\n【割り込み応答の制約（いま方針決めの質問進行中・残り${undecided.length}問：${undecided.map((b) => BUCKET_LABEL[b]).join("・")}）】
-1. ユーザーへの逆質問・追加の聞き返しを一切しない（応答を疑問文で終えない）。手持ちの【会員の診断データ】と決定状況だけで完結した回答を返す。
-2. 情報が足りず一般論しか言えない場合は、「詳しい状況は、質問が終わってからゆっくり伺います」と正直に添える。
-3. 応答の最後は、改行して「では、質問の続きです。」で締める（それ以外の締め方をしない）。質問文そのものは書かない（画面が別途提示します）。
-4. マークダウン記法（**太字**・#・箇条書き記号の*等）はここでも禁止。強調は「」、箇条書きは「・」。`
-      : `\n\n【伴走モードの追加ルール（方針決めは完了済み）】
-1. 深掘りに必要なら、1応答につき1つまでユーザーへ質問してよい。質問した場合は、次のユーザーの回答を受けてから完結した回答を返すこと（聞いたのに答えない、を禁止）。質問は応答の最後に置く。
-2. 会話でユーザーの方針が固まったとき（目標の言明・選択肢の決定・配分の合意）、および**既存の方針の変更・更新の言明**（「やっぱり〜にしたい」「〜に変える」「目標を〜に」等）を受けたときは、応答本文の後に次の形式のタグを1つ付ける：
-<plan>{"action_id":"liq/edu/refi/prepay/nisaのいずれか該当する一手","goal_text":"目標を40字以内","next_step_text":"次の一歩を40字以内","monthly_yen":毎月の金額が合意されていれば円の整数（任意・例 20000）}</plan>
-・雑談・情報質問・方針がまだ固まっていない会話では絶対に付けない（乱発は信頼を下げる）。
-・タグ内に商品名・事業者名・「おすすめ」等の推奨表現を入れない。
-・monthly_yenは会話で合意された毎月の金額を円の整数でそのまま。goal_text内に金額を書く場合もコンテキストの値を円表記で転記（「万」への換算・言い換え禁止。単位誤りは信頼を壊す）。
-・タグは記録の「提案」であり、記録するかはユーザーが決める（確認カードが別途表示される）。本文で記録を押し付けない。
-・配分や見込みの再計算はあなたの仕事ではない。タグで方針を記録すれば、システムが正確に再計算して画面（配分表・65歳見込み）に反映する。「計算できないので記録できない」という理由でタグを出し惜しみしない——対象の一手と金額が合意できていれば、まずタグを出す。本文では「記録すると、マイページの配分と見込みに反映されます」と案内してよい。
-3. **保存を示唆する表現の禁止**：「承認します」「記録します」「更新しました」「保存しました」等を本文で言わない。保存はタグ→確認カード→ユーザー承認の経路でのみ起こる。会話上の受け止めは「その方針に変えるのですね」までにとどめる。
-4. 配分（毎月の使い道）の金額を変える意図（例「備えを月6,000円に」「投資を減らして備えへ」）を受けたら、算数を一切せず次のタグを1つ**必ず**返す：
-<realloc>{"target":"liq/edu/prepay/nisaのいずれか","monthly_yen":希望額の円整数,"source":"補填元バケツID(liq/edu/prepay/nisa)／未配分からならunallocated／指定なければnull"}</realloc>
-・対象の一手（target）と金額が分かれば、確認を求める前に必ずこのタグを出す。本文で新しい金額を述べたり「〜になります」「確定しますか？」と聞くだけでタグを出さずに終わらせない（タグを出せば承認カードが自動で表示され、ユーザーがそこで確認・承認する）。本文は「変更後の配分をカードでお見せします。ご確認ください。」の一文にとどめる。
-・新しい配分金額を本文で計算・提示しない（合計・差し引き・「＋◯」・「投資は月¥◯になる」等の結果金額を書かない）。『変更後の配分は、次のカードでご確認ください』とだけ添える。変更前→変更後の配分表はシステムが計算し承認カードで見せる。
-・補填元がユーザー発言から不明で未配分だけでは足りない場合のみ、タグを出さず本文で「どこから減らしますか？」と1回だけ聞く（明言済みなら聞かない）。
-・バケツID対応：もしもの備え＝liq／教育費＝edu／繰り上げ返済と投資＝prepay／NISA＝nisa（「投資」は文脈に応じてprepayかnisa）。
-・「実行メモ（申告額）」と「配分方針」は別物。申告額を配分方針として扱わない。`;
+    // マイページの自由対話モード（会員が「決める」場・4問フローは撤去）。
+    // 修正4：realloc は「明確な決定の意思」のときだけ提案（雑談・比較・検討では出さない）。
+    const flowNote = `\n\n【マイページの自由対話モード（会員が「決める」場）】
+1. これはユーザー主導の自由な相談です。深掘りに必要なら1応答1問まで質問してよい（質問したら次の回答で完結させる）。診断データを文脈に、中立・非計算を維持して答える。
+2. **配分（毎月の使い道）の変更は、ユーザーが明確に「決定」の意思を示したときだけ**、算数を一切せず次のタグを1つ返す：
+<realloc>{"target":"liq/edu/prepay/nisaのいずれか","monthly_yen":希望額の円整数,"source":"補填元バケツID(liq/edu/prepay/nisa)／未配分ならunallocated／指定なければnull"}</realloc>
+・「決定の意思」とは「〜に決めた」「〜に変える」「〜にして」「〜でお願い」等の確定表現。単なる質問・比較・検討・相談・雑談（「〜はどう？」「どっちがいい？」「〜だといくら？」等）では**絶対にタグを出さない**（雑談での乱発は信頼を壊す）。迷っている段階では、選択肢と数字の変化を示すにとどめ、タグは出さない。
+・タグを出すときは本文で新しい金額を計算・提示しない。「変更後の配分は、次のカードでご確認ください」とだけ添える（結果金額・合計・差し引きを本文に書かない）。
+・補填元が不明で未配分だけでは足りない場合のみ、タグを出さず本文で「どこから減らしますか？」と1回だけ聞く。
+・バケツID：もしもの備え＝liq／教育費＝edu／繰り上げ返済と投資＝prepay／NISA＝nisa（「投資」は文脈に応じてprepayかnisa）。「実行メモ（申告額）」と「配分方針」は別物。
+3. 方針（定性の次の一歩）がユーザーの言明で固まったときは、応答本文の後に次を1つ付ける：
+<plan>{"action_id":"liq/edu/refi/prepay/nisaのいずれか","goal_text":"目標を40字以内","next_step_text":"次の一歩を40字以内","monthly_yen":合意時のみ円の整数（任意）}</plan>
+・雑談・情報質問・まだ固まっていない会話では付けない。商品名・事業者名・推奨表現は入れない。
+4. **保存を示唆する表現の禁止**：「承認します」「記録します」「更新しました」「保存しました」等を本文で言わない。保存はタグ→確認カード→ユーザー承認の経路でのみ起こる。
+5. マークダウン記法（**太字**・#・箇条書き記号の*等）は使わない。強調は「」、箇条書きは「・」。`;
     const history = (historyDesc ?? []).reverse().map((m) => ({
       role: m.role as "user" | "assistant",
       content: m.content as string,
@@ -189,17 +178,17 @@ export async function POST(req: NextRequest) {
     const { text: afterRealloc, intent: taggedIntent } = extractRealloc(rawReply);
     const { text: replyBody, proposal } = extractPlanProposal(afterRealloc, poolCap);
     let reply = stripInternalTerms(stripMarkdown(replyBody));
-    const validProposal = undecided.length === 0 ? proposal : null;
+    const validProposal = proposal;
     // フォールバック(c)：タグが無くても配分変更の気配（意図 or AIの確認表現）があれば
     //   専用の単機能抽出で意図を組み立て、承認カードを強制表示する（タグ発行の単一障害点を除去）。
     let reallocIntent = taggedIntent;
-    if (undecided.length === 0 && !reallocIntent) {
+    if (!reallocIntent) {
       reallocIntent = await extractReallocFallback({ apiKey, model: MODEL, history, message, aiReply: rawReply });
     }
-    // 配分変更（伴走モードのみ・修正1）：意図→サーバー計算→変更前→変更後の配分表（全変化行・合計＝余力）
+    // 配分変更（自由対話・修正1）：意図→サーバー計算→変更前→変更後の配分表（全変化行・合計＝余力）
     let realloc: unknown = null;
     let reallocHasRows = false;
-    if (undecided.length === 0 && reallocIntent) {
+    if (reallocIntent) {
       const curPA = planAmountsFromMonthly({
         liq: plans.liq?.monthlyYen ?? null, edu: plans.edu?.monthlyYen ?? null,
         prepay: plans.prepay?.monthlyYen ?? null, nisa: plans.nisa?.monthlyYen ?? null,

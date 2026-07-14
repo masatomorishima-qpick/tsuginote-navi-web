@@ -30,6 +30,7 @@ interface MypageData {
   tasks: { id: string; label: string; nextStep: string | null; done: boolean; cta: string }[];
   total: number;
   remainingCount: number;
+  savedAnswers: { id: string; question: string; answer: string; createdAt: string }[];
 }
 
 const AMOUNT_LABEL_DEFAULT = "この一手で、毎月の家計はいくら変わりましたか？（変わらない場合は空欄でOK）";
@@ -50,7 +51,8 @@ function MypageInner() {
       decisions: j.decisions ?? [], reports: j.reports ?? {}, plans: j.plans ?? {},
       verdict: j.verdict ?? "", allocation: j.allocation ?? { rows: [], totalYen: null, overflowYen: null },
       tasks: j.tasks ?? [],
-      total: j.total ?? 0, remainingCount: j.remainingCount ?? 0 });
+      total: j.total ?? 0, remainingCount: j.remainingCount ?? 0,
+      savedAnswers: j.savedAnswers ?? [] });
     return true;
   };
 
@@ -200,26 +202,33 @@ function MypageInner() {
         );
       })()}
 
-      {/* 未決定（方針の質問が残っている）＝AIへ誘導 */}
-      {data && data.remainingCount > 0 && (
-        <div className="rounded-2xl border border-emerald-300 bg-emerald-50 p-4 mb-4">
-          <div className="font-bold text-[15px] text-emerald-900 mb-1">
-            あなたの方針を決める質問が残っています（残り{data.remainingCount}問）
+      {/* 保存したアドバイス（修正3・診断結果画面で保存したアクション案の全文＋質問＋日時。配分数字とは非連動） */}
+      {data && data.savedAnswers.length > 0 && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 mb-4">
+          <h2 className="text-[15px] font-extrabold text-emerald-800 mb-2">保存したアドバイス</h2>
+          <div className="space-y-3">
+            {data.savedAnswers.map((a) => (
+              <div key={a.id} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                <div className="text-[11px] text-slate-400 mb-1">{new Date(a.createdAt).toLocaleString("ja-JP")}</div>
+                {a.question && <div className="text-[13px] font-bold text-slate-700 mb-1">Q. {a.question}</div>}
+                <div className="text-[13px] text-slate-700 leading-relaxed whitespace-pre-wrap">{a.answer}</div>
+              </div>
+            ))}
           </div>
-          <p className="text-[12px] text-slate-600 mb-3">質問に答える場所はAIチャットです。途中からでも続けられます。</p>
-          <Link href="/shisan/chat" onClick={() => track("shisan_chat_open_click")}
-            className="block w-full py-3 rounded-xl text-center text-white text-[15px] font-bold bg-emerald-600 hover:bg-emerald-700 transition">
-            AIと決める →
-          </Link>
         </div>
       )}
 
-      {/* ③ 伴走AIに相談 */}
-      <Link href="/shisan/chat"
-        className="block w-full mt-5 py-4 rounded-2xl text-center text-white text-base font-bold shadow-md bg-amber-500 hover:bg-amber-600 transition"
-        onClick={() => track("shisan_chat_open_click")}>
-        資産づくりAIに詳細を相談 →
-      </Link>
+      {/* AIに相談（自由対話）＝マイページは「決める場」。旧「残り質問／AIと決める」「詳細を相談」を1本に統合（4問フロー撤去） */}
+      <div className="mt-5">
+        <Link href="/shisan/chat"
+          className="block w-full py-4 rounded-2xl text-center text-white text-base font-bold shadow-md bg-emerald-600 hover:bg-emerald-700 transition"
+          onClick={() => track("shisan_chat_open_click")}>
+          AIに相談する →
+        </Link>
+        <p className="text-[12px] text-slate-500 text-center mt-1.5">
+          教育費・繰り上げ返済と投資・NISA・備えなど、何でも自由に相談できます。決めたら数字に反映します。
+        </p>
+      </div>
     </main>
   );
 }

@@ -12,7 +12,6 @@ import { useEffect, useRef, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { track } from "@/lib/shisan/track";
-import { flowGreeting } from "@/lib/shisan/flow";
 import { BUCKET_LABEL, type BucketId } from "@/lib/shisan/calc";
 import { LoginPanel } from "../LoginPanel";
 
@@ -62,7 +61,7 @@ function ChatInner() {
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState("");
   const [flow, setFlow] = useState<FlowState | null>(null);
-  const [greeting, setGreeting] = useState(GREETING);
+  const greeting = GREETING;
   const [answering, setAnswering] = useState(false);
   const [justCompleted, setJustCompleted] = useState(false);
   const [remaining, setRemaining] = useState<number | null>(null); // 本日の残り相談回数（修正4）
@@ -73,7 +72,6 @@ function ChatInner() {
   const [realloc, setRealloc] = useState<ReallocView | null>(null); // 配分変更の承認カード（修正1）
   const [reallocBusy, setReallocBusy] = useState(false);
   const chatOpened = useRef(false);
-  const flowStarted = useRef(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -86,25 +84,12 @@ function ChatInner() {
           track("shisan_chat_open", { scenario: me.scenario ?? "" });
           chatOpened.current = true;
         }
-        const [h, f] = await Promise.all([
-          fetch("/api/shisan/chat").then((r) => r.json()),
-          fetch("/api/shisan/flow").then((r) => r.json()).catch(() => null),
-        ]);
+        // 自由対話モード（4問フロー撤去）：チャット履歴のみ取得。方針決めフローは起動しない。
+        const h = await fetch("/api/shisan/chat").then((r) => r.json());
         const history: ChatMsg[] = h.ok ? h.messages : [];
         setMessages(history);
         if (typeof h.remaining === "number") setRemaining(h.remaining);
         if (typeof h.limit === "number") setLimit(h.limit);
-        if (f?.ok && f.total > 0) {
-          // 挨拶は決定論的に出し分け（開始宣言／スキップ／再開／全問決定済み＝伴走モード）
-          setGreeting(flowGreeting(f.total, f.remaining.length, history.length > 0));
-          if (f.next) {
-            setFlow({ total: f.total, remaining: f.remaining, next: f.next, decided: f.decided });
-            if (!flowStarted.current) {
-              track("shisan_ai_flow_start", { scenario: me.scenario ?? "" });
-              flowStarted.current = true;
-            }
-          }
-        }
         setState("chat");
       } catch {
         setState("login");

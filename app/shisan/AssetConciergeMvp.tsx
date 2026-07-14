@@ -1008,6 +1008,7 @@ function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView,
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [existing, setExisting] = useState(false);
+  const [answeredQuestion, setAnsweredQuestion] = useState(""); // 保存用：この回答のもとになった質問
   const isMember = loggedIn || registered;
   const viewFired = useRef(false);
 
@@ -1034,6 +1035,7 @@ function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView,
       const json = await res.json().catch(() => ({})) as { ok?: boolean; answer?: string };
       if (res.ok && json.ok && json.answer) {
         setAnswer(json.answer);
+        setAnsweredQuestion(q); // 保存用に、この回答のもとになった質問を保持
         setQuestion(""); // 続けて聞けるよう入力欄をクリア（会話を断ち切らない）
         track("shisan_answer_view", { scenario });
         if (!isMember && !viewFired.current) { onView(); viewFired.current = true; } // 保存パネル露出＝会員化の母数
@@ -1061,6 +1063,16 @@ function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView,
       const json: { ok?: boolean; session?: boolean; existing?: boolean } = await res.json().catch(() => ({}));
       if (res.ok && json.ok && json.session) {
         onRegistered();            // registeredフラグ永続＋shisan_signup_submit
+        // 表示中のアクション案を会員に紐付けて保存（修正3・best-effort。失敗してもマイページへ）
+        if (answer) {
+          try {
+            await fetch("/api/shisan/save-answer", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ question: answeredQuestion, answer }),
+            });
+          } catch { /* 保存失敗は致命にしない */ }
+        }
         router.push("/shisan/mypage"); // 保存済み。チャットへは遷移させずマイページへ
       } else if (res.ok && json.ok && json.existing) {
         setExisting(true);

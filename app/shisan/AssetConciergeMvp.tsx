@@ -515,15 +515,7 @@ export default function AssetConciergeMvp() {
               マイページへ →
             </Link>
           )}
-          {/* AI入口＝結果画面内のアクション案入力欄(#ai-cta)へスクロール（会員・非会員ともチャットへは遷移させない） */}
-          <button type="button" className="text-[12px] font-semibold text-emerald-700 underline underline-offset-2"
-            onClick={() => {
-              track("shisan_chat_open_click");
-              const el = document.getElementById("ai-cta");
-              if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
-            }}>
-            AIに聞く →
-          </button>
+          {/* AI導線はページ下部の相談欄一本に集約（2026-07-15 表示調整：ヘッダーの「AIに聞く」リンクを撤去） */}
         </div>
       </div>
 
@@ -537,13 +529,14 @@ export default function AssetConciergeMvp() {
           <div className="h-2 bg-white/25 rounded-full overflow-hidden mb-5"><div className="h-full bg-white transition-all duration-500" style={{ width: `${score}%` }} /></div>
         </>)}
 
-        {/* 結論：65歳の見込み（目安）＋目標比％（変更1-1） */}
+        {/* 結論：65歳の見込み（目安）＋目標比％（変更1-1）
+            修正1（2026-07-15）：金額は必ず1行。clamp()で幅に応じ縮小＋whitespace-nowrap、右ブロックは shrink-0。 */}
         <div className="text-[13px] font-bold opacity-90 mb-1">65歳の見込み（目安）</div>
-        <div className="flex justify-between items-end gap-3">
-          <div className="text-[34px] font-extrabold leading-none">約¥<CountUp value={result ? Math.round(result.future / 10000) : 0} />万</div>
-          <div className="text-right">
-            <div className="text-[26px] font-extrabold leading-none">{result?.achieve}%</div>
-            <span className="text-[11px] opacity-85">目標 ¥{inputs ? man(inputs.target) : 0}万 に対して</span>
+        <div className="flex justify-between items-end gap-2">
+          <div className="font-extrabold leading-none whitespace-nowrap" style={{ fontSize: "clamp(24px, 7.5vw, 34px)" }}>約¥<CountUp value={result ? Math.round(result.future / 10000) : 0} />万</div>
+          <div className="text-right shrink-0">
+            <div className="font-extrabold leading-none whitespace-nowrap" style={{ fontSize: "clamp(20px, 6vw, 26px)" }}>{result?.achieve}%</div>
+            <span className="text-[11px] opacity-85 whitespace-nowrap">目標 ¥{inputs ? man(inputs.target) : 0}万</span>
           </div>
         </div>
         {/* 変更6：前提と揺らぎの一行（想定リターンと0%時の目安） */}
@@ -557,6 +550,60 @@ export default function AssetConciergeMvp() {
           </div>
         )}
 
+        {/* 入力の鏡（修正2・2026-07-15：緑カード内テキストへ統合。カードinカードにしない／ラベル廃止）。
+            見出しは本文より一段大きく・太字、本文中の数字は太字。緑背景で読めるコントラスト。 */}
+        {mirror && inputs && (
+          <div className="mt-4 pt-4 border-t border-white/25 space-y-3.5">
+            {/* ① 住宅ローン金利について（mBal>0のときのみ・従来条件） */}
+            {mirror.hasLoan && (
+              <div>
+                <div className="text-[15px] font-bold mb-0.5">住宅ローン金利について</div>
+                {mirror.refiRoomYen > 0 ? (
+                  <p className="text-[13px] leading-relaxed opacity-95">
+                    あなたの金利<b className="font-extrabold">{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）より高めです。借り換えで<b className="font-extrabold">月々約¥{yen(mirror.refiRoomYen)}</b>を軽くできる余地があります。
+                  </p>
+                ) : (
+                  <p className="text-[13px] leading-relaxed opacity-95">
+                    あなたの金利<b className="font-extrabold">{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）と同水準かそれより低めです。今の金利では借り換えの余地は小さめです。
+                  </p>
+                )}
+                <div className="text-[10px] opacity-75 mt-1">※水準は内部目安。借り換え試算の基準金利は{REFI_BASE}%。</div>
+              </div>
+            )}
+
+            {/* 借り換えで増やせる手取り（yutori>0のときのみ・従来条件） */}
+            {result && result.yutori > 0 && (
+              <div>
+                <div className="text-[15px] font-bold mb-0.5">借り換えで増やせる手取り（目安）</div>
+                <p className="text-[13px] leading-relaxed opacity-95">
+                  毎月<b className="font-extrabold">約¥{yen(result.yutori)}</b>の手取りを増やせる可能性があります。
+                </p>
+              </div>
+            )}
+
+            {/* ② 生活防衛資金の目安（living>0のとき） */}
+            {mirror.monthsCovered != null && (
+              <div>
+                <div className="text-[15px] font-bold mb-0.5">生活防衛資金の目安</div>
+                <p className="text-[13px] leading-relaxed opacity-95">
+                  手元の資産は生活費の<b className="font-extrabold">約{Math.round(mirror.monthsCovered)}ヶ月分</b>。目安の6ヶ月分に対して
+                  {mirror.monthsCovered >= 6
+                    ? <> <b className="font-extrabold">＋約{Math.round(mirror.monthsCovered - 6)}ヶ月</b>の余裕があります。</>
+                    : <> <b className="font-extrabold">−約{Math.round(6 - mirror.monthsCovered)}ヶ月</b>不足しています。</>}
+                </p>
+              </div>
+            )}
+
+            {/* ③ あと少し増やすと（全員） */}
+            <div>
+              <div className="text-[15px] font-bold mb-0.5">あと少し増やすと</div>
+              <p className="text-[13px] leading-relaxed opacity-95">
+                毎月あと<b className="font-extrabold">¥{yen(SENSITIVITY_STEP_YEN)}</b>を投資に回すと、65歳見込みは<b className="font-extrabold">＋約{man(mirror.sensitivityYen)}万円</b>（想定{inputs.r}%）。
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* シェア導線（変更1-4：結果カード内下部へ。シェア対象＝診断結果なので結果カードに付随させ、結果を見た全員の視界に入れる）。X intent・文言に金額/年齢/個人情報は入れない。 */}
         {scenario && (
           <button type="button" onClick={shareToX}
@@ -565,63 +612,6 @@ export default function AssetConciergeMvp() {
           </button>
         )}
       </div>
-
-      {/* ===== 入力の鏡（変更2・全面改善 2026-07-14）：追加入力なし・既存計算の派生のみ ===== */}
-      {mirror && inputs && (
-        <section className="mb-4 space-y-2.5">
-          <p className="text-[12px] text-slate-400 px-1">あなたの入力から分かること</p>
-
-          {/* a. 住宅ローン金利の市場比較（mBal>0のときのみ） */}
-          {mirror.hasLoan && (
-            <div className="rounded-2xl bg-white border border-slate-200 p-4">
-              <div className="text-[12px] font-bold text-emerald-800 mb-1">住宅ローン金利の現在地</div>
-              {mirror.refiRoomYen > 0 ? (
-                <p className="text-[13px] text-slate-700 leading-relaxed">
-                  あなたの金利<b>{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）より高めです。
-                  借り換えで<b>月々約¥{yen(mirror.refiRoomYen)}</b>を軽くできる余地があります。
-                </p>
-              ) : (
-                <p className="text-[13px] text-slate-700 leading-relaxed">
-                  あなたの金利<b>{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）と同水準かそれより低めです。
-                  今の金利では借り換えの余地は小さめです。
-                </p>
-              )}
-              <div className="text-[10px] text-slate-400 mt-1.5">※水準は内部目安。借り換え試算の基準金利は{REFI_BASE}%。</div>
-            </div>
-          )}
-
-          {/* 変更3：借り換えで増やせる手取り（旧「毎月生まれたゆとり」）。¥0は非表示 */}
-          {result && result.yutori > 0 && (
-            <div className="rounded-2xl bg-white border border-slate-200 p-4">
-              <div className="text-[12px] font-bold text-emerald-800 mb-1">借り換えで増やせる手取り（目安）</div>
-              <p className="text-[13px] text-slate-700 leading-relaxed">
-                毎月<b>約¥{yen(result.yutori)}</b>の手取りを増やせる可能性があります。
-              </p>
-            </div>
-          )}
-
-          {/* b. 生活防衛資金（全員・living>0のとき） */}
-          {mirror.monthsCovered != null && (
-            <div className="rounded-2xl bg-white border border-slate-200 p-4">
-              <div className="text-[12px] font-bold text-emerald-800 mb-1">生活防衛資金の目安</div>
-              <p className="text-[13px] text-slate-700 leading-relaxed">
-                手元の資産は生活費の<b>約{Math.round(mirror.monthsCovered)}ヶ月分</b>。目安の6ヶ月分に対して
-                {mirror.monthsCovered >= 6
-                  ? <> <b>＋約{Math.round(mirror.monthsCovered - 6)}ヶ月</b>の余裕があります。</>
-                  : <> <b>−約{Math.round(6 - mirror.monthsCovered)}ヶ月</b>不足しています。</>}
-              </p>
-            </div>
-          )}
-
-          {/* c. 感度の一行（全員） */}
-          <div className="rounded-2xl bg-white border border-slate-200 p-4">
-            <div className="text-[12px] font-bold text-emerald-800 mb-1">あと少し増やすと</div>
-            <p className="text-[13px] text-slate-700 leading-relaxed">
-              毎月あと<b>¥{yen(SENSITIVITY_STEP_YEN)}</b>を投資に回すと、65歳見込みは<b>＋約{man(mirror.sensitivityYen)}万円</b>（想定{inputs.r}%）。
-            </p>
-          </div>
-        </section>
-      )}
 
       {/* AIへの大導線（追加要件E-2／変更1-3）：主役級・登録もここに一本化。ダッシュボードは常に scenario 有り。 */}
       {scenario && (

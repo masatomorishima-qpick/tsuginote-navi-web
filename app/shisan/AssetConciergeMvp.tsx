@@ -15,7 +15,7 @@
  * - 金利変動シナリオは次フェーズ（rを変数化しておき後付け可能）。
  */
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 /* 計算エンジンは共有モジュール（Phase1 §6：クライアントとchat APIの両方から参照） */
@@ -46,30 +46,14 @@ interface Store {
 }
 interface SignupFlags { registered?: boolean; closed?: boolean; }
 
-/* 打ち手カード（あなたの次の一手） */
-type ActionExternal = "expense" | "income" | "invest" | "refi";
-interface DualCell { label: string; value: string; note: string; }
-interface ActionCard {
-  id: string;                 // 計測用 action_id
-  title: string;              // 行動（商品名は出さない）
-  effect?: ReactNode;         // 効果の一行（数字 or 方向性＋理由）
-  dual?: { left: DualCell; right: DualCell }; // 繰上げvs投資の対等表示
-  bucket?: BucketId;          // タップで開く対応質問（段階3で結線）
-  external?: ActionExternal;  // 実行接点（段階4で送客リンク）
-}
-/* 実行接点（アフィリエイト送客）。URLは後入れ＝空でも枠と計測は動く（差し替え可能）。 */
-const AFFILIATE_LINKS: Record<ActionExternal, string> = {
-  expense: "", income: "", invest: "", refi: "",
-};
-const EXEC_LABEL: Record<ActionExternal, string> = {
-  expense: "固定費の見直しを調べる →",
-  income: "仕事・学びの選択肢を見る →",
-  invest: "口座の選択肢を見る →",
-  refi: "借り換えを調べる →",
-};
-
 /* シェア導線（第一陣・要件2）。金額・年齢・個人情報はシェア文言に一切含めない。 */
 const SHARE_URL = "https://www.tsuginotenavi.jp/shisan";
+
+/* 入力の鏡（全面改善 2026-07-14）用の定数。追加入力なし・既存計算の派生のみ。 */
+// 借り換えの市場水準（表示用の内部目安・手動更新可。実際の借り換え試算は calc.ts の REFI_BASE を使用）。
+const MARKET_RATE_BAND = "変動0.3〜0.5%台";
+// 感度の一行「毎月あと¥X 増やすと」の刻み。
+const SENSITIVITY_STEP_YEN = 10000;
 
 /* ===== 計測は lib/shisan/track.ts に共有化（Phase1）。冒頭でimport ===== */
 
@@ -114,7 +98,6 @@ export default function AssetConciergeMvp() {
   const [toast, setToast] = useState("");
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoOpened = useRef(false);
-  const actionsViewed = useRef(false);
   /* 会員登録導線（第一陣・要件1） */
   const signupViewed = useRef(false);
   const [signupFlags, setSignupFlags] = useState<SignupFlags>({});
@@ -295,89 +278,26 @@ export default function AssetConciergeMvp() {
   /* 試算結果（A'案3ブロック。ロジックは lib/shisan/calc.ts の computeResult に共有化） */
   const result = useMemo(() => computeResult(inputs, decisions), [inputs, decisions]);
 
-  /* 打ち手カード群「あなたの次の一手」（シナリオ別・推奨順・数字は既存関数流用） */
-  const actions = useMemo<ActionCard[]>(() => {
-    if (!inputs || !scenario) return [];
+  /* 65歳見込みの「0%リターン時」の目安（変更6・前提の揺らぎを一行で示すため。既存エンジンを r=0 で再計算） */
+  const result0 = useMemo(
+    () => computeResult(inputs ? { ...inputs, r: 0 } : null, decisions),
+    [inputs, decisions],
+  );
+
+  /* 入力の鏡（変更2・全面改善 2026-07-14）：追加入力なし・既存の計算式の派生のみ。
+   *  a. 住宅ローン金利の市場比較（借り換え余地＝既存 refinance を流用）
+   *  b. 生活防衛資金（手元資産÷月間生活費。目安6ヶ月）
+   *  c. 感度の一行（毎月+¥10,000を投資に回したときの65歳増分＝既存の複利 annFactor） */
+  const mirror = useMemo(() => {
+    if (!inputs) return null;
     const n = Math.max(0, RET_AGE - inputs.age);
-    const hasLoan = inputs.hasMortgage && inputs.mBal > 0;
-    const invMan = man(inputs.surplus * 12 * annFactor(n, inputs.r / 100)); // 投資の65歳将来額
-    const refi = hasLoan ? refinance(inputs.mBal, inputs.mRate, inputs.mYears) : null;
-    const refiEffect: ReactNode = refi && refi.dMonthly > 0
-      ? <>月々 <b>¥{yen(refi.dMonthly)}</b> 軽くなる</>
-      : <>今の金利では下げ幅は小さめ</>;
-    const list: ActionCard[] = [];
-
-    if (scenario === "A") {
-      const cur = eduMonthly(inputs.childAges, inputs.eduPlan);
-      const save = Math.max(0, cur - eduMonthly(inputs.childAges, "kokukou"));
-      list.push({
-        id: "edu_review", bucket: "edu", title: "教育費の目標を見直す",
-        effect: save > 0
-          ? <>私立→国公立で、月 <b>約¥{yen(save)}</b> 軽くなる</>
-          : <>必要な積立は 月 <b>約¥{yen(cur)}</b></>,
-      });
-      if (inputs.surplus > 0) list.push({
-        id: "invest_more", bucket: "nisa", external: "invest", title: "積立を増やす",
-        effect: <>65歳で <b>＋約{invMan}万</b>（想定{inputs.r}%）</>,
-      });
-      list.push({
-        id: "income_up", external: "income", title: "収入を増やす",
-        effect: <>支出だけでは届きにくいとき効く</>,
-      });
-    }
-
-    if (scenario === "B") {
-      if (inputs.surplus > 0) list.push({
-        id: "invest_more", bucket: "nisa", external: "invest", title: "積立を増やす",
-        effect: <>65歳で <b>＋約{invMan}万</b>（想定{inputs.r}%）</>,
-      });
-      if (hasLoan && inputs.surplus > 0) {
-        const compMan = man(prepayCompression(inputs.mBal, inputs.mRate, inputs.mYears, inputs.surplus * 12));
-        list.push({
-          id: "prepay_vs_invest", bucket: "prepay", title: "繰上げ vs 投資",
-          dual: {
-            left: { label: "繰上げ", value: `利息 約${compMan}万圧縮`, note: "確実・無リスク" },
-            right: { label: "投資", value: `65歳 ＋約${invMan}万`, note: `想定${inputs.r}%・不確実` },
-          },
-        });
-      }
-      if (hasLoan) list.push({ id: "refi", bucket: "refi", external: "refi", title: "借り換え", effect: refiEffect });
-      if (!hasLoan && inputs.surplus > 0) {
-        const annualMan = man(inputs.surplus * 12);
-        const usedPct = Math.min(100, Math.round((inputs.surplus * 12 / 3600000) * 100));
-        list.push({
-          id: "nisa_fill", bucket: "nisa", external: "invest", title: "NISA枠を使い切る",
-          effect: <>年 <b>¥{annualMan}万</b>（枠360万の約{usedPct}%）</>,
-        });
-      }
-    }
-
-    if (scenario === "C") {
-      list.push({
-        id: "expense_cut", external: "expense", title: "固定費を見直す",
-        effect: <>通信や保険から、余力を生む</>,
-      });
-      if (hasLoan) list.push({ id: "refi", bucket: "refi", external: "refi", title: "借り換え", effect: refiEffect });
-      list.push({
-        id: "buffer", bucket: "liq", title: "もしもの備え",
-        effect: <>目安 <b>¥{man(inputs.living * 6)}万</b>（生活費6か月）</>,
-      });
-    }
-
-    return list;
-  }, [inputs, scenario]);
-
-  /* 打ち手ブロック表示時に一度だけ shisan_actions_view（GA・段階5） */
-  useEffect(() => {
-    if (screen === "dash" && actions.length > 0 && !actionsViewed.current) {
-      track("shisan_actions_view", {
-        scenario, count: actions.length,
-        surplus_band: inputs ? surplusBand(inputs.surplus) : "",
-        buckets_count: buckets.length,
-      });
-      actionsViewed.current = true;
-    }
-  }, [screen, actions, scenario, inputs, buckets]);
+    const refi = inputs.hasMortgage && inputs.mBal > 0
+      ? refinance(inputs.mBal, inputs.mRate, inputs.mYears) : null;
+    const refiRoomYen = refi ? Math.round(refi.dMonthly) : 0;
+    const monthsCovered = inputs.living > 0 ? inputs.assets / inputs.living : null;
+    const sensitivityYen = SENSITIVITY_STEP_YEN * 12 * annFactor(n, inputs.r / 100);
+    return { hasLoan: !!refi, refiRoomYen, monthsCovered, sensitivityYen };
+  }, [inputs]);
 
   const setR = (v: number) => {
     if (!inputs) return;
@@ -385,40 +305,6 @@ export default function AssetConciergeMvp() {
     setInputs(ni); persist({ inputs: ni });
     syncServerStore(ni); // 想定リターン変更もサーバーへ同期（追加要件C）
     track("shisan_set_return", { r: v });
-  };
-
-  // 打ち手カード本体タップ＋select計測（段階3/5）。rank＝推奨順位（先頭=0）。
-  // AI主導フロー（追加要件E-3）：質問アコーディオンが無いため、タップ先はAI大導線へのスクロールに変更。
-  const selectAction = (a: ActionCard, rank: number) => {
-    if (!a.bucket) return; // 送客のみのカードは executeAction 側
-    track("shisan_action_select", { action_id: a.id, rank });
-    if (typeof document === "undefined") return;
-    if (SHOW_INLINE_QUESTIONS) {
-      setOpenBucket(a.bucket);
-      const el = document.getElementById(`bucket-${a.bucket}`);
-      if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "start" }));
-    } else {
-      const el = document.getElementById("ai-cta");
-      if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
-    }
-  };
-
-  // 打ち手カード → 実行接点（送客・段階4/5）。select とは別イベント。URL未設定でも計測は動く。
-  const executeAction = (a: ActionCard, rank: number) => {
-    if (!a.external) return;
-    track("shisan_action_execute_click", { external: a.external, action_id: a.id, rank });
-    const url = AFFILIATE_LINKS[a.external];
-    if (url) window.open(url, "_blank", "noopener,noreferrer");
-    else showToast("ご案内を準備中です。");
-  };
-
-  // B案：不活性カード（bucket無し・送客URL空）のタップ → AI相談パネルへ誘導（Dead tap解消）。
-  // 専用イベントで独立計測（action_select/action_execute_click には混ぜない）。
-  const cardToAi = (a: ActionCard, rank: number) => {
-    track("shisan_card_to_ai_click", { action_id: a.id, rank });
-    if (typeof document === "undefined") return;
-    const el = document.getElementById("ai-cta");
-    if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
   };
 
   const decide = (b: BucketId, choice: string) => {
@@ -641,8 +527,8 @@ export default function AssetConciergeMvp() {
         </div>
       </div>
 
-      {/* 診断結果コーナー（緑・A'案 3ブロック・全ブロック緑で統一） */}
-      <div className="rounded-2xl shadow-sm p-5 mb-5 text-white bg-gradient-to-br from-emerald-600 to-emerald-800">
+      {/* ===== 診断結果コーナー（全面改善 2026-07-14）：結論＝65歳見込みを最上部に（変更1） ===== */}
+      <div className="rounded-2xl shadow-sm p-5 mb-4 text-white bg-gradient-to-br from-emerald-600 to-emerald-800">
         {/* 完了スコアは質問前提のUIのためAI主導フローでは非表示（追加要件E-1） */}
         {SHOW_INLINE_QUESTIONS && (<>
           <div className="flex items-center justify-end mb-1">
@@ -651,82 +537,94 @@ export default function AssetConciergeMvp() {
           <div className="h-2 bg-white/25 rounded-full overflow-hidden mb-5"><div className="h-full bg-white transition-all duration-500" style={{ width: `${score}%` }} /></div>
         </>)}
 
-        {/* ① 毎月生まれたゆとり */}
-        <div className="mb-5">
-          <div className="flex items-center gap-2 mb-0.5">
-            <span className="w-5 h-5 rounded-full bg-white/25 text-[11px] font-bold flex items-center justify-center">1</span>
-            <span className="text-[14px] font-bold">毎月生まれたゆとり</span>
+        {/* 結論：65歳の見込み（目安）＋目標比％（変更1-1） */}
+        <div className="text-[13px] font-bold opacity-90 mb-1">65歳の見込み（目安）</div>
+        <div className="flex justify-between items-end gap-3">
+          <div className="text-[34px] font-extrabold leading-none">約¥<CountUp value={result ? Math.round(result.future / 10000) : 0} />万</div>
+          <div className="text-right">
+            <div className="text-[26px] font-extrabold leading-none">{result?.achieve}%</div>
+            <span className="text-[11px] opacity-85">目標 ¥{inputs ? man(inputs.target) : 0}万 に対して</span>
           </div>
-          <div className="text-[28px] font-extrabold leading-tight">＋¥<CountUp value={result?.yutori ?? 0} /><span className="text-sm font-bold">/月</span></div>
-          <div className="text-[11px] opacity-80">借り換えなどで手取りが増えた分です。</div>
         </div>
-
-        {/* ② 毎月の余力の使い道（緑上のバー行で統一） */}
-        <div className="mb-5">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="w-5 h-5 rounded-full bg-white/25 text-[11px] font-bold flex items-center justify-center">2</span>
-            <span className="text-[14px] font-bold">毎月の余力 ¥{result ? yen(result.pool) : 0} の使い道</span>
-          </div>
-          {result && [
-            { k: "備え", v: result.bei },
-            { k: "教育費", v: result.edu },
-            { k: "繰上げ", v: result.kuriage },
-            { k: result.nisaUsed ? "投資（NISA枠）" : "投資", v: result.toushi },
-            { k: "未配分（自由）", v: result.mihai },
-          ].filter((s) => s.v > 0).map((s) => (
-            <div key={s.k} className="flex items-center gap-2 mb-1.5">
-              <span className="text-[12px] w-24 shrink-0 opacity-90">{s.k}</span>
-              <div className="flex-1 h-2.5 bg-white/20 rounded-full overflow-hidden"><div className="h-full bg-white rounded-full" style={{ width: `${result.pool > 0 ? (s.v / result.pool) * 100 : 0}%` }} /></div>
-              <span className="text-[12px] font-bold w-20 text-right">¥{yen(s.v)}</span>
-            </div>
-          ))}
-          <div className="text-[11px] opacity-80 mt-1.5">配ったお金は減ったのではなく、目的が決まったお金です。</div>
-
-          {result?.eduCrowdsOut && inputs && (
-            <div className="mt-3 p-3 rounded-lg bg-white/15 text-[12px] leading-relaxed">
-              <div className="font-bold mb-1">今の余力では、教育費と投資の“両取り”は難しい状態です</div>
-              教育費の目標（¥{yen(eduMonthly(inputs.childAges, inputs.eduPlan))}/月）を満たすと、繰上げ・投資に回す分は残りません。投資が0なのは失敗ではなく「教育費を最優先に決めた」という意思決定です。
-              <div className="opacity-85 mt-1.5">投資にも回したいなら（どれも正解ではありません）：①教育費の目標を見直す ②余力を増やす（借換・固定費）③今は教育費を優先と決める。</div>
-            </div>
-          )}
+        {/* 変更6：前提と揺らぎの一行（想定リターンと0%時の目安） */}
+        <div className="text-[11px] opacity-80 mt-2 leading-relaxed">
+          想定リターン{inputs?.r}%の場合の目安（備え・教育費は元本のまま反映）。{result0 && <>0%なら約¥{man(result0.future)}万。</>}
         </div>
-
-        {/* ③ 65歳の見込み */}
-        <div>
-          <div className="flex items-center gap-2 mb-0.5">
-            <span className="w-5 h-5 rounded-full bg-white/25 text-[11px] font-bold flex items-center justify-center">3</span>
-            <span className="text-[14px] font-bold">65歳の見込み（目安）</span>
+        {/* 変更5：目標を上回る見込みの人への出口 */}
+        {result && result.achieve > 100 && (
+          <div className="mt-3 p-3 rounded-lg bg-white/15 text-[12px] leading-relaxed">
+            目標を上回る見込みです。その余裕の使い道（教育費の上積み・早期リタイア・使う楽しみ）も、下の「AIに聞く」で相談できます。
           </div>
-          <div className="flex justify-between items-end">
-            <div className="text-[28px] font-extrabold leading-tight">約¥<CountUp value={result ? Math.round(result.future / 10000) : 0} />万</div>
-            <div className="text-right"><span className="text-[12px] opacity-85">目標 ¥{inputs ? man(inputs.target) : 0}万</span><div className="text-[22px] font-extrabold leading-tight">{result?.achieve}%</div></div>
-          </div>
-          <div className="text-[11px] opacity-80 mt-1">想定リターン{inputs?.r}%の目安（備え・教育費は元本のまま反映）。</div>
-        </div>
-      </div>
+        )}
 
-      {/* あなたの次の一手（行動導線）＝面で囲って独立させ、肝を肝に見せる */}
-      {actions.length > 0 && (
-        <section className="mb-6 rounded-2xl bg-emerald-50 border border-emerald-100 p-4">
-          <h2 className="text-[20px] font-extrabold text-emerald-900 leading-tight mb-0.5">あなたの次の一手</h2>
-          <p className="text-[11px] text-slate-400 mb-3">いまのあなたに効く順に並べています。</p>
-          {actions.map((a, i) => (
-            <ActionCardView key={a.id} a={a} rank={i} primary={i === 0} onSelect={selectAction} onExecute={executeAction} onCardToAi={cardToAi} />
-          ))}
-          <p className="text-[13px] mt-1">
-            <span className="font-bold text-emerald-800">できることは、ちゃんとあります。</span>
-            <span className="text-slate-500"> 正解はひとつじゃない。選ぶのはあなた。</span>
-          </p>
-          {/* シェア導線（第一陣・要件2）：X intent・文言に金額/年齢は入れない */}
+        {/* シェア導線（変更1-4：結果カード内下部へ。シェア対象＝診断結果なので結果カードに付随させ、結果を見た全員の視界に入れる）。X intent・文言に金額/年齢/個人情報は入れない。 */}
+        {scenario && (
           <button type="button" onClick={shareToX}
-            className="mt-3 w-full py-2.5 rounded-xl border border-emerald-600 bg-white text-emerald-700 text-sm font-bold hover:bg-emerald-600 hover:text-white transition">
+            className="mt-4 w-full py-2.5 rounded-xl bg-white text-emerald-700 text-sm font-bold hover:bg-emerald-50 transition">
             この診断をシェアする
           </button>
+        )}
+      </div>
+
+      {/* ===== 入力の鏡（変更2・全面改善 2026-07-14）：追加入力なし・既存計算の派生のみ ===== */}
+      {mirror && inputs && (
+        <section className="mb-4 space-y-2.5">
+          <p className="text-[12px] text-slate-400 px-1">あなたの入力から分かること</p>
+
+          {/* a. 住宅ローン金利の市場比較（mBal>0のときのみ） */}
+          {mirror.hasLoan && (
+            <div className="rounded-2xl bg-white border border-slate-200 p-4">
+              <div className="text-[12px] font-bold text-emerald-800 mb-1">住宅ローン金利の現在地</div>
+              {mirror.refiRoomYen > 0 ? (
+                <p className="text-[13px] text-slate-700 leading-relaxed">
+                  あなたの金利<b>{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）より高めです。
+                  借り換えで<b>月々約¥{yen(mirror.refiRoomYen)}</b>を軽くできる余地があります。
+                </p>
+              ) : (
+                <p className="text-[13px] text-slate-700 leading-relaxed">
+                  あなたの金利<b>{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）と同水準かそれより低めです。
+                  今の金利では借り換えの余地は小さめです。
+                </p>
+              )}
+              <div className="text-[10px] text-slate-400 mt-1.5">※水準は内部目安。借り換え試算の基準金利は{REFI_BASE}%。</div>
+            </div>
+          )}
+
+          {/* 変更3：借り換えで増やせる手取り（旧「毎月生まれたゆとり」）。¥0は非表示 */}
+          {result && result.yutori > 0 && (
+            <div className="rounded-2xl bg-white border border-slate-200 p-4">
+              <div className="text-[12px] font-bold text-emerald-800 mb-1">借り換えで増やせる手取り（目安）</div>
+              <p className="text-[13px] text-slate-700 leading-relaxed">
+                毎月<b>約¥{yen(result.yutori)}</b>の手取りを増やせる可能性があります。
+              </p>
+            </div>
+          )}
+
+          {/* b. 生活防衛資金（全員・living>0のとき） */}
+          {mirror.monthsCovered != null && (
+            <div className="rounded-2xl bg-white border border-slate-200 p-4">
+              <div className="text-[12px] font-bold text-emerald-800 mb-1">生活防衛資金の目安</div>
+              <p className="text-[13px] text-slate-700 leading-relaxed">
+                手元の資産は生活費の<b>約{Math.round(mirror.monthsCovered)}ヶ月分</b>。目安の6ヶ月分に対して
+                {mirror.monthsCovered >= 6
+                  ? <> <b>＋約{Math.round(mirror.monthsCovered - 6)}ヶ月</b>の余裕があります。</>
+                  : <> <b>−約{Math.round(6 - mirror.monthsCovered)}ヶ月</b>不足しています。</>}
+              </p>
+            </div>
+          )}
+
+          {/* c. 感度の一行（全員） */}
+          <div className="rounded-2xl bg-white border border-slate-200 p-4">
+            <div className="text-[12px] font-bold text-emerald-800 mb-1">あと少し増やすと</div>
+            <p className="text-[13px] text-slate-700 leading-relaxed">
+              毎月あと<b>¥{yen(SENSITIVITY_STEP_YEN)}</b>を投資に回すと、65歳見込みは<b>＋約{man(mirror.sensitivityYen)}万円</b>（想定{inputs.r}%）。
+            </p>
+          </div>
         </section>
       )}
 
-      {/* AIへの大導線（追加要件E-2）：主役級・登録もここに一本化。余力0（別出口）はactionsが無いため出ない */}
-      {actions.length > 0 && scenario && (
+      {/* AIへの大導線（追加要件E-2／変更1-3）：主役級・登録もここに一本化。ダッシュボードは常に scenario 有り。 */}
+      {scenario && (
         <AiCtaPanel loggedIn={loggedIn} registered={!!signupFlags.registered} scenario={scenario}
           snapshot={signupSnapshot} summary={signupSummary}
           onView={onSignupView} onRegistered={onSignupRegistered} />
@@ -916,74 +814,6 @@ function BucketPanel({ id, inputs, n, onDecide, onSetR }: { id: BucketId; inputs
       <button className={cbtnGray} onClick={() => onDecide("今は使わない")}>今は使わない</button>
     </div>
   </>);
-}
-
-/* ===== 打ち手カード（行動名＋数字ひとつ） =====
- * 本体タップ：バケツありカード＝select（質問を開く）／送客のみカード＝execute（送客）。
- * バケツあり＋外部接点のカードは、本体=select・別リンク=execute の2導線（別イベントで区別）。 */
-function ActionCardView({ a, rank, primary, onSelect, onExecute, onCardToAi }: {
-  a: ActionCard; rank: number; primary?: boolean;
-  onSelect?: (a: ActionCard, rank: number) => void;
-  onExecute?: (a: ActionCard, rank: number) => void;
-  onCardToAi?: (a: ActionCard, rank: number) => void;
-}) {
-  // 要件3（第一陣）：URL未設定（空文字）の送客導線は出さない。
-  // 送客のみカードはタップ無効＋押せる見た目なしの情報カードとして静置。
-  // AFFILIATE_LINKS にURLを入れるだけで、リンク表示・タップ・execute計測が自動復帰する。
-  const hasUrl = !!a.external && !!AFFILIATE_LINKS[a.external];
-  const bodyOpens = !!a.bucket && !!onSelect;                          // 本体＝質問を開く
-  const bodyExecs = !a.bucket && !!a.external && !!onExecute && hasUrl; // 本体＝送客（バケツなし・URL設定時のみ）
-  // B案（Dead tap解消）：不活性カード（bucket無し かつ 送客URL空＝上のどちらでもない）は、
-  //   従来 <div> でタップ不能だった。これをタップ可能にし、AI相談パネル(#ai-cta)へ誘導する。
-  //   ID決め打ちではなく「bodyOpens でも bodyExecs でもない」条件で将来カードも自動で拾う。
-  const bodyToAi = !bodyOpens && !bodyExecs && !!onCardToAi;
-  const bodyClickable = bodyOpens || bodyExecs || bodyToAi;
-  const showExecLink = !!a.bucket && !!a.external && !!onExecute && hasUrl; // 質問＋送客の2導線（URL設定時のみ）
-  const onBody = () => {
-    if (bodyOpens) onSelect!(a, rank);
-    else if (bodyExecs) onExecute!(a, rank);
-    else if (bodyToAi) onCardToAi!(a, rank);
-  };
-  const body = (
-    <>
-      {primary && <div className="text-[10px] font-bold text-emerald-700 mb-1">まず、これ</div>}
-      <div className="flex items-center justify-between gap-2">
-        <div className="font-bold text-[15px] leading-snug">{a.title}</div>
-        {bodyClickable && <span className="text-slate-300 text-lg leading-none">›</span>}
-      </div>
-      {a.dual ? (
-        <div className="mt-2">
-          {/* 2つの数字は対等表示（同サイズ・同色・どちらも強調しない＝中立） */}
-          <div className="flex gap-2">
-            {[a.dual.left, a.dual.right].map((d, i) => (
-              <div key={i} className="flex-1 rounded-lg bg-slate-50 p-2.5 text-center">
-                <div className="text-[11px] text-slate-500">{d.label}</div>
-                <div className="text-[13px] font-bold text-slate-700 mt-0.5">{d.value}</div>
-                <div className="text-[10px] text-slate-400 mt-0.5">{d.note}</div>
-              </div>
-            ))}
-          </div>
-          <div className="text-[11px] text-slate-500 mt-1.5">性質が違います。</div>
-        </div>
-      ) : (
-        <div className="text-[13px] text-slate-600 leading-relaxed mt-0.5">{a.effect}</div>
-      )}
-    </>
-  );
-  const cls = `rounded-xl p-3.5 mb-2.5 ${primary ? "bg-emerald-100 border border-emerald-300 border-l-4 border-l-emerald-600" : "bg-white border border-slate-200"}`;
-  return (
-    <div className={cls}>
-      {bodyClickable
-        ? <button type="button" className="block w-full text-left" onClick={onBody}>{body}</button>
-        : <div>{body}</div>}
-      {showExecLink && (
-        <button type="button" onClick={() => onExecute!(a, rank)}
-          className="mt-2.5 text-[12px] font-semibold text-emerald-700 underline underline-offset-2">
-          {EXEC_LABEL[a.external!]}
-        </button>
-      )}
-    </div>
-  );
 }
 
 /* ===== AIへの大導線＝診断結果画面で「聞きたいことを書く→アクション案を返す」（AI導線の全面移行） =====

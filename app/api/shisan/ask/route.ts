@@ -6,6 +6,7 @@
  * - 既存のチャット資産を流用：buildDiagnosisContext / buildOfficialSummary / SYSTEM_PROMPT / 整形。
  * - 返すのは「現状説明」でなく「アクション案」（数字に基づく選択肢と変化）。投資助言はしない・計算はさせない。
  * - フリーテキストは一次情報として shisan_anon_questions に best-effort 保存（PII＝メール等は保存しない）。
+ *   連続質問の紐づけ用に匿名ID（Cookie "sa"・PIIではない）を anon_id として保存。応答内容・UI・CV・広告は不変。
  *
  * 軽いガード（MVP）：入力2000字上限＋store形式検証。ANTHROPIC_API_KEY 必須。
  */
@@ -95,10 +96,15 @@ export async function POST(req: NextRequest) {
     const answer = stripInternalTerms(stripMarkdown(rawAnswer));
     if (!answer) return NextResponse.json({ ok: false, error: "empty_reply" }, { status: 502 });
 
+    // 匿名ID（連続質問の紐づけ用・PIIではない）。Cookieから復元し、無ければ発行。
+    const cookieAnon = req.cookies.get("sa")?.value ?? "";
+    const anonId = /^[0-9a-f-]{36}$/i.test(cookieAnon) ? cookieAnon : crypto.randomUUID();
+
     // 一次情報として best-effort 保存（失敗しても回答は返す＝既存メール送信と同じ思想）。PIIは保存しない。
     try {
       const supabase = createAdminSupabaseClient();
       await supabase.from("shisan_anon_questions").insert({
+        anon_id: anonId,
         question,
         answer,
         scenario: judgeScenario(inputs),
@@ -109,7 +115,10 @@ export async function POST(req: NextRequest) {
       console.error("[api/shisan/ask] save skipped", saveErr instanceof Error ? saveErr.message : saveErr);
     }
 
-    return NextResponse.json({ ok: true, answer });
+    // 応答内容・UI・CV・広告には影響しない。分析用に匿名IDを再送（30日）＝同一訪問者の連続質問を紐づける。
+    const res = NextResponse.json({ ok: true, answer });
+    res.cookies.set("sa", anonId, { httpOnly: true, sameSite: "lax", secure: true, path: "/", maxAge: 60 * 60 * 24 * 30 });
+    return res;
   } catch (err) {
     console.error("[api/shisan/ask] threw", err instanceof Error ? err.message : err);
     return NextResponse.json({ ok: false, error: "ask_failed" }, { status: 500 });

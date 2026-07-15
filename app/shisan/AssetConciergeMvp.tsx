@@ -537,7 +537,7 @@ export default function AssetConciergeMvp() {
       </div>
 
       {/* ===== 診断結果コーナー（全面改善 2026-07-14）：結論＝65歳見込みを最上部に（変更1） ===== */}
-      <div className="rounded-2xl shadow-sm p-5 mb-4 text-white bg-gradient-to-br from-emerald-600 to-emerald-800">
+      <div className="rounded-2xl shadow-sm p-5 mb-4 text-white bg-gradient-to-br from-emerald-700 to-emerald-900">
         {/* 完了スコアは質問前提のUIのためAI主導フローでは非表示（追加要件E-1） */}
         {SHOW_INLINE_QUESTIONS && (<>
           <div className="flex items-center justify-end mb-1">
@@ -574,7 +574,7 @@ export default function AssetConciergeMvp() {
             {/* ① 住宅ローン金利について（mBal>0のときのみ・従来条件） */}
             {mirror.hasLoan && (
               <div>
-                <div className="text-[15px] font-bold mb-0.5">住宅ローン金利について</div>
+                <div className="text-[15px] font-extrabold mb-0.5">住宅ローン金利について</div>
                 {mirror.refiRoomYen > 0 ? (
                   <p className="text-[13px] leading-relaxed opacity-95">
                     あなたの金利<b className="font-extrabold">{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）より高めです。借り換えで<b className="font-extrabold">月々約¥{yen(mirror.refiRoomYen)}</b>を軽くできる余地があります。
@@ -591,7 +591,7 @@ export default function AssetConciergeMvp() {
             {/* 借り換えで増やせる手取り（yutori>0のときのみ・従来条件） */}
             {result && result.yutori > 0 && (
               <div>
-                <div className="text-[15px] font-bold mb-0.5">借り換えで増やせる手取り（目安）</div>
+                <div className="text-[15px] font-extrabold mb-0.5">借り換えで増やせる手取り（目安）</div>
                 <p className="text-[13px] leading-relaxed opacity-95">
                   毎月<b className="font-extrabold">約¥{yen(result.yutori)}</b>の手取りを増やせる可能性があります。
                 </p>
@@ -601,7 +601,7 @@ export default function AssetConciergeMvp() {
             {/* ② 生活防衛資金の目安（living>0のとき） */}
             {mirror.monthsCovered != null && (
               <div>
-                <div className="text-[15px] font-bold mb-0.5">生活防衛資金の目安</div>
+                <div className="text-[15px] font-extrabold mb-0.5">生活防衛資金の目安</div>
                 <p className="text-[13px] leading-relaxed opacity-95">
                   手元の資産は生活費の<b className="font-extrabold">約{Math.round(mirror.monthsCovered)}ヶ月分</b>。目安の6ヶ月分に対して
                   {mirror.monthsCovered >= 6
@@ -613,7 +613,7 @@ export default function AssetConciergeMvp() {
 
             {/* ③ あと少し増やすと（全員） */}
             <div>
-              <div className="text-[15px] font-bold mb-0.5">あと少し増やすと</div>
+              <div className="text-[15px] font-extrabold mb-0.5">あと少し増やすと</div>
               <p className="text-[13px] leading-relaxed opacity-95">
                 毎月あと<b className="font-extrabold">¥{yen(SENSITIVITY_STEP_YEN)}</b>を投資に回すと、65歳見込みは<b className="font-extrabold">＋約{man(mirror.sensitivityYen)}万円</b>（想定{inputs.r}%）。
               </p>
@@ -624,15 +624,15 @@ export default function AssetConciergeMvp() {
                 現在の見込み＝result.future（上部と同一値）／1年遅延＝resultDelay1.future（age+1でn-1）。 */}
             {delayCost && (
               <div className="pt-3.5 border-t border-white/20">
-                <div className="text-[15px] font-bold mb-0.5">始める時期でこれだけ変わります</div>
+                <div className="text-[15px] font-extrabold mb-0.5">始める時期でこれだけ変わります</div>
                 <p className="text-[13px] leading-relaxed opacity-95">
                   いまの配分を<b className="font-extrabold">今月から</b>始めた場合、65歳見込みは<b className="font-extrabold">約¥{yen(delayCost.nowMan)}万</b>。
                 </p>
                 <p className="text-[13px] leading-relaxed opacity-95">
                   <b className="font-extrabold">1年後に</b>始めた場合は<b className="font-extrabold">約¥{yen(delayCost.delayMan)}万</b>。
                 </p>
-                <p className="text-[14px] leading-relaxed font-extrabold mt-2 bg-white/15 rounded-lg px-3 py-2">
-                  開始が1年遅れると、約¥{yen(delayCost.diffMan)}万 の差になります（想定{inputs.r}%）。
+                <p className="text-[13px] leading-relaxed mt-1.5">
+                  <span className="bg-yellow-300/25 font-extrabold rounded px-1 py-0.5 box-decoration-clone">開始が1年遅れると、約¥{yen(delayCost.diffMan)}万の差になります</span>（想定{inputs.r}%）。
                 </p>
               </div>
             )}
@@ -867,7 +867,7 @@ function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView,
   const isMember = loggedIn || registered;
   const viewFired = useRef(false);
 
-  const panel = "rounded-2xl shadow-sm text-white bg-gradient-to-br from-emerald-600 to-emerald-800 p-4 mb-6";
+  const panel = "rounded-2xl shadow-sm text-white bg-gradient-to-br from-emerald-700 to-emerald-900 p-4 mb-6";
 
   // アクション案を取得（メアド不要・その場表示）
   const ask = async () => {
@@ -1041,7 +1041,7 @@ function MemberCta({ registered, justRegistered, showSignup, scenario, snapshot,
   if (registered) {
     return (
       <Link href="/shisan/mypage"
-        className="block w-full my-4 py-3.5 rounded-2xl text-center text-white text-base font-bold shadow-sm bg-gradient-to-br from-emerald-600 to-emerald-800 hover:opacity-95 transition"
+        className="block w-full my-4 py-3.5 rounded-2xl text-center text-white text-base font-bold shadow-sm bg-gradient-to-br from-emerald-700 to-emerald-900 hover:opacity-95 transition"
         onClick={() => track("shisan_chat_open_click")}>
         マイページで見返す →
         <span className="block text-[11px] font-normal text-white/80 mt-0.5">あなたの診断結果と決めたことが残っています</span>
@@ -1090,7 +1090,7 @@ function SignupBlock({ done, scenario, snapshot, summary, onView, onClose, onReg
   };
 
   /* 濃緑パネル（診断結果カードと同トーン）＝白・薄緑の質問カードと明確に区別する独立コーナー */
-  const panel = "rounded-2xl shadow-sm text-white bg-gradient-to-br from-emerald-600 to-emerald-800 p-4 my-4";
+  const panel = "rounded-2xl shadow-sm text-white bg-gradient-to-br from-emerald-700 to-emerald-900 p-4 my-4";
   if (done) {
     return (
       <div className={`${panel} text-sm`}>

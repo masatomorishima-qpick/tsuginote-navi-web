@@ -284,6 +284,23 @@ export default function AssetConciergeMvp() {
     [inputs, decisions],
   );
 
+  /* 先延ばしコストの鏡（鏡④・2026-07-15）：開始が1年遅れた場合の65歳見込み。
+   * 既存エンジンをそのまま流用し、age を +1（＝積立期間 n を1年短縮）して再計算する。
+   * 配分は age に依存しないため現状と同一で、n だけが1年短くなる（＝上部の見込みとロジック同一・ズレなし）。 */
+  const resultDelay1 = useMemo(
+    () => computeResult(inputs ? { ...inputs, age: inputs.age + 1 } : null, decisions),
+    [inputs, decisions],
+  );
+  /* 先延ばしコストの表示値（万円・整数）。差額は表示中の2値の差（画面上の引き算と一致させる）。
+   * 表示条件：積立期間 n>1 かつ 差額>0（ゼロ差は非表示＝既存の¥0非表示方針と同じ）。 */
+  const delayCost = useMemo(() => {
+    if (!result || !resultDelay1 || result.n <= 1) return null;
+    const nowMan = Math.round(result.future / 10000);
+    const delayMan = Math.round(resultDelay1.future / 10000);
+    const diffMan = nowMan - delayMan;
+    return diffMan > 0 ? { nowMan, delayMan, diffMan } : null;
+  }, [result, resultDelay1]);
+
   /* 入力の鏡（変更2・全面改善 2026-07-14）：追加入力なし・既存の計算式の派生のみ。
    *  a. 住宅ローン金利の市場比較（借り換え余地＝既存 refinance を流用）
    *  b. 生活防衛資金（手元資産÷月間生活費。目安6ヶ月）
@@ -601,6 +618,24 @@ export default function AssetConciergeMvp() {
                 毎月あと<b className="font-extrabold">¥{yen(SENSITIVITY_STEP_YEN)}</b>を投資に回すと、65歳見込みは<b className="font-extrabold">＋約{man(mirror.sensitivityYen)}万円</b>（想定{inputs.r}%）。
               </p>
             </div>
+
+            {/* ④ 先延ばしコストの鏡（2026-07-15）：開始が1年遅れた場合の差額。中立維持（推奨・急かしなし・事実の差分のみ）。
+                表示条件：差額>0 かつ 積立期間 n>1 のときのみ（ゼロ差は非表示＝既存の¥0非表示方針と同じ）。
+                現在の見込み＝result.future（上部と同一値）／1年遅延＝resultDelay1.future（age+1でn-1）。 */}
+            {delayCost && (
+              <div className="pt-3.5 border-t border-white/20">
+                <div className="text-[15px] font-bold mb-0.5">始める時期でこれだけ変わります</div>
+                <p className="text-[13px] leading-relaxed opacity-95">
+                  いまの配分を<b className="font-extrabold">今月から</b>始めた場合、65歳見込みは<b className="font-extrabold">約¥{yen(delayCost.nowMan)}万</b>。
+                </p>
+                <p className="text-[13px] leading-relaxed opacity-95">
+                  <b className="font-extrabold">1年後に</b>始めた場合は<b className="font-extrabold">約¥{yen(delayCost.delayMan)}万</b>。
+                </p>
+                <p className="text-[14px] leading-relaxed font-extrabold mt-2 bg-white/15 rounded-lg px-3 py-2">
+                  開始が1年遅れると、約¥{yen(delayCost.diffMan)}万 の差になります（想定{inputs.r}%）。
+                </p>
+              </div>
+            )}
           </div>
         )}
 

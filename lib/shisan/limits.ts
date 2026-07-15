@@ -27,3 +27,8 @@ export function dailyLimitFor(email: string | null | undefined): number {
   if (email && operatorEmails().has(email.toLowerCase())) return Math.max(OPERATOR_LIMIT, base);
   return base;
 }
+
+/** 運営者メールか（SHISAN_OPERATOR_EMAILS 判定）。分析時にテスト行を機械的に除外するためのフラグ算出に使う。 */
+export function isOperatorEmail(email: string | null | undefined): boolean {
+  return !!email && operatorEmails().has(email.toLowerCase());
+}

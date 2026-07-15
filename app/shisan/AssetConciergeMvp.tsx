@@ -98,6 +98,12 @@ export default function AssetConciergeMvp() {
   const [toast, setToast] = useState("");
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoOpened = useRef(false);
+  /* 統計・分析用の一次データ保存（2026-07-15・裏側のみ・UI/GA/ファネル不変）：
+   * 入力開始時刻（所要時間）・流入元（referrer/utm/debug）・訪問種別（新規/再訪/再診断）を控える。 */
+  const formStartAt = useRef(Date.now());
+  const traffic = useRef<{ referrer: string; utmSource: string; utmMedium: string; utmCampaign: string; debug: boolean }>(
+    { referrer: "", utmSource: "", utmMedium: "", utmCampaign: "", debug: false });
+  const visitKind = useRef<"new" | "return" | "reenter">("new");
   /* 会員登録導線（第一陣・要件1） */
   const signupViewed = useRef(false);
   const [signupFlags, setSignupFlags] = useState<SignupFlags>({});
@@ -167,6 +173,17 @@ export default function AssetConciergeMvp() {
     try { s = JSON.parse(localStorage.getItem(KEY) || "null"); } catch { s = null; }
     // 会員の再診断（?reenter=1）：診断結果ページを経由せず、入力画面に直行（プリフィル）→確定でマイページへ（修正1）
     const reenter = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("reenter") === "1";
+    // 分析用メタを控える（裏側のみ・表示やGAは不変）：流入元・デバッグ判定・訪問種別。
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      traffic.current = {
+        referrer: document.referrer || "",
+        utmSource: p.get("utm_source") || "", utmMedium: p.get("utm_medium") || "", utmCampaign: p.get("utm_campaign") || "",
+        debug: p.get("ga_debug") === "1" || p.get("debug") === "1",
+      };
+      visitKind.current = reenter && s?.inputs ? "reenter" : s?.inputs ? "return" : "new";
+      formStartAt.current = Date.now();
+    }
     if (s?.inputs && reenter) {
       setInputs(s.inputs); setDecisions(s.decisions || {}); setSignupFlags(s.signup ?? {});
       setForm({
@@ -202,6 +219,28 @@ export default function AssetConciergeMvp() {
   const persist = (patch: Partial<Store>) => {
     let cur: Store; try { cur = JSON.parse(localStorage.getItem(KEY) || "null") || ({} as Store); } catch { cur = {} as Store; }
     localStorage.setItem(KEY, JSON.stringify({ ...cur, ...patch }));
+  };
+
+  /* 統計・分析用の一次データ保存（2026-07-15）：診断完了時に非会員も含め入力をサーバーへ best-effort 送信。
+   * fire-and-forget＝応答は使わない。UI・GA・ファネル・入力項目には一切影響しない。保存失敗は無音。 */
+  const saveDiagnosis = (i: Inputs) => {
+    try {
+      const durationSec = Math.round((Date.now() - formStartAt.current) / 1000);
+      const t = traffic.current;
+      fetch("/api/shisan/diagnosis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        keepalive: true, // 再診断→マイページ遷移時も送信を取りこぼさない
+        body: JSON.stringify({
+          inputs: i,
+          durationSec,
+          referrer: t.referrer, utmSource: t.utmSource, utmMedium: t.utmMedium, utmCampaign: t.utmCampaign,
+          debug: t.debug,
+          isReenter: visitKind.current === "reenter",
+          isNew: visitKind.current === "new",
+        }),
+      }).catch(() => { /* best-effort：失敗しても診断表示に影響しない */ });
+    } catch { /* fetch自体の例外も無音 */ }
   };
   const showToast = (m: string) => { setToast(m); if (toastTimer.current) clearTimeout(toastTimer.current); toastTimer.current = setTimeout(() => setToast(""), 2400); };
 
@@ -244,6 +283,9 @@ export default function AssetConciergeMvp() {
       buckets_count: deriveBuckets(i).length,
       scenario: judgeScenario(i) ?? "",
     });
+    // 統計・分析用の一次データ保存（2026-07-15）：非会員も含め診断入力をサーバーへ best-effort 保存。
+    // fire-and-forget・keepalive で、この後の遷移（再診断→マイページ）でも送信を取りこぼさない。応答・UI・GAには不干渉。
+    saveDiagnosis(i);
     // 会員の再診断復帰（修正1）：サーバーstoreを確実に同期してからマイページへ戻る（結果ページを経由しない）
     if (returnToMypage) {
       try { await syncServerStore(i, { force: true }); } catch { /* 失敗時もマイページで最新化を試みる */ }
@@ -495,7 +537,7 @@ export default function AssetConciergeMvp() {
 
         <button className={btn} onClick={submit}>診断する →</button>
         <p className="text-[11px] text-slate-400 border-t border-dashed border-slate-200 pt-3 mt-4">
-          すべて目安です。前提：インフレ未反映／借り換え試算の基準金利は{REFI_BASE}%（内部目安・手動更新）。特定の商品・サービスの推奨や投資助言は行いません。入力データはこの端末内（ブラウザ）にのみ保存され、サーバには送信されません。
+          すべて目安です。前提：インフレ未反映／借り換え試算の基準金利は{REFI_BASE}%（内部目安・手動更新）。特定の商品・サービスの推奨や投資助言は行いません。入力データはこの端末内（ブラウザ）に保存されます。
         </p>
         {toast && <Toast msg={toast} />}
       </main>

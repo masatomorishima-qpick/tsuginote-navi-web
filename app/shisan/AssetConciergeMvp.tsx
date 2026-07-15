@@ -570,10 +570,10 @@ export default function AssetConciergeMvp() {
         {/* 入力の鏡（修正2・2026-07-15：緑カード内テキストへ統合。カードinカードにしない／ラベル廃止）。
             見出しは本文より一段大きく・太字、本文中の数字は太字。緑背景で読めるコントラスト。 */}
         {mirror && inputs && (
-          <div className="mt-4 pt-4 border-t border-white/25 space-y-3.5">
+          <div className="mt-4">
             {/* ① 住宅ローン金利について（mBal>0のときのみ・従来条件） */}
             {mirror.hasLoan && (
-              <div>
+              <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">住宅ローン金利について</div>
                 {mirror.refiRoomYen > 0 ? (
                   <p className="text-[13px] leading-relaxed opacity-95">
@@ -590,7 +590,7 @@ export default function AssetConciergeMvp() {
 
             {/* 借り換えで増やせる手取り（yutori>0のときのみ・従来条件） */}
             {result && result.yutori > 0 && (
-              <div>
+              <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">借り換えで増やせる手取り（目安）</div>
                 <p className="text-[13px] leading-relaxed opacity-95">
                   毎月<b className="font-extrabold">約¥{yen(result.yutori)}</b>の手取りを増やせる可能性があります。
@@ -600,7 +600,7 @@ export default function AssetConciergeMvp() {
 
             {/* ② 生活防衛資金の目安（living>0のとき） */}
             {mirror.monthsCovered != null && (
-              <div>
+              <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">生活防衛資金の目安</div>
                 <p className="text-[13px] leading-relaxed opacity-95">
                   手元の資産は生活費の<b className="font-extrabold">約{Math.round(mirror.monthsCovered)}ヶ月分</b>。目安の6ヶ月分に対して
@@ -612,7 +612,7 @@ export default function AssetConciergeMvp() {
             )}
 
             {/* ③ あと少し増やすと（全員） */}
-            <div>
+            <div className="pt-3.5 border-t border-white/20">
               <div className="text-[15px] font-extrabold mb-0.5">あと少し増やすと</div>
               <p className="text-[13px] leading-relaxed opacity-95">
                 毎月あと<b className="font-extrabold">¥{yen(SENSITIVITY_STEP_YEN)}</b>を投資に回すと、65歳見込みは<b className="font-extrabold">＋約{man(mirror.sensitivityYen)}万円</b>（想定{inputs.r}%）。

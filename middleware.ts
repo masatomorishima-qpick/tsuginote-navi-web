@@ -29,11 +29,16 @@ export async function middleware(request: NextRequest) {
       .getAll()
       .some((c) => c.name.startsWith('sb-') && c.name.includes('auth-token'));
     if (hasAuthCookie) {
+      // 既存のデジタル資産の会員はアプリ本体へ（/digital は残置・機能維持）。
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = '/digital';
       return NextResponse.redirect(redirectUrl);
     }
-    return response;
+    // ピボット（2026-07-15）：TOP を /shisan に移管。未ログインは新TOP（診断）へ。
+    // 307（temporary）で開始し、安定後に恒久化（308）する運用（canonical は /shisan・自己参照）。
+    const shisanUrl = request.nextUrl.clone();
+    shisanUrl.pathname = '/shisan';
+    return NextResponse.redirect(shisanUrl);
   }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

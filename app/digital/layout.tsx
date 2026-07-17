@@ -8,10 +8,16 @@
  * このレイアウトでも二重に getUser() チェックを行い確実性を高めています。
  */
 
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getDigitalSession } from '@/lib/supabase/digitalServer';
 import DigitalHeader from '@/components/digital/DigitalHeader';
 import SiteFooter from '@/components/SiteFooter';
+
+// ピボット（2026-07-15）：/digital は残置・機能維持だが、検索インデックスから外す（robots.txt の Disallow と二重で担保）。
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function DigitalLayout({
   children,

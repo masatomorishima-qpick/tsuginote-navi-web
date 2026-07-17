@@ -49,6 +49,9 @@ interface SignupFlags { registered?: boolean; closed?: boolean; }
 /* シェア導線（第一陣・要件2）。金額・年齢・個人情報はシェア文言に一切含めない。 */
 const SHARE_URL = "https://www.tsuginotenavi.jp/shisan";
 
+/* LINE友だち追加URL（ピボット 2026-07-15・再接触権）。運営保有の公式アカウント友だち追加URL。 */
+const LINE_ADD_URL = "https://lin.ee/5zqngmK";
+
 /* 入力の鏡（全面改善 2026-07-14）用の定数。追加入力なし・既存計算の派生のみ。 */
 // 借り換えの市場水準（表示用の内部目安・手動更新可。実際の借り換え試算は calc.ts の REFI_BASE を使用）。
 const MARKET_RATE_BAND = "変動0.3〜0.5%台";
@@ -86,7 +89,7 @@ const chip = "px-3 py-1.5 rounded-full text-sm font-semibold border transition";
 
 export default function AssetConciergeMvp() {
   // 入力フォームから開始（従来フロー維持。別LP画面は挟まない）。
-  const [screen, setScreen] = useState<"hook" | "input" | "dash" | "exit">("input");
+  const [screen, setScreen] = useState<"hook" | "input" | "dash">("input");
   const [form, setForm] = useState<Record<string, string>>({ target: "20000000", r: "3", eduPlan: "shibun", mType: "変動" });
   // 住宅ローンは「任意の一要素」。賃貸・完済層も対象に入るため既定オフ。
   const [hasMortgage, setHasMortgage] = useState(false);
@@ -117,16 +120,13 @@ export default function AssetConciergeMvp() {
   const router = useRouter();
   const [reports, setReports] = useState<Record<string, { status: string; monthly_amount: number | null }>>({});
   useEffect(() => {
-    // 役割分担：会員が /shisan に来たらマイページへ送る（非会員＝結果ページ、会員＝マイページ）。
-    // 再診断（?reenter=1）だけは入力画面を優先し、リダイレクトしない。
-    const reenter = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("reenter") === "1";
+    // ピボット（2026-07-15）：会員モデル廃止。マイページへの自動送りは撤去（マイページは /shisan へリダイレクト）。
+    // 既存の実行申告データがあれば拾うのみ（表示は SHOW_INLINE_QUESTIONS=false のため出ない・害なし）。
     fetch("/api/shisan/me").then((r) => r.json()).then((me) => {
       if (!me?.authenticated) return;
       setLoggedIn(true);
-      if (!reenter) { router.replace("/shisan/mypage"); return; }
       fetch("/api/shisan/report").then((r) => r.json()).then((j) => { if (j?.ok) setReports(j.reports ?? {}); }).catch(() => {});
     }).catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   /* 再診断とサーバーデータの同期（追加要件C・訴求の根幹）。
    * ログイン済みなら、診断確定時とダッシュボード表示時に store をサーバーへ同期し、
@@ -256,6 +256,13 @@ export default function AssetConciergeMvp() {
   };
   const setNum = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value.replace(/[^\d]/g, "") }));
+  // 1-5：金額フィールドの単位ミス（例：年収「60」）防止。入力値の万円換算を即時表示（内部単位は円のまま・保存/計算に影響なし）。
+  const manHint = (v?: string): string => {
+    const d = (v ?? "").replace(/[^\d]/g, "");
+    if (!d) return "";
+    const n = Number(d);
+    return n >= 10000 ? `＝${Math.round(n / 10000).toLocaleString("ja-JP")}万円` : "";
+  };
 
   /* 子の人数→年齢入力欄 */
   const onChildCount = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -266,6 +273,11 @@ export default function AssetConciergeMvp() {
 
   const submit = async () => {
     if (!num("age") || !num("income") || !num("assets")) { showToast("年齢・年収・金融資産を入力してください"); return; }
+    // 1-5：生活費0のまま送信できる穴を塞ぐ（強制はしない＝確認を挟むのみ。生活防衛資金の分析に必要）。
+    if (num("living") <= 0 && typeof window !== "undefined") {
+      const proceed = window.confirm("毎月の生活費が未入力（0円）のようです。このままだと生活防衛資金の分析が出せません。このまま診断を続けますか？");
+      if (!proceed) return;
+    }
     const surplus = num("surplus");
     const i: Inputs = {
       age: num("age"), income: num("income"), assets: num("assets"),
@@ -294,8 +306,7 @@ export default function AssetConciergeMvp() {
       return;
     }
     syncServerStore(i); // 再診断の確定をサーバーへ同期（追加要件C）
-    // A層判定：毎月の余力が極小＝困窮の可能性 → 別出口
-    if (surplus <= 0) { track("shisan_a_layer_exit"); setScreen("exit"); window.scrollTo(0, 0); return; }
+    // ピボット 1-6（2026-07-15）：余力ゼロ以下の別出口（exit）を廃止。余力ゼロでも診断結果（65歳見込み＋鏡）を表示する。
     track("shisan_dashboard_view"); track("shisan_result_view");
     setScreen("dash"); window.scrollTo(0, 0);
   };
@@ -485,9 +496,9 @@ export default function AssetConciergeMvp() {
         <div className={card}>
           <div className="flex gap-2.5">
             <div className="flex-1"><label className={label}>年齢<input type="number" className={inputCls} value={form.age ?? ""} onChange={set("age")} placeholder="42" /></label></div>
-            <div className="flex-1"><label className={label}>額面年収 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.income)} onChange={setNum("income")} placeholder="7,000,000" /></label></div>
+            <div className="flex-1"><label className={label}>額面年収 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.income)} onChange={setNum("income")} placeholder="7,000,000" />{manHint(form.income) && <span className="block text-[11px] font-semibold text-emerald-700 mt-0.5">{manHint(form.income)}</span>}</label></div>
           </div>
-          <label className={label}>金融資産（ざっくり） <span className={hint}>円・現預金＋投資</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.assets)} onChange={setNum("assets")} placeholder="10,000,000" /></label>
+          <label className={label}>金融資産（ざっくり） <span className={hint}>円・現預金＋投資</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.assets)} onChange={setNum("assets")} placeholder="10,000,000" />{manHint(form.assets) && <span className="block text-[11px] font-semibold text-emerald-700 mt-0.5">{manHint(form.assets)}</span>}</label>
           <div className="flex gap-2.5">
             <div className="flex-1"><label className={label}>毎月の投資・貯蓄余力 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.surplus)} onChange={setNum("surplus")} placeholder="60,000" /></label></div>
             <div className="flex-1"><label className={label}>毎月の生活費 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.living)} onChange={setNum("living")} placeholder="250,000" /></label></div>
@@ -502,9 +513,9 @@ export default function AssetConciergeMvp() {
           {hasMortgage && (
             <>
               <div className="flex gap-2.5 mt-1">
-                <div className="flex-[2]"><label className={label}>残高 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.mBal)} onChange={setNum("mBal")} placeholder="30,000,000" /></label></div>
-                <div className="w-[72px] flex-shrink-0"><label className={label}>残年数<input type="number" className={inputCls} value={form.mYears ?? ""} onChange={set("mYears")} placeholder="28" /></label></div>
-                <div className="w-[72px] flex-shrink-0"><label className={label}>金利 <span className={hint}>%</span><input type="number" step="0.01" className={inputCls} value={form.mRate ?? ""} onChange={set("mRate")} placeholder="1.0" /></label></div>
+                <div className="flex-[2]"><label className={label}>残高 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.mBal)} onChange={setNum("mBal")} placeholder="30,000,000" />{manHint(form.mBal) && <span className="block text-[11px] font-semibold text-emerald-700 mt-0.5">{manHint(form.mBal)}</span>}</label></div>
+                <div className="w-[72px] flex-shrink-0"><label className={label}>残年数<input type="text" inputMode="numeric" className={inputCls} value={form.mYears ?? ""} onChange={set("mYears")} placeholder="28" /></label></div>
+                <div className="w-[72px] flex-shrink-0"><label className={label}>金利 <span className={hint}>%</span><input type="text" inputMode="decimal" className={inputCls} value={form.mRate ?? ""} onChange={set("mRate")} placeholder="1.0" /></label></div>
               </div>
               <div className="flex gap-2 mt-2">
                 {["変動", "固定"].map((t) => (
@@ -532,7 +543,7 @@ export default function AssetConciergeMvp() {
         </div>
 
         <div className={card}>
-          <label className={label}>65歳での目標額 <span className={hint}>円・変更可</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.target)} onChange={setNum("target")} placeholder="20,000,000" /></label>
+          <label className={label}>65歳での目標額 <span className={hint}>円・変更可</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.target)} onChange={setNum("target")} placeholder="20,000,000" />{manHint(form.target) && <span className="block text-[11px] font-semibold text-emerald-700 mt-0.5">{manHint(form.target)}</span>}</label>
         </div>
 
         <button className={btn} onClick={submit}>診断する →</button>
@@ -544,38 +555,12 @@ export default function AssetConciergeMvp() {
     );
   }
 
-  /* ============ 別出口：A層（余力が小さい） ============ */
-  if (screen === "exit") {
-    return (
-      <main className="max-w-2xl mx-auto px-4 pt-10 pb-24 text-slate-800">
-        <div className={card}>
-          <h1 className="text-xl font-bold mb-2">まずは家計の土台を整えるのが安心かもしれません</h1>
-          <p className="text-sm text-slate-600 leading-relaxed">
-            入力いただいた毎月の余力が小さいようです。無理な資産形成より、固定費の見直しや、
-            <b>お住まいの自治体の生活相談窓口</b>など公的な支援の活用を先にご検討ください。
-            （具体的な窓口名は状況により変わるため、ここでは一般的なご案内に留めています）
-          </p>
-          <p className="text-xs text-slate-400 mt-3">本ツールは住宅ローンの返済余力がある方向けの試算です。状況が変わったら、いつでも戻ってきてください。</p>
-        </div>
-        <button className={`${btnSm} bg-slate-100 text-slate-700`} onClick={editAgain}>入力に戻る</button>
-      </main>
-    );
-  }
-
   /* ============ 画面2：ダッシュボード ============ */
   return (
     <main className="max-w-2xl mx-auto px-4 pt-6 pb-24 text-slate-800">
       <div className="flex items-center justify-between mb-3">
         <h1 className="text-[22px] font-extrabold leading-tight">診断結果</h1>
-        <div className="flex items-center gap-3">
-          {/* 会員が結果ページに来た場合の迷子救済（修正1-4）：マイページへ戻れる導線 */}
-          {loggedIn && (
-            <Link href="/shisan/mypage" className="text-[12px] font-semibold text-emerald-700 underline underline-offset-2">
-              マイページへ →
-            </Link>
-          )}
-          {/* AI導線はページ下部の相談欄一本に集約（2026-07-15 表示調整：ヘッダーの「AIに聞く」リンクを撤去） */}
-        </div>
+        {/* ピボット（2026-07-15）：会員モデル廃止に伴い、ヘッダーのマイページ導線を撤去。 */}
       </div>
 
       {/* ===== 診断結果コーナー（全面改善 2026-07-14）：結論＝65歳見込みを最上部に（変更1） ===== */}
@@ -605,7 +590,7 @@ export default function AssetConciergeMvp() {
         {/* 変更5：目標を上回る見込みの人への出口 */}
         {result && result.achieve > 100 && (
           <div className="mt-3 p-3 rounded-lg bg-white/15 text-[12px] leading-relaxed">
-            目標を上回る見込みです。その余裕の使い道（教育費の上積み・早期リタイア・使う楽しみ）も、下の「AIに聞く」で相談できます。
+            目標を上回る見込みです。その余裕の使い道（教育費の上積み・早期リタイア・使う楽しみ）も考えてみる余地があります。
           </div>
         )}
 
@@ -613,6 +598,16 @@ export default function AssetConciergeMvp() {
             見出しは本文より一段大きく・太字、本文中の数字は太字。緑背景で読めるコントラスト。 */}
         {mirror && inputs && (
           <div className="mt-4">
+            {/* 1-6（2026-07-15）：余力ゼロ以下でも結果を見せる。追い返さず中立の一文を鏡群の先頭に置く
+                （本文が「下の住宅ローン金利」を参照するため、金利カードより上に配置）。 */}
+            {inputs.surplus <= 0 && (
+              <div className="pt-3.5 border-t border-white/20">
+                <div className="text-[15px] font-extrabold mb-0.5">毎月の余力がない状態です</div>
+                <p className="text-[13px] leading-relaxed opacity-95">
+                  いまの入力では、毎月の投資・貯蓄に回せる金額がありません。固定費の見直しや、下の「住宅ローン金利について」の余地が、最初の一歩になります。
+                </p>
+              </div>
+            )}
             {/* ① 住宅ローン金利について（mBal>0のときのみ・従来条件） */}
             {mirror.hasLoan && (
               <div className="pt-3.5 border-t border-white/20">
@@ -653,18 +648,21 @@ export default function AssetConciergeMvp() {
               </div>
             )}
 
-            {/* ③ あと少し増やすと（全員） */}
-            <div className="pt-3.5 border-t border-white/20">
-              <div className="text-[15px] font-extrabold mb-0.5">あと少し増やすと</div>
-              <p className="text-[13px] leading-relaxed opacity-95">
-                毎月あと<b className="font-extrabold">¥{yen(SENSITIVITY_STEP_YEN)}</b>を投資に回すと、65歳見込みは<b className="font-extrabold">＋約{man(mirror.sensitivityYen)}万円</b>（想定{inputs.r}%）。
-              </p>
-            </div>
+            {/* ③ あと少し増やすと（1-6：余力ゼロでは意味をなさないため surplus>0 のみ表示） */}
+            {inputs.surplus > 0 && (
+              <div className="pt-3.5 border-t border-white/20">
+                <div className="text-[15px] font-extrabold mb-0.5">あと少し増やすと</div>
+                <p className="text-[13px] leading-relaxed opacity-95">
+                  毎月あと<b className="font-extrabold">¥{yen(SENSITIVITY_STEP_YEN)}</b>を投資に回すと、65歳見込みは<b className="font-extrabold">＋約{man(mirror.sensitivityYen)}万円</b>（想定{inputs.r}%）。
+                </p>
+              </div>
+            )}
 
             {/* ④ 先延ばしコストの鏡（2026-07-15）：開始が1年遅れた場合の差額。中立維持（推奨・急かしなし・事実の差分のみ）。
                 表示条件：差額>0 かつ 積立期間 n>1 のときのみ（ゼロ差は非表示＝既存の¥0非表示方針と同じ）。
-                現在の見込み＝result.future（上部と同一値）／1年遅延＝resultDelay1.future（age+1でn-1）。 */}
-            {delayCost && (
+                現在の見込み＝result.future（上部と同一値）／1年遅延＝resultDelay1.future（age+1でn-1）。
+                1-6：余力ゼロでは意味をなさないため surplus>0 のみ表示。 */}
+            {inputs.surplus > 0 && delayCost && (
               <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">始める時期でこれだけ変わります</div>
                 <p className="text-[13px] leading-relaxed opacity-95">
@@ -681,21 +679,29 @@ export default function AssetConciergeMvp() {
           </div>
         )}
 
-        {/* シェア導線（変更1-4：結果カード内下部へ。シェア対象＝診断結果なので結果カードに付随させ、結果を見た全員の視界に入れる）。X intent・文言に金額/年齢/個人情報は入れない。 */}
+        {/* LINE友だち追加（ピボット 2026-07-15）：会員化に代わる再接触権。緑カード内・鏡群の直後（スクロール一等地・最下部には置かない）。
+            誇大回避＝個別パーソナライズは約束せず「再計算のきっかけをお知らせ」に留める。GA：shisan_line_click。 */}
+        <div className="mt-4 pt-4 border-t border-white/20">
+          <div className="text-[15px] font-extrabold mb-1">この診断、覚えておきます</div>
+          <p className="text-[13px] leading-relaxed opacity-95 mb-3">
+            金利や制度が変わったら、あなたの条件で再計算のきっかけをLINEでお知らせします。配信は月1〜2回。
+          </p>
+          <a href={LINE_ADD_URL} target="_blank" rel="noopener noreferrer"
+            onClick={() => track("shisan_line_click", { scenario: scenario ?? "" })}
+            style={{ backgroundColor: "#06C755" }}
+            className="block w-full py-3 rounded-xl text-white text-center text-[15px] font-bold hover:opacity-90 transition">
+            LINEで受け取る
+          </a>
+        </div>
+
+        {/* シェア導線（結果カード内下部）。X intent・文言に金額/年齢/個人情報は入れない。 */}
         {scenario && (
           <button type="button" onClick={shareToX}
-            className="mt-4 w-full py-2.5 rounded-xl bg-white text-emerald-700 text-sm font-bold hover:bg-emerald-50 transition">
+            className="mt-3 w-full py-2.5 rounded-xl bg-white/15 text-white text-sm font-bold hover:bg-white/25 transition">
             この診断をシェアする
           </button>
         )}
       </div>
-
-      {/* AIへの大導線（追加要件E-2／変更1-3）：主役級・登録もここに一本化。ダッシュボードは常に scenario 有り。 */}
-      {scenario && (
-        <AiCtaPanel loggedIn={loggedIn} registered={!!signupFlags.registered} scenario={scenario}
-          snapshot={signupSnapshot} summary={signupSummary}
-          onView={onSignupView} onRegistered={onSignupRegistered} />
-      )}
 
       {/* ===== 従来型（画面内で質問に答える）＝比較検証用に温存（追加要件E-1） ===== */}
       {SHOW_INLINE_QUESTIONS && (<>
@@ -881,184 +887,6 @@ function BucketPanel({ id, inputs, n, onDecide, onSetR }: { id: BucketId; inputs
       <button className={cbtnGray} onClick={() => onDecide("今は使わない")}>今は使わない</button>
     </div>
   </>);
-}
-
-/* ===== AIへの大導線＝診断結果画面で「聞きたいことを書く→アクション案を返す」（AI導線の全面移行） =====
- * 1) フリーテキスト入力→送信で /api/shisan/ask（未認証）がアクション案を生成（メアド不要・その場表示）
- * 2) 回答の下で「保存して見返す」＝メアド入力＝即セッション発行（価値体験後に会員化）→ マイページへ
- * ※ チャット画面(/shisan/chat)へは遷移させない（会員フローとは分離） */
-function AiCtaPanel({ loggedIn, registered, scenario, snapshot, summary, onView, onRegistered }: {
-  loggedIn: boolean;
-  registered: boolean;
-  scenario: "A" | "B" | "C";
-  snapshot: () => Record<string, unknown>;
-  summary: () => Record<string, unknown> | null;
-  onView: () => void;
-  onRegistered: () => void;
-}) {
-  const router = useRouter();
-  const [question, setQuestion] = useState("");
-  const [asking, setAsking] = useState(false);
-  const [askError, setAskError] = useState("");
-  const [answer, setAnswer] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState("");
-  const [existing, setExisting] = useState(false);
-  const [qaHistory, setQaHistory] = useState<{ question: string; answer: string }[]>([]); // 保存用：このセッションのやりとり全部
-  const isMember = loggedIn || registered;
-  const viewFired = useRef(false);
-
-  const panel = "rounded-2xl shadow-sm text-white bg-gradient-to-br from-emerald-700 to-emerald-900 p-4 mb-6";
-
-  // アクション案を取得（メアド不要・その場表示）
-  const ask = async () => {
-    const q = question.trim();
-    if (!q) { setAskError("聞きたいことを入力してください。"); return; }
-    const snap = snapshot();
-    const inputs = (snap as { inputs?: Inputs }).inputs ?? null;
-    track("shisan_ask_submit", {
-      scenario,
-      surplus_band: inputs ? surplusBand(inputs.surplus) : "",
-      buckets_count: deriveBuckets(inputs).length,
-    });
-    setAskError(""); setAsking(true);
-    try {
-      const res = await fetch("/api/shisan/ask", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: q, store: snap }),
-      });
-      const json = await res.json().catch(() => ({})) as { ok?: boolean; answer?: string };
-      if (res.ok && json.ok && json.answer) {
-        const a = json.answer;
-        setAnswer(a);
-        setQaHistory((h) => [...h, { question: q, answer: a }]); // やりとりを蓄積（表示用の最新回答＋保存用の履歴）
-        setQuestion(""); // 続けて聞けるよう入力欄をクリア（会話を断ち切らない）
-        track("shisan_answer_view", { scenario });
-        // 会員（ログイン済み）はボタンを介さず、この回答をその場で自動保存（best-effort）
-        if (isMember) {
-          fetch("/api/shisan/save-answer", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ question: q, answer: a }),
-          }).catch(() => { /* 保存失敗は致命にしない */ });
-        }
-        if (!isMember && !viewFired.current) { onView(); viewFired.current = true; } // 保存パネル露出＝会員化の母数
-      } else {
-        setAskError("うまく取得できませんでした。少し表現を変えてお試しください。");
-      }
-    } catch {
-      setAskError("通信に失敗しました。時間をおいてお試しください。");
-    } finally {
-      setAsking(false);
-    }
-  };
-
-  // アクション案を保存＝メアド登録（新規は即セッション→マイページ。既存はマジックリンク案内）
-  const save = async () => {
-    const v = email.trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { setError("メールアドレスの形式をご確認ください。"); return; }
-    setError(""); setSending(true);
-    try {
-      const res = await fetch("/api/shisan/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: v, scenario, store: snapshot(), summary: summary() }),
-      });
-      const json: { ok?: boolean; session?: boolean; existing?: boolean } = await res.json().catch(() => ({}));
-      if (res.ok && json.ok && json.session) {
-        onRegistered();            // registeredフラグ永続＋shisan_signup_submit
-        // メール送信＝このセッションでやりとりした回答を全部まとめて保存（best-effort。失敗してもマイページへ）
-        if (qaHistory.length > 0) {
-          try {
-            await fetch("/api/shisan/save-answer", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ items: qaHistory }),
-            });
-          } catch { /* 保存失敗は致命にしない */ }
-        }
-        router.push("/shisan/mypage"); // 保存済み。チャットへは遷移させずマイページへ
-      } else if (res.ok && json.ok && json.existing) {
-        setExisting(true);
-      } else {
-        setError("保存に失敗しました。時間をおいてお試しください。");
-        setSending(false);
-      }
-    } catch {
-      setError("通信に失敗しました。時間をおいてお試しください。");
-      setSending(false);
-    }
-  };
-
-  return (
-    <div id="ai-cta" className={panel}>
-      {/* 回答前のみ：見出し＋本文（修正3の文言） */}
-      {!answer && (<>
-        <div className="font-extrabold text-[18px] leading-snug">今、いちばん気になることは？</div>
-        <p className="text-[13px] text-white/85 mt-1 leading-relaxed">
-          わからないこと・迷っていることを、何でも書いてください。あなたの数字に合わせた次の一手を、その場でお返しします。
-        </p>
-      </>)}
-
-      {/* 1) アクション案の表示（回答が最上部・メアド不要） */}
-      {answer && (
-        <div className="rounded-xl bg-white text-slate-800 p-3.5 text-[14px] leading-relaxed whitespace-pre-wrap">
-          {answer}
-        </div>
-      )}
-
-      {/* 2) 入力欄（回答後は「続けて聞く」＝会話を断ち切らない） */}
-      <div className={answer ? "mt-4" : "mt-3"}>
-        {answer && <div className="text-[13px] font-bold mb-1.5">続けて聞きたいことがあれば書いてください</div>}
-        <textarea
-          className="w-full px-3 py-2.5 rounded-xl text-[15px] bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white resize-none"
-          rows={3}
-          placeholder="例：教育費と老後資金どっちを優先すべき？ / NISAで何から始めればいい？ など、気になることを書いてください"
-          value={question} onChange={(e) => setQuestion(e.target.value)} disabled={asking} maxLength={2000} />
-        <button type="button" disabled={asking}
-          onClick={ask}
-          className={`${btnSm} w-full mt-2 bg-white text-emerald-700 hover:bg-emerald-50 disabled:opacity-60`}>
-          {asking ? "送信中…" : "アドバイスをもらう"}
-        </button>
-        {askError && <p className="text-[12px] text-red-200 mt-1.5">{askError}</p>}
-      </div>
-
-      {/* 3) 保存＝会員化（回答後のみ・控えめに） */}
-      {answer && (
-        isMember ? (
-          <Link href="/shisan/mypage"
-            className="block w-full mt-4 py-2.5 rounded-xl text-center bg-white/90 text-emerald-700 text-[14px] font-bold hover:bg-white transition">
-            マイページで見返す →
-          </Link>
-        ) : existing ? (
-          <div className="mt-4 rounded-xl bg-white/15 p-3 text-[13px] leading-relaxed">
-            このメールアドレスは登録済みです。ログインリンクをお送りしたので、メールからお戻りください。
-          </div>
-        ) : (
-          <div className="mt-4 pt-3 border-t border-white/20">
-            <div className="text-[12px] text-white/80">このアドバイスを保存して、いつでも見返す</div>
-            <div className="flex gap-2 mt-1.5 flex-wrap">
-              <input type="email" inputMode="email" autoComplete="email"
-                className="flex-1 min-w-[160px] px-3 py-2 rounded-lg text-[14px] bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white"
-                placeholder="メールアドレス"
-                value={email} onChange={(e) => setEmail(e.target.value)} disabled={sending} />
-              <button type="button" disabled={sending}
-                onClick={save}
-                className={`${btnSm} bg-white/90 text-emerald-700 hover:bg-white disabled:opacity-60 whitespace-nowrap`}>
-                {sending ? "保存中…" : "マイページに保存"}
-              </button>
-            </div>
-            {error && <p className="text-[12px] text-red-200 mt-1.5">{error}</p>}
-            <p className="text-[11px] mt-1.5">
-              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline text-white/70">プライバシーポリシー</a>
-            </p>
-          </div>
-        )
-      )}
-    </div>
-  );
 }
 
 /* ===== 会員CTA（Phase1 §2-2/2-3）＝登録状態に応じて出し分け =====

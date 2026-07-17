@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import AssetConciergeMvp from "./AssetConciergeMvp";
 import { ShisanHeader, ShisanFooter } from "./ShisanChrome";
 
-// テストLP：本体の相続・デジタル承継導線とは切り離した独立ルート。
-// TOP・既存導線からはリンクしない。GA4 / Clarity は app/layout.tsx の設置を継承。
+// ピボット（2026-07-15）：本ルートを新TOPに移管。/ は /shisan へリダイレクト（middleware）。
+// オーガニック解禁のため noindex を解除（canonical は自己参照 /shisan）。GA4 / Clarity は app/layout.tsx を継承。
 const SHISAN_TITLE = "つぎの手ナビ 資産づくり（β）";
 const SHISAN_DESCRIPTION =
   "資産づくりの質問に答えると、今月の“次の一手”が見えてくる。繰り上げ・投資・借り換え・教育費を、あなたの数字で中立に。";
@@ -12,8 +12,8 @@ const SHISAN_URL = "https://www.tsuginotenavi.jp/shisan";
 export const metadata: Metadata = {
   title: SHISAN_TITLE,
   description: SHISAN_DESCRIPTION,
-  // テスト期間は検索インデックスを避けたい場合は noindex（不要なら削除）
-  robots: { index: false, follow: false },
+  // ピボットでオーガニック解禁：インデックス許可（noindex 解除）。
+  robots: { index: true, follow: true },
   // SNS（X・コミュニティ）配布時のプレビューを資産づくり用に上書き。
   // これがないと app/layout.tsx の共通 OG（デジタル資産）が継承され食い違う。
   openGraph: {

@@ -28,7 +28,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
-      url: baseUrl,
+      // ピボット（2026-07-15）：新TOP＝資産づくり診断（/ は /shisan へリダイレクトのため / は載せない）。
+      url: `${baseUrl}/shisan`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1.0,

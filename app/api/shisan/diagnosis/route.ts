@@ -119,6 +119,9 @@ export async function POST(req: NextRequest) {
       utm_medium: strCap(body.utmMedium, 120),
       utm_campaign: strCap(body.utmCampaign, 200),
       user_agent: strCap(req.headers.get("user-agent"), 400),
+      // 地域（2-3）：Vercel の geo ヘッダから都道府県レベルのみ推定（市区町村は取らない）。IP推定のため精度に限界あり。
+      region: strCap(req.headers.get("x-vercel-ip-country-region"), 16),
+      region_country: strCap(req.headers.get("x-vercel-ip-country"), 8),
       raw: inputs,
     });
     if (error) throw new Error(error.message);

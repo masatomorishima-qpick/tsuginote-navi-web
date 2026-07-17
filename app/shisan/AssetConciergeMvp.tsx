@@ -43,6 +43,7 @@ interface Store {
   firstVisit: number;
   lastVisit: number | null;
   signup?: SignupFlags; // 会員登録の状態（第一陣・開発依頼書_20260703）
+  lastFuture?: number;  // 直近診断の65歳見込み（Wave 2・前回差分の鏡用）
 }
 interface SignupFlags { registered?: boolean; closed?: boolean; }
 
@@ -51,6 +52,37 @@ const SHARE_URL = "https://www.tsuginotenavi.jp/shisan";
 
 /* LINE友だち追加URL（ピボット 2026-07-15・再接触権）。運営保有の公式アカウント友だち追加URL。 */
 const LINE_ADD_URL = "https://lin.ee/5zqngmK";
+
+/* ===== 二段診断（Wave 2・2-1）：全タップ・全任意。第1段（既存入力）は不変。 ===== */
+const DEEP_TOUCHED_OPTIONS: { key: string; label: string }[] = [
+  { key: "nisa", label: "NISA・つみたてNISA" },
+  { key: "refi", label: "住宅ローンの借換を検討したことがある" },
+  { key: "buffer", label: "生活防衛資金は確保済み" },
+  { key: "insurance", label: "保険を見直した" },
+  { key: "ideco", label: "iDeCo" },
+  { key: "none", label: "どれもまだ" },
+];
+const DEEP_ASSET_OPTIONS: { key: string; label: string }[] = [
+  { key: "cash", label: "ほぼ現金" },
+  { key: "half", label: "半々くらい" },
+  { key: "invested", label: "ほぼ運用" },
+];
+const DEEP_PURPOSE_OPTIONS: { key: string; label: string }[] = [
+  { key: "retire_living", label: "老後の生活費" },
+  { key: "early_retire", label: "早期リタイア" },
+  { key: "family_edu", label: "教育・家族" },
+  { key: "enjoy", label: "使う楽しみ" },
+  { key: "vague_anxiety", label: "漠然と不安" },
+];
+const DEEP_HOUSEHOLD_OPTIONS: { key: string; label: string }[] = [
+  { key: "single", label: "単身" },
+  { key: "couple", label: "夫婦" },
+  { key: "kids", label: "子育て中" },
+];
+// インフレ目減り試算の定数（目安・画面に明記）。エンジンには手を入れず、この定数で単純派生。
+const INFLATION_RATE = 0.02;
+// 新NISAの年間非課税枠（万円・表示用の目安）。
+const NISA_ANNUAL_MAN = 360;
 
 /* 入力の鏡（全面改善 2026-07-14）用の定数。追加入力なし・既存計算の派生のみ。 */
 // 借り換えの市場水準（表示用の内部目安・手動更新可。実際の借り換え試算は calc.ts の REFI_BASE を使用）。
@@ -107,6 +139,16 @@ export default function AssetConciergeMvp() {
   const traffic = useRef<{ referrer: string; utmSource: string; utmMedium: string; utmCampaign: string; debug: boolean }>(
     { referrer: "", utmSource: "", utmMedium: "", utmCampaign: "", debug: false });
   const visitKind = useRef<"new" | "return" | "reenter">("new");
+  /* 二段診断（Wave 2・2-1）：第2段の展開・回答・保存。全タップ・全任意。 */
+  const [deepOpen, setDeepOpen] = useState(false);
+  const [deepTouched, setDeepTouched] = useState<string[]>([]);
+  const [deepAssetMix, setDeepAssetMix] = useState<string | null>(null);
+  const [deepPurpose, setDeepPurpose] = useState<string | null>(null);
+  const [deepHousehold, setDeepHousehold] = useState<string | null>(null);
+  const deepStartAt = useRef(0);
+  const deepSubmitted = useRef(false);
+  /* 前回差分の鏡（Wave 2・2-2）：今セッションで再診断したときの前回見込み（万円換算前の円）。 */
+  const [prevFuture, setPrevFuture] = useState<number | null>(null);
   /* 会員登録導線（第一陣・要件1） */
   const signupViewed = useRef(false);
   const [signupFlags, setSignupFlags] = useState<SignupFlags>({});
@@ -288,6 +330,13 @@ export default function AssetConciergeMvp() {
       target: num("target") || 2000, r: num("r") || 3,
     };
     setInputs(i); persist({ inputs: i });
+    // Wave 2（前回差分の鏡）：旧 lastFuture を「前回」として控え、今回の見込みを lastFuture へ更新（best-effort）。
+    try {
+      const prevStore = JSON.parse(localStorage.getItem(KEY) || "null") as Store | null;
+      if (typeof prevStore?.lastFuture === "number") setPrevFuture(prevStore.lastFuture);
+      const newFuture = computeResult(i, {})?.future;
+      if (typeof newFuture === "number") persist({ lastFuture: Math.round(newFuture) });
+    } catch { /* 前回差分は best-effort */ }
     // GA計測：非会員の家計属性を「帯」で計測（生の金額＝PIIは送らない・区分のみ）。
     // scenario/bucketsは i から決定論的に導出（stateの反映を待たない）。
     track("shisan_input_complete", {
@@ -353,6 +402,55 @@ export default function AssetConciergeMvp() {
     const diffMan = nowMan - delayMan;
     return diffMan > 0 ? { nowMan, delayMan, diffMan } : null;
   }, [result, resultDelay1]);
+
+  /* ===== 二段診断（Wave 2）：ハンドラ＋解錠される鏡の派生値 ===== */
+  const openDeep = () => {
+    if (deepOpen) return;
+    setDeepOpen(true);
+    deepStartAt.current = Date.now();
+    track("shisan_deep_open", { scenario: scenario ?? "" });
+  };
+  // 第2段の回答を best-effort でサーバーへ（最新の diagnoses 行を更新）。deep_submit は最初の1回だけ発火。
+  const saveDeep = (override: Partial<{ touched: string[]; assetMix: string | null; purpose: string | null; household: string | null }> = {}) => {
+    if (!deepSubmitted.current) { track("shisan_deep_submit", { scenario: scenario ?? "" }); deepSubmitted.current = true; }
+    const payload = {
+      touched: override.touched ?? deepTouched,
+      assetMix: override.assetMix ?? deepAssetMix,
+      purpose: override.purpose ?? deepPurpose,
+      household: override.household ?? deepHousehold,
+      durationSec: deepStartAt.current ? Math.round((Date.now() - deepStartAt.current) / 1000) : null,
+    };
+    try {
+      fetch("/api/shisan/diagnosis/deep", {
+        method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+        body: JSON.stringify(payload),
+      }).catch(() => { /* best-effort */ });
+    } catch { /* 無音 */ }
+  };
+  const toggleTouched = (key: string) => {
+    const prev = deepTouched;
+    let next: string[];
+    if (key === "none") next = prev.includes("none") ? [] : ["none"];
+    else { const base = prev.filter((k) => k !== "none"); next = base.includes(key) ? base.filter((k) => k !== key) : [...base, key]; }
+    setDeepTouched(next); saveDeep({ touched: next });
+  };
+  const chooseAsset = (k: string) => { setDeepAssetMix(k); saveDeep({ assetMix: k }); };
+  const choosePurpose = (k: string) => { setDeepPurpose(k); saveDeep({ purpose: k }); };
+  const chooseHousehold = (k: string) => { setDeepHousehold(k); saveDeep({ household: k }); };
+
+  /* 解錠される新しい鏡（2-2）：すべて既存エンジン流用＋単純派生。AIに計算させない。 */
+  const deepMirror = useMemo(() => {
+    if (!inputs || !result) return null;
+    const cashRatio = deepAssetMix === "cash" ? 1 : deepAssetMix === "half" ? 0.5 : 0;
+    const inflationErosionYen = Math.round(inputs.assets * cashRatio * INFLATION_RATE);
+    const nisaTouched = deepTouched.includes("nisa");
+    const untouched = deepTouched.length > 0
+      ? DEEP_TOUCHED_OPTIONS.filter((o) => o.key !== "none" && !deepTouched.includes(o.key))
+      : [];
+    const refi = inputs.hasMortgage && inputs.mBal > 0 ? refinance(inputs.mBal, inputs.mRate, inputs.mYears) : null;
+    const refiNetYen = refi ? Math.round(refi.dInterest - refi.cost) : 0;
+    return { cashRatio, inflationErosionYen, nisaTouched, untouched, refi, refiNetYen };
+  }, [inputs, result, deepAssetMix, deepTouched]);
 
   /* 入力の鏡（変更2・全面改善 2026-07-14）：追加入力なし・既存の計算式の派生のみ。
    *  a. 住宅ローン金利の市場比較（借り換え余地＝既存 refinance を流用）
@@ -702,6 +800,129 @@ export default function AssetConciergeMvp() {
           </button>
         )}
       </div>
+
+      {/* ===== 二段診断（Wave 2・2-1）：第1段の結果の後に「あと30秒で分析を深める」。全タップ・全任意・第1段は不変。 ===== */}
+      {!deepOpen && inputs && (
+        <button type="button" onClick={openDeep}
+          className="w-full mb-4 py-3 rounded-xl border border-emerald-600 bg-white text-emerald-700 text-sm font-bold hover:bg-emerald-50 transition">
+          あと30秒で、分析を深める →
+        </button>
+      )}
+      {deepOpen && inputs && (
+        <section className="mb-4 space-y-3">
+          {/* 第2段の4問（全タップ・全任意） */}
+          <div className="rounded-2xl bg-white border border-slate-200 p-4 space-y-4">
+            <p className="text-[12px] text-slate-400">30秒で分析を深めます（すべて任意・タップだけ）。</p>
+            <div>
+              <div className="text-[13px] font-bold text-slate-700 mb-1.5">すでに手をつけているもの（複数可）</div>
+              <div className="flex flex-wrap gap-2">
+                {DEEP_TOUCHED_OPTIONS.map((o) => (
+                  <button key={o.key} type="button" onClick={() => toggleTouched(o.key)}
+                    className={`px-3 py-1.5 rounded-full text-[13px] border transition ${deepTouched.includes(o.key) ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-300"}`}>{o.label}</button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="text-[13px] font-bold text-slate-700 mb-1.5">資産の内訳は？</div>
+              <div className="flex flex-wrap gap-2">
+                {DEEP_ASSET_OPTIONS.map((o) => (
+                  <button key={o.key} type="button" onClick={() => chooseAsset(o.key)}
+                    className={`px-3 py-1.5 rounded-full text-[13px] border transition ${deepAssetMix === o.key ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-300"}`}>{o.label}</button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="text-[13px] font-bold text-slate-700 mb-1.5">何のために？</div>
+              <div className="flex flex-wrap gap-2">
+                {DEEP_PURPOSE_OPTIONS.map((o) => (
+                  <button key={o.key} type="button" onClick={() => choosePurpose(o.key)}
+                    className={`px-3 py-1.5 rounded-full text-[13px] border transition ${deepPurpose === o.key ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-300"}`}>{o.label}</button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="text-[13px] font-bold text-slate-700 mb-1.5">世帯構成は？</div>
+              <div className="flex flex-wrap gap-2">
+                {DEEP_HOUSEHOLD_OPTIONS.map((o) => (
+                  <button key={o.key} type="button" onClick={() => chooseHousehold(o.key)}
+                    className={`px-3 py-1.5 rounded-full text-[13px] border transition ${deepHousehold === o.key ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-slate-600 border-slate-300"}`}>{o.label}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 解錠される新しい鏡（2-2）：既存エンジン流用＋単純派生・中立維持。回答に応じて表示。 */}
+          {deepMirror && result && (
+            <div className="rounded-2xl shadow-sm p-5 text-white bg-gradient-to-br from-emerald-700 to-emerald-900">
+              <div className="text-[13px] font-bold opacity-90">深掘り分析（目安）</div>
+
+              {/* 前回との差（今セッションで再診断したとき） */}
+              {prevFuture != null && Math.round(prevFuture / 10000) !== Math.round(result.future / 10000) && (
+                <div className="mt-3 pt-3.5 border-t border-white/20">
+                  <div className="text-[15px] font-extrabold mb-0.5">前回との差</div>
+                  <p className="text-[13px] leading-relaxed opacity-95">
+                    前回：約¥{man(prevFuture)}万 → 今回：約¥{man(result.future)}万（{result.future >= prevFuture ? "＋" : "−"}約¥{man(Math.abs(result.future - prevFuture))}万）。
+                  </p>
+                </div>
+              )}
+
+              {/* 現金比率×インフレ（②） */}
+              {deepMirror.cashRatio > 0 && (
+                <div className="mt-3 pt-3.5 border-t border-white/20">
+                  <div className="text-[15px] font-extrabold mb-0.5">現金とインフレ</div>
+                  <p className="text-[13px] leading-relaxed opacity-95">
+                    資産<b className="font-extrabold">{man(inputs.assets)}万円</b>のうち{deepMirror.cashRatio === 1 ? "ほぼ現金" : "半分ほどが現金"}なら、インフレ2%で実質<b className="font-extrabold">年約¥{man(deepMirror.inflationErosionYen)}万</b>の目減り（購買力ベースの目安）。
+                  </p>
+                </div>
+              )}
+
+              {/* NISA枠（①） */}
+              <div className="mt-3 pt-3.5 border-t border-white/20">
+                <div className="text-[15px] font-extrabold mb-0.5">NISAの非課税枠</div>
+                <p className="text-[13px] leading-relaxed opacity-95">
+                  {deepMirror.nisaTouched
+                    ? "新NISAの非課税枠を、使い切れているかが次の論点です。"
+                    : <>新NISAの年間非課税枠<b className="font-extrabold">{NISA_ANNUAL_MAN}万円</b>が、まだ使われていません。</>}
+                </p>
+              </div>
+
+              {/* 未対策領域（①） */}
+              {deepMirror.untouched.length > 0 && (
+                <div className="mt-3 pt-3.5 border-t border-white/20">
+                  <div className="text-[15px] font-extrabold mb-0.5">まだ手をつけていない領域</div>
+                  <p className="text-[13px] leading-relaxed opacity-95">{deepMirror.untouched.map((o) => o.label).join("・")}。</p>
+                </div>
+              )}
+
+              {/* 借り換えの損益分岐（既存の鏡の拡張・mBal>0） */}
+              {deepMirror.refi && (
+                <div className="mt-3 pt-3.5 border-t border-white/20">
+                  <div className="text-[15px] font-extrabold mb-0.5">借り換えの損益分岐</div>
+                  <p className="text-[13px] leading-relaxed opacity-95">
+                    残<b className="font-extrabold">{inputs.mYears}年</b>・残高<b className="font-extrabold">{man(inputs.mBal)}万円</b>なら、借り換えメリットは概算手数料（約¥{man(deepMirror.refi.cost)}万）を引いて
+                    {deepMirror.refiNetYen > 0
+                      ? <> <b className="font-extrabold">約¥{man(deepMirror.refiNetYen)}万</b>。</>
+                      : <> <b className="font-extrabold">逆ザヤの可能性</b>があります。</>}
+                  </p>
+                  <div className="text-[10px] opacity-75 mt-1">※手数料は概算の定数（目安）。基準金利{REFI_BASE}%前提。</div>
+                </div>
+              )}
+
+              {/* 世帯構成の観点（④・文言調整のみ・エンジン改修なし） */}
+              {deepHousehold && (
+                <div className="mt-3 pt-3.5 border-t border-white/20">
+                  <div className="text-[15px] font-extrabold mb-0.5">世帯構成の観点</div>
+                  <p className="text-[13px] leading-relaxed opacity-95">
+                    {deepHousehold === "single" && "単身世帯では、生活防衛資金はご自身の生活費が基準です。まずは手元の備えの確認から。"}
+                    {deepHousehold === "couple" && "ご夫婦では、二人分の生活費と将来の使い道をあわせて見ると目安が立てやすくなります。"}
+                    {deepHousehold === "kids" && "子育て中は、教育費と老後準備の両立が論点です。どちらも「目安」で並べて見ると判断しやすくなります。"}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* ===== 従来型（画面内で質問に答える）＝比較検証用に温存（追加要件E-1） ===== */}
       {SHOW_INLINE_QUESTIONS && (<>

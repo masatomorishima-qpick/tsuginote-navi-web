@@ -472,6 +472,20 @@ export default function AssetConciergeMvp() {
     return { cashRatio, inflationErosionYen, nisaTouched, untouched };
   }, [inputs, result, deepAssetMix, deepTouched]);
 
+  /* 感度の鏡（7/18）：第2段「何のために」で老後/漠然と不安 のとき、余力を +1万/+3万 にした場合の65歳見込みを見せる。
+   * 3値はすべて computeResult（calc.ts）由来（フロントで金額計算はしない）。外部基準（平均・必要額）は持ち込まない。
+   * 余力ゼロ以下や差が出ないときは、現状ゼロでも成立する片側表現に切り替える。 */
+  const sensitivity = useMemo(() => {
+    if (!inputs || !result || result.n <= 0) return null;
+    const base = Math.max(inputs.surplus, 0); // 余力<=0でも「作れば動く」を示すため 0 を起点に加算
+    const futureAt = (extra: number) => computeResult({ ...inputs, surplus: base + extra }, decisions)?.future ?? 0;
+    const nowMan = Math.round(result.future / 10000);
+    const man1 = Math.round(futureAt(10000) / 10000);
+    const man3 = Math.round(futureAt(30000) / 10000);
+    const oneSided = inputs.surplus <= 0 || nowMan <= 0 || man3 - nowMan < 1;
+    return { nowMan, man1, man3, oneSided, surplusMan: Math.round(inputs.surplus / 10000) };
+  }, [inputs, result, decisions]);
+
   /* 入力の鏡（変更2・全面改善 2026-07-14）：追加入力なし・既存の計算式の派生のみ。
    *  a. 住宅ローン金利の市場比較（借り換え余地＝既存 refinance を流用）
    *  b. 生活防衛資金（手元資産÷月間生活費。目安6ヶ月）
@@ -771,8 +785,8 @@ export default function AssetConciergeMvp() {
                 <p className="text-[13px] leading-relaxed opacity-95">
                   手元の資産は生活費の<b className="font-extrabold">約{Math.round(mirror.monthsCovered)}ヶ月分</b>。目安の6ヶ月分に対して
                   {mirror.monthsCovered >= 6
-                    ? <> <b className="font-extrabold">＋約{Math.round(mirror.monthsCovered - 6)}ヶ月</b>の余裕があります。</>
-                    : <> <b className="font-extrabold">−約{Math.round(6 - mirror.monthsCovered)}ヶ月</b>不足しています。</>}
+                    ? <> <b className="font-extrabold">約{Math.round(mirror.monthsCovered - 6)}ヶ月分（約{man(Math.round(mirror.monthsCovered - 6) * inputs.living)}万円）</b>の余裕があります。</>
+                    : <> <b className="font-extrabold">約{Math.round(6 - mirror.monthsCovered)}ヶ月分（約{man(Math.round(6 - mirror.monthsCovered) * inputs.living)}万円）</b>足りません。</>}
                 </p>
               </div>
             )}
@@ -886,6 +900,26 @@ export default function AssetConciergeMvp() {
           {deepMirror && result && (
             <div className="rounded-2xl shadow-sm p-5 text-white bg-gradient-to-br from-emerald-700 to-emerald-900">
               <div className="text-[13px] font-bold opacity-90">深掘り分析（目安）</div>
+
+              {/* 感度の鏡（7/18）：第2段「何のために」＝老後の生活費／漠然と不安 のときだけ表示。
+                  そのユーザー自身の数字が余力の増減でどう動くかを見せる（外部基準なし）。金額は computeResult 由来。 */}
+              {sensitivity && (deepPurpose === "retire_living" || deepPurpose === "vague_anxiety") && (
+                <div className="mt-3 pt-3.5 border-t border-white/20">
+                  <div className="text-[15px] font-extrabold mb-0.5">老後に向けて、今できること</div>
+                  {sensitivity.oneSided ? (
+                    <p className="text-[13px] leading-relaxed opacity-95">
+                      毎月の余力を<b className="font-extrabold">+1万円</b>つくれると、65歳の見込みが<b className="font-extrabold">約¥{yen(sensitivity.man1)}万</b>になります。
+                    </p>
+                  ) : (
+                    <>
+                      <p className="text-[13px] leading-relaxed opacity-95">
+                        あなたの65歳時点の見込みは<b className="font-extrabold">約¥{yen(sensitivity.nowMan)}万</b>です。もし毎月の余力を<b className="font-extrabold">+1万円</b>増やせると、見込みは<b className="font-extrabold">約¥{yen(sensitivity.man1)}万</b>に。<b className="font-extrabold">+3万円</b>なら<b className="font-extrabold">約¥{yen(sensitivity.man3)}万</b>まで届きます。
+                      </p>
+                      <div className="text-[10px] opacity-75 mt-1">※いまの余力（月{sensitivity.surplusMan}万円）を前提に、追加で積み立てた場合の目安です。</div>
+                    </>
+                  )}
+                </div>
+              )}
 
               {/* 現金比率×インフレ（②） */}
               {deepMirror.cashRatio > 0 && (

@@ -44,7 +44,10 @@ interface Store {
   lastVisit: number | null;
   signup?: SignupFlags; // 会員登録の状態（第一陣・開発依頼書_20260703）
   lastFuture?: number;  // 直近診断の65歳見込み（Wave 2・前回差分の鏡用）
+  prevFuture?: number;  // 前回（1つ前）の65歳見込み（A・7/17：再訪でも前回差分を出す）
+  deep?: DeepStore;     // 第2段の回答（F・7/17：再訪で深掘り分析を復元）
 }
+interface DeepStore { open?: boolean; touched?: string[]; assetMix?: string | null; purpose?: string | null; household?: string | null; }
 interface SignupFlags { registered?: boolean; closed?: boolean; }
 
 /* シェア導線（第一陣・要件2）。金額・年齢・個人情報はシェア文言に一切含めない。 */
@@ -54,13 +57,14 @@ const SHARE_URL = "https://www.tsuginotenavi.jp/shisan";
 const LINE_ADD_URL = "https://lin.ee/5zqngmK";
 
 /* ===== 二段診断（Wave 2・2-1）：全タップ・全任意。第1段（既存入力）は不変。 ===== */
-const DEEP_TOUCHED_OPTIONS: { key: string; label: string }[] = [
-  { key: "nisa", label: "NISA・つみたてNISA" },
-  { key: "refi", label: "住宅ローンの借換を検討したことがある" },
-  { key: "buffer", label: "生活防衛資金は確保済み" },
-  { key: "insurance", label: "保険を見直した" },
-  { key: "ideco", label: "iDeCo" },
-  { key: "none", label: "どれもまだ" },
+// label＝選択肢の表示（動詞形）／area＝領域の名詞名（「まだ手をつけていない領域」で使う。C・7/17）
+const DEEP_TOUCHED_OPTIONS: { key: string; label: string; area: string }[] = [
+  { key: "nisa", label: "NISA・つみたてNISA", area: "NISA" },
+  { key: "refi", label: "住宅ローンの借換を検討したことがある", area: "住宅ローンの借り換え" },
+  { key: "buffer", label: "生活防衛資金は確保済み", area: "生活防衛資金" },
+  { key: "insurance", label: "保険を見直した", area: "保険の見直し" },
+  { key: "ideco", label: "iDeCo", area: "iDeCo" },
+  { key: "none", label: "どれもまだ", area: "" },
 ];
 const DEEP_ASSET_OPTIONS: { key: string; label: string }[] = [
   { key: "cash", label: "ほぼ現金" },
@@ -147,8 +151,10 @@ export default function AssetConciergeMvp() {
   const [deepHousehold, setDeepHousehold] = useState<string | null>(null);
   const deepStartAt = useRef(0);
   const deepSubmitted = useRef(false);
-  /* 前回差分の鏡（Wave 2・2-2）：今セッションで再診断したときの前回見込み（万円換算前の円）。 */
+  /* 前回差分の鏡（Wave 2・2-2／A・7/17）：前回見込み（円）。再訪でも表示できるよう store から復元する。 */
   const [prevFuture, setPrevFuture] = useState<number | null>(null);
+  /* 生活費0のインライン警告（D・7/17）：ネイティブconfirmを廃し、非ブロッキングに。 */
+  const [livingWarn, setLivingWarn] = useState(false);
   /* 会員登録導線（第一陣・要件1） */
   const signupViewed = useRef(false);
   const [signupFlags, setSignupFlags] = useState<SignupFlags>({});
@@ -241,6 +247,16 @@ export default function AssetConciergeMvp() {
     } else if (s?.inputs) {
       setInputs(s.inputs); setDecisions(s.decisions || {}); setSignupFlags(s.signup ?? {}); setScreen("dash");
       track("shisan_dashboard_view"); track("shisan_result_view");
+      // A（7/17）：再訪でも前回差分を出す。／F（7/17）：第2段の回答と深掘り分析を復元。
+      if (typeof s.prevFuture === "number") setPrevFuture(s.prevFuture);
+      if (s.deep) {
+        setDeepTouched(s.deep.touched ?? []);
+        setDeepAssetMix(s.deep.assetMix ?? null);
+        setDeepPurpose(s.deep.purpose ?? null);
+        setDeepHousehold(s.deep.household ?? null);
+        const hasAns = (s.deep.touched?.length ?? 0) > 0 || !!s.deep.assetMix || !!s.deep.purpose || !!s.deep.household;
+        if (s.deep.open || hasAns) { setDeepOpen(true); deepSubmitted.current = true; }
+      }
       if (s.lastVisit) {
         const prev = new Date(s.lastVisit), now = new Date();
         const monthsApart = (now.getFullYear() - prev.getFullYear()) * 12 + (now.getMonth() - prev.getMonth());
@@ -253,6 +269,8 @@ export default function AssetConciergeMvp() {
       inputs: s?.inputs ?? null, decisions: s?.decisions ?? {},
       firstVisit: s?.firstVisit ?? Date.now(), lastVisit: Date.now(),
       signup: s?.signup,
+      // A/F（7/17）：前回差分・直近見込み・第2段の回答を保持（マウント時に消さない）。
+      lastFuture: s?.lastFuture, prevFuture: s?.prevFuture, deep: s?.deep,
     };
     localStorage.setItem(KEY, JSON.stringify(next));
     track("shisan_start");
@@ -315,11 +333,8 @@ export default function AssetConciergeMvp() {
 
   const submit = async () => {
     if (!num("age") || !num("income") || !num("assets")) { showToast("年齢・年収・金融資産を入力してください"); return; }
-    // 1-5：生活費0のまま送信できる穴を塞ぐ（強制はしない＝確認を挟むのみ。生活防衛資金の分析に必要）。
-    if (num("living") <= 0 && typeof window !== "undefined") {
-      const proceed = window.confirm("毎月の生活費が未入力（0円）のようです。このままだと生活防衛資金の分析が出せません。このまま診断を続けますか？");
-      if (!proceed) return;
-    }
+    // D（7/17）：生活費0のインライン警告（非ブロッキング）。1回目は警告表示のみで止め、もう一度押すと続行。
+    if (num("living") <= 0 && !livingWarn) { setLivingWarn(true); return; }
     const surplus = num("surplus");
     const i: Inputs = {
       age: num("age"), income: num("income"), assets: num("assets"),
@@ -330,12 +345,13 @@ export default function AssetConciergeMvp() {
       target: num("target") || 2000, r: num("r") || 3,
     };
     setInputs(i); persist({ inputs: i });
-    // Wave 2（前回差分の鏡）：旧 lastFuture を「前回」として控え、今回の見込みを lastFuture へ更新（best-effort）。
+    // A（7/17）：前回差分。旧 lastFuture を「前回」として控え（store にも保存＝再訪でも表示）、今回の見込みを lastFuture へ更新。
     try {
       const prevStore = JSON.parse(localStorage.getItem(KEY) || "null") as Store | null;
-      if (typeof prevStore?.lastFuture === "number") setPrevFuture(prevStore.lastFuture);
+      const prev = typeof prevStore?.lastFuture === "number" ? prevStore.lastFuture : null;
       const newFuture = computeResult(i, {})?.future;
-      if (typeof newFuture === "number") persist({ lastFuture: Math.round(newFuture) });
+      setPrevFuture(prev);
+      persist({ prevFuture: prev ?? undefined, lastFuture: typeof newFuture === "number" ? Math.round(newFuture) : undefined });
     } catch { /* 前回差分は best-effort */ }
     // GA計測：非会員の家計属性を「帯」で計測（生の金額＝PIIは送らない・区分のみ）。
     // scenario/bucketsは i から決定論的に導出（stateの反映を待たない）。
@@ -408,7 +424,13 @@ export default function AssetConciergeMvp() {
     if (deepOpen) return;
     setDeepOpen(true);
     deepStartAt.current = Date.now();
+    persistDeep({ open: true });
     track("shisan_deep_open", { scenario: scenario ?? "" });
+  };
+  // F（7/17）：第2段の回答を localStorage に保存（再訪で深掘り分析ごと復元）。
+  const persistDeep = (patch: Partial<DeepStore>) => {
+    let cur: Store; try { cur = JSON.parse(localStorage.getItem(KEY) || "null") || ({} as Store); } catch { cur = {} as Store; }
+    localStorage.setItem(KEY, JSON.stringify({ ...cur, deep: { ...(cur.deep ?? {}), ...patch } }));
   };
   // 第2段の回答を best-effort でサーバーへ（最新の diagnoses 行を更新）。deep_submit は最初の1回だけ発火。
   const saveDeep = (override: Partial<{ touched: string[]; assetMix: string | null; purpose: string | null; household: string | null }> = {}) => {
@@ -432,11 +454,11 @@ export default function AssetConciergeMvp() {
     let next: string[];
     if (key === "none") next = prev.includes("none") ? [] : ["none"];
     else { const base = prev.filter((k) => k !== "none"); next = base.includes(key) ? base.filter((k) => k !== key) : [...base, key]; }
-    setDeepTouched(next); saveDeep({ touched: next });
+    setDeepTouched(next); saveDeep({ touched: next }); persistDeep({ touched: next });
   };
-  const chooseAsset = (k: string) => { setDeepAssetMix(k); saveDeep({ assetMix: k }); };
-  const choosePurpose = (k: string) => { setDeepPurpose(k); saveDeep({ purpose: k }); };
-  const chooseHousehold = (k: string) => { setDeepHousehold(k); saveDeep({ household: k }); };
+  const chooseAsset = (k: string) => { setDeepAssetMix(k); saveDeep({ assetMix: k }); persistDeep({ assetMix: k }); };
+  const choosePurpose = (k: string) => { setDeepPurpose(k); saveDeep({ purpose: k }); persistDeep({ purpose: k }); };
+  const chooseHousehold = (k: string) => { setDeepHousehold(k); saveDeep({ household: k }); persistDeep({ household: k }); };
 
   /* 解錠される新しい鏡（2-2）：すべて既存エンジン流用＋単純派生。AIに計算させない。 */
   const deepMirror = useMemo(() => {
@@ -447,9 +469,7 @@ export default function AssetConciergeMvp() {
     const untouched = deepTouched.length > 0
       ? DEEP_TOUCHED_OPTIONS.filter((o) => o.key !== "none" && !deepTouched.includes(o.key))
       : [];
-    const refi = inputs.hasMortgage && inputs.mBal > 0 ? refinance(inputs.mBal, inputs.mRate, inputs.mYears) : null;
-    const refiNetYen = refi ? Math.round(refi.dInterest - refi.cost) : 0;
-    return { cashRatio, inflationErosionYen, nisaTouched, untouched, refi, refiNetYen };
+    return { cashRatio, inflationErosionYen, nisaTouched, untouched };
   }, [inputs, result, deepAssetMix, deepTouched]);
 
   /* 入力の鏡（変更2・全面改善 2026-07-14）：追加入力なし・既存の計算式の派生のみ。
@@ -462,9 +482,12 @@ export default function AssetConciergeMvp() {
     const refi = inputs.hasMortgage && inputs.mBal > 0
       ? refinance(inputs.mBal, inputs.mRate, inputs.mYears) : null;
     const refiRoomYen = refi ? Math.round(refi.dMonthly) : 0;
+    // B（7/17）：借換カード統合用。手数料込みの正味メリット（総利息差 − 概算手数料）も持たせる。
+    const refiCostYen = refi ? Math.round(refi.cost) : 0;
+    const refiNetYen = refi ? Math.round(refi.dInterest - refi.cost) : 0;
     const monthsCovered = inputs.living > 0 ? inputs.assets / inputs.living : null;
     const sensitivityYen = SENSITIVITY_STEP_YEN * 12 * annFactor(n, inputs.r / 100);
-    return { hasLoan: !!refi, refiRoomYen, monthsCovered, sensitivityYen };
+    return { hasLoan: !!refi, refiRoomYen, refiCostYen, refiNetYen, monthsCovered, sensitivityYen };
   }, [inputs]);
 
   const setR = (v: number) => {
@@ -598,8 +621,8 @@ export default function AssetConciergeMvp() {
           </div>
           <label className={label}>金融資産（ざっくり） <span className={hint}>円・現預金＋投資</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.assets)} onChange={setNum("assets")} placeholder="10,000,000" />{manHint(form.assets) && <span className="block text-[11px] font-semibold text-emerald-700 mt-0.5">{manHint(form.assets)}</span>}</label>
           <div className="flex gap-2.5">
-            <div className="flex-1"><label className={label}>毎月の投資・貯蓄余力 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.surplus)} onChange={setNum("surplus")} placeholder="60,000" /></label></div>
-            <div className="flex-1"><label className={label}>毎月の生活費 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.living)} onChange={setNum("living")} placeholder="250,000" /></label></div>
+            <div className="flex-1"><label className={label}>毎月の投資・貯蓄余力 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.surplus)} onChange={setNum("surplus")} placeholder="60,000" />{manHint(form.surplus) && <span className="block text-[11px] font-semibold text-emerald-700 mt-0.5">{manHint(form.surplus)}</span>}</label></div>
+            <div className="flex-1"><label className={label}>毎月の生活費 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.living)} onChange={(e) => { setNum("living")(e); if (livingWarn) setLivingWarn(false); }} placeholder="250,000" />{manHint(form.living) && <span className="block text-[11px] font-semibold text-emerald-700 mt-0.5">{manHint(form.living)}</span>}</label></div>
           </div>
         </div>
 
@@ -644,6 +667,12 @@ export default function AssetConciergeMvp() {
           <label className={label}>65歳での目標額 <span className={hint}>円・変更可</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.target)} onChange={setNum("target")} placeholder="20,000,000" />{manHint(form.target) && <span className="block text-[11px] font-semibold text-emerald-700 mt-0.5">{manHint(form.target)}</span>}</label>
         </div>
 
+        {/* D（7/17）：生活費0のインライン警告（非ブロッキング）。もう一度「診断する」で続行。 */}
+        {livingWarn && (
+          <div className="mb-2 p-3 rounded-lg bg-amber-50 border border-amber-200 text-[12px] text-amber-800 leading-relaxed">
+            毎月の生活費が未入力（0円）のようです。このままだと生活防衛資金の分析は出せません。金額を入れると精度が上がります。もう一度「診断する」を押すと、このまま診断します。
+          </div>
+        )}
         <button className={btn} onClick={submit}>診断する →</button>
         <p className="text-[11px] text-slate-400 border-t border-dashed border-slate-200 pt-3 mt-4">
           すべて目安です。前提：インフレ未反映／借り換え試算の基準金利は{REFI_BASE}%（内部目安・手動更新）。特定の商品・サービスの推奨や投資助言は行いません。入力データはこの端末内（ブラウザ）に保存されます。
@@ -696,40 +725,42 @@ export default function AssetConciergeMvp() {
             見出しは本文より一段大きく・太字、本文中の数字は太字。緑背景で読めるコントラスト。 */}
         {mirror && inputs && (
           <div className="mt-4">
-            {/* 1-6（2026-07-15）：余力ゼロ以下でも結果を見せる。追い返さず中立の一文を鏡群の先頭に置く
-                （本文が「下の住宅ローン金利」を参照するため、金利カードより上に配置）。 */}
+            {/* 前回との差（A・7/17：深掘りを開かなくても主カードに表示。再診断・再訪の両方で出る） */}
+            {result && prevFuture != null && Math.round(prevFuture / 10000) !== Math.round(result.future / 10000) && (
+              <div className="pt-3.5 border-t border-white/20">
+                <div className="text-[15px] font-extrabold mb-0.5">前回との差</div>
+                <p className="text-[13px] leading-relaxed opacity-95">
+                  前回：約¥{man(prevFuture)}万 → 今回：<b className="font-extrabold">約¥{man(result.future)}万</b>（{result.future >= prevFuture ? "＋" : "−"}約¥{man(Math.abs(result.future - prevFuture))}万）。
+                </p>
+              </div>
+            )}
+            {/* 1-6（2026-07-15）：余力ゼロ以下でも結果を見せる。追い返さず中立の一文を鏡群の先頭に置く。 */}
             {inputs.surplus <= 0 && (
               <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">毎月の余力がない状態です</div>
                 <p className="text-[13px] leading-relaxed opacity-95">
-                  いまの入力では、毎月の投資・貯蓄に回せる金額がありません。固定費の見直しや、下の「住宅ローン金利について」の余地が、最初の一歩になります。
+                  いまの入力では、毎月の投資・貯蓄に回せる金額がありません。固定費の見直しや、下の「住宅ローンの借り換え」の余地が、最初の一歩になります。
                 </p>
               </div>
             )}
-            {/* ① 住宅ローン金利について（mBal>0のときのみ・従来条件） */}
+            {/* 住宅ローンの借り換え（B・7/17：金利／手取り／損益分岐の3枚を1項目に統合。
+                月々の余地＋手数料込みの正味メリットを1文で。重複を解消。 */}
             {mirror.hasLoan && (
               <div className="pt-3.5 border-t border-white/20">
-                <div className="text-[15px] font-extrabold mb-0.5">住宅ローン金利について</div>
+                <div className="text-[15px] font-extrabold mb-0.5">住宅ローンの借り換え</div>
                 {mirror.refiRoomYen > 0 ? (
                   <p className="text-[13px] leading-relaxed opacity-95">
-                    あなたの金利<b className="font-extrabold">{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）より高めです。借り換えで<b className="font-extrabold">月々約¥{yen(mirror.refiRoomYen)}</b>を軽くできる余地があります。
+                    あなたの金利<b className="font-extrabold">{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）より高めです。借り換えで<b className="font-extrabold">月々約¥{yen(mirror.refiRoomYen)}</b>軽くでき、残<b className="font-extrabold">{inputs.mYears}年</b>で概算手数料（約¥{man(mirror.refiCostYen)}万）を引いても
+                    {mirror.refiNetYen > 0
+                      ? <> <b className="font-extrabold">約¥{man(mirror.refiNetYen)}万のメリット</b>が見込めます。</>
+                      : <> <b className="font-extrabold">逆ザヤの可能性</b>があります。</>}
                   </p>
                 ) : (
                   <p className="text-[13px] leading-relaxed opacity-95">
                     あなたの金利<b className="font-extrabold">{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）と同水準かそれより低めです。今の金利では借り換えの余地は小さめです。
                   </p>
                 )}
-                <div className="text-[10px] opacity-75 mt-1">※水準は内部目安。借り換え試算の基準金利は{REFI_BASE}%。</div>
-              </div>
-            )}
-
-            {/* 借り換えで増やせる手取り（yutori>0のときのみ・従来条件） */}
-            {result && result.yutori > 0 && (
-              <div className="pt-3.5 border-t border-white/20">
-                <div className="text-[15px] font-extrabold mb-0.5">借り換えで増やせる手取り（目安）</div>
-                <p className="text-[13px] leading-relaxed opacity-95">
-                  毎月<b className="font-extrabold">約¥{yen(result.yutori)}</b>の手取りを増やせる可能性があります。
-                </p>
+                <div className="text-[10px] opacity-75 mt-1">※水準・手数料は概算の内部目安。基準金利は{REFI_BASE}%前提。</div>
               </div>
             )}
 
@@ -856,16 +887,6 @@ export default function AssetConciergeMvp() {
             <div className="rounded-2xl shadow-sm p-5 text-white bg-gradient-to-br from-emerald-700 to-emerald-900">
               <div className="text-[13px] font-bold opacity-90">深掘り分析（目安）</div>
 
-              {/* 前回との差（今セッションで再診断したとき） */}
-              {prevFuture != null && Math.round(prevFuture / 10000) !== Math.round(result.future / 10000) && (
-                <div className="mt-3 pt-3.5 border-t border-white/20">
-                  <div className="text-[15px] font-extrabold mb-0.5">前回との差</div>
-                  <p className="text-[13px] leading-relaxed opacity-95">
-                    前回：約¥{man(prevFuture)}万 → 今回：約¥{man(result.future)}万（{result.future >= prevFuture ? "＋" : "−"}約¥{man(Math.abs(result.future - prevFuture))}万）。
-                  </p>
-                </div>
-              )}
-
               {/* 現金比率×インフレ（②） */}
               {deepMirror.cashRatio > 0 && (
                 <div className="mt-3 pt-3.5 border-t border-white/20">
@@ -886,25 +907,11 @@ export default function AssetConciergeMvp() {
                 </p>
               </div>
 
-              {/* 未対策領域（①） */}
+              {/* 未対策領域（①）：C（7/17）＝選択肢の動詞形ラベルではなく領域の名詞名（area）で並べる */}
               {deepMirror.untouched.length > 0 && (
                 <div className="mt-3 pt-3.5 border-t border-white/20">
                   <div className="text-[15px] font-extrabold mb-0.5">まだ手をつけていない領域</div>
-                  <p className="text-[13px] leading-relaxed opacity-95">{deepMirror.untouched.map((o) => o.label).join("・")}。</p>
-                </div>
-              )}
-
-              {/* 借り換えの損益分岐（既存の鏡の拡張・mBal>0） */}
-              {deepMirror.refi && (
-                <div className="mt-3 pt-3.5 border-t border-white/20">
-                  <div className="text-[15px] font-extrabold mb-0.5">借り換えの損益分岐</div>
-                  <p className="text-[13px] leading-relaxed opacity-95">
-                    残<b className="font-extrabold">{inputs.mYears}年</b>・残高<b className="font-extrabold">{man(inputs.mBal)}万円</b>なら、借り換えメリットは概算手数料（約¥{man(deepMirror.refi.cost)}万）を引いて
-                    {deepMirror.refiNetYen > 0
-                      ? <> <b className="font-extrabold">約¥{man(deepMirror.refiNetYen)}万</b>。</>
-                      : <> <b className="font-extrabold">逆ザヤの可能性</b>があります。</>}
-                  </p>
-                  <div className="text-[10px] opacity-75 mt-1">※手数料は概算の定数（目安）。基準金利{REFI_BASE}%前提。</div>
+                  <p className="text-[13px] leading-relaxed opacity-95">{deepMirror.untouched.map((o) => o.area).join("・")}。</p>
                 </div>
               )}
 

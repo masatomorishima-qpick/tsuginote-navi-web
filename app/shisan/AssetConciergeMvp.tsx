@@ -46,8 +46,16 @@ interface Store {
   lastFuture?: number;  // 直近診断の65歳見込み（Wave 2・前回差分の鏡用）
   prevFuture?: number;  // 前回（1つ前）の65歳見込み（A・7/17：再訪でも前回差分を出す）
   deep?: DeepStore;     // 第2段の回答（F・7/17：再訪で深掘り分析を復元）
+  scenarios?: ScenarioSnap[]; // シナリオ比較の履歴（7/19・最大5件・古い順破棄）
 }
 interface DeepStore { open?: boolean; touched?: string[]; assetMix?: string | null; purpose?: string | null; household?: string | null; }
+/* シナリオ1件のスナップショット（入力の主要項目＋算出結果。金額はすべてエンジン由来）。 */
+interface ScenarioSnap {
+  id: string; at: number; harsh?: boolean;
+  future: number; achieve: number;
+  age: number; income: number; assets: number; surplus: number; living: number;
+  hasMortgage: boolean; mBal: number; mRate: number; mYears: number; r: number; target: number; childCount: number;
+}
 interface SignupFlags { registered?: boolean; closed?: boolean; }
 
 /* シェア導線（第一陣・要件2）。金額・年齢・個人情報はシェア文言に一切含めない。 */
@@ -93,6 +101,11 @@ const NISA_ANNUAL_MAN = 360;
 const MARKET_RATE_BAND = "変動0.3〜0.5%台";
 // 感度の一行「毎月あと¥X 増やすと」の刻み。
 const SENSITIVITY_STEP_YEN = 10000;
+
+/* シナリオ比較（7/19）用の定数。厳しめ条件の定義は暫定・ここに集約（後から調整可）。 */
+const HARSH_RETURN = 0;          // 厳しめ：想定リターン0%
+const HARSH_SURPLUS_MULT = 0.8;  // 厳しめ：毎月の余力を8掛け（想定外支出を織り込む）
+const SCENARIO_MAX = 5;          // 保存するシナリオの最大件数（超えたら古い順に破棄）
 
 /* ===== 計測は lib/shisan/track.ts に共有化（Phase1）。冒頭でimport ===== */
 
@@ -155,6 +168,10 @@ export default function AssetConciergeMvp() {
   const [prevFuture, setPrevFuture] = useState<number | null>(null);
   /* 生活費0のインライン警告（D・7/17）：ネイティブconfirmを廃し、非ブロッキングに。 */
   const [livingWarn, setLivingWarn] = useState(false);
+  /* シナリオ比較（7/19）：厳しめプリセットのトグル・履歴・GA一回制御。 */
+  const [harshOpen, setHarshOpen] = useState(false);
+  const [scenarios, setScenarios] = useState<ScenarioSnap[]>([]);
+  const compareViewed = useRef(false);
   /* 会員登録導線（第一陣・要件1） */
   const signupViewed = useRef(false);
   const [signupFlags, setSignupFlags] = useState<SignupFlags>({});
@@ -247,8 +264,9 @@ export default function AssetConciergeMvp() {
     } else if (s?.inputs) {
       setInputs(s.inputs); setDecisions(s.decisions || {}); setSignupFlags(s.signup ?? {}); setScreen("dash");
       track("shisan_dashboard_view"); track("shisan_result_view");
-      // A（7/17）：再訪でも前回差分を出す。／F（7/17）：第2段の回答と深掘り分析を復元。
+      // A（7/17）：再訪でも前回差分を出す。／F（7/17）：第2段の回答と深掘り分析を復元。／シナリオ復元（7/19）。
       if (typeof s.prevFuture === "number") setPrevFuture(s.prevFuture);
+      if (Array.isArray(s.scenarios)) setScenarios(s.scenarios);
       if (s.deep) {
         setDeepTouched(s.deep.touched ?? []);
         setDeepAssetMix(s.deep.assetMix ?? null);
@@ -269,8 +287,8 @@ export default function AssetConciergeMvp() {
       inputs: s?.inputs ?? null, decisions: s?.decisions ?? {},
       firstVisit: s?.firstVisit ?? Date.now(), lastVisit: Date.now(),
       signup: s?.signup,
-      // A/F（7/17）：前回差分・直近見込み・第2段の回答を保持（マウント時に消さない）。
-      lastFuture: s?.lastFuture, prevFuture: s?.prevFuture, deep: s?.deep,
+      // A/F（7/17）：前回差分・直近見込み・第2段の回答を保持（マウント時に消さない）。／シナリオ（7/19）。
+      lastFuture: s?.lastFuture, prevFuture: s?.prevFuture, deep: s?.deep, scenarios: s?.scenarios,
     };
     localStorage.setItem(KEY, JSON.stringify(next));
     track("shisan_start");
@@ -353,6 +371,9 @@ export default function AssetConciergeMvp() {
       setPrevFuture(prev);
       persist({ prevFuture: prev ?? undefined, lastFuture: typeof newFuture === "number" ? Math.round(newFuture) : undefined });
     } catch { /* 前回差分は best-effort */ }
+    // シナリオ比較（7/19）：今回の診断をスナップショットとして履歴へ追加。厳しめ表示は毎回リセット。
+    setHarshOpen(false);
+    addScenario(snapFrom(i, false));
     // GA計測：非会員の家計属性を「帯」で計測（生の金額＝PIIは送らない・区分のみ）。
     // scenario/bucketsは i から決定論的に導出（stateの反映を待たない）。
     track("shisan_input_complete", {
@@ -485,6 +506,81 @@ export default function AssetConciergeMvp() {
     const oneSided = inputs.surplus <= 0 || nowMan <= 0 || man3 - nowMan < 1;
     return { nowMan, man1, man3, oneSided, surplusMan: Math.round(inputs.surplus / 10000) };
   }, [inputs, result, decisions]);
+
+  /* ===== シナリオ比較（7/19）：厳しめプリセット＋履歴。金額はすべて computeResult 由来（フロントで計算しない）。 ===== */
+  // 厳しめ試算：想定リターン0%かつ余力8掛け（定数集約）。既存エンジンの再呼び出しのみ。
+  const harsh = useMemo(() => {
+    if (!inputs || !result) return null;
+    const surplusHarsh = Math.round(inputs.surplus * HARSH_SURPLUS_MULT);
+    const hr = computeResult({ ...inputs, r: HARSH_RETURN, surplus: surplusHarsh }, decisions);
+    if (!hr) return null;
+    const nowMan = Math.round(result.future / 10000);
+    const harshMan = Math.round(hr.future / 10000);
+    return { future: hr.future, achieve: hr.achieve, harshMan, diffMan: nowMan - harshMan, surplusHarsh };
+  }, [inputs, result, decisions]);
+
+  // Inputs＋算出結果を1件のスナップショットに（履歴用）。
+  const snapFrom = (i: Inputs, isHarsh: boolean): ScenarioSnap | null => {
+    const r = computeResult(i, {});
+    if (!r) return null;
+    return {
+      id: (typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now() + Math.random()),
+      at: Date.now(), harsh: isHarsh, future: Math.round(r.future), achieve: r.achieve,
+      age: i.age, income: i.income, assets: i.assets, surplus: i.surplus, living: i.living,
+      hasMortgage: i.hasMortgage, mBal: i.mBal, mRate: i.mRate, mYears: i.mYears, r: i.r, target: i.target,
+      childCount: i.childAges.length,
+    };
+  };
+  // シナリオ追加（最大5・古い順破棄）。store と state を同時更新（副作用は updater の外）。
+  const addScenario = (snap: ScenarioSnap | null) => {
+    if (!snap) return;
+    const next = [...scenarios, snap].slice(-SCENARIO_MAX);
+    setScenarios(next); persist({ scenarios: next });
+  };
+  const deleteScenario = (id: string) => {
+    const next = scenarios.filter((s) => s.id !== id);
+    setScenarios(next); persist({ scenarios: next });
+  };
+  const clearScenarios = () => { setScenarios([]); persist({ scenarios: [] }); };
+
+  // 厳しめプリセットのトグル。開くときに GA と「厳しめ」シナリオ追加（直近が同一厳しめなら重複追加しない）。
+  // 副作用は setState updater の外で行う（StrictMode の二重実行で重複追加しないため）。
+  const toggleHarsh = () => {
+    const opening = !harshOpen;
+    setHarshOpen(opening);
+    if (opening && inputs && harsh) {
+      track("shisan_harsh_view", { scenario: scenario ?? "", scenario_count: scenarios.length });
+      const hi: Inputs = { ...inputs, r: HARSH_RETURN, surplus: Math.round(inputs.surplus * HARSH_SURPLUS_MULT) };
+      const last = scenarios[scenarios.length - 1];
+      if (!(last && last.harsh && last.future === Math.round(harsh.future))) addScenario(snapFrom(hi, true));
+    }
+  };
+
+  /* シナリオ間の変更項目（1つ前との差分）。金額は万円で表示。 */
+  const scenarioDiff = (cur: ScenarioSnap, prev: ScenarioSnap | undefined): string[] => {
+    if (!prev) return [];
+    const out: string[] = [];
+    const manOf = (yen: number) => Math.round(yen / 10000).toLocaleString("ja-JP");
+    if (cur.age !== prev.age) out.push(`年齢 ${prev.age}→${cur.age}歳`);
+    if (cur.income !== prev.income) out.push(`年収 ${manOf(prev.income)}→${manOf(cur.income)}万`);
+    if (cur.assets !== prev.assets) out.push(`資産 ${manOf(prev.assets)}→${manOf(cur.assets)}万`);
+    if (cur.surplus !== prev.surplus) out.push(`余力 ${manOf(prev.surplus)}→${manOf(cur.surplus)}万`);
+    if (cur.living !== prev.living) out.push(`生活費 ${manOf(prev.living)}→${manOf(cur.living)}万`);
+    if (cur.r !== prev.r) out.push(`想定リターン ${prev.r}→${cur.r}%`);
+    if (cur.target !== prev.target) out.push(`目標 ${manOf(prev.target)}→${manOf(cur.target)}万`);
+    if (cur.hasMortgage !== prev.hasMortgage) out.push(`ローン ${prev.hasMortgage ? "有" : "無"}→${cur.hasMortgage ? "有" : "無"}`);
+    else if (cur.hasMortgage && cur.mRate !== prev.mRate) out.push(`金利 ${prev.mRate}→${cur.mRate}%`);
+    if (cur.childCount !== prev.childCount) out.push(`子 ${prev.childCount}→${cur.childCount}人`);
+    return out;
+  };
+  // GA：シナリオ比較が2件以上で表示された時に1回。
+  useEffect(() => {
+    if (screen === "dash" && scenarios.length >= 2 && !compareViewed.current) {
+      track("shisan_compare_view", { scenario: scenario ?? "", scenario_count: scenarios.length });
+      compareViewed.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, scenarios]);
 
   /* 入力の鏡（変更2・全面改善 2026-07-14）：追加入力なし・既存の計算式の派生のみ。
    *  a. 住宅ローン金利の市場比較（借り換え余地＝既存 refinance を流用）
@@ -728,6 +824,23 @@ export default function AssetConciergeMvp() {
         <div className="text-[11px] opacity-80 mt-2 leading-relaxed">
           想定リターン{inputs?.r}%の場合の目安（備え・教育費は元本のまま反映）。{result0 && <>0%なら約¥{man(result0.future)}万。</>}
         </div>
+
+        {/* 厳しめプリセット（機能1・7/19）：0%＋余力8掛けをワンタップ並列（トグル）。条件を明示・金額はエンジン由来。 */}
+        {harsh && (
+          <div className="mt-3">
+            <button type="button" onClick={toggleHarsh}
+              className="w-full py-2 rounded-lg bg-white/15 text-white text-[13px] font-bold hover:bg-white/25 transition">
+              {harshOpen ? "厳しめ条件を閉じる" : "厳しめ条件で見る →"}
+            </button>
+            {harshOpen && (
+              <div className="mt-2 p-3 rounded-lg bg-white/15 text-[12px] leading-relaxed">
+                <div className="font-extrabold text-[13px] mb-0.5">厳しめ（リターン0%・余力2割減）</div>
+                65歳見込みは<b className="font-extrabold">約¥{man(harsh.future)}万</b>（達成率<b className="font-extrabold">{harsh.achieve}%</b>）。通常条件（想定{inputs?.r}%・余力そのまま）との差は<b className="font-extrabold">約¥{yen(harsh.diffMan)}万</b>。
+                <div className="opacity-75 mt-1 text-[10px]">※想定外の支出などに備え、想定リターン0%かつ毎月の余力を8割にした試算です（目安）。</div>
+              </div>
+            )}
+          </div>
+        )}
         {/* 変更5：目標を上回る見込みの人への出口 */}
         {result && result.achieve > 100 && (
           <div className="mt-3 p-3 rounded-lg bg-white/15 text-[12px] leading-relaxed">
@@ -845,6 +958,43 @@ export default function AssetConciergeMvp() {
           </button>
         )}
       </div>
+
+      {/* ===== シナリオ比較（機能2・7/19）：緑カードの下・第2段の上。2件以上のときのみ表示。 ===== */}
+      {scenarios.length >= 2 && (
+        <section className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-[15px] font-extrabold text-emerald-900">シナリオ比較</h2>
+            <button type="button" onClick={clearScenarios} className="text-[11px] text-slate-400 underline underline-offset-2 hover:text-slate-600">すべて消す</button>
+          </div>
+          <div className="space-y-2">
+            {scenarios.map((s, idx) => {
+              const diff = scenarioDiff(s, scenarios[idx - 1]);
+              return (
+                <div key={s.id} className="rounded-xl bg-white border border-slate-200 p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[11px] text-slate-400">{new Date(s.at).toLocaleString("ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                        {s.harsh && <span className="text-[10px] font-bold text-amber-700 bg-amber-100 rounded px-1.5 py-0.5">厳しめ</span>}
+                      </div>
+                      {idx === 0
+                        ? <div className="text-[11px] text-slate-400 mt-0.5">最初の診断</div>
+                        : diff.length > 0
+                          ? <div className="text-[11px] text-emerald-700 mt-0.5">{diff.join(" / ")}</div>
+                          : <div className="text-[11px] text-slate-400 mt-0.5">前回から変更なし</div>}
+                    </div>
+                    <button type="button" onClick={() => deleteScenario(s.id)} className="text-[11px] text-slate-300 hover:text-slate-500 shrink-0">削除</button>
+                  </div>
+                  <div className="flex items-baseline gap-3 mt-1.5">
+                    <div className="text-[17px] font-extrabold text-emerald-900">約¥{man(s.future)}万</div>
+                    <div className="text-[12px] text-slate-500">達成率 {s.achieve}%</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* ===== 二段診断（Wave 2・2-1）：第1段の結果の後に「あと30秒で分析を深める」。全タップ・全任意・第1段は不変。 ===== */}
       {!deepOpen && inputs && (

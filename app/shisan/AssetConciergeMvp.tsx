@@ -47,6 +47,7 @@ interface Store {
   prevFuture?: number;  // 前回（1つ前）の65歳見込み（A・7/17：再訪でも前回差分を出す）
   deep?: DeepStore;     // 第2段の回答（F・7/17：再訪で深掘り分析を復元）
   scenarios?: ScenarioSnap[]; // シナリオ比較の履歴（7/19・最大5件・古い順破棄）
+  targetTouched?: boolean;    // 目標額をユーザー自身が入力したか（7/20・逆算の表示条件）
 }
 interface DeepStore { open?: boolean; touched?: string[]; assetMix?: string | null; purpose?: string | null; household?: string | null; }
 /* シナリオ1件のスナップショット（入力の主要項目＋算出結果。金額はすべてエンジン由来）。 */
@@ -172,6 +173,17 @@ export default function AssetConciergeMvp() {
   const [harshOpen, setHarshOpen] = useState(false);
   const [scenarios, setScenarios] = useState<ScenarioSnap[]>([]);
   const compareViewed = useRef(false);
+  /* 第4区間（7/20）：極端値の警告／目標の逆算／満足度。 */
+  const [extremeWarn, setExtremeWarn] = useState(false);          // 年齢・年収の極端値警告（非ブロッキング）
+  const [targetTouched, setTargetTouched] = useState(false);      // 目標額を本人が入力したか
+  const [targetEdit, setTargetEdit] = useState(false);            // 結果画面での目標入力欄の表示
+  const [targetDraft, setTargetDraft] = useState("");             // 同・入力中の値
+  const [satAnswer, setSatAnswer] = useState<string | null>(null);  // 1問目
+  const [satReason, setSatReason] = useState<string | null>(null);  // 2問目A
+  const [satHelpful, setSatHelpful] = useState<string | null>(null);// 2問目B
+  const [satFree, setSatFree] = useState("");                     // 自由記述（その他のみ）
+  const targetCalcViewed = useRef("");                            // GA一回制御（分岐種別ごと）
+  const savePromptViewed = useRef(false);
   /* 会員登録導線（第一陣・要件1） */
   const signupViewed = useRef(false);
   const [signupFlags, setSignupFlags] = useState<SignupFlags>({});
@@ -267,6 +279,7 @@ export default function AssetConciergeMvp() {
       // A（7/17）：再訪でも前回差分を出す。／F（7/17）：第2段の回答と深掘り分析を復元。／シナリオ復元（7/19）。
       if (typeof s.prevFuture === "number") setPrevFuture(s.prevFuture);
       if (Array.isArray(s.scenarios)) setScenarios(s.scenarios);
+      if (s.targetTouched) setTargetTouched(true);
       if (s.deep) {
         setDeepTouched(s.deep.touched ?? []);
         setDeepAssetMix(s.deep.assetMix ?? null);
@@ -289,6 +302,7 @@ export default function AssetConciergeMvp() {
       signup: s?.signup,
       // A/F（7/17）：前回差分・直近見込み・第2段の回答を保持（マウント時に消さない）。／シナリオ（7/19）。
       lastFuture: s?.lastFuture, prevFuture: s?.prevFuture, deep: s?.deep, scenarios: s?.scenarios,
+      targetTouched: s?.targetTouched,
     };
     localStorage.setItem(KEY, JSON.stringify(next));
     track("shisan_start");
@@ -353,6 +367,10 @@ export default function AssetConciergeMvp() {
     if (!num("age") || !num("income") || !num("assets")) { showToast("年齢・年収・金融資産を入力してください"); return; }
     // D（7/17）：生活費0のインライン警告（非ブロッキング）。1回目は警告表示のみで止め、もう一度押すと続行。
     if (num("living") <= 0 && !livingWarn) { setLivingWarn(true); return; }
+    // 変更1（7/20）：極端な数字の警告（非ブロッキング・同型）。年齢18未満/100超、年収10万未満/1億超。
+    const ageV = num("age"), incomeV = num("income");
+    const extreme = ageV < 18 || ageV > 100 || incomeV < 100000 || incomeV > 100000000;
+    if (extreme && !extremeWarn) { setExtremeWarn(true); return; }
     const surplus = num("surplus");
     const i: Inputs = {
       age: num("age"), income: num("income"), assets: num("assets"),
@@ -374,6 +392,10 @@ export default function AssetConciergeMvp() {
     // シナリオ比較（7/19）：今回の診断をスナップショットとして履歴へ追加。厳しめ表示は毎回リセット。
     setHarshOpen(false);
     addScenario(snapFrom(i, false));
+    // 第4区間（7/20）：新しい診断なので満足度は聞き直す。極端値の警告と目標入力欄は閉じる。
+    setSatAnswer(null); setSatReason(null); setSatHelpful(null); setSatFree("");
+    savePromptViewed.current = false; targetCalcViewed.current = "";
+    setExtremeWarn(false); setTargetEdit(false);
     // GA計測：非会員の家計属性を「帯」で計測（生の金額＝PIIは送らない・区分のみ）。
     // scenario/bucketsは i から決定論的に導出（stateの反映を待たない）。
     track("shisan_input_complete", {
@@ -518,6 +540,53 @@ export default function AssetConciergeMvp() {
     const harshMan = Math.round(hr.future / 10000);
     return { future: hr.future, achieve: hr.achieve, harshMan, diffMan: nowMan - harshMan, surplusHarsh };
   }, [inputs, result, decisions]);
+
+  /* 逆算（変更2・7/20）：目標に届く「毎月の最小額」を computeResult の二分探索で求める。
+   * calc.ts は不変。金額はすべてエンジン由来（フロントで金額式を持たない）。
+   * 分岐：assets_only（毎月0でも届く）／enough（今の額で届く・減らせる余地）／short（不足）／unreachable（上限でも届かない）。 */
+  const REVERSE_MAX_YEN = 1000000; // 探索上限（月100万円）
+  const targetCalc = useMemo(() => {
+    if (!inputs || !result || !targetTouched || inputs.target <= 0) return null;
+    const futureAt = (s: number) => computeResult({ ...inputs, surplus: s }, decisions)?.future ?? 0;
+    const goal = inputs.target;
+    if (futureAt(0) >= goal) {
+      return { kind: "assets_only" as const, needYen: 0, curYen: inputs.surplus, gapYen: 0 };
+    }
+    if (futureAt(REVERSE_MAX_YEN) < goal) {
+      return { kind: "unreachable" as const, needYen: 0, curYen: inputs.surplus, gapYen: 0 };
+    }
+    let lo = 0, hi = REVERSE_MAX_YEN;
+    for (let k = 0; k < 60 && hi - lo > 1; k++) {
+      const mid = Math.floor((lo + hi) / 2);
+      if (futureAt(mid) >= goal) hi = mid; else lo = mid;
+    }
+    const needYen = hi;
+    const gapYen = Math.max(0, needYen - inputs.surplus);
+    const kind = inputs.surplus >= needYen ? ("enough" as const) : ("short" as const);
+    return { kind, needYen, curYen: inputs.surplus, gapYen };
+  }, [inputs, result, decisions, targetTouched]);
+
+  // GA：逆算の表示（分岐種別ごとに1回）。
+  useEffect(() => {
+    if (screen === "dash" && targetCalc && targetCalcViewed.current !== targetCalc.kind) {
+      track("shisan_target_calc_view", { kind: targetCalc.kind, scenario: scenario ?? "" });
+      targetCalcViewed.current = targetCalc.kind;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, targetCalc]);
+
+  /* 満足度（変更4・7/20）：診断1件に紐づけて best-effort 保存。連打・二重記録はサーバー側の上書きで防ぐ。 */
+  const saveSat = (patch: { answer?: string | null; reason?: string | null; helpful?: string | null; free?: string }) => {
+    try {
+      fetch("/api/shisan/diagnosis/feedback", {
+        method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+        body: JSON.stringify({
+          answer: patch.answer ?? satAnswer, reason: patch.reason ?? satReason,
+          helpful: patch.helpful ?? satHelpful, free: patch.free ?? satFree,
+        }),
+      }).catch(() => { /* best-effort */ });
+    } catch { /* 無音 */ }
+  };
 
   // Inputs＋算出結果を1件のスナップショットに（履歴用）。
   const snapFrom = (i: Inputs, isHarsh: boolean): ScenarioSnap | null => {
@@ -726,8 +795,8 @@ export default function AssetConciergeMvp() {
 
         <div className={card}>
           <div className="flex gap-2.5">
-            <div className="flex-1"><label className={label}>年齢<input type="number" className={inputCls} value={form.age ?? ""} onChange={set("age")} placeholder="42" /></label></div>
-            <div className="flex-1"><label className={label}>額面年収 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.income)} onChange={setNum("income")} placeholder="7,000,000" />{manHint(form.income) && <span className="block text-[11px] font-semibold text-emerald-700 mt-0.5">{manHint(form.income)}</span>}</label></div>
+            <div className="flex-1"><label className={label}>年齢<input type="number" className={inputCls} value={form.age ?? ""} onChange={(e) => { set("age")(e); if (extremeWarn) setExtremeWarn(false); }} placeholder="42" /></label></div>
+            <div className="flex-1"><label className={label}>額面年収 <span className={hint}>円</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.income)} onChange={(e) => { setNum("income")(e); if (extremeWarn) setExtremeWarn(false); }} placeholder="7,000,000" />{manHint(form.income) && <span className="block text-[11px] font-semibold text-emerald-700 mt-0.5">{manHint(form.income)}</span>}</label></div>
           </div>
           <label className={label}>金融資産（ざっくり） <span className={hint}>円・現預金＋投資</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.assets)} onChange={setNum("assets")} placeholder="10,000,000" />{manHint(form.assets) && <span className="block text-[11px] font-semibold text-emerald-700 mt-0.5">{manHint(form.assets)}</span>}</label>
           <div className="flex gap-2.5">
@@ -774,13 +843,19 @@ export default function AssetConciergeMvp() {
         </div>
 
         <div className={card}>
-          <label className={label}>65歳での目標額 <span className={hint}>円・変更可</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.target)} onChange={setNum("target")} placeholder="20,000,000" />{manHint(form.target) && <span className="block text-[11px] font-semibold text-emerald-700 mt-0.5">{manHint(form.target)}</span>}</label>
+          <label className={label}>65歳での目標額 <span className={hint}>円・変更可</span><input type="text" inputMode="numeric" className={inputCls} value={comma(form.target)} onChange={(e) => { setNum("target")(e); if (!targetTouched) { setTargetTouched(true); persist({ targetTouched: true }); } }} placeholder="20,000,000" />{manHint(form.target) && <span className="block text-[11px] font-semibold text-emerald-700 mt-0.5">{manHint(form.target)}</span>}</label>
         </div>
 
         {/* D（7/17）：生活費0のインライン警告（非ブロッキング）。もう一度「診断する」で続行。 */}
         {livingWarn && (
           <div className="mb-2 p-3 rounded-lg bg-amber-50 border border-amber-200 text-[12px] text-amber-800 leading-relaxed">
             毎月の生活費が未入力（0円）のようです。このままだと生活防衛資金の分析は出せません。金額を入れると精度が上がります。もう一度「診断する」を押すと、このまま診断します。
+          </div>
+        )}
+        {/* 変更1（7/20）：極端な数字の警告（非ブロッキング・データの汚れ対策）。 */}
+        {extremeWarn && (
+          <div className="mb-2 p-3 rounded-lg bg-amber-50 border border-amber-200 text-[13px] text-amber-800 leading-relaxed">
+            入力された数字をご確認ください。このまま進むこともできます。
           </div>
         )}
         <button className={btn} onClick={submit}>診断する →</button>
@@ -812,7 +887,7 @@ export default function AssetConciergeMvp() {
 
         {/* 結論：65歳の見込み（目安）＋目標比％（変更1-1）
             修正1（2026-07-15）：金額は必ず1行。clamp()で幅に応じ縮小＋whitespace-nowrap、右ブロックは shrink-0。 */}
-        <div className="text-[13px] font-bold opacity-90 mb-1">65歳の見込み（目安）</div>
+        <div className="text-[14px] font-bold opacity-90 mb-1">65歳のときの金額（目安）</div>
         <div className="flex justify-between items-end gap-2">
           <div className="font-extrabold leading-none whitespace-nowrap" style={{ fontSize: "clamp(24px, 7.5vw, 34px)" }}>約¥<CountUp value={result ? Math.round(result.future / 10000) : 0} />万</div>
           <div className="text-right shrink-0">
@@ -820,10 +895,68 @@ export default function AssetConciergeMvp() {
             <span className="text-[11px] opacity-85 whitespace-nowrap">目標 ¥{inputs ? man(inputs.target) : 0}万</span>
           </div>
         </div>
-        {/* 変更6：前提と揺らぎの一行（想定リターンと0%時の目安） */}
-        <div className="text-[11px] opacity-80 mt-2 leading-relaxed">
-          想定リターン{inputs?.r}%の場合の目安（備え・教育費は元本のまま反映）。{result0 && <>0%なら約¥{man(result0.future)}万。</>}
+        {/* 前提と揺らぎの一行（変更7・7/20：平易化） */}
+        <div className="text-[12px] opacity-85 mt-2 leading-relaxed">
+          いま持っている資産が年に{inputs?.r}%ふえたとした場合の目安です。毎月ためるお金は、ふえない前提で計算しています。{result0 && <>ふえなかった場合（0%）は約¥{man(result0.future)}万です。</>}
         </div>
+
+        {/* 変更2/3（7/20）：目標までに毎月いくら必要か（逆算）。本人が目標を設定した人にだけ表示。 */}
+        {targetCalc && inputs ? (
+          <div className="mt-3 p-3 rounded-lg bg-white/15">
+            <div className="text-[15px] font-extrabold mb-1">目標までに、毎月いくら必要か</div>
+            <p className="text-[13px] leading-relaxed">
+              {targetCalc.kind === "short" && (<>
+                目標の<b className="font-extrabold">¥{man(inputs.target)}万</b>にとどくには、毎月およそ<b className="font-extrabold">¥{yen(targetCalc.needYen)}</b>を貯金や投資にまわす計算です。いまは毎月¥{yen(targetCalc.curYen)}なので、あとおよそ<b className="font-extrabold">¥{yen(targetCalc.gapYen)}</b>になります。
+              </>)}
+              {targetCalc.kind === "enough" && (<>
+                いまのペースなら、目標の<b className="font-extrabold">¥{man(inputs.target)}万</b>にとどく見通しです。毎月およそ<b className="font-extrabold">¥{yen(targetCalc.needYen)}</b>まで減らしても、目標にはとどく計算になります。
+              </>)}
+              {targetCalc.kind === "assets_only" && (<>
+                いま持っている資産だけで、目標の<b className="font-extrabold">¥{man(inputs.target)}万</b>にとどく見通しです。毎月の貯金や投資を続けなくても、計算のうえでは目標に届きます。
+              </>)}
+              {targetCalc.kind === "unreachable" && (<>
+                毎月の貯金や投資をふやしても、65歳までに目標の<b className="font-extrabold">¥{man(inputs.target)}万</b>にとどくのは難しい計算になりました。目標の金額を見直したり、目標の年齢を先にのばすことも考えられます。
+              </>)}
+            </p>
+            <div className="text-[11px] opacity-75 mt-1">
+              {targetCalc.kind === "short" || targetCalc.kind === "enough"
+                ? "※毎月ためるお金がふえない前提で計算しているため、多めの金額になっています。あくまで目安です。"
+                : "※あくまで目安の計算です。"}
+            </div>
+          </div>
+        ) : (
+          inputs && (
+            <div className="mt-3 p-3 rounded-lg bg-white/15">
+              <p className="text-[13px] leading-relaxed">65歳までにいくらためたいかを入れると、毎月いくら必要かが分かります。</p>
+              {!targetEdit ? (
+                <button type="button"
+                  onClick={() => { setTargetEdit(true); setTargetDraft(String(inputs.target || "")); track("shisan_target_set_click", { scenario: scenario ?? "" }); }}
+                  className="mt-2 w-full py-2 rounded-lg bg-white text-emerald-800 text-[13px] font-bold hover:bg-emerald-50 transition">
+                  目標の金額を入れる
+                </button>
+              ) : (
+                <div className="mt-2 flex gap-2">
+                  <input type="text" inputMode="numeric" value={comma(targetDraft)}
+                    onChange={(e) => setTargetDraft(e.target.value.replace(/[^\d]/g, ""))}
+                    placeholder="20,000,000"
+                    className="flex-1 min-w-0 rounded-lg px-3 py-2 text-[14px] text-slate-800" />
+                  <button type="button"
+                    onClick={() => {
+                      const v = parseFloat(targetDraft) || 0;
+                      if (v <= 0 || !inputs) return;
+                      const ni = { ...inputs, target: v };
+                      setInputs(ni); setForm((f) => ({ ...f, target: String(v) }));
+                      setTargetTouched(true); setTargetEdit(false);
+                      persist({ inputs: ni, targetTouched: true });
+                    }}
+                    className="shrink-0 px-4 py-2 rounded-lg bg-white text-emerald-800 text-[13px] font-bold hover:bg-emerald-50 transition">
+                    反映する
+                  </button>
+                </div>
+              )}
+            </div>
+          )
+        )}
 
         {/* 厳しめプリセット（機能1・7/19）：0%＋余力8掛けをワンタップ並列（トグル）。条件を明示・金額はエンジン由来。 */}
         {harsh && (
@@ -856,7 +989,7 @@ export default function AssetConciergeMvp() {
             {result && prevFuture != null && Math.round(prevFuture / 10000) !== Math.round(result.future / 10000) && (
               <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">前回との差</div>
-                <p className="text-[13px] leading-relaxed opacity-95">
+                <p className="text-[14px] leading-relaxed opacity-95">
                   前回：約¥{man(prevFuture)}万 → 今回：<b className="font-extrabold">約¥{man(result.future)}万</b>（{result.future >= prevFuture ? "＋" : "−"}約¥{man(Math.abs(result.future - prevFuture))}万）。
                 </p>
               </div>
@@ -865,7 +998,7 @@ export default function AssetConciergeMvp() {
             {inputs.surplus <= 0 && (
               <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">毎月の余力がない状態です</div>
-                <p className="text-[13px] leading-relaxed opacity-95">
+                <p className="text-[14px] leading-relaxed opacity-95">
                   いまの入力では、毎月の投資・貯蓄に回せる金額がありません。固定費の見直しや、下の「住宅ローンの借り換え」の余地が、最初の一歩になります。
                 </p>
               </div>
@@ -876,26 +1009,26 @@ export default function AssetConciergeMvp() {
               <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">住宅ローンの借り換え</div>
                 {mirror.refiRoomYen > 0 ? (
-                  <p className="text-[13px] leading-relaxed opacity-95">
+                  <p className="text-[14px] leading-relaxed opacity-95">
                     あなたの金利<b className="font-extrabold">{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）より高めです。借り換えで<b className="font-extrabold">月々約¥{yen(mirror.refiRoomYen)}</b>軽くでき、残<b className="font-extrabold">{inputs.mYears}年</b>で概算手数料（約¥{man(mirror.refiCostYen)}万）を引いても
                     {mirror.refiNetYen > 0
                       ? <> <b className="font-extrabold">約¥{man(mirror.refiNetYen)}万のメリット</b>が見込めます。</>
                       : <> <b className="font-extrabold">逆ザヤの可能性</b>があります。</>}
                   </p>
                 ) : (
-                  <p className="text-[13px] leading-relaxed opacity-95">
+                  <p className="text-[14px] leading-relaxed opacity-95">
                     あなたの金利<b className="font-extrabold">{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）と同水準かそれより低めです。今の金利では借り換えの余地は小さめです。
                   </p>
                 )}
-                <div className="text-[10px] opacity-75 mt-1">※水準・手数料は概算の内部目安。基準金利は{REFI_BASE}%前提。</div>
+                <div className="text-[11px] opacity-75 mt-1">※水準・手数料は概算の内部目安。基準金利は{REFI_BASE}%前提。</div>
               </div>
             )}
 
             {/* ② 生活防衛資金の目安（living>0のとき） */}
             {mirror.monthsCovered != null && (
               <div className="pt-3.5 border-t border-white/20">
-                <div className="text-[15px] font-extrabold mb-0.5">生活防衛資金の目安</div>
-                <p className="text-[13px] leading-relaxed opacity-95">
+                <div className="text-[15px] font-extrabold mb-0.5">急な出費にそなえるお金（生活防衛資金）</div>
+                <p className="text-[14px] leading-relaxed opacity-95">
                   手元の資産は生活費の<b className="font-extrabold">約{Math.round(mirror.monthsCovered)}ヶ月分</b>。目安の6ヶ月分に対して
                   {mirror.monthsCovered >= 6
                     ? <> <b className="font-extrabold">約{Math.round(mirror.monthsCovered - 6)}ヶ月分（約{man(Math.round(mirror.monthsCovered - 6) * inputs.living)}万円）</b>の余裕があります。</>
@@ -908,7 +1041,7 @@ export default function AssetConciergeMvp() {
             {inputs.surplus > 0 && (
               <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">あと少し増やすと</div>
-                <p className="text-[13px] leading-relaxed opacity-95">
+                <p className="text-[14px] leading-relaxed opacity-95">
                   毎月あと<b className="font-extrabold">¥{yen(SENSITIVITY_STEP_YEN)}</b>を投資に回すと、65歳見込みは<b className="font-extrabold">＋約{man(mirror.sensitivityYen)}万円</b>（想定{inputs.r}%）。
                 </p>
               </div>
@@ -921,10 +1054,10 @@ export default function AssetConciergeMvp() {
             {inputs.surplus > 0 && delayCost && (
               <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">始める時期でこれだけ変わります</div>
-                <p className="text-[13px] leading-relaxed opacity-95">
+                <p className="text-[14px] leading-relaxed opacity-95">
                   いまの配分を<b className="font-extrabold">今月から</b>始めた場合、65歳見込みは<b className="font-extrabold">約¥{yen(delayCost.nowMan)}万</b>。
                 </p>
-                <p className="text-[13px] leading-relaxed opacity-95">
+                <p className="text-[14px] leading-relaxed opacity-95">
                   <b className="font-extrabold">1年後に</b>始めた場合は<b className="font-extrabold">約¥{yen(delayCost.delayMan)}万</b>。
                 </p>
                 <p className="text-[13px] leading-relaxed mt-1.5">
@@ -939,7 +1072,7 @@ export default function AssetConciergeMvp() {
             誇大回避＝個別パーソナライズは約束せず「再計算のきっかけをお知らせ」に留める。GA：shisan_line_click。 */}
         <div className="mt-4 pt-4 border-t border-white/20">
           <div className="text-[15px] font-extrabold mb-1">この診断、覚えておきます</div>
-          <p className="text-[13px] leading-relaxed opacity-95 mb-3">
+          <p className="text-[14px] leading-relaxed opacity-95 mb-3">
             金利や制度が変わったら、あなたの条件で再計算のきっかけをLINEでお知らせします。配信は月1〜2回。
           </p>
           <a href={LINE_ADD_URL} target="_blank" rel="noopener noreferrer"
@@ -957,6 +1090,100 @@ export default function AssetConciergeMvp() {
             この診断をシェアする
           </button>
         )}
+
+        {/* 変更4/5（7/20）：満足度の測定＋回答直後の保存案内。すべて任意・タップのみ。 */}
+        <div className="mt-4 pt-4 border-t border-white/20">
+          <div className="text-[14px] font-extrabold mb-2">この結果は、知りたかったことに答えていましたか？</div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { k: "answered", label: "答えていた" },
+              { k: "partial", label: "少し物足りなかった" },
+              { k: "mismatch", label: "知りたいこととは違った" },
+            ].map((o) => (
+              <button key={o.k} type="button"
+                onClick={() => {
+                  if (satAnswer === o.k) return; // 連打で二重記録しない
+                  setSatAnswer(o.k); setSatReason(null); setSatHelpful(null);
+                  track("shisan_sat_answer", { value: o.k, scenario: scenario ?? "" });
+                  saveSat({ answer: o.k, reason: null, helpful: null });
+                  if (!savePromptViewed.current) { track("shisan_save_prompt_view", { scenario: scenario ?? "" }); savePromptViewed.current = true; }
+                }}
+                className={`px-3 py-2 rounded-full text-[13px] border transition ${satAnswer === o.k ? "bg-white text-emerald-800 border-white font-bold" : "bg-white/10 text-white border-white/40"}`}>{o.label}</button>
+            ))}
+          </div>
+
+          {/* 2問目A：物足りない・違った を選んだ人 */}
+          {(satAnswer === "partial" || satAnswer === "mismatch") && (
+            <div className="mt-3">
+              <div className="text-[13px] font-bold mb-1.5">どんなことが知りたかったですか？</div>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { k: "amount", label: "老後にいくら必要なのか、その金額" },
+                  { k: "steps", label: "これから何をすればいいのか、その手順" },
+                  { k: "comparison", label: "自分の状況が、ほかの人と比べてどうなのか" },
+                  { k: "basis", label: "計算の中身や根拠を、もっとくわしく" },
+                  { k: "other", label: "その他" },
+                ].map((o) => (
+                  <button key={o.k} type="button"
+                    onClick={() => {
+                      if (satReason === o.k) return;
+                      setSatReason(o.k);
+                      track("shisan_sat_reason", { value: o.k, scenario: scenario ?? "" });
+                      saveSat({ reason: o.k });
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-[12px] border transition ${satReason === o.k ? "bg-white text-emerald-800 border-white font-bold" : "bg-white/10 text-white border-white/40"}`}>{o.label}</button>
+                ))}
+              </div>
+              {satReason === "other" && (
+                <div className="mt-2">
+                  <input type="text" value={satFree} maxLength={100}
+                    onChange={(e) => setSatFree(e.target.value)}
+                    onBlur={() => { if (satFree.trim()) saveSat({ free: satFree.trim() }); }}
+                    placeholder="ひとことで結構です"
+                    className="w-full rounded-lg px-3 py-2 text-[13px] text-slate-800" />
+                  <div className="text-[11px] opacity-75 mt-1">お名前や連絡先など、個人が分かる内容は書かないでください。</div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 2問目B：答えていた を選んだ人 */}
+          {satAnswer === "answered" && (
+            <div className="mt-3">
+              <div className="text-[13px] font-bold mb-1.5">どれが役に立ちましたか？</div>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { k: "monthly", label: "毎月いくら必要かの金額" },
+                  { k: "harsh", label: "厳しめの条件で見た結果" },
+                  { k: "compare", label: "条件をかえて見くらべた結果" },
+                  { k: "explanation", label: "結果の下に出てくる説明の文章" },
+                ].map((o) => (
+                  <button key={o.k} type="button"
+                    onClick={() => {
+                      if (satHelpful === o.k) return;
+                      setSatHelpful(o.k);
+                      track("shisan_sat_helpful", { value: o.k, scenario: scenario ?? "" });
+                      saveSat({ helpful: o.k });
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-[12px] border transition ${satHelpful === o.k ? "bg-white text-emerald-800 border-white font-bold" : "bg-white/10 text-white border-white/40"}`}>{o.label}</button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 変更5：回答直後の保存案内（既存のLINEカードは据え置き） */}
+          {satAnswer && (
+            <div className="mt-3 p-3 rounded-lg bg-white/15">
+              <p className="text-[13px] leading-relaxed mb-2">この結果をとっておきますか？ 金利や制度が変わったときに、あなたが入れた内容で計算し直してお知らせします。</p>
+              <a href={LINE_ADD_URL} target="_blank" rel="noopener noreferrer"
+                onClick={() => track("shisan_save_prompt_click", { scenario: scenario ?? "" })}
+                style={{ backgroundColor: "#06C755" }}
+                className="block w-full py-2.5 rounded-xl text-white text-center text-[14px] font-bold hover:opacity-90 transition">
+                LINEで受け取る
+              </a>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ===== シナリオ比較（機能2・7/19）：緑カードの下・第2段の上。2件以上のときのみ表示。 ===== */}
@@ -1057,15 +1284,15 @@ export default function AssetConciergeMvp() {
                 <div className="mt-3 pt-3.5 border-t border-white/20">
                   <div className="text-[15px] font-extrabold mb-0.5">老後に向けて、今できること</div>
                   {sensitivity.oneSided ? (
-                    <p className="text-[13px] leading-relaxed opacity-95">
+                    <p className="text-[14px] leading-relaxed opacity-95">
                       毎月の余力を<b className="font-extrabold">+1万円</b>つくれると、65歳の見込みが<b className="font-extrabold">約¥{yen(sensitivity.man1)}万</b>になります。
                     </p>
                   ) : (
                     <>
-                      <p className="text-[13px] leading-relaxed opacity-95">
+                      <p className="text-[14px] leading-relaxed opacity-95">
                         あなたの65歳時点の見込みは<b className="font-extrabold">約¥{yen(sensitivity.nowMan)}万</b>です。もし毎月の余力を<b className="font-extrabold">+1万円</b>増やせると、見込みは<b className="font-extrabold">約¥{yen(sensitivity.man1)}万</b>に。<b className="font-extrabold">+3万円</b>なら<b className="font-extrabold">約¥{yen(sensitivity.man3)}万</b>まで届きます。
                       </p>
-                      <div className="text-[10px] opacity-75 mt-1">※いまの余力（月{sensitivity.surplusMan}万円）を前提に、追加で積み立てた場合の目安です。</div>
+                      <div className="text-[11px] opacity-75 mt-1">※いまの余力（月{sensitivity.surplusMan}万円）を前提に、追加で積み立てた場合の目安です。</div>
                     </>
                   )}
                 </div>
@@ -1075,7 +1302,7 @@ export default function AssetConciergeMvp() {
               {deepMirror.cashRatio > 0 && (
                 <div className="mt-3 pt-3.5 border-t border-white/20">
                   <div className="text-[15px] font-extrabold mb-0.5">現金とインフレ</div>
-                  <p className="text-[13px] leading-relaxed opacity-95">
+                  <p className="text-[14px] leading-relaxed opacity-95">
                     資産<b className="font-extrabold">{man(inputs.assets)}万円</b>のうち{deepMirror.cashRatio === 1 ? "ほぼ現金" : "半分ほどが現金"}なら、インフレ2%で実質<b className="font-extrabold">年約¥{man(deepMirror.inflationErosionYen)}万</b>の目減り（購買力ベースの目安）。
                   </p>
                 </div>
@@ -1084,7 +1311,7 @@ export default function AssetConciergeMvp() {
               {/* NISA枠（①） */}
               <div className="mt-3 pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">NISAの非課税枠</div>
-                <p className="text-[13px] leading-relaxed opacity-95">
+                <p className="text-[14px] leading-relaxed opacity-95">
                   {deepMirror.nisaTouched
                     ? "新NISAの非課税枠を、使い切れているかが次の論点です。"
                     : <>新NISAの年間非課税枠<b className="font-extrabold">{NISA_ANNUAL_MAN}万円</b>が、まだ使われていません。</>}
@@ -1095,7 +1322,7 @@ export default function AssetConciergeMvp() {
               {deepMirror.untouched.length > 0 && (
                 <div className="mt-3 pt-3.5 border-t border-white/20">
                   <div className="text-[15px] font-extrabold mb-0.5">まだ手をつけていない領域</div>
-                  <p className="text-[13px] leading-relaxed opacity-95">{deepMirror.untouched.map((o) => o.area).join("・")}。</p>
+                  <p className="text-[14px] leading-relaxed opacity-95">{deepMirror.untouched.map((o) => o.area).join("・")}。</p>
                 </div>
               )}
 
@@ -1103,7 +1330,7 @@ export default function AssetConciergeMvp() {
               {deepHousehold && (
                 <div className="mt-3 pt-3.5 border-t border-white/20">
                   <div className="text-[15px] font-extrabold mb-0.5">世帯構成の観点</div>
-                  <p className="text-[13px] leading-relaxed opacity-95">
+                  <p className="text-[14px] leading-relaxed opacity-95">
                     {deepHousehold === "single" && "単身世帯では、生活防衛資金はご自身の生活費が基準です。まずは手元の備えの確認から。"}
                     {deepHousehold === "couple" && "ご夫婦では、二人分の生活費と将来の使い道をあわせて見ると目安が立てやすくなります。"}
                     {deepHousehold === "kids" && "子育て中は、教育費と老後準備の両立が論点です。どちらも「目安」で並べて見ると判断しやすくなります。"}

@@ -644,14 +644,14 @@ export default function AssetConciergeMvp() {
   const scenarioDiff = (cur: ScenarioSnap, prev: ScenarioSnap | undefined): string[] => {
     if (!prev) return [];
     const out: string[] = [];
-    const manOf = (yen: number) => Math.round(yen / 10000).toLocaleString("ja-JP");
+    const manOf = (yenValue: number) => manOku(yenValue);
     if (cur.age !== prev.age) out.push(`年齢 ${prev.age}→${cur.age}歳`);
-    if (cur.income !== prev.income) out.push(`年収 ${manOf(prev.income)}→${manOf(cur.income)}万`);
-    if (cur.assets !== prev.assets) out.push(`資産 ${manOf(prev.assets)}→${manOf(cur.assets)}万`);
-    if (cur.surplus !== prev.surplus) out.push(`余力 ${manOf(prev.surplus)}→${manOf(cur.surplus)}万`);
-    if (cur.living !== prev.living) out.push(`生活費 ${manOf(prev.living)}→${manOf(cur.living)}万`);
+    if (cur.income !== prev.income) out.push(`年収 ${manOf(prev.income)}→${manOf(cur.income)}`);
+    if (cur.assets !== prev.assets) out.push(`資産 ${manOf(prev.assets)}→${manOf(cur.assets)}`);
+    if (cur.surplus !== prev.surplus) out.push(`余力 ${manOf(prev.surplus)}→${manOf(cur.surplus)}`);
+    if (cur.living !== prev.living) out.push(`生活費 ${manOf(prev.living)}→${manOf(cur.living)}`);
     if (cur.r !== prev.r) out.push(`想定リターン ${prev.r}→${cur.r}%`);
-    if (cur.target !== prev.target) out.push(`目標 ${manOf(prev.target)}→${manOf(cur.target)}万`);
+    if (cur.target !== prev.target) out.push(`目標 ${manOf(prev.target)}→${manOf(cur.target)}`);
     if (cur.hasMortgage !== prev.hasMortgage) out.push(`ローン ${prev.hasMortgage ? "有" : "無"}→${cur.hasMortgage ? "有" : "無"}`);
     else if (cur.hasMortgage && cur.mRate !== prev.mRate) out.push(`金利 ${prev.mRate}→${cur.mRate}%`);
     if (cur.childCount !== prev.childCount) out.push(`子 ${prev.childCount}→${cur.childCount}人`);
@@ -1051,8 +1051,8 @@ export default function AssetConciergeMvp() {
                 <p className="text-[14px] leading-relaxed opacity-95">
                   手元の資産は生活費の<b className="font-extrabold">約{Math.round(mirror.monthsCovered)}ヶ月分</b>。目安の6ヶ月分に対して
                   {mirror.monthsCovered >= 6
-                    ? <> <b className="font-extrabold">約{Math.round(mirror.monthsCovered - 6)}ヶ月分（約{man(Math.round(mirror.monthsCovered - 6) * inputs.living)}万円）</b>の余裕があります。</>
-                    : <> <b className="font-extrabold">約{Math.round(6 - mirror.monthsCovered)}ヶ月分（約{man(Math.round(6 - mirror.monthsCovered) * inputs.living)}万円）</b>足りません。</>}
+                    ? <> <b className="font-extrabold">約{Math.round(mirror.monthsCovered - 6)}ヶ月分（約{manOku(Math.round(mirror.monthsCovered - 6) * inputs.living)}円）</b>の余裕があります。</>
+                    : <> <b className="font-extrabold">約{Math.round(6 - mirror.monthsCovered)}ヶ月分（約{manOku(Math.round(6 - mirror.monthsCovered) * inputs.living)}円）</b>足りません。</>}
                 </p>
               </div>
             )}
@@ -1076,13 +1076,13 @@ export default function AssetConciergeMvp() {
               <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">始める時期でこれだけ変わります</div>
                 <p className="text-[14px] leading-relaxed opacity-95">
-                  いまの配分を<b className="font-extrabold">今月から</b>始めた場合、65歳見込みは<b className="font-extrabold">約{yen(delayCost.nowMan)}万円</b>。
+                  いまの配分を<b className="font-extrabold">今月から</b>始めた場合、65歳見込みは<b className="font-extrabold">約{manUnitToOku(delayCost.nowMan)}円</b>。
                 </p>
                 <p className="text-[14px] leading-relaxed opacity-95">
-                  <b className="font-extrabold">1年後に</b>始めた場合は<b className="font-extrabold">約{yen(delayCost.delayMan)}万円</b>。
+                  <b className="font-extrabold">1年後に</b>始めた場合は<b className="font-extrabold">約{manUnitToOku(delayCost.delayMan)}円</b>。
                 </p>
                 <p className="text-[13px] leading-relaxed mt-1.5">
-                  <span className="bg-yellow-300/25 font-extrabold rounded px-1 py-0.5 box-decoration-clone">開始が1年遅れると、約{yen(delayCost.diffMan)}万円の差になります</span>（想定{inputs.r}%）。
+                  <span className="bg-yellow-300/25 font-extrabold rounded px-1 py-0.5 box-decoration-clone">開始が1年遅れると、約{manUnitToOku(delayCost.diffMan)}円の差になります</span>（想定{inputs.r}%）。
                 </p>
               </div>
             )}

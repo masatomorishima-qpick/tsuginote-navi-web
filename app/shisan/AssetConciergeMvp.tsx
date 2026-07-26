@@ -113,15 +113,12 @@ const SCENARIO_MAX = 5;          // 保存するシナリオの最大件数（�
 /* 金額の表示ヘルパー（7/20）：1億以上は「◯億」「◯億◯,◯◯◯万」と表記する（「¥20,000万」を避ける）。
  * 表示のみ・calc.ts は不変。1億未満は従来どおり「◯,◯◯◯万」。 */
 function manOku(yenValue: number): string {
-  const manTotal = Math.round(yenValue / 10000);
-  if (Math.abs(manTotal) < 10000) return `${manTotal.toLocaleString("ja-JP")}万`;
-  const oku = Math.trunc(manTotal / 10000);
-  const rest = Math.abs(manTotal % 10000);
-  return rest === 0 ? `${oku.toLocaleString("ja-JP")}億` : `${oku.toLocaleString("ja-JP")}億${rest.toLocaleString("ja-JP")}万`;
+  return manUnitToOku(Math.round(yenValue / 10000));
 }
 
-/* ===== カウントアップ ===== */
-function CountUp({ value }: { value: number }) {
+/* ===== カウントアップ =====
+ * format を渡すと表示だけ差し替えできる（7/20：億表記のため。アニメーション挙動は不変）。 */
+function CountUp({ value, format }: { value: number; format?: (n: number) => string }) {
   const [disp, setDisp] = useState(value);
   const prev = useRef(value);
   useEffect(() => {
@@ -135,7 +132,14 @@ function CountUp({ value }: { value: number }) {
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
   }, [value]);
-  return <>{disp.toLocaleString("ja-JP")}</>;
+  return <>{format ? format(disp) : disp.toLocaleString("ja-JP")}</>;
+}
+/** 万円単位の数値を「2億5,813万」「1,623万」の形にする（表示専用）。 */
+function manUnitToOku(manTotal: number): string {
+  if (Math.abs(manTotal) < 10000) return `${manTotal.toLocaleString("ja-JP")}万`;
+  const oku = Math.trunc(manTotal / 10000);
+  const rest = Math.abs(manTotal % 10000);
+  return rest === 0 ? `${oku.toLocaleString("ja-JP")}億` : `${oku.toLocaleString("ja-JP")}億${rest.toLocaleString("ja-JP")}万`;
 }
 
 /* ===== UIクラス ===== */
@@ -363,7 +367,8 @@ export default function AssetConciergeMvp() {
     const d = (v ?? "").replace(/[^\d]/g, "");
     if (!d) return "";
     const n = Number(d);
-    return n >= 10000 ? `＝${Math.round(n / 10000).toLocaleString("ja-JP")}万円` : "";
+    // 7/20：1億以上は「＝2億5,813万円」のように億表記（表示のみ・計算は不変）。
+    return n >= 10000 ? `＝${manOku(n)}円` : "";
   };
 
   /* 子の人数→年齢入力欄 */
@@ -902,15 +907,15 @@ export default function AssetConciergeMvp() {
             修正1（2026-07-15）：金額は必ず1行。clamp()で幅に応じ縮小＋whitespace-nowrap、右ブロックは shrink-0。 */}
         <div className="text-[14px] font-bold opacity-90 mb-1">65歳のときの金額（目安）</div>
         <div className="flex justify-between items-end gap-2">
-          <div className="font-extrabold leading-none whitespace-nowrap" style={{ fontSize: "clamp(24px, 7.5vw, 34px)" }}>約¥<CountUp value={result ? Math.round(result.future / 10000) : 0} />万</div>
+          <div className="font-extrabold leading-none whitespace-nowrap" style={{ fontSize: "clamp(24px, 7.5vw, 34px)" }}>約<CountUp value={result ? Math.round(result.future / 10000) : 0} format={manUnitToOku} />円</div>
           <div className="text-right shrink-0">
             <div className="font-extrabold leading-none whitespace-nowrap" style={{ fontSize: "clamp(20px, 6vw, 26px)" }}>{result?.achieve}%</div>
-            <span className="text-[11px] opacity-85 whitespace-nowrap">目標 ¥{inputs ? manOku(inputs.target) : "0万"}</span>
+            <span className="text-[11px] opacity-85 whitespace-nowrap">目標 {inputs ? manOku(inputs.target) : "0万"}円</span>
           </div>
         </div>
         {/* 前提と揺らぎの一行（変更7・7/20：平易化） */}
         <div className="text-[12px] opacity-85 mt-2 leading-relaxed">
-          いま持っている資産が年に{inputs?.r}%ふえたとした場合の目安です。毎月ためるお金は、ふえない前提で計算しています。{result0 && <>ふえなかった場合（0%）は約¥{man(result0.future)}万です。</>}
+          いま持っている資産が年に{inputs?.r}%ふえたとした場合の目安です。毎月ためるお金は、ふえない前提で計算しています。{result0 && <>ふえなかった場合（0%）は約{manOku(result0.future)}円です。</>}
         </div>
 
         {/* 変更2/3（7/20）：目標までに毎月いくら必要か（逆算）。本人が目標を設定した人にだけ表示。 */}
@@ -919,16 +924,16 @@ export default function AssetConciergeMvp() {
             <div className="text-[15px] font-extrabold mb-1">目標までに、毎月いくら必要か</div>
             <p className="text-[13px] leading-relaxed">
               {targetCalc.kind === "short" && (<>
-                目標の<b className="font-extrabold">¥{manOku(inputs.target)}</b>にとどくには、毎月およそ<b className="font-extrabold">¥{yen(targetCalc.needYen)}</b>を貯金や投資にまわす計算です。いまは毎月¥{yen(targetCalc.curYen)}なので、あとおよそ<b className="font-extrabold">¥{yen(targetCalc.gapYen)}</b>になります。
+                目標の<b className="font-extrabold">{manOku(inputs.target)}円</b>にとどくには、毎月およそ<b className="font-extrabold">{yen(targetCalc.needYen)}円</b>を貯金や投資にまわす計算です。いまは毎月{yen(targetCalc.curYen)}円なので、あとおよそ<b className="font-extrabold">{yen(targetCalc.gapYen)}円</b>になります。
               </>)}
               {targetCalc.kind === "enough" && (<>
-                いまのペースなら、目標の<b className="font-extrabold">¥{manOku(inputs.target)}</b>にとどく見通しです。毎月およそ<b className="font-extrabold">¥{yen(targetCalc.needYen)}</b>まで減らしても、目標にはとどく計算になります。
+                いまのペースなら、目標の<b className="font-extrabold">{manOku(inputs.target)}円</b>にとどく見通しです。毎月およそ<b className="font-extrabold">{yen(targetCalc.needYen)}円</b>まで減らしても、目標にはとどく計算になります。
               </>)}
               {targetCalc.kind === "assets_only" && (<>
-                いま持っている資産だけで、目標の<b className="font-extrabold">¥{manOku(inputs.target)}</b>にとどく見通しです。毎月の貯金や投資を続けなくても、計算のうえでは目標に届きます。
+                いま持っている資産だけで、目標の<b className="font-extrabold">{manOku(inputs.target)}円</b>にとどく見通しです。毎月の貯金や投資を続けなくても、計算のうえでは目標に届きます。
               </>)}
               {targetCalc.kind === "unreachable" && (<>
-                毎月の貯金や投資をふやしても、65歳までに目標の<b className="font-extrabold">¥{manOku(inputs.target)}</b>にとどくのは難しい計算になりました。目標の金額を見直したり、目標の年齢を先にのばすことも考えられます。
+                毎月の貯金や投資をふやしても、65歳までに目標の<b className="font-extrabold">{manOku(inputs.target)}円</b>にとどくのは難しい計算になりました。目標の金額を見直したり、目標の年齢を先にのばすことも考えられます。
               </>)}
             </p>
             <div className="text-[11px] opacity-75 mt-1">
@@ -983,7 +988,7 @@ export default function AssetConciergeMvp() {
             {harshOpen && (
               <div className="mt-2 p-3 rounded-lg bg-white/15 text-[12px] leading-relaxed">
                 <div className="font-extrabold text-[13px] mb-0.5">厳しめ（リターン0%・余力2割減）</div>
-                65歳見込みは<b className="font-extrabold">約¥{man(harsh.future)}万</b>（達成率<b className="font-extrabold">{harsh.achieve}%</b>）。通常条件（想定{inputs?.r}%・余力そのまま）との差は<b className="font-extrabold">約¥{yen(harsh.diffMan)}万</b>。
+                65歳見込みは<b className="font-extrabold">約{manOku(harsh.future)}円</b>（達成率<b className="font-extrabold">{harsh.achieve}%</b>）。通常条件（想定{inputs?.r}%・余力そのまま）との差は<b className="font-extrabold">約{yen(harsh.diffMan)}万円</b>。
                 <div className="opacity-75 mt-1 text-[10px]">※想定外の支出などに備え、想定リターン0%かつ毎月の余力を8割にした試算です（目安）。</div>
               </div>
             )}
@@ -1005,7 +1010,7 @@ export default function AssetConciergeMvp() {
               <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">前回との差</div>
                 <p className="text-[14px] leading-relaxed opacity-95">
-                  前回：約¥{man(prevFuture)}万 → 今回：<b className="font-extrabold">約¥{man(result.future)}万</b>（{result.future >= prevFuture ? "＋" : "−"}約¥{man(Math.abs(result.future - prevFuture))}万）。
+                  前回：約{manOku(prevFuture)}円 → 今回：<b className="font-extrabold">約{manOku(result.future)}円</b>（{result.future >= prevFuture ? "＋" : "−"}約{manOku(Math.abs(result.future - prevFuture))}円）。
                 </p>
               </div>
             )}
@@ -1025,9 +1030,9 @@ export default function AssetConciergeMvp() {
                 <div className="text-[15px] font-extrabold mb-0.5">住宅ローンの借り換え</div>
                 {mirror.refiRoomYen > 0 ? (
                   <p className="text-[14px] leading-relaxed opacity-95">
-                    あなたの金利<b className="font-extrabold">{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）より高めです。借り換えで<b className="font-extrabold">月々約¥{yen(mirror.refiRoomYen)}</b>軽くでき、残<b className="font-extrabold">{inputs.mYears}年</b>で概算手数料（約¥{man(mirror.refiCostYen)}万）を引いても
+                    あなたの金利<b className="font-extrabold">{inputs.mRate}%</b>は、現在の借り換え水準（{MARKET_RATE_BAND}）より高めです。借り換えで<b className="font-extrabold">月々約{yen(mirror.refiRoomYen)}円</b>軽くでき、残<b className="font-extrabold">{inputs.mYears}年</b>で概算手数料（約{man(mirror.refiCostYen)}万円）を引いても
                     {mirror.refiNetYen > 0
-                      ? <> <b className="font-extrabold">約¥{man(mirror.refiNetYen)}万のメリット</b>が見込めます。</>
+                      ? <> <b className="font-extrabold">約{man(mirror.refiNetYen)}万円のメリット</b>が見込めます。</>
                       : <> <b className="font-extrabold">逆ザヤの可能性</b>があります。</>}
                   </p>
                 ) : (
@@ -1057,7 +1062,7 @@ export default function AssetConciergeMvp() {
               <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">あと少し増やすと</div>
                 <p className="text-[14px] leading-relaxed opacity-95">
-                  毎月あと<b className="font-extrabold">¥{yen(SENSITIVITY_STEP_YEN)}</b>をためると、65歳のときの金額は<b className="font-extrabold">＋約{man(mirror.sensitivityYen)}万円</b>になります。
+                  毎月あと<b className="font-extrabold">{yen(SENSITIVITY_STEP_YEN)}円</b>をためると、65歳のときの金額は<b className="font-extrabold">＋約{man(mirror.sensitivityYen)}万円</b>になります。
                 </p>
                 <div className="text-[11px] opacity-75 mt-1">※毎月ためるお金は、ふえない前提の計算です。</div>
               </div>
@@ -1071,13 +1076,13 @@ export default function AssetConciergeMvp() {
               <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">始める時期でこれだけ変わります</div>
                 <p className="text-[14px] leading-relaxed opacity-95">
-                  いまの配分を<b className="font-extrabold">今月から</b>始めた場合、65歳見込みは<b className="font-extrabold">約¥{yen(delayCost.nowMan)}万</b>。
+                  いまの配分を<b className="font-extrabold">今月から</b>始めた場合、65歳見込みは<b className="font-extrabold">約{yen(delayCost.nowMan)}万円</b>。
                 </p>
                 <p className="text-[14px] leading-relaxed opacity-95">
-                  <b className="font-extrabold">1年後に</b>始めた場合は<b className="font-extrabold">約¥{yen(delayCost.delayMan)}万</b>。
+                  <b className="font-extrabold">1年後に</b>始めた場合は<b className="font-extrabold">約{yen(delayCost.delayMan)}万円</b>。
                 </p>
                 <p className="text-[13px] leading-relaxed mt-1.5">
-                  <span className="bg-yellow-300/25 font-extrabold rounded px-1 py-0.5 box-decoration-clone">開始が1年遅れると、約¥{yen(delayCost.diffMan)}万の差になります</span>（想定{inputs.r}%）。
+                  <span className="bg-yellow-300/25 font-extrabold rounded px-1 py-0.5 box-decoration-clone">開始が1年遅れると、約{yen(delayCost.diffMan)}万円の差になります</span>（想定{inputs.r}%）。
                 </p>
               </div>
             )}
@@ -1229,7 +1234,7 @@ export default function AssetConciergeMvp() {
                     <button type="button" onClick={() => deleteScenario(s.id)} className="text-[11px] text-slate-300 hover:text-slate-500 shrink-0">削除</button>
                   </div>
                   <div className="flex items-baseline gap-3 mt-1.5">
-                    <div className="text-[17px] font-extrabold text-emerald-900">約¥{man(s.future)}万</div>
+                    <div className="text-[17px] font-extrabold text-emerald-900">約{manOku(s.future)}円</div>
                     <div className="text-[12px] text-slate-500">達成率 {s.achieve}%</div>
                   </div>
                 </div>
@@ -1301,12 +1306,12 @@ export default function AssetConciergeMvp() {
                   <div className="text-[15px] font-extrabold mb-0.5">老後に向けて、今できること</div>
                   {sensitivity.oneSided ? (
                     <p className="text-[14px] leading-relaxed opacity-95">
-                      毎月の余力を<b className="font-extrabold">+1万円</b>つくれると、65歳の見込みが<b className="font-extrabold">約¥{yen(sensitivity.man1)}万</b>になります。
+                      毎月の余力を<b className="font-extrabold">+1万円</b>つくれると、65歳の見込みが<b className="font-extrabold">約{yen(sensitivity.man1)}万円</b>になります。
                     </p>
                   ) : (
                     <>
                       <p className="text-[14px] leading-relaxed opacity-95">
-                        あなたの65歳時点の見込みは<b className="font-extrabold">約¥{yen(sensitivity.nowMan)}万</b>です。もし毎月の余力を<b className="font-extrabold">+1万円</b>増やせると、見込みは<b className="font-extrabold">約¥{yen(sensitivity.man1)}万</b>に。<b className="font-extrabold">+3万円</b>なら<b className="font-extrabold">約¥{yen(sensitivity.man3)}万</b>まで届きます。
+                        あなたの65歳時点の見込みは<b className="font-extrabold">約{yen(sensitivity.nowMan)}万円</b>です。もし毎月の余力を<b className="font-extrabold">+1万円</b>増やせると、見込みは<b className="font-extrabold">約{yen(sensitivity.man1)}万円</b>に。<b className="font-extrabold">+3万円</b>なら<b className="font-extrabold">約{yen(sensitivity.man3)}万円</b>まで届きます。
                       </p>
                       <div className="text-[11px] opacity-75 mt-1">※いまの余力（月{sensitivity.surplusMan}万円）を前提に、追加で積み立てた場合の目安です。</div>
                     </>
@@ -1319,7 +1324,7 @@ export default function AssetConciergeMvp() {
                 <div className="mt-3 pt-3.5 border-t border-white/20">
                   <div className="text-[15px] font-extrabold mb-0.5">現金とインフレ</div>
                   <p className="text-[14px] leading-relaxed opacity-95">
-                    資産<b className="font-extrabold">{man(inputs.assets)}万円</b>のうち{deepMirror.cashRatio === 1 ? "ほぼ現金" : "半分ほどが現金"}なら、インフレ2%で実質<b className="font-extrabold">年約¥{man(deepMirror.inflationErosionYen)}万</b>の目減り（購買力ベースの目安）。
+                    資産<b className="font-extrabold">{man(inputs.assets)}万円</b>のうち{deepMirror.cashRatio === 1 ? "ほぼ現金" : "半分ほどが現金"}なら、インフレ2%で実質<b className="font-extrabold">年約{man(deepMirror.inflationErosionYen)}万円</b>の目減り（購買力ベースの目安）。
                   </p>
                 </div>
               )}
@@ -1450,7 +1455,7 @@ function BucketPanel({ id, inputs, n, onDecide, onSetR }: { id: BucketId; inputs
   if (id === "liq") {
     const target = inputs.living * 6;
     return (<>
-      <div className={box}>生活防衛資金の目安＝生活費6ヶ月分＝<b>¥{yen(target)}</b>。<br />一般に「投資や繰上げより先に確保」と言われますが、決めるのはあなたです。</div>
+      <div className={box}>生活防衛資金の目安＝生活費6ヶ月分＝<b>{yen(target)}円</b>。<br />一般に「投資や繰上げより先に確保」と言われますが、決めるのはあなたです。</div>
       <div className={choices}>
         <button className={cbtn} onClick={() => onDecide("確保している/する")}>確保している / する</button>
         <button className={cbtnGray} onClick={() => onDecide("今は見送る")}>今は見送る</button>
@@ -1464,12 +1469,12 @@ function BucketPanel({ id, inputs, n, onDecide, onSetR }: { id: BucketId; inputs
     return (<>
       <div className={box}>
         想定する進路：<b>{planLabel[inputs.eduPlan]}</b>（子1人あたり・文科省データ等の目安）。<br />
-        子{inputs.childAges.length}人ぶんを大学入学（18歳）までに用意するには、<b>約¥{yen(monthly)}/月</b>の積立が必要（目安）。<br />
+        子{inputs.childAges.length}人ぶんを大学入学（18歳）までに用意するには、<b>約{yen(monthly)}円/月</b>の積立が必要（目安）。<br />
         ＝必要額 ÷ 入学までの残月数。<b>いくら積むかを決めてください。</b>
       </div>
       <p className={note}>※「いくら必要か・いつまでか」だけを出します。どの商品で積むか（学資保険など）には踏み込みません。</p>
       <div className={choices}>
-        <button className={cbtn} onClick={() => onDecide("必要額を積む")}>必要額（¥{yen(monthly)}/月）を積む</button>
+        <button className={cbtn} onClick={() => onDecide("必要額を積む")}>必要額（{yen(monthly)}円/月）を積む</button>
         <button className={cbtn} onClick={() => onDecide("一部を積む")}>一部を積む</button>
         <button className={cbtnGray} onClick={() => onDecide("今は積まない")}>今は積まない</button>
       </div>
@@ -1481,11 +1486,11 @@ function BucketPanel({ id, inputs, n, onDecide, onSetR }: { id: BucketId; inputs
     return (<>
       <div className={box}>
         <div className="text-[11px] text-slate-500 mb-1">この試算は基準金利 {REFI_BASE}% を前提にしています（内部目安）。</div>
-        現在 <b>{inputs.mRate}%</b> → 基準 <b>{REFI_BASE}%</b> に借り換えた場合（残高¥{man(inputs.mBal)}万・残{inputs.mYears}年）：<br />
+        現在 <b>{inputs.mRate}%</b> → 基準 <b>{REFI_BASE}%</b> に借り換えた場合（残高{man(inputs.mBal)}万円・残{inputs.mYears}年）：<br />
         {refi && refi.dMonthly > 0 ? (<>
-          ・月々の返済：<b>¥{yen(refi.dMonthly)}/月 減</b><br />
-          ・総支払利息：<b>約¥{man(refi.dInterest)}万 減</b><br />
-          ・諸費用：約¥{man(refi.cost)}万 → <b>{isFinite(refi.months) ? refi.months : "—"}ヶ月で回収</b>
+          ・月々の返済：<b>{yen(refi.dMonthly)}円/月 減</b><br />
+          ・総支払利息：<b>約{man(refi.dInterest)}万円 減</b><br />
+          ・諸費用：約{man(refi.cost)}万円 → <b>{isFinite(refi.months) ? refi.months : "—"}ヶ月で回収</b>
         </>) : "現在の金利は基準より低く、借り換えの余地は小さいようです。"}
       </div>
       <p className={note}>※「得/損」は判定しません。事実（いくら減り、諸費用を何ヶ月で回収するか）だけを出します。金利が下がっても必ず得とは限りません。</p>
@@ -1506,8 +1511,8 @@ function BucketPanel({ id, inputs, n, onDecide, onSetR }: { id: BucketId; inputs
         数字の大小：ローン金利 <b>{i}%</b> ／ 想定リターン <b>{r}%</b>。<br />
         {i > r ? "数字上は繰上げ側が出発点。" : i < r ? "数字上は投資側が出発点。" : "ほぼ拮抗。"}
         <div className="mt-2 text-[13px]">
-          ・余力（年¥{man(inputs.surplus * 12)}万）を<b>繰上げ</b>に回すと利息 <b>約¥{man(comp)}万</b> 圧縮（確定）。<br />
-          ・同じ額を<b>投資</b>に回すと65歳で <b>約¥{man(invFuture)}万</b>（想定{r}%・不確実）。
+          ・余力（年{man(inputs.surplus * 12)}万円）を<b>繰上げ</b>に回すと利息 <b>約{man(comp)}万円</b> 圧縮（確定）。<br />
+          ・同じ額を<b>投資</b>に回すと65歳で <b>約{man(invFuture)}万円</b>（想定{r}%・不確実）。
         </div>
       </div>
       <p className={note}>※これは数字の大小であって正解ではありません。繰上げ＝確実・無リスク・流動性低下／投資＝期待値は高いが不確実。どちらを重視するかはあなた次第。方向は評価しません。</p>
@@ -1533,7 +1538,7 @@ function BucketPanel({ id, inputs, n, onDecide, onSetR }: { id: BucketId; inputs
   return (<>
     <div className={box}>
       新NISAの年間非課税枠は <b>360万円</b>（つみたて投資枠＋成長投資枠）。<br />
-      あなたの毎月の投資・貯蓄余力 ¥{yen(inputs.surplus)} を年換算すると ¥{man(annualInvest)}万（枠の約{used}%）。<br />
+      あなたの毎月の投資・貯蓄余力 {yen(inputs.surplus)}円 を年換算すると {man(annualInvest)}万円（枠の約{used}%）。<br />
       枠を使うか、今は使わないかを決めてください。
     </div>
     <p className={note}>※一般的な制度の説明のみ。特定の商品名や金融機関は出しません。</p>

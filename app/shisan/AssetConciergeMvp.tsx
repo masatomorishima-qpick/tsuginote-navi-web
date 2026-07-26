@@ -110,6 +110,16 @@ const SCENARIO_MAX = 5;          // 保存するシナリオの最大件数（�
 
 /* ===== 計測は lib/shisan/track.ts に共有化（Phase1）。冒頭でimport ===== */
 
+/* 金額の表示ヘルパー（7/20）：1億以上は「◯億」「◯億◯,◯◯◯万」と表記する（「¥20,000万」を避ける）。
+ * 表示のみ・calc.ts は不変。1億未満は従来どおり「◯,◯◯◯万」。 */
+function manOku(yenValue: number): string {
+  const manTotal = Math.round(yenValue / 10000);
+  if (Math.abs(manTotal) < 10000) return `${manTotal.toLocaleString("ja-JP")}万`;
+  const oku = Math.trunc(manTotal / 10000);
+  const rest = Math.abs(manTotal % 10000);
+  return rest === 0 ? `${oku.toLocaleString("ja-JP")}億` : `${oku.toLocaleString("ja-JP")}億${rest.toLocaleString("ja-JP")}万`;
+}
+
 /* ===== カウントアップ ===== */
 function CountUp({ value }: { value: number }) {
   const [disp, setDisp] = useState(value);
@@ -895,7 +905,7 @@ export default function AssetConciergeMvp() {
           <div className="font-extrabold leading-none whitespace-nowrap" style={{ fontSize: "clamp(24px, 7.5vw, 34px)" }}>約¥<CountUp value={result ? Math.round(result.future / 10000) : 0} />万</div>
           <div className="text-right shrink-0">
             <div className="font-extrabold leading-none whitespace-nowrap" style={{ fontSize: "clamp(20px, 6vw, 26px)" }}>{result?.achieve}%</div>
-            <span className="text-[11px] opacity-85 whitespace-nowrap">目標 ¥{inputs ? man(inputs.target) : 0}万</span>
+            <span className="text-[11px] opacity-85 whitespace-nowrap">目標 ¥{inputs ? manOku(inputs.target) : "0万"}</span>
           </div>
         </div>
         {/* 前提と揺らぎの一行（変更7・7/20：平易化） */}
@@ -909,22 +919,24 @@ export default function AssetConciergeMvp() {
             <div className="text-[15px] font-extrabold mb-1">目標までに、毎月いくら必要か</div>
             <p className="text-[13px] leading-relaxed">
               {targetCalc.kind === "short" && (<>
-                目標の<b className="font-extrabold">¥{man(inputs.target)}万</b>にとどくには、毎月およそ<b className="font-extrabold">¥{yen(targetCalc.needYen)}</b>を貯金や投資にまわす計算です。いまは毎月¥{yen(targetCalc.curYen)}なので、あとおよそ<b className="font-extrabold">¥{yen(targetCalc.gapYen)}</b>になります。
+                目標の<b className="font-extrabold">¥{manOku(inputs.target)}</b>にとどくには、毎月およそ<b className="font-extrabold">¥{yen(targetCalc.needYen)}</b>を貯金や投資にまわす計算です。いまは毎月¥{yen(targetCalc.curYen)}なので、あとおよそ<b className="font-extrabold">¥{yen(targetCalc.gapYen)}</b>になります。
               </>)}
               {targetCalc.kind === "enough" && (<>
-                いまのペースなら、目標の<b className="font-extrabold">¥{man(inputs.target)}万</b>にとどく見通しです。毎月およそ<b className="font-extrabold">¥{yen(targetCalc.needYen)}</b>まで減らしても、目標にはとどく計算になります。
+                いまのペースなら、目標の<b className="font-extrabold">¥{manOku(inputs.target)}</b>にとどく見通しです。毎月およそ<b className="font-extrabold">¥{yen(targetCalc.needYen)}</b>まで減らしても、目標にはとどく計算になります。
               </>)}
               {targetCalc.kind === "assets_only" && (<>
-                いま持っている資産だけで、目標の<b className="font-extrabold">¥{man(inputs.target)}万</b>にとどく見通しです。毎月の貯金や投資を続けなくても、計算のうえでは目標に届きます。
+                いま持っている資産だけで、目標の<b className="font-extrabold">¥{manOku(inputs.target)}</b>にとどく見通しです。毎月の貯金や投資を続けなくても、計算のうえでは目標に届きます。
               </>)}
               {targetCalc.kind === "unreachable" && (<>
-                毎月の貯金や投資をふやしても、65歳までに目標の<b className="font-extrabold">¥{man(inputs.target)}万</b>にとどくのは難しい計算になりました。目標の金額を見直したり、目標の年齢を先にのばすことも考えられます。
+                毎月の貯金や投資をふやしても、65歳までに目標の<b className="font-extrabold">¥{manOku(inputs.target)}</b>にとどくのは難しい計算になりました。目標の金額を見直したり、目標の年齢を先にのばすことも考えられます。
               </>)}
             </p>
             <div className="text-[11px] opacity-75 mt-1">
-              {targetCalc.kind === "short" || targetCalc.kind === "enough"
+              {targetCalc.kind === "short"
                 ? "※毎月ためるお金がふえない前提で計算しているため、多めの金額になっています。あくまで目安です。"
-                : "※あくまで目安の計算です。"}
+                : targetCalc.kind === "enough"
+                  ? "※毎月ためるお金がふえない前提で計算しているため、余裕は少なめに見ています。あくまで目安です。"
+                  : "※あくまで目安の計算です。"}
             </div>
           </div>
         ) : (

@@ -654,10 +654,9 @@ export default function AssetConciergeMvp() {
   /* 入力の鏡（変更2・全面改善 2026-07-14）：追加入力なし・既存の計算式の派生のみ。
    *  a. 住宅ローン金利の市場比較（借り換え余地＝既存 refinance を流用）
    *  b. 生活防衛資金（手元資産÷月間生活費。目安6ヶ月）
-   *  c. 感度の一行（毎月+¥10,000を投資に回したときの65歳増分＝既存の複利 annFactor） */
+   *  c. 感度の一行（毎月+¥10,000をためたときの65歳増分。7/20：独自の複利式をやめ、エンジン経由の差分に統一） */
   const mirror = useMemo(() => {
     if (!inputs) return null;
-    const n = Math.max(0, RET_AGE - inputs.age);
     const refi = inputs.hasMortgage && inputs.mBal > 0
       ? refinance(inputs.mBal, inputs.mRate, inputs.mYears) : null;
     const refiRoomYen = refi ? Math.round(refi.dMonthly) : 0;
@@ -665,9 +664,13 @@ export default function AssetConciergeMvp() {
     const refiCostYen = refi ? Math.round(refi.cost) : 0;
     const refiNetYen = refi ? Math.round(refi.dInterest - refi.cost) : 0;
     const monthsCovered = inputs.living > 0 ? inputs.assets / inputs.living : null;
-    const sensitivityYen = SENSITIVITY_STEP_YEN * 12 * annFactor(n, inputs.r / 100);
+    // 7/20：独自の複利式（annFactor）をやめ、本体と同じエンジン経由の差分に統一。
+    // 毎月ためるお金は本体でも「ふえない前提」のため、表示と再診断結果が必ず一致する。
+    const baseFuture = computeResult(inputs, decisions)?.future ?? 0;
+    const plusFuture = computeResult({ ...inputs, surplus: inputs.surplus + SENSITIVITY_STEP_YEN }, decisions)?.future ?? 0;
+    const sensitivityYen = Math.max(0, plusFuture - baseFuture);
     return { hasLoan: !!refi, refiRoomYen, refiCostYen, refiNetYen, monthsCovered, sensitivityYen };
-  }, [inputs]);
+  }, [inputs, decisions]);
 
   const setR = (v: number) => {
     if (!inputs) return;
@@ -1042,8 +1045,9 @@ export default function AssetConciergeMvp() {
               <div className="pt-3.5 border-t border-white/20">
                 <div className="text-[15px] font-extrabold mb-0.5">あと少し増やすと</div>
                 <p className="text-[14px] leading-relaxed opacity-95">
-                  毎月あと<b className="font-extrabold">¥{yen(SENSITIVITY_STEP_YEN)}</b>を投資に回すと、65歳見込みは<b className="font-extrabold">＋約{man(mirror.sensitivityYen)}万円</b>（想定{inputs.r}%）。
+                  毎月あと<b className="font-extrabold">¥{yen(SENSITIVITY_STEP_YEN)}</b>をためると、65歳のときの金額は<b className="font-extrabold">＋約{man(mirror.sensitivityYen)}万円</b>になります。
                 </p>
+                <div className="text-[11px] opacity-75 mt-1">※毎月ためるお金は、ふえない前提の計算です。</div>
               </div>
             )}
 

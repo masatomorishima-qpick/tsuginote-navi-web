@@ -1,0 +1,25 @@
+# つぎの手ナビ
+
+> 家計と住宅ローンの判断を、入力された数字にもとづく試算で支援するサイトです。特定の金融機関・金融商品の推奨や、投資助言・販売勧誘は行いません。すべて目安の計算です。
+
+運営：Blue Adventures（https://www.tsuginotenavi.jp/company）
+
+## 診断ツール
+
+- [資産づくり診断](https://www.tsuginotenavi.jp/shisan): 年齢・収入・資産・毎月の余力・住宅ローンなどを入力すると、65歳時点の金額の目安、目標までに毎月いくら必要か（逆算）、厳しめの条件で見た場合、住宅ローンの借り換えで軽くできる金額の目安などを表示します。登録不要。
+
+## 住宅ローン
+
+- [住宅ローンの判断に迷ったら](https://www.tsuginotenavi.jp/loan): 住宅ローンで迷いやすい判断をまとめたページ。
+- [住宅ローンは変動と固定どちらがいいか](https://www.tsuginotenavi.jp/loan/hendo-kotei): 2026年7月時点で変動は年1%前後、全期間固定（フラット35）は3.14%。すでに変動で借りている人が固定へ切り替えた場合に月々いくら増えるか、変動が何%まで上がると総支払額が並ぶか（分岐点は残り30年で約3.3%、残り10年で約3.6%）を、残高・残り年数別の表で示しています。借り換え費用は事務手数料2.2%＋登記費用など10万円で概算。
+
+## 役立ちガイド
+
+- [役立ちガイド](https://www.tsuginotenavi.jp/guide): デジタルの整理、パスワード・認証の管理、家族間の情報共有、資産・お金の管理などの解説記事。
+- [保険契約の一覧表をエクセルで作る方法](https://www.tsuginotenavi.jp/guide/shisan-kanri/hoken-ichiran-excel): 無料テンプレート付き。
+
+## サイト情報
+
+- [プライバシーポリシー](https://www.tsuginotenavi.jp/privacy)
+- [利用規約](https://www.tsuginotenavi.jp/terms)
+- [運営会社・お問い合わせ](https://www.tsuginotenavi.jp/company)

@@ -11,7 +11,24 @@
 
 /* ===== 定数 ===== */
 export const RET_AGE = 65;
-export const REFI_BASE = 0.7; // 借り換え試算の内部基準金利(%)・画面に明示・手動更新可
+/* 借り換え試算の内部基準金利(%)。画面に明示・手動更新可。
+ * 2026-07-28：0.7% → 1.0% に更新。2026年7月時点の変動金利の実勢（ネット銀行0.9〜1.0%台。
+ * 住信SBIネット銀行0.990%、楽天銀行の借り換え1.224%、ソニー銀行1.347%）にもとづく。
+ * 金利環境の変化に応じて手動更新する。 */
+export const REFI_BASE = 1.0;
+/** 画面表示用の市場水準の表記。基準金利と同じ場所で管理し、計算と表示がずれないようにする。 */
+export const REFI_MARKET_BAND = "変動0.9〜1.0%台";
+/* 借り換え諸費用の概算（2026-07-28 修正）。将来の税率改定・相場変動に備え一箇所に集約する。
+ * 内訳（借入額に比例する分＝REFI_COST_RATE）：
+ *   ・事務手数料 2.2%
+ *   ・抵当権設定の登録免許税 0.4%（住宅取得時の軽減税率0.1%は「新築または取得後1年以内の登記」が要件のため、
+ *     借り換えには適用されない。原則どおり0.4%で計算する）
+ * 内訳（定額分＝REFI_COST_FIXED）：
+ *   ・抵当権抹消の登録免許税 2,000円（不動産2個）
+ *   ・司法書士報酬 70,000円（相場5〜10万円の中央値）
+ *   ・印紙税 20,000円（借入額1,000万円超5,000万円以下） */
+export const REFI_COST_RATE = 0.026;   // 2.2% + 0.4%
+export const REFI_COST_FIXED = 92000;  // 2,000 + 70,000 + 20,000
 export const EDU_PLANS = { kokukou: 400, shibun: 550, shiri: 700 } as const; // 万円・目安
 export type EduPlan = keyof typeof EDU_PLANS;
 export const SURPLUS_THIN = 30000; // 円/月・余力が薄いライン（仮）
@@ -73,7 +90,7 @@ export function refinance(B: number, curRate: number, years: number) {
   const mNew = loanPayment(B, REFI_BASE, years);
   const dMonthly = Math.max(0, mNow - mNew);
   const dInterest = Math.max(0, totalInterest(B, curRate, years) - totalInterest(B, REFI_BASE, years));
-  const cost = Math.round(B * 0.022 + 100000); // 諸費用概算（事務手数料2.2%＋登記等10万）
+  const cost = Math.round(B * REFI_COST_RATE + REFI_COST_FIXED); // 諸費用概算（内訳は定数の定義を参照）
   const months = dMonthly > 0 ? Math.ceil(cost / dMonthly) : Infinity;
   return { mNow, mNew, dMonthly, dInterest, cost, months };
 }

@@ -20,7 +20,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 /* 計算エンジンは共有モジュール（Phase1 §6：クライアントとchat APIの両方から参照） */
 import {
-  RET_AGE, REFI_BASE, type EduPlan, SCENARIO_PHASE, BUCKET_LABEL,
+  RET_AGE, REFI_BASE, REFI_MARKET_BAND, type EduPlan, SCENARIO_PHASE, BUCKET_LABEL,
   type Inputs, type BucketId, type Decision,
   yen, man, annFactor, prepayCompression, refinance, eduMonthly,
   judgeScenario, deriveBuckets, computeResult, surplusBand,
@@ -99,7 +99,8 @@ const NISA_ANNUAL_MAN = 360;
 
 /* 入力の鏡（全面改善 2026-07-14）用の定数。追加入力なし・既存計算の派生のみ。 */
 // 借り換えの市場水準（表示用の内部目安・手動更新可。実際の借り換え試算は calc.ts の REFI_BASE を使用）。
-const MARKET_RATE_BAND = "変動0.3〜0.5%台";
+// 2026-07-28：市場水準の表記は calc.ts（基準金利と同じ場所）で管理し、計算と表示がずれないようにする。
+const MARKET_RATE_BAND = REFI_MARKET_BAND;
 // 感度の一行「毎月あと¥X 増やすと」の刻み。
 const SENSITIVITY_STEP_YEN = 10000;
 
@@ -1041,6 +1042,10 @@ export default function AssetConciergeMvp() {
                   </p>
                 )}
                 <div className="text-[11px] opacity-75 mt-1">※水準・手数料は概算の内部目安。基準金利は{REFI_BASE}%前提。</div>
+                {/* 内部リンク（2026-07-28）：解説記事へ。カードの表示・計算・GAイベントは変更していない。 */}
+                <Link href="/loan/hendo-kotei" className="mt-1.5 inline-block text-[13px] font-bold underline underline-offset-2 hover:opacity-80">
+                  変動金利のままでいいか迷っている方はこちら →
+                </Link>
               </div>
             )}
 

@@ -11,6 +11,12 @@ export default function SiteFooter() {
             <Link href="/login?next=/digital" className="hover:text-slate-700">
               デジタル資産の整理
             </Link>
+            {/* 2026-07-29 追加：/loan 配下がサイト内のどこからもHTMLのリンクで辿れない状態
+                （/shisan 側の導線はJSで描画されるためクローラーに見えない）だったため、
+                共通フッターに入口を置く。サーバー出力のHTMLに href="/loan" が必ず含まれる。 */}
+            <Link href="/loan" className="hover:text-slate-700">
+              住宅ローンの判断
+            </Link>
             <Link href="/guide" className="hover:text-slate-700">
               役立ちガイド
             </Link>

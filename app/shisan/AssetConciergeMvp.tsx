@@ -26,6 +26,7 @@ import {
   judgeScenario, deriveBuckets, computeResult, surplusBand,
 } from "@/lib/shisan/calc";
 import { track } from "@/lib/shisan/track";
+import { manOku, manUnitToOku, manHint } from "@/lib/shisan/format";
 import { ExecuteReportPanel, type ExecReportProps, type ReportSaveResult } from "./ExecuteReportPanel";
 
 /* ===== 定数 ===== */
@@ -112,10 +113,8 @@ const SCENARIO_MAX = 5;          // 保存するシナリオの最大件数（�
 /* ===== 計測は lib/shisan/track.ts に共有化（Phase1）。冒頭でimport ===== */
 
 /* 金額の表示ヘルパー（7/20）：1億以上は「◯億」「◯億◯,◯◯◯万」と表記する（「¥20,000万」を避ける）。
- * 表示のみ・calc.ts は不変。1億未満は従来どおり「◯,◯◯◯万」。 */
-function manOku(yenValue: number): string {
-  return manUnitToOku(Math.round(yenValue / 10000));
-}
+ * 表示のみ・calc.ts は不変。1億未満は従来どおり「◯,◯◯◯万」。
+ * 7/29：/loan の計算ツールと共用するため lib/shisan/format.ts へ移設（ロジックは不変）。 */
 
 /* ===== カウントアップ =====
  * format を渡すと表示だけ差し替えできる（7/20：億表記のため。アニメーション挙動は不変）。 */
@@ -135,14 +134,6 @@ function CountUp({ value, format }: { value: number; format?: (n: number) => str
   }, [value]);
   return <>{format ? format(disp) : disp.toLocaleString("ja-JP")}</>;
 }
-/** 万円単位の数値を「2億5,813万」「1,623万」の形にする（表示専用）。 */
-function manUnitToOku(manTotal: number): string {
-  if (Math.abs(manTotal) < 10000) return `${manTotal.toLocaleString("ja-JP")}万`;
-  const oku = Math.trunc(manTotal / 10000);
-  const rest = Math.abs(manTotal % 10000);
-  return rest === 0 ? `${oku.toLocaleString("ja-JP")}億` : `${oku.toLocaleString("ja-JP")}億${rest.toLocaleString("ja-JP")}万`;
-}
-
 /* ===== UIクラス ===== */
 const card = "bg-white border border-slate-200 rounded-2xl shadow-sm p-5 mb-4";
 const inputCls = "w-full px-3 py-2.5 border border-slate-200 rounded-xl text-[15px] focus:outline-none focus:ring-2 focus:ring-emerald-600";
@@ -364,13 +355,7 @@ export default function AssetConciergeMvp() {
   const setNum = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value.replace(/[^\d]/g, "") }));
   // 1-5：金額フィールドの単位ミス（例：年収「60」）防止。入力値の万円換算を即時表示（内部単位は円のまま・保存/計算に影響なし）。
-  const manHint = (v?: string): string => {
-    const d = (v ?? "").replace(/[^\d]/g, "");
-    if (!d) return "";
-    const n = Number(d);
-    // 7/20：1億以上は「＝2億5,813万円」のように億表記（表示のみ・計算は不変）。
-    return n >= 10000 ? `＝${manOku(n)}円` : "";
-  };
+  // 7/29：lib/shisan/format.ts の manHint へ移設（ロジックは不変）。
 
   /* 子の人数→年齢入力欄 */
   const onChildCount = (e: React.ChangeEvent<HTMLInputElement>) => {

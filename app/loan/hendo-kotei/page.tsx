@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
+import LoanCalculator from '@/components/loan/LoanCalculator';
 import {
   Breadcrumb, Toc, FaqSection, SourcesAndDisclaimer, TableScroll, ArticleUpdatedAt,
   buildArticleJsonLd, buildArticleMetadata, tableCls, thCls, tdCls,
@@ -393,7 +394,11 @@ export default function HendoKoteiPage() {
             <strong>注意点：住宅を取得したときに使えた登録免許税の軽減税率（0.1%）は、借り換えには適用されません。</strong> 軽減の対象は「住宅用家屋の新築または取得をするための資金の貸付け等に係る抵当権の設定登記」であり、あわせて床面積50平方メートル以上、新築または取得後1年以内の登記であることなどが要件とされています（国税庁タックスアンサーNo.7191）。借り換えのための資金は「取得をするための資金」にあたらないため、原則どおり0.4%で計算されます。この点を見落とすと、費用を実際より低く見積もることになります。
           </p>
           <p className={p}>
-            なお、<strong>借り換えの審査は新規の借入と同様に行われます</strong>。転職直後、収入が減った、健康状態が変わったなどの場合、審査に通らないことがあります。「いつでも変えられる」と考えていると、変えたいときに変えられない可能性があります。
+            なお、<strong>借り換えの審査は新規の借入と同様に行われます</strong>。転職直後、収入が減った、健康状態が変わったなどの場合、審査に通らないことがあります。「いつでも変えられる」と考えていると、変えたいときに変えられない可能性があります。年齢・団信・審査といった条件が時間とともにどう変わるかは「
+            <Link href="/loan/karikae/timing" className="text-blue-700 underline hover:no-underline">
+              住宅ローンの借り換えはいつがベストなタイミングか
+            </Link>
+            」で整理しています。
           </p>
           <p className={p}>
             → 借り換えの費用と手続きについて詳しくは「
@@ -404,23 +409,15 @@ export default function HendoKoteiPage() {
           </p>
         </section>
 
-        {/* 計算ツール（Phase 2 でここに差し込む） */}
+        {/* 計算ツール（2026-07-29：Phase 2 の予定どおり、住宅ローン専用ツールを埋め込み） */}
         <section id="calculator">
           <h2 className={h2}>変動と固定を自分の数字で比べる（計算ツール）</h2>
           <p className={p}>
             ここまでの表は代表的なケースです。実際の判断は、あなたの残高・残り年数・現在の金利で計算する必要があります。
           </p>
-          {/* Phase 2：この位置に「変動と固定の比較ツール」を差し込む（既存の計算エンジンを再利用する） */}
-          <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-            <p className="text-[15px] leading-relaxed text-slate-700">
-              現在ご利用いただける診断ツールでも、住宅ローンの借り換えで得られる金額の目安を計算できます。残高・残り年数・金利を入力すると、借り換えによる月々の軽減額と、手数料を差し引いた正味のメリットが表示されます。
-            </p>
-            <p className="mt-3">
-              → <Link href="/shisan" className="font-bold text-emerald-800 underline hover:no-underline">資産づくり診断で計算する</Link>
-            </p>
-          </div>
+          <LoanCalculator articlePath={PAGE_PATH} />
           <p className={p}>
-            入力するのは、残高・残り年数・現在の金利の3つだけです。金利が上がった場合の返済額、固定に切り替えた場合の返済額、そしてあなたの条件での損益分岐点を計算します。
+            入力するのは、残高・残り年数・現在の金利・金利タイプの4つだけです。金利が上がった場合の返済額、より低い変動へ借り換えた場合の正味のメリット、固定に切り替えた場合の返済額、そしてあなたの条件での損益分岐点を計算します。
           </p>
         </section>
 

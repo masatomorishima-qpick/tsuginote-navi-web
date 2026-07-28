@@ -27,6 +27,9 @@ export function ShisanFooter() {
           一般的な情報と、あなたが入力した数字による試算のみを提供します。特定の金融商品・保険・サービスの推奨や投資助言は行いません。すべて目安です。
         </p>
         <nav className="flex flex-wrap gap-x-4 gap-y-1 mb-3">
+          {/* 2026-07-29 追加：/loan 配下への入口。結果画面の借り換えカード内のリンクはJSで描画されるため
+              クローラーに見えない。ここはサーバー出力のHTMLに必ず含まれる（内部遷移なので Link を使う）。 */}
+          <Link href="/loan" className="underline hover:text-emerald-700">住宅ローンの判断</Link>
           <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-emerald-700">プライバシーポリシー</a>
           <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-emerald-700">利用規約</a>
           <a href="/company" target="_blank" rel="noopener noreferrer" className="underline hover:text-emerald-700">運営会社・お問い合わせ</a>

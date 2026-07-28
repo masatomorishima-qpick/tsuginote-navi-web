@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
+import LoanCalculator from '@/components/loan/LoanCalculator';
 import {
   Breadcrumb, Toc, FaqSection, SourcesAndDisclaimer, TableScroll, ArticleUpdatedAt,
   buildArticleJsonLd, buildArticleMetadata, tableCls, thCls, tdCls,
@@ -448,20 +449,20 @@ export default function KarikaeHiyouPage() {
           </p>
         </section>
 
-        {/* 計算ツール導線 */}
+        {/* 計算ツール（2026-07-29：/shisan への導線から住宅ローン専用ツールに差し替え） */}
         <section id="calculator">
           <h2 className={h2}>自分の数字で計算する</h2>
           <p className={p}>
             ここまでの表は代表的なケースです。実際の判断は、あなたの残高・残り年数・現在の金利で計算する必要があります。
           </p>
-          <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-            <p className="text-[15px] leading-relaxed text-slate-700">
-              現在ご利用いただける診断ツールでは、住宅ローンの借り換えで得られる金額の目安を計算できます。残高・残り年数・金利を入力すると、借り換えによる月々の軽減額と、手数料を差し引いた正味のメリットが表示されます。
-            </p>
-            <p className="mt-3">
-              → <Link href="/shisan" className="font-bold text-emerald-800 underline hover:no-underline">資産づくり診断で計算する</Link>
-            </p>
-          </div>
+          <LoanCalculator articlePath={PAGE_PATH} />
+          <p className={p}>
+            借り換えを「いつ」実行するかについては、「
+            <Link href="/loan/karikae/timing" className="text-blue-700 underline hover:no-underline">
+              住宅ローンの借り換えはいつがベストなタイミングか
+            </Link>
+            」で、待つことのコストと年齢・団信・審査の制約を整理しています。
+          </p>
         </section>
 
         <FaqSection id="faq" heading="住宅ローンの借り換え費用に関するよくある質問" faqs={FAQS} />

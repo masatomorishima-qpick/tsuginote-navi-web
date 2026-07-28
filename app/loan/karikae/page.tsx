@@ -33,6 +33,13 @@ const ARTICLES: { path: string; title: string; summary: string; published: boole
       '費用は借入額の2.8〜3.4%程度、残高3,000万円なら約87万円。事務手数料と登録免許税が借入額に比例して増えます。費用を引いた後にいくら残るのかを、残高・残り年数・金利差ごとの表で示しています。',
     published: true,
   },
+  {
+    path: '/loan/karikae/timing',
+    title: '住宅ローンの借り換えはいつがベストなタイミングか',
+    summary:
+      '金利の底は誰にも予測できません。判断できるのは自分の条件です。残りの返済期間が10年を切ると費用倒れになりやすいこと、1年待つとメリットが7万〜18万円減ることを、残高・残り年数ごとの表で示しています。',
+    published: true,
+  },
 ];
 
 const jsonLd = {

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 /**
@@ -29,6 +30,44 @@ export interface Faq {
 export const SITE_URL = 'https://www.tsuginotenavi.jp';
 /** 記事の author / publisher（決定事項1：個人名は出さない） */
 export const ORG_NAME = 'Blue Adventures';
+export const SITE_NAME = 'つぎの手ナビ';
+
+/* ===== 日付（2026-07-28 追加） =====
+ * リッチリザルトテストで datePublished / dateModified に
+ * 「日時値が無効／タイムゾーンがありません」の警告が出ていたための対応。
+ *
+ * 記事側に書かせるのは 'YYYY-MM-DD' の1形式だけにして、
+ * ・構造化データ用の ISO 8601（タイムゾーン付き）
+ * ・画面表示用の「2026年7月28日」
+ * の両方をここで組み立てる。記事ごとに書式がぶれる余地をなくすのが目的。
+ */
+const JST_TIME = 'T09:00:00+09:00';
+
+/** 'YYYY-MM-DD' → '2026-07-28T09:00:00+09:00'（すでに時刻付きならそのまま返す） */
+export function toIsoJst(date: string): string {
+  return date.includes('T') ? date : `${date}${JST_TIME}`;
+}
+
+/** 'YYYY-MM-DD' → '2026年7月28日'（画面表示用。ゼロ埋めしない） */
+export function formatJaDate(date: string): string {
+  const [y, m, d] = date.split('-').map(Number);
+  return `${y}年${m}月${d}日`;
+}
+
+/* ===== OGP画像（2026-07-28 追加） =====
+ * 画像ファイルは置かず、next/og の ImageResponse で動的生成する（app/og/route.tsx）。
+ * 記事が増えても画像まわりの作業が発生しないようにするため。
+ *
+ * 注意：置き場所を /api/og にしてはいけない。app/robots.ts が /api/ を
+ * 全クローラーに Disallow しているため、Google が画像を取得できず
+ * 「項目 image がありません」の警告が戻る。
+ */
+const OG_PATH = '/og';
+
+/** 記事タイトルから OGP画像のURLを組み立てる（記事側では指定不要） */
+export function ogImageUrl(title: string): string {
+  return `${SITE_URL}${OG_PATH}?title=${encodeURIComponent(title)}`;
+}
 
 /** JSON-LD（Article / FAQPage / BreadcrumbList）を手書きで組み立てる。
  *  reviewedBy は決定事項2により今回は出力しない（引数で渡せば将来追加できる）。 */
@@ -48,8 +87,11 @@ export function buildArticleJsonLd(opts: {
     headline: opts.title,
     description: opts.description,
     mainEntityOfPage: url,
-    datePublished: opts.datePublished,
-    dateModified: opts.dateModified,
+    // 日付はタイムゾーン付きの ISO 8601 で出す（記事側は 'YYYY-MM-DD' のみ書く）
+    datePublished: toIsoJst(opts.datePublished),
+    dateModified: toIsoJst(opts.dateModified),
+    // image は動的生成のOGP画像。記事側での指定は不要
+    image: [ogImageUrl(opts.title)],
     inLanguage: 'ja',
     author: { '@type': 'Organization', name: ORG_NAME, url: SITE_URL },
     publisher: { '@type': 'Organization', name: ORG_NAME, url: SITE_URL },
@@ -83,6 +125,52 @@ export function buildArticleJsonLd(opts: {
       },
     ],
   };
+}
+
+/** 記事の metadata（title / canonical / OGP / Twitter）をまとめて組み立てる。
+ *  OGP画像・日付書式をここに閉じ込めることで、記事側は原稿の情報を渡すだけでよくなる。 */
+export function buildArticleMetadata(opts: {
+  path: string;
+  title: string;
+  description: string;
+  datePublished: string;
+  dateModified: string;
+}): Metadata {
+  const url = `${SITE_URL}${opts.path}`;
+  const image = ogImageUrl(opts.title);
+  return {
+    title: `${opts.title} | ${SITE_NAME}`,
+    description: opts.description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: opts.title,
+      description: opts.description,
+      url,
+      siteName: SITE_NAME,
+      type: 'article',
+      locale: 'ja_JP',
+      publishedTime: toIsoJst(opts.datePublished),
+      modifiedTime: toIsoJst(opts.dateModified),
+      images: [{ url: image, width: 1200, height: 630, alt: opts.title }],
+    },
+    // サイト既定（app/layout.tsx）と同じ summary_large_image に揃える。
+    // 1200×630 の画像を小さい正方形で切り取られないようにするため。
+    twitter: {
+      card: 'summary_large_image',
+      title: opts.title,
+      description: opts.description,
+      images: [image],
+    },
+  };
+}
+
+/** 「最終更新：2026年7月28日」の表示。JSON-LD と同じ定数から作るのでズレない。 */
+export function ArticleUpdatedAt({ dateModified }: { dateModified: string }) {
+  return (
+    <p className="mt-3 text-[13px] text-slate-500">
+      最終更新：<time dateTime={toIsoJst(dateModified)}>{formatJaDate(dateModified)}</time>
+    </p>
+  );
 }
 
 /** パンくず表示 */

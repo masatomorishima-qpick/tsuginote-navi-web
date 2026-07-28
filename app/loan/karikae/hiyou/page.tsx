@@ -1,11 +1,10 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 import {
-  Breadcrumb, Toc, FaqSection, SourcesAndDisclaimer, TableScroll,
-  buildArticleJsonLd, tableCls, thCls, tdCls,
-  SITE_URL, type Faq, type TocItem,
+  Breadcrumb, Toc, FaqSection, SourcesAndDisclaimer, TableScroll, ArticleUpdatedAt,
+  buildArticleJsonLd, buildArticleMetadata, tableCls, thCls, tdCls,
+  type Faq, type TocItem,
 } from '@/components/loan/LoanArticle';
 
 /* ===== メタ情報 ===== */
@@ -16,22 +15,15 @@ const PAGE_DESCRIPTION =
 const DATE_PUBLISHED = '2026-07-28';
 const DATE_MODIFIED = '2026-07-28';
 
-export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ`,
+/* metadata（canonical / OGP / Twitter / OGP画像）はテンプレート側で組み立てる。
+ * 記事ごとに画像や日付書式を書かないための共通化。 */
+export const metadata = buildArticleMetadata({
+  path: PAGE_PATH,
+  title: PAGE_TITLE,
   description: PAGE_DESCRIPTION,
-  alternates: { canonical: `${SITE_URL}${PAGE_PATH}` },
-  openGraph: {
-    title: PAGE_TITLE,
-    description: PAGE_DESCRIPTION,
-    url: `${SITE_URL}${PAGE_PATH}`,
-    siteName: 'つぎの手ナビ',
-    type: 'article',
-    locale: 'ja_JP',
-    publishedTime: DATE_PUBLISHED,
-    modifiedTime: DATE_MODIFIED,
-  },
-  twitter: { card: 'summary', title: PAGE_TITLE, description: PAGE_DESCRIPTION },
-};
+  datePublished: DATE_PUBLISHED,
+  dateModified: DATE_MODIFIED,
+});
 
 /* ===== 目次（H2 と対応） ===== */
 const TOC: TocItem[] = [
@@ -113,9 +105,7 @@ export default function KarikaeHiyouPage() {
         <h1 className="text-[24px] font-bold leading-tight text-slate-900 sm:text-[30px]">
           住宅ローンの借り換え費用はいくら？手数料の内訳と、元が取れる条件
         </h1>
-        <p className="mt-3 text-[13px] text-slate-500">
-          最終更新：<time dateTime={DATE_MODIFIED}>2026年7月28日</time>
-        </p>
+        <ArticleUpdatedAt dateModified={DATE_MODIFIED} />
 
         <Toc items={TOC} />
 

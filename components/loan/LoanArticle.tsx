@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 
 /**
@@ -69,6 +70,51 @@ export function ogImageUrl(title: string): string {
   return `${SITE_URL}${OG_PATH}?title=${encodeURIComponent(title)}`;
 }
 
+/* ===== メインビジュアル（2026-07-29 追加） =====
+ * 記事ごとの図版。H1・最終更新日の下、本文の前に置く。
+ *
+ * 並び順の理由（masato の決定）：金融の記事では更新日が信頼性のシグナルなので、
+ * 「これは何か」「いまの情報か」を先に見せ、そのあとに図版を置く。
+ * 本記事は冒頭に結論を置く構成のため、大きな画像を日付より上に入れると結論が遠くなる。
+ *
+ * 用途の使い分け：
+ *   ・Article 構造化データの image → この図版（Googleが記事を代表する画像として扱う）
+ *   ・og:image                    → /og の動的生成カード（SNSではタイトルが読める方が有効）
+ */
+export interface MainVisual {
+  /** サイトルートからのパス（例：/loan/karikae-demerit.webp） */
+  src: string;
+  /** 記事の内容を表す日本語。「アイキャッチ」等の無内容な語は使わない */
+  alt: string;
+}
+
+/** 図版の実寸（4枚とも同じ。next/image のレイアウト確保に使う） */
+const VISUAL_W = 1600;
+const VISUAL_H = 900;
+
+/** メインビジュアルの絶対URL（構造化データ用） */
+export function mainVisualUrl(v: MainVisual): string {
+  return `${SITE_URL}${v.src}`;
+}
+
+/** H1・最終更新日の下に置く図版。未設定なら何も描画しない（レイアウトは崩れない）。 */
+export function ArticleVisual({ visual }: { visual?: MainVisual }) {
+  if (!visual) return null;
+  return (
+    <div className="mt-4 overflow-hidden rounded-xl border border-slate-200">
+      <Image
+        src={visual.src}
+        alt={visual.alt}
+        width={VISUAL_W}
+        height={VISUAL_H}
+        priority
+        sizes="(max-width: 768px) 100vw, 768px"
+        className="h-auto w-full"
+      />
+    </div>
+  );
+}
+
 /** JSON-LD（Article / FAQPage / BreadcrumbList）を手書きで組み立てる。
  *  reviewedBy は決定事項2により今回は出力しない（引数で渡せば将来追加できる）。 */
 export function buildArticleJsonLd(opts: {
@@ -79,6 +125,8 @@ export function buildArticleJsonLd(opts: {
   dateModified: string;
   crumbs: Crumb[];
   faqs: Faq[];
+  /** 記事のメインビジュアル。Article の image に使う（未指定ならOGPカードで代替）。 */
+  visual?: MainVisual;
   reviewedBy?: { name: string; url?: string };
 }) {
   const url = `${SITE_URL}${opts.path}`;
@@ -90,8 +138,9 @@ export function buildArticleJsonLd(opts: {
     // 日付はタイムゾーン付きの ISO 8601 で出す（記事側は 'YYYY-MM-DD' のみ書く）
     datePublished: toIsoJst(opts.datePublished),
     dateModified: toIsoJst(opts.dateModified),
-    // image は動的生成のOGP画像。記事側での指定は不要
-    image: [ogImageUrl(opts.title)],
+    // image は記事のメインビジュアル（Googleが記事を代表する画像として扱う）。
+    // og:image（SNS用の動的生成カード）とは用途が違うので、あえて別のものを指定する。
+    image: [opts.visual ? mainVisualUrl(opts.visual) : ogImageUrl(opts.title)],
     inLanguage: 'ja',
     author: { '@type': 'Organization', name: ORG_NAME, url: SITE_URL },
     publisher: { '@type': 'Organization', name: ORG_NAME, url: SITE_URL },

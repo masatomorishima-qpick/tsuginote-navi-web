@@ -40,6 +40,13 @@ const ARTICLES: { path: string; title: string; summary: string; published: boole
       '金利の底は誰にも予測できません。判断できるのは自分の条件です。残りの返済期間が10年を切ると費用倒れになりやすいこと、1年待つとメリットが7万〜18万円減ることを、残高・残り年数ごとの表で示しています。',
     published: true,
   },
+  {
+    path: '/loan/karikae/demerit',
+    title: '住宅ローン借り換えのデメリット｜損をする6つのケース',
+    summary:
+      '費用を回収できない、住宅ローン控除が受けられなくなる、月々が下がっても総額は増える——借り換えで損をするケースを数字で確認します。控除の喪失は残高2,000万円・残り5年で約70万円になります。',
+    published: true,
+  },
 ];
 
 const jsonLd = {

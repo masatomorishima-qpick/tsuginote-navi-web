@@ -37,7 +37,9 @@ const siteJsonLd = {
       alternateName: "つぎの手ナビ",
       url: SITE_URL,
       logo: `${SITE_URL}/logo.png`,
-      image: `${SITE_URL}/logo.png`,
+      // 2026-07-29：image を削除。組織情報としては logo があれば足り、image は冗長。
+      // 記事ページでは Article の image と並んで出力されるため、
+      // 「記事の代表画像が logo.png になっている」と誤読される原因になっていた。
       email: "info@blueadventures.jp",
       description:
         "デジタル資産やパスワードの「在りか」を、生きている間は誰にも見せず、もしものとき（入院・事故・死亡など）だけ、指定した大切な人へ届ける準備ができるサービス。資産の登録・PDF出力・定期リマインドは無料。運営：BlueAdventures。",

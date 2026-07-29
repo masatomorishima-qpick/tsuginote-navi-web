@@ -3,9 +3,9 @@ import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 import LoanCalculator from '@/components/loan/LoanCalculator';
 import {
-  Breadcrumb, Toc, FaqSection, SourcesAndDisclaimer, TableScroll, ArticleUpdatedAt,
+  Breadcrumb, Toc, FaqSection, SourcesAndDisclaimer, TableScroll, ArticleUpdatedAt, ArticleVisual,
   buildArticleJsonLd, buildArticleMetadata, tableCls, thCls, tdCls,
-  type Faq, type TocItem,
+  type Faq, type TocItem, type MainVisual,
 } from '@/components/loan/LoanArticle';
 
 /* ===== メタ情報 ===== */
@@ -15,6 +15,11 @@ const PAGE_DESCRIPTION =
   '住宅ローンの借り換え費用は借入額の2.8〜3.4%程度、残高3,000万円なら約87万円です。事務手数料と登録免許税が借入額に比例して増えます。費用を引いた後にいくら残るのかを残高・残り年数・金利差ごとの表で示します。';
 const DATE_PUBLISHED = '2026-07-28';
 const DATE_MODIFIED = '2026-07-28';
+/* メインビジュアル（H1・最終更新日の下に表示し、Article の image にも使う） */
+const VISUAL: MainVisual = {
+  src: '/loan/karikae-hiyou.webp',
+  alt: '借り換え費用の内訳を積み上げで表した図',
+};
 
 /* metadata（canonical / OGP / Twitter / OGP画像）はテンプレート側で組み立てる。
  * 記事ごとに画像や日付書式を書かないための共通化。 */
@@ -82,6 +87,7 @@ const jsonLd = buildArticleJsonLd({
     { name: '借り換え費用と元が取れる条件', path: PAGE_PATH },
   ],
   faqs: FAQS,
+  visual: VISUAL,
 });
 
 const h2 = 'mt-10 scroll-mt-20 text-[20px] font-bold text-slate-900 sm:text-[22px]';
@@ -107,6 +113,7 @@ export default function KarikaeHiyouPage() {
           住宅ローンの借り換え費用はいくら？手数料の内訳と、元が取れる条件
         </h1>
         <ArticleUpdatedAt dateModified={DATE_MODIFIED} />
+        <ArticleVisual visual={VISUAL} />
 
         <Toc items={TOC} />
 
@@ -446,6 +453,13 @@ export default function KarikaeHiyouPage() {
               住宅ローンは変動と固定どちらがいいか
             </Link>
             」で、2026年7月時点の金利をもとに比較しています。
+          </p>
+          <p className={p}>
+            また、<strong>住宅ローン控除を受けている場合は、借り換えで対象から外れることがあります。</strong>費用の損得より影響が大きいことがあるため、「
+            <Link href="/loan/karikae/demerit" className="text-blue-700 underline hover:no-underline">
+              住宅ローン借り換えのデメリット
+            </Link>
+            」もあわせて確認してください。
           </p>
         </section>
 

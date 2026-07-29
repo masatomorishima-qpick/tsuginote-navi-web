@@ -3,9 +3,9 @@ import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 import LoanCalculator from '@/components/loan/LoanCalculator';
 import {
-  Breadcrumb, Toc, FaqSection, SourcesAndDisclaimer, TableScroll, ArticleUpdatedAt,
+  Breadcrumb, Toc, FaqSection, SourcesAndDisclaimer, TableScroll, ArticleUpdatedAt, ArticleVisual,
   buildArticleJsonLd, buildArticleMetadata, tableCls, thCls, tdCls,
-  type Faq, type TocItem,
+  type Faq, type TocItem, type MainVisual,
 } from '@/components/loan/LoanArticle';
 
 /* ===== メタ情報 ===== */
@@ -15,6 +15,11 @@ const PAGE_DESCRIPTION =
   '住宅ローンの借り換えのタイミングは、金利ではなく自分の条件で決まります。金利の底は誰にも予測できません。残りの返済期間が10年を切ると費用倒れになりやすく、1年待つだけでメリットは7万〜18万円減ります。';
 const DATE_PUBLISHED = '2026-07-29';
 const DATE_MODIFIED = '2026-07-29';
+/* メインビジュアル（H1・最終更新日の下に表示し、Article の image にも使う） */
+const VISUAL: MainVisual = {
+  src: '/loan/karikae-timing.webp',
+  alt: '時間の経過とともに借り換えメリットが減ることを表した図',
+};
 
 export const metadata = buildArticleMetadata({
   path: PAGE_PATH,
@@ -79,6 +84,7 @@ const jsonLd = buildArticleJsonLd({
     { name: '借り換えのタイミング', path: PAGE_PATH },
   ],
   faqs: FAQS,
+  visual: VISUAL,
 });
 
 const h2 = 'mt-10 scroll-mt-20 text-[20px] font-bold text-slate-900 sm:text-[22px]';
@@ -103,6 +109,7 @@ export default function KarikaeTimingPage() {
           住宅ローンの借り換えはいつがベストなタイミングか｜判断できることとできないこと
         </h1>
         <ArticleUpdatedAt dateModified={DATE_MODIFIED} />
+        <ArticleVisual visual={VISUAL} />
 
         <Toc items={TOC} />
 
@@ -241,6 +248,9 @@ export default function KarikaeTimingPage() {
             <li><strong>近いうちに転職や独立を予定している人。</strong>むしろ<strong>その前に</strong>動くべきかを検討してください。転職後は審査が通りにくくなります。</li>
             <li><strong>数年以内に売却を検討している人。</strong>借り換え費用を回収する前に完済することになります。</li>
           </ul>
+          <p className={p}>
+            <strong>住宅ローン控除を受けている人</strong>も、動く前に確認が必要です。借り換え後の返済期間を10年未満にすると控除の対象から外れ、残高2,000万円で控除期間があと5年なら約70万円を失います。「<Link href="/loan/karikae/demerit" className="text-blue-700 underline hover:no-underline">住宅ローン借り換えのデメリット</Link>」で整理しています。
+          </p>
         </section>
 
         {/* 節目 */}

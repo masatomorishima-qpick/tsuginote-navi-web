@@ -3,9 +3,9 @@ import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 import LoanCalculator from '@/components/loan/LoanCalculator';
 import {
-  Breadcrumb, Toc, FaqSection, SourcesAndDisclaimer, TableScroll, ArticleUpdatedAt,
+  Breadcrumb, Toc, FaqSection, SourcesAndDisclaimer, TableScroll, ArticleUpdatedAt, ArticleVisual,
   buildArticleJsonLd, buildArticleMetadata, tableCls, thCls, tdCls,
-  type Faq, type TocItem,
+  type Faq, type TocItem, type MainVisual,
 } from '@/components/loan/LoanArticle';
 
 /* ===== メタ情報 ===== */
@@ -15,6 +15,11 @@ const PAGE_DESCRIPTION =
   '2026年7月時点で変動は年1%前後、固定（フラット35）は3.14%。金利差は約2.1%です。いま固定に切り替えると月2〜4万円増え、変動が3.3%前後まで上がって初めて総支払額が並びます。残高・残り年数別の表で示します。';
 const DATE_PUBLISHED = '2026-07-28';
 const DATE_MODIFIED = '2026-07-28';
+/* メインビジュアル（H1・最終更新日の下に表示し、Article の image にも使う） */
+const VISUAL: MainVisual = {
+  src: '/loan/hendo-kotei.webp',
+  alt: '変動金利と固定金利の分かれ道を表した図',
+};
 
 /* metadata（canonical / OGP / Twitter / OGP画像）はテンプレート側で組み立てる。
  * 記事ごとに画像や日付書式を書かないための共通化。 */
@@ -79,6 +84,7 @@ const jsonLd = buildArticleJsonLd({
     { name: '変動と固定どちらがいいか', path: PAGE_PATH },
   ],
   faqs: FAQS,
+  visual: VISUAL,
 });
 
 const h2 = 'mt-10 scroll-mt-20 text-[20px] font-bold text-slate-900 sm:text-[22px]';
@@ -103,6 +109,7 @@ export default function HendoKoteiPage() {
           住宅ローンは変動と固定どちらがいいか｜2026年7月の金利で試算して比べる
         </h1>
         <ArticleUpdatedAt dateModified={DATE_MODIFIED} />
+        <ArticleVisual visual={VISUAL} />
 
         <Toc items={TOC} />
 
@@ -370,6 +377,9 @@ export default function HendoKoteiPage() {
             <li>繰上げ返済に回せる資金があり、金利が上がったら残高を減らせる</li>
             <li>借り換えの審査に通る見込みが立たない（転職直後、健康状態など）</li>
           </ul>
+          <p className={p}>
+            なお、切り替えには借り換えが伴うため、住宅ローン控除の喪失や団信の保障の変化といった副作用もあります。「<Link href="/loan/karikae/demerit" className="text-blue-700 underline hover:no-underline">住宅ローン借り換えのデメリット</Link>」で、損をする6つのケースを数字で整理しています。
+          </p>
           <p className={p}>
             <strong>どちらとも言えない場合</strong>、判断を分けるのは「金利がどこまで上がるか」ではなく、<strong>「上がったときに家計が耐えられるか」</strong>です。上限を予測することは誰にもできませんが、耐えられるかどうかは自分の数字で計算できます。
           </p>

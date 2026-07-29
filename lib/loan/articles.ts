@@ -72,6 +72,20 @@ const ARTICLES: LoanArticle[] = [
     order: 1,
   },
   {
+    path: '/loan/5nen-rule',
+    title: '住宅ローンの5年ルール・125%ルールとは｜返済額が変わらない仕組み',
+    heading: '住宅ローンの5年ルール・125%ルールとは｜返済額が変わらない仕組みと未払利息',
+    breadcrumb: '5年ルール・125%ルール',
+    description:
+      '返済額が変わらないことと、負担が増えていないことは違います。金利が上がると元金の減り方が鈍り、やがて未払利息が発生します。発生する金利は「返済額×12÷残高」で自分で計算できます。',
+    summary:
+      '金利が上がっても返済額が5年間変わらない仕組みと、その間に元金の減り方がどう変わるかを解説。未払利息が発生する金利は自分で計算できます。',
+    datePublished: '2026-07-29',
+    dateModified: '2026-07-29',
+    visual: { src: '/loan/5nen-rule.webp', alt: '返済額が変わらないまま元金と利息の内訳が変わることを表した図' },
+    order: 2,
+  },
+  {
     path: '/loan/karikae/hiyou',
     title: '住宅ローンの借り換え費用はいくら？手数料の内訳と元が取れる条件',
     heading: '住宅ローンの借り換え費用はいくら？手数料の内訳と、元が取れる条件',
@@ -83,7 +97,7 @@ const ARTICLES: LoanArticle[] = [
     datePublished: '2026-07-28',
     dateModified: '2026-07-28',
     visual: { src: '/loan/karikae-hiyou.webp', alt: '借り換え費用の内訳を積み上げで表した図' },
-    order: 2,
+    order: 3,
   },
   {
     path: '/loan/karikae/timing',
@@ -97,7 +111,7 @@ const ARTICLES: LoanArticle[] = [
     datePublished: '2026-07-29',
     dateModified: '2026-07-29',
     visual: { src: '/loan/karikae-timing.webp', alt: '時間の経過とともに借り換えメリットが減ることを表した図' },
-    order: 3,
+    order: 4,
   },
   {
     path: '/loan/karikae/demerit',
@@ -111,7 +125,7 @@ const ARTICLES: LoanArticle[] = [
     datePublished: '2026-07-29',
     dateModified: '2026-07-29',
     visual: { src: '/loan/karikae-demerit.webp', alt: '見えにくい部分に費用が隠れていることを表した図' },
-    order: 4,
+    order: 5,
   },
 ];
 

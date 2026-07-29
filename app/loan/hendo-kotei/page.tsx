@@ -320,6 +320,9 @@ export default function HendoKoteiPage() {
           <p className={p}>
             <strong>まず確認すべきことは、自分の借入先にこのルールがあるかどうかです。</strong> 返済額が変わっていないことと、負担が増えていないことは、同じではありません。
           </p>
+          <p className={p}>
+            → 仕組みの詳しい解説と、未払利息が発生する金利の求め方は「<Link href="/loan/5nen-rule" className="text-blue-700 underline hover:no-underline">住宅ローンの5年ルール・125%ルールとは</Link>」で扱っています。
+          </p>
         </section>
 
         {/* 向き不向き */}

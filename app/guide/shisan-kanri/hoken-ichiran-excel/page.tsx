@@ -442,6 +442,21 @@ export default function HokenIchiranExcelPage() {
             </li>
           </ul>
         </section>
+
+        {/* 2026-07-30 追加：/loan への導線。
+            7/29 に /digital の獲得CTAを撤去した位置に、お金に関わる記事だけへ置く。
+            /guide は唯一オーガニック流入がある領域だが、主軸である /loan への
+            接続がゼロだったため。デジタル遺品・パスワード・思い出系の記事には
+            読者の目的が違うので張らない。 */}
+        <section className="mt-14 rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
+          <h2 className="text-lg font-semibold text-slate-900">住宅ローンの判断でお困りではありませんか</h2>
+          <p className="mt-3 text-[15px] leading-8 text-slate-700">
+            金利が上がっても返済額が変わらない仕組みや、借り換えで元が取れる条件を、残高・残り年数ごとの試算で解説しています。特定の金融機関・金融商品の推奨は行いません。
+          </p>
+          <p className="mt-4 text-[15px]">
+            → <Link href="/loan" className="text-blue-600 hover:underline">住宅ローンの判断ガイド</Link>
+          </p>
+        </section>
       </div>
 
       <SiteFooter />

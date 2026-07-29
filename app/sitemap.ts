@@ -29,11 +29,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
-      // ピボット（2026-07-15）：新TOP＝資産づくり診断（/ は /shisan へリダイレクトのため / は載せない）。
-      url: `${baseUrl}/shisan`,
+      // 2026-07-30：TOP を実体化したので sitemap に載せる（リダイレクト廃止）。
+      url: baseUrl,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/shisan`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
     },
     // 住宅ローン（2026-07-28 新設 → 07-29 レジストリ参照に変更）。
     // 記事は lib/loan/articles.ts に1件足すだけでここにも自動で載る。

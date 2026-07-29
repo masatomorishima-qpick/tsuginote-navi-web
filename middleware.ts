@@ -29,29 +29,23 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(hubUrl, 301);
   }
 
-  // --- TOP（"/"）専用の軽量処理 ---
-  // TOP は静的 LP（CDN キャッシュ対象）。ここで Supabase へ getUser 通信をすると
-  // 広告流入（ほぼ未ログイン）の初期表示が遅くなるため、ネットワーク往復をせず
-  // Cookie の有無だけで「ログイン済みらしさ」を判定する。
-  //   - ログイン済みらしい（auth Cookie あり）→ /digital へ誘導
-  //   - 未ログイン → そのまま静的 TOP を表示（getUser しない）
-  // ※ Cookie が期限切れの稀なケースは /digital 側で再度ログインに弾かれるため安全。
-  if (pathname === '/') {
-    const hasAuthCookie = request.cookies
-      .getAll()
-      .some((c) => c.name.startsWith('sb-') && c.name.includes('auth-token'));
-    if (hasAuthCookie) {
-      // 既存のデジタル資産の会員はアプリ本体へ（/digital は残置・機能維持）。
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = '/digital';
-      return NextResponse.redirect(redirectUrl);
-    }
-    // ピボット（2026-07-15）：TOP を /shisan に移管。未ログインは新TOP（診断）へ。
-    // 307（temporary）で開始し、安定後に恒久化（308）する運用（canonical は /shisan・自己参照）。
-    const shisanUrl = request.nextUrl.clone();
-    shisanUrl.pathname = '/shisan';
-    return NextResponse.redirect(shisanUrl);
-  }
+  /* --- TOP（"/"）のリダイレクトは 2026-07-30 に廃止 ---
+   *
+   * 経緯：2026-07-15 のピボットで TOP を /shisan に移管し、"/" は
+   *   ・auth Cookie あり → /digital
+   *   ・それ以外        → /shisan（307）
+   * にリダイレクトしていた。その結果、サイトの顔が「老後資金の診断ツール」になり、
+   * 主軸である /loan にトップから辿れない状態が続いていた。
+   *
+   * "/" を実体のあるトップページ（app/page.tsx）にしたので、両方の分岐を削除した。
+   *   ・/digital の会員はゼロのため、Cookie による振り分けは不要。
+   *     /digital へは直接URLでアクセスできる状態を維持している。
+   *   ・/shisan は独立したページのまま（canonical は自己参照）。
+   *     トップは入口、/shisan はツール、という役割分担にしている。
+   *
+   * これに伴い、"/" に集約していた旧URL（相続・実家片付け）は
+   * next.config.ts で /guide/ihinseiri に転送先を変更した（二段転送も解消）。
+   */
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey =
@@ -109,7 +103,9 @@ export const config = {
    * 既存の `/souzoku-houki` `/tokyo/*` `/souzoku-tetsuzuki` 等は完全に素通りします。
    */
   matcher: [
-    '/',
+    // 2026-07-30：'/' を除外した。TOP のリダイレクトを廃止したため middleware で
+    // 行う処理がなくなり、残したままだと毎回 Supabase の getUser() が走って
+    // トップの初期表示が遅くなる（広告流入はほぼ未ログインで、その通信は無駄）。
     // 中カテゴリ廃止に伴う 301（配下の記事 /loan/karikae/* は含まないので素通りする）
     '/loan/karikae',
     '/digital/:path*',

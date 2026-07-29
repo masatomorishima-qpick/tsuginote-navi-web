@@ -3,33 +3,20 @@ import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 import LoanCalculator from '@/components/loan/LoanCalculator';
 import {
-  Breadcrumb, Toc, FaqSection, SourcesAndDisclaimer, TableScroll, ArticleUpdatedAt, ArticleVisual,
+  ArticleHeader, Toc, FaqSection, SourcesAndDisclaimer, TableScroll,
   buildArticleJsonLd, buildArticleMetadata, tableCls, thCls, tdCls,
-  type Faq, type TocItem, type MainVisual,
+  type Faq, type TocItem,
 } from '@/components/loan/LoanArticle';
+import { getLoanArticle } from '@/lib/loan/articles';
 
-/* ===== メタ情報 ===== */
-const PAGE_PATH = '/loan/karikae/hiyou';
-const PAGE_TITLE = '住宅ローンの借り換え費用はいくら？手数料の内訳と元が取れる条件';
-const PAGE_DESCRIPTION =
-  '住宅ローンの借り換え費用は借入額の2.8〜3.4%程度、残高3,000万円なら約87万円です。事務手数料と登録免許税が借入額に比例して増えます。費用を引いた後にいくら残るのかを残高・残り年数・金利差ごとの表で示します。';
-const DATE_PUBLISHED = '2026-07-28';
-const DATE_MODIFIED = '2026-07-28';
-/* メインビジュアル（H1・最終更新日の下に表示し、Article の image にも使う） */
-const VISUAL: MainVisual = {
-  src: '/loan/karikae-hiyou.webp',
-  alt: '借り換え費用の内訳を積み上げで表した図',
-};
+/* ===== メタ情報 =====
+ * 実体は lib/loan/articles.ts（レジストリ）が持つ。ここでは参照するだけ。 */
+const ARTICLE = getLoanArticle('/loan/karikae/hiyou');
+const PAGE_PATH = ARTICLE.path;
 
 /* metadata（canonical / OGP / Twitter / OGP画像）はテンプレート側で組み立てる。
  * 記事ごとに画像や日付書式を書かないための共通化。 */
-export const metadata = buildArticleMetadata({
-  path: PAGE_PATH,
-  title: PAGE_TITLE,
-  description: PAGE_DESCRIPTION,
-  datePublished: DATE_PUBLISHED,
-  dateModified: DATE_MODIFIED,
-});
+export const metadata = buildArticleMetadata(ARTICLE);
 
 /* ===== 目次（H2 と対応） ===== */
 const TOC: TocItem[] = [
@@ -75,20 +62,7 @@ const FAQS: Faq[] = [
   },
 ];
 
-const jsonLd = buildArticleJsonLd({
-  path: PAGE_PATH,
-  title: PAGE_TITLE,
-  description: PAGE_DESCRIPTION,
-  datePublished: DATE_PUBLISHED,
-  dateModified: DATE_MODIFIED,
-  crumbs: [
-    { name: '住宅ローン', path: '/loan' },
-    { name: '借り換え', path: '/loan/karikae' },
-    { name: '借り換え費用と元が取れる条件', path: PAGE_PATH },
-  ],
-  faqs: FAQS,
-  visual: VISUAL,
-});
+const jsonLd = buildArticleJsonLd({ article: ARTICLE, faqs: FAQS });
 
 const h2 = 'mt-10 scroll-mt-20 text-[20px] font-bold text-slate-900 sm:text-[22px]';
 const h3 = 'mt-6 text-[16px] font-bold text-slate-900 sm:text-[17px]';
@@ -101,19 +75,7 @@ export default function KarikaeHiyouPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <GuideHeader />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6">
-        <Breadcrumb
-          crumbs={[
-            { name: '住宅ローン', path: '/loan' },
-            { name: '借り換え', path: '/loan/karikae' },
-            { name: '借り換え費用と元が取れる条件', path: PAGE_PATH },
-          ]}
-        />
-
-        <h1 className="text-[24px] font-bold leading-tight text-slate-900 sm:text-[30px]">
-          住宅ローンの借り換え費用はいくら？手数料の内訳と、元が取れる条件
-        </h1>
-        <ArticleUpdatedAt dateModified={DATE_MODIFIED} />
-        <ArticleVisual visual={VISUAL} />
+        <ArticleHeader article={ARTICLE} />
 
         <Toc items={TOC} />
 
@@ -498,7 +460,7 @@ export default function KarikaeHiyouPage() {
         />
 
         <p className="mt-8 text-[14px]">
-          <Link href="/loan/karikae" className="text-blue-700 underline hover:no-underline">← 住宅ローンの借り換えの記事一覧へ</Link>
+          <Link href="/loan" className="text-blue-700 underline hover:no-underline">← 住宅ローンの記事一覧へ</Link>
         </p>
       </main>
       <SiteFooter />

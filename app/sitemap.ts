@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { LOAN_ARTICLES } from "@/lib/loan/articles";
 
 /**
  * sitemap.xml — Phase 1 ローンチ準備にあわせて刷新
@@ -34,43 +35,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1.0,
     },
-    // 住宅ローン（2026-07-28 新設）。記事を追加したらこの配列に足す。
+    // 住宅ローン（2026-07-28 新設 → 07-29 レジストリ参照に変更）。
+    // 記事は lib/loan/articles.ts に1件足すだけでここにも自動で載る。
+    // 中カテゴリ /loan/karikae は 2026-07-29 に廃止（middleware で /loan へ301）。
     {
       url: `${baseUrl}/loan`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.9,
     },
-    {
-      url: `${baseUrl}/loan/hendo-kotei`,
-      lastModified: now,
-      changeFrequency: "monthly",
+    ...LOAN_ARTICLES.map((a) => ({
+      url: `${baseUrl}${a.path}`,
+      lastModified: new Date(`${a.dateModified}T09:00:00+09:00`),
+      changeFrequency: "monthly" as const,
       priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/loan/karikae`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/loan/karikae/hiyou`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/loan/karikae/timing`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/loan/karikae/demerit`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
+    })),
     {
       url: `${baseUrl}/privacy`,
       lastModified: now,

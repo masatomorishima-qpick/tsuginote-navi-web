@@ -1,8 +1,13 @@
 /**
  * MarketingHeader
  *
- * 認証不要の公開ページ（/login, /privacy, /terms, /company 等）で使う共通ヘッダー。
+ * **認証系ページ専用**のヘッダー（/login, /signup, /forgot-password, /reset-password）。
  * /digital/* で使う DigitalHeader とは別物。
+ *
+ * 2026-07-29 の整理：
+ *   ・/privacy・/terms・/company は GuideHeader に移した。法務ページは記事の読者が
+ *     信用してよいか確かめる場所であり、そこにログイン/新規登録を置く理由がないため。
+ *   ・サブタイトル「デジタル資産」を削除（サイト全体で表記を「つぎの手ナビ」に統一）。
  *
  * ロゴをクリックすると TOP（/）に戻る。シンプルで邪魔にならない最小構成。
  */
@@ -19,9 +24,6 @@ export default function MarketingHeader() {
         >
           <span className="whitespace-nowrap text-base font-bold text-slate-900 sm:text-lg">
             つぎの手ナビ
-          </span>
-          <span className="hidden whitespace-nowrap text-xs text-slate-500 sm:inline sm:text-sm">
-            デジタル資産
           </span>
         </Link>
         <div className="flex flex-shrink-0 items-center gap-1.5 sm:gap-3">

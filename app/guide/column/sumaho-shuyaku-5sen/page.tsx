@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import GuideCtaLink from '@/components/guide/GuideCtaLink';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 
@@ -13,7 +12,7 @@ const PAGE_DESCRIPTION =
   'お金、きっぷ、診察券、身分証、そして家の鍵まで——この5年でスマホ1台に集まった5つの機能を、公的な数字とともに振り返ります。便利になった一方で、家族が代わりに開けられなくなった。その先にある「史上初めて必要になった一覧」の話。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
+  title: `${PAGE_TITLE} | つぎの手ナビ`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,
@@ -81,7 +80,7 @@ const jsonLd = {
       inLanguage: 'ja',
       author: {
         '@type': 'Organization',
-        name: 'つぎの手ナビ デジタル資産',
+        name: 'つぎの手ナビ',
         url: SITE_URL,
       },
       publisher: {
@@ -418,35 +417,10 @@ export default function SumahoShuyaku5senPage() {
             この5年で、私たちの荷物は史上いちばん軽くなりました。あとは、その身軽さに、「どこに何があるか」の一覧を1枚足すだけ。
           </p>
           <p>
-            こうしたお金や契約、写真の在りかを、ふだんは誰にも見せず、もしものときにだけ選んだ家族へ届くようにしておく専用のサービスもあります。私たちが運営する
-            <strong>「つぎの手ナビ デジタル資産」</strong>
-            もそのひとつで、登録・一覧のPDF出力・見直しの定期リマインドまでは無料で使えます。
+            こうしたお金や契約、写真の在りかを、ふだんは誰にも見せず、もしものときにだけ選んだ家族へ届くようにしておく専用のサービスもあります。
           </p>
           <p>便利さは、そのままでいい。一覧を1枚足した日から、もう心配しなくて大丈夫です。</p>
         </Section>
-
-        <section className="mt-14 rounded-3xl bg-slate-50 p-8 text-center sm:p-10">
-          <h2 className="text-xl font-semibold text-slate-900">
-            「どこに何があるか」を、もしものときだけ届く形で残すなら
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-8 text-slate-600">
-            あなたにもしもがあったとき、家族が「どこに何があるか」にたどり着けるように。「つぎの手ナビ デジタル資産」は、パスワードや口座・契約・写真の在りかを、生きている間は誰にも見せず、もしものときだけ選んだ人へ届ける準備ができるサービスです。登録・PDF出力・定期リマインドは無料。あなたにできる、いちばんやさしい準備です。
-          </p>
-          <div className="mt-6">
-            <GuideCtaLink
-              href="/signup?next=/digital"
-              className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
-            >
-              つぎの手ナビを無料で始める
-            </GuideCtaLink>
-          </div>
-          <p className="mt-4 text-sm">
-            <Link href="/" className="text-blue-600 hover:underline">
-              サービスの詳しい紹介を見る &rsaquo;
-            </Link>
-          </p>
-        </section>
-
         <section className="mt-14">
           <h2 className="border-b border-slate-200 pb-3 text-xl font-semibold text-slate-900">
             あわせて確認したい記事

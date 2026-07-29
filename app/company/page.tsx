@@ -1,11 +1,11 @@
 import BackButton from "@/components/common/BackButton";
 import SiteFooter from "@/components/SiteFooter";
-import MarketingHeader from "@/components/MarketingHeader";
+import GuideHeader from "@/components/GuideHeader";
 
 export default function CompanyPage() {
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
-      <MarketingHeader />
+      <GuideHeader />
       <main className="flex-1">
         <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">

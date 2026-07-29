@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { LoanArticle, MainVisual } from '@/lib/loan/articles';
+
+export type { LoanArticle, MainVisual };
 
 /**
  * 住宅ローン記事（/loan/*）の共通テンプレート。
@@ -80,13 +83,9 @@ export function ogImageUrl(title: string): string {
  * 用途の使い分け：
  *   ・Article 構造化データの image → この図版（Googleが記事を代表する画像として扱う）
  *   ・og:image                    → /og の動的生成カード（SNSではタイトルが読める方が有効）
+ *
+ * 型と実データは lib/loan/articles.ts（レジストリ）が持つ。
  */
-export interface MainVisual {
-  /** サイトルートからのパス（例：/loan/karikae-demerit.webp） */
-  src: string;
-  /** 記事の内容を表す日本語。「アイキャッチ」等の無内容な語は使わない */
-  alt: string;
-}
 
 /** 図版の実寸（4枚とも同じ。next/image のレイアウト確保に使う） */
 const VISUAL_W = 1600;
@@ -117,30 +116,35 @@ export function ArticleVisual({ visual }: { visual?: MainVisual }) {
 
 /** JSON-LD（Article / FAQPage / BreadcrumbList）を手書きで組み立てる。
  *  reviewedBy は決定事項2により今回は出力しない（引数で渡せば将来追加できる）。 */
+/* パンくずは「ホーム › 住宅ローン › 記事」の3階層で固定する（2026-07-29）。
+ * 中カテゴリ /loan/karikae をページとして廃止したため、間に挟むものがなくなった。
+ * 記事のURLに karikae が残っていてもパンくずには出さない。 */
+export const LOAN_HUB: Crumb = { name: '住宅ローン', path: '/loan' };
+
+/** 記事のパンくず（表示・JSON-LD 共通の元データ） */
+export function articleCrumbs(article: LoanArticle): Crumb[] {
+  return [LOAN_HUB, { name: article.breadcrumb, path: article.path }];
+}
+
 export function buildArticleJsonLd(opts: {
-  path: string;
-  title: string;
-  description: string;
-  datePublished: string;
-  dateModified: string;
-  crumbs: Crumb[];
+  article: LoanArticle;
   faqs: Faq[];
-  /** 記事のメインビジュアル。Article の image に使う（未指定ならOGPカードで代替）。 */
-  visual?: MainVisual;
   reviewedBy?: { name: string; url?: string };
 }) {
-  const url = `${SITE_URL}${opts.path}`;
+  const a = opts.article;
+  const url = `${SITE_URL}${a.path}`;
+  const crumbs = articleCrumbs(a);
   const article: Record<string, unknown> = {
     '@type': 'Article',
-    headline: opts.title,
-    description: opts.description,
+    headline: a.title,
+    description: a.description,
     mainEntityOfPage: url,
-    // 日付はタイムゾーン付きの ISO 8601 で出す（記事側は 'YYYY-MM-DD' のみ書く）
-    datePublished: toIsoJst(opts.datePublished),
-    dateModified: toIsoJst(opts.dateModified),
+    // 日付はタイムゾーン付きの ISO 8601 で出す（レジストリは 'YYYY-MM-DD' のみ持つ）
+    datePublished: toIsoJst(a.datePublished),
+    dateModified: toIsoJst(a.dateModified),
     // image は記事のメインビジュアル（Googleが記事を代表する画像として扱う）。
     // og:image（SNS用の動的生成カード）とは用途が違うので、あえて別のものを指定する。
-    image: [opts.visual ? mainVisualUrl(opts.visual) : ogImageUrl(opts.title)],
+    image: [mainVisualUrl(a.visual)],
     inLanguage: 'ja',
     author: { '@type': 'Organization', name: ORG_NAME, url: SITE_URL },
     publisher: { '@type': 'Organization', name: ORG_NAME, url: SITE_URL },
@@ -164,7 +168,7 @@ export function buildArticleJsonLd(opts: {
         '@type': 'BreadcrumbList',
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'ホーム', item: SITE_URL },
-          ...opts.crumbs.map((c, i) => ({
+          ...crumbs.map((c, i) => ({
             '@type': 'ListItem',
             position: i + 2,
             name: c.name,
@@ -178,36 +182,30 @@ export function buildArticleJsonLd(opts: {
 
 /** 記事の metadata（title / canonical / OGP / Twitter）をまとめて組み立てる。
  *  OGP画像・日付書式をここに閉じ込めることで、記事側は原稿の情報を渡すだけでよくなる。 */
-export function buildArticleMetadata(opts: {
-  path: string;
-  title: string;
-  description: string;
-  datePublished: string;
-  dateModified: string;
-}): Metadata {
-  const url = `${SITE_URL}${opts.path}`;
-  const image = ogImageUrl(opts.title);
+export function buildArticleMetadata(article: LoanArticle): Metadata {
+  const url = `${SITE_URL}${article.path}`;
+  const image = ogImageUrl(article.title);
   return {
-    title: `${opts.title} | ${SITE_NAME}`,
-    description: opts.description,
+    title: `${article.title} | ${SITE_NAME}`,
+    description: article.description,
     alternates: { canonical: url },
     openGraph: {
-      title: opts.title,
-      description: opts.description,
+      title: article.title,
+      description: article.description,
       url,
       siteName: SITE_NAME,
       type: 'article',
       locale: 'ja_JP',
-      publishedTime: toIsoJst(opts.datePublished),
-      modifiedTime: toIsoJst(opts.dateModified),
-      images: [{ url: image, width: 1200, height: 630, alt: opts.title }],
+      publishedTime: toIsoJst(article.datePublished),
+      modifiedTime: toIsoJst(article.dateModified),
+      images: [{ url: image, width: 1200, height: 630, alt: article.title }],
     },
     // サイト既定（app/layout.tsx）と同じ summary_large_image に揃える。
     // 1200×630 の画像を小さい正方形で切り取られないようにするため。
     twitter: {
       card: 'summary_large_image',
-      title: opts.title,
-      description: opts.description,
+      title: article.title,
+      description: article.description,
       images: [image],
     },
   };
@@ -242,6 +240,21 @@ export function Breadcrumb({ crumbs }: { crumbs: Crumb[] }) {
         ))}
       </ol>
     </nav>
+  );
+}
+
+/** 記事の冒頭（パンくず → H1 → 最終更新日 → メインビジュアル）をまとめて描画する。
+ *  記事ページ側は本文だけを書けばよくなり、並び順が記事ごとにぶれない。 */
+export function ArticleHeader({ article }: { article: LoanArticle }) {
+  return (
+    <>
+      <Breadcrumb crumbs={articleCrumbs(article)} />
+      <h1 className="text-[24px] font-bold leading-tight text-slate-900 sm:text-[30px]">
+        {article.heading}
+      </h1>
+      <ArticleUpdatedAt dateModified={article.dateModified} />
+      <ArticleVisual visual={article.visual} />
+    </>
   );
 }
 

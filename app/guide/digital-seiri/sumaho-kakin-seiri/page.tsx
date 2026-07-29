@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import GuideCtaLink from '@/components/guide/GuideCtaLink';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 
@@ -13,7 +12,7 @@ const PAGE_DESCRIPTION =
   'スマホの有料サービス・課金の整理方法を解説。アプリストアのサブスク、アプリ内課金、キャリア決済、キャリアの有料オプションまで「4つの種類」に分けて確認・解約する全手順。気づかず払い続けているお金が見つかります。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
+  title: `${PAGE_TITLE} | つぎの手ナビ`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,
@@ -91,7 +90,7 @@ const jsonLd = {
       inLanguage: 'ja',
       author: {
         '@type': 'Organization',
-        name: 'つぎの手ナビ デジタル資産',
+        name: 'つぎの手ナビ',
         url: SITE_URL,
       },
       publisher: {
@@ -445,29 +444,6 @@ export default function SumahoKakinSeiriPage() {
             もどうぞ。
           </p>
         </Section>
-
-        <section className="mt-14 rounded-3xl bg-slate-50 p-8 text-center sm:p-10">
-          <h2 className="text-xl font-semibold text-slate-900">
-            整理した契約一覧の「在りか」を、もしものときに届く形で残すには
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-8 text-slate-600">
-            あなたにもしもがあったとき、家族が「どこに何があるか」にたどり着けるように。「つぎの手ナビ デジタル資産」は、パスワードや口座・契約・写真の在りかを、生きている間は誰にも見せず、もしものときだけ選んだ人へ届ける準備ができるサービスです。登録・PDF出力・定期リマインドは無料。あなたにできる、いちばんやさしい準備です。
-          </p>
-          <div className="mt-6">
-            <GuideCtaLink
-              href="/signup?next=/digital"
-              className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
-            >
-              無料で始める（新規登録）
-            </GuideCtaLink>
-          </div>
-          <p className="mt-4 text-sm">
-            <Link href="/" className="text-blue-600 hover:underline">
-              サービスの詳しい紹介を見る &rsaquo;
-            </Link>
-          </p>
-        </section>
-
         <section className="mt-14">
           <h2 className="border-b border-slate-200 pb-3 text-xl font-semibold text-slate-900">
             あわせて確認したい記事

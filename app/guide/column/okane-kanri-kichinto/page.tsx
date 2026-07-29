@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import GuideCtaLink from '@/components/guide/GuideCtaLink';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 
@@ -13,7 +12,7 @@ const PAGE_DESCRIPTION =
   'ネット銀行・NISA・ペーパーレス——正しい管理ほど、家族からは「見えない資産」になる。きちんとしている人だけに起きる副作用を、公的な数字と相談事例から解き明かし、金額もパスワードも書かない「どこに何があるかの一覧」を残す15分の備え方までを解説します。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
+  title: `${PAGE_TITLE} | つぎの手ナビ`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,
@@ -80,7 +79,7 @@ const jsonLd = {
       inLanguage: 'ja',
       author: {
         '@type': 'Organization',
-        name: 'つぎの手ナビ デジタル資産',
+        name: 'つぎの手ナビ',
         url: SITE_URL,
       },
       publisher: {
@@ -513,38 +512,13 @@ export default function OkaneKanriKichintoPage() {
             最後にひとつだけ。紙の一覧にも弱点があります。口座は増えたり減ったりするので内容がすぐ古くなること。そして、家族がその紙の存在と置き場所を知らなければ、結局見つけてもらえないことです。
           </p>
           <p>
-            こうした口座やNISA、パスワードといった「デジタル資産」の在りかを、ふだんは誰にも見せずに整理しておき、もしものときにだけ、自分が選んだ家族へ引き継げるようにする専用のサービスもあります。私たちが運営する
-            <strong>「つぎの手ナビ デジタル資産」</strong>
-            もそのひとつで、資産の登録・一覧のPDF出力・見直しの定期リマインドまでは無料で使えます。
+            こうした口座やNISA、パスワードといった「デジタル資産」の在りかを、ふだんは誰にも見せずに整理しておき、もしものときにだけ、自分が選んだ家族へ引き継げるようにする専用のサービスもあります。
           </p>
           <p>あなたの「きちんと」は、何も間違っていません。足りないのは、最後の1ピースだけ。</p>
           <p>
             コツコツ積み上げてきたその努力を、家族に届く形に変える作業は、15分で終わります。それはあなたの資産管理の、本当の完成だと思うのです。
           </p>
         </Section>
-
-        <section className="mt-14 rounded-3xl bg-slate-50 p-8 text-center sm:p-10">
-          <h2 className="text-xl font-semibold text-slate-900">
-            資産の在りかの一覧を、もしものときだけ届く形で残すなら
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-8 text-slate-600">
-            あなたにもしもがあったとき、家族が「どこに何があるか」にたどり着けるように。「つぎの手ナビ デジタル資産」は、パスワードや口座・契約・写真の在りかを、生きている間は誰にも見せず、もしものときだけ選んだ人へ届ける準備ができるサービスです。登録・PDF出力・定期リマインドは無料。あなたにできる、いちばんやさしい準備です。
-          </p>
-          <div className="mt-6">
-            <GuideCtaLink
-              href="/signup?next=/digital"
-              className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
-            >
-              無料で始める（新規登録）
-            </GuideCtaLink>
-          </div>
-          <p className="mt-4 text-sm">
-            <Link href="/" className="text-blue-600 hover:underline">
-              サービスの詳しい紹介を見る &rsaquo;
-            </Link>
-          </p>
-        </section>
-
         <section className="mt-14">
           <h2 className="border-b border-slate-200 pb-3 text-xl font-semibold text-slate-900">
             あわせて確認したい記事

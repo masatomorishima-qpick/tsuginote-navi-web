@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import GuideCtaLink from '@/components/guide/GuideCtaLink';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 
@@ -13,7 +12,7 @@ const PAGE_DESCRIPTION =
   '現金、ポイントカード、通帳、印鑑、アルバム——この5年で財布と引き出しから消えた5つには、ある共通点があります。キャッシュレス比率58%、通帳の印紙税、年賀状6分の1。公的な数字で振り返る大変化と、その先にある「史上初めて必要になった習慣」の話。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
+  title: `${PAGE_TITLE} | つぎの手ナビ`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,
@@ -73,7 +72,7 @@ const jsonLd = {
       inLanguage: 'ja',
       author: {
         '@type': 'Organization',
-        name: 'つぎの手ナビ デジタル資産',
+        name: 'つぎの手ナビ',
         url: SITE_URL,
       },
       publisher: {
@@ -525,37 +524,12 @@ export default function SaifuHikidashi5senPage() {
             うれしい副産物もあります。書き出してみると、使っていないポイントアプリ、ほぼ残高ゼロの口座、忘れていたサブスクがたいてい1つや2つ見つかります。一覧づくりは、将来の備えであると同時に、財布と暮らしをもう一段身軽にする整理でもあるのです。
           </p>
           <p>
-            紙に書いて引き出しに入れておくだけでも、ないよりずっと良い。ただ、紙には「内容がすぐ古くなる」「家族がその存在を知らなければ見つからない」という2つの弱点が残ります。こうした口座や契約、写真の在りかといった「デジタル資産」を、ふだんは誰にも見せず、もしものときにだけ選んだ家族へ引き継げるようにする専用のサービスもあります。私たちが運営する
-            <strong>「つぎの手ナビ デジタル資産」</strong>
-            もそのひとつで、登録・一覧のPDF出力・見直しの定期リマインドまでは無料で使えます。
+            紙に書いて引き出しに入れておくだけでも、ないよりずっと良い。ただ、紙には「内容がすぐ古くなる」「家族がその存在を知らなければ見つからない」という2つの弱点が残ります。こうした口座や契約、写真の在りかといった「デジタル資産」を、ふだんは誰にも見せず、もしものときにだけ選んだ家族へ引き継げるようにする専用のサービスもあります。
           </p>
           <p>
             この5年で、私たちの持ち物は史上いちばん身軽になりました。あとは、その身軽さに在りかの一覧を1枚足すだけ。財布と引き出しが黙ってやってくれていた仕事は、それでぜんぶ取り戻せます。もう、考えなくて大丈夫です。
           </p>
         </Section>
-
-        <section className="mt-14 rounded-3xl bg-slate-50 p-8 text-center sm:p-10">
-          <h2 className="text-xl font-semibold text-slate-900">
-            「どこに何があるか」を、もしものときだけ届く形で残すなら
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-8 text-slate-600">
-            あなたにもしもがあったとき、家族が「どこに何があるか」にたどり着けるように。「つぎの手ナビ デジタル資産」は、パスワードや口座・契約・写真の在りかを、生きている間は誰にも見せず、もしものときだけ選んだ人へ届ける準備ができるサービスです。登録・PDF出力・定期リマインドは無料。あなたにできる、いちばんやさしい準備です。
-          </p>
-          <div className="mt-6">
-            <GuideCtaLink
-              href="/signup?next=/digital"
-              className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
-            >
-              無料で始める（新規登録）
-            </GuideCtaLink>
-          </div>
-          <p className="mt-4 text-sm">
-            <Link href="/" className="text-blue-600 hover:underline">
-              サービスの詳しい紹介を見る &rsaquo;
-            </Link>
-          </p>
-        </section>
-
         <section className="mt-14">
           <h2 className="border-b border-slate-200 pb-3 text-xl font-semibold text-slate-900">
             動画でも見る（約20秒）

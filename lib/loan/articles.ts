@@ -1,0 +1,133 @@
+/**
+ * lib/loan/articles.ts — 住宅ローン記事のレジストリ（2026-07-29 新設）
+ *
+ * ここが記事メタ情報の**唯一の正**である。
+ *
+ * 参照している場所：
+ *   ・/loan ハブの記事一覧（app/loan/page.tsx）
+ *   ・sitemap.xml（app/sitemap.ts）
+ *   ・各記事ページの metadata / 構造化データ / パンくず / メインビジュアル
+ *     （components/loan/LoanArticle.tsx 経由）
+ *
+ * 記事を1本増やす手順：
+ *   1. 下の ARTICLES に1件足す（order で並び順を決める）
+ *   2. app/loan/<path>/page.tsx に本文（目次・FAQ・セクション）だけを書く
+ *   これでハブの一覧・sitemap・パンくず・Article/BreadcrumbList・OGP・
+ *   メインビジュアルはすべて自動で揃う。個別に更新する場所は他にない。
+ *
+ * URL の方針（重要）：
+ *   2026-07-29 に中カテゴリ /loan/karikae をページとして廃止したが、
+ *   **記事のURLは変更していない**（インデックス済みの評価を失わないため）。
+ *   パスに karikae が残っているのはその名残で、将来カテゴリを復活させる
+ *   ときはそのまま使える。
+ */
+
+/** 記事のメインビジュアル（H1・最終更新日の下に表示し、Article の image にも使う） */
+export interface MainVisual {
+  /** サイトルートからのパス（例：/loan/karikae-demerit.webp） */
+  src: string;
+  /** 記事の内容を表す日本語。「アイキャッチ」等の無内容な語は使わない */
+  alt: string;
+}
+
+export interface LoanArticle {
+  /** サイトルートからのURL。レジストリのキーになる */
+  path: string;
+  /** meta title・OGP・一覧の見出しに使う */
+  title: string;
+  /** 記事ページの H1。title より説明的でよい */
+  heading: string;
+  /** パンくずの末尾に出す短い名前 */
+  breadcrumb: string;
+  /** meta description（検索結果用・120字前後） */
+  description: string;
+  /** /loan の一覧に出す説明（1〜2行）。description とは用途が違うので別に持つ */
+  summary: string;
+  /** 'YYYY-MM-DD'。ISO 8601 への変換は LoanArticle.tsx 側で行う */
+  datePublished: string;
+  dateModified: string;
+  visual: MainVisual;
+  /** 一覧・sitemap の並び順（小さいほど先）。判断の流れに沿った論理順にする */
+  order: number;
+}
+
+/**
+ * 記事の一覧。
+ * 並び順は「変動か固定か」→「費用はいくらか」→「いつ動くか」→「損をしないか」
+ * という判断の流れに沿わせている。
+ */
+const ARTICLES: LoanArticle[] = [
+  {
+    path: '/loan/hendo-kotei',
+    title: '住宅ローンは変動と固定どちらがいいか｜2026年7月の金利で試算',
+    heading: '住宅ローンは変動と固定どちらがいいか｜2026年7月の金利で試算して比べる',
+    breadcrumb: '変動と固定どちらがいいか',
+    description:
+      '2026年7月時点で変動は年1%前後、固定（フラット35）は3.14%。金利差は約2.1%です。いま固定に切り替えると月2〜4万円増え、変動が3.3%前後まで上がって初めて総支払額が並びます。残高・残り年数別の表で示します。',
+    summary:
+      'すでに変動で借りている人向けに、いま固定へ切り替えると月々いくら増えるのか、変動が何%まで上がったら切り替えた方が総支払額が少なくなるのかを、残高・残り年数ごとの表で示しています。',
+    datePublished: '2026-07-28',
+    dateModified: '2026-07-28',
+    visual: { src: '/loan/hendo-kotei.webp', alt: '変動金利と固定金利の分かれ道を表した図' },
+    order: 1,
+  },
+  {
+    path: '/loan/karikae/hiyou',
+    title: '住宅ローンの借り換え費用はいくら？手数料の内訳と元が取れる条件',
+    heading: '住宅ローンの借り換え費用はいくら？手数料の内訳と、元が取れる条件',
+    breadcrumb: '借り換え費用と元が取れる条件',
+    description:
+      '住宅ローンの借り換え費用は借入額の2.8〜3.4%程度、残高3,000万円なら約87万円です。事務手数料と登録免許税が借入額に比例して増えます。費用を引いた後にいくら残るのかを残高・残り年数・金利差ごとの表で示します。',
+    summary:
+      '費用は借入額の2.8〜3.4%程度、残高3,000万円なら約87万円。事務手数料と登録免許税が借入額に比例して増えます。費用を引いた後にいくら残るのかを、残高・残り年数・金利差ごとの表で示しています。',
+    datePublished: '2026-07-28',
+    dateModified: '2026-07-28',
+    visual: { src: '/loan/karikae-hiyou.webp', alt: '借り換え費用の内訳を積み上げで表した図' },
+    order: 2,
+  },
+  {
+    path: '/loan/karikae/timing',
+    title: '住宅ローンの借り換えはいつがベストなタイミングか',
+    heading: '住宅ローンの借り換えはいつがベストなタイミングか｜判断できることとできないこと',
+    breadcrumb: '借り換えのタイミング',
+    description:
+      '住宅ローンの借り換えのタイミングは、金利ではなく自分の条件で決まります。金利の底は誰にも予測できません。残りの返済期間が10年を切ると費用倒れになりやすく、1年待つだけでメリットは7万〜18万円減ります。',
+    summary:
+      '金利の底は誰にも予測できません。判断できるのは自分の条件です。残りの返済期間が10年を切ると費用倒れになりやすいこと、1年待つとメリットが7万〜18万円減ることを、残高・残り年数ごとの表で示しています。',
+    datePublished: '2026-07-29',
+    dateModified: '2026-07-29',
+    visual: { src: '/loan/karikae-timing.webp', alt: '時間の経過とともに借り換えメリットが減ることを表した図' },
+    order: 3,
+  },
+  {
+    path: '/loan/karikae/demerit',
+    title: '住宅ローン借り換えのデメリット｜損をする6つのケース',
+    heading: '住宅ローン借り換えのデメリット｜損をする6つのケースと確認すべきこと',
+    breadcrumb: '借り換えのデメリット',
+    description:
+      '住宅ローンの借り換えで損をするのは主に6つのケースです。費用を回収できない、住宅ローン控除が受けられなくなる（約70万円の損）、月々の返済が下がっても総額では87万円増える、など数字で確認します。',
+    summary:
+      '費用を回収できない、住宅ローン控除が受けられなくなる、月々が下がっても総額は増える——借り換えで損をするケースを数字で確認します。控除の喪失は残高2,000万円・残り5年で約70万円になります。',
+    datePublished: '2026-07-29',
+    dateModified: '2026-07-29',
+    visual: { src: '/loan/karikae-demerit.webp', alt: '見えにくい部分に費用が隠れていることを表した図' },
+    order: 4,
+  },
+];
+
+/** 表示順に並べた記事一覧（ハブと sitemap が使う） */
+export const LOAN_ARTICLES: LoanArticle[] = [...ARTICLES].sort((a, b) => a.order - b.order);
+
+/**
+ * パスから記事を取得する。各記事ページの先頭で呼ぶ。
+ * 登録がなければビルド時に落とす（レジストリへの追加漏れをその場で気づけるようにする）。
+ */
+export function getLoanArticle(path: string): LoanArticle {
+  const found = ARTICLES.find((a) => a.path === path);
+  if (!found) {
+    throw new Error(
+      `[lib/loan/articles] ${path} がレジストリに登録されていません。lib/loan/articles.ts の ARTICLES に追加してください。`,
+    );
+  }
+  return found;
+}

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import GuideCtaLink from '@/components/guide/GuideCtaLink';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 
@@ -13,7 +12,7 @@ const PAGE_DESCRIPTION =
   'スマホに何千枚——私たちは人類史上いちばん子どもを撮っている親です。でも「撮る」と「残る」は別の話。共有・二重保管・フォトブック・声の記録、そして見落とされがちな「鍵の引き継ぎ」まで、撮りためた思い出を一生ものにする5つの習慣を解説します。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
+  title: `${PAGE_TITLE} | つぎの手ナビ`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,
@@ -73,7 +72,7 @@ const jsonLd = {
       inLanguage: 'ja',
       author: {
         '@type': 'Organization',
-        name: 'つぎの手ナビ デジタル資産',
+        name: 'つぎの手ナビ',
         url: SITE_URL,
       },
       publisher: {
@@ -464,9 +463,7 @@ export default function KodomoOmoide5ShukanPage() {
             ]}
           />
           <p>
-            こうした写真や契約の「在りか」を、ふだんは誰にも見せずに整理しておき、もしものときにだけ、選んだ家族へ届くようにしておく専用のサービスもあります。私たちが運営する
-            <strong>「つぎの手ナビ デジタル資産」</strong>
-            もそのひとつで、登録・一覧のPDF出力・見直しの定期リマインドまでは無料で使えます。
+            こうした写真や契約の「在りか」を、ふだんは誰にも見せずに整理しておき、もしものときにだけ、選んだ家族へ届くようにしておく専用のサービスもあります。
           </p>
         </Section>
 
@@ -530,29 +527,6 @@ export default function KodomoOmoide5ShukanPage() {
             それはきっと、あなたから子どもへの、いちばん大きな贈り物になります。備えた日から、もう心配しなくて大丈夫です。
           </p>
         </Section>
-
-        <section className="mt-14 rounded-3xl bg-slate-50 p-8 text-center sm:p-10">
-          <h2 className="text-xl font-semibold text-slate-900">
-            子どもの思い出の「鍵」を、もしものときだけ届く形で残すなら
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-8 text-slate-600">
-            あなたにもしもがあったとき、家族が「どこに何があるか」にたどり着けるように。「つぎの手ナビ デジタル資産」は、パスワードや口座・契約・写真の在りかを、生きている間は誰にも見せず、もしものときだけ選んだ人へ届ける準備ができるサービスです。登録・PDF出力・定期リマインドは無料。あなたにできる、いちばんやさしい準備です。
-          </p>
-          <div className="mt-6">
-            <GuideCtaLink
-              href="/signup?next=/digital"
-              className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
-            >
-              無料で始める（新規登録）
-            </GuideCtaLink>
-          </div>
-          <p className="mt-4 text-sm">
-            <Link href="/" className="text-blue-600 hover:underline">
-              サービスの詳しい紹介を見る &rsaquo;
-            </Link>
-          </p>
-        </section>
-
         <section className="mt-14">
           <h2 className="border-b border-slate-200 pb-3 text-xl font-semibold text-slate-900">
             あわせて確認したい記事

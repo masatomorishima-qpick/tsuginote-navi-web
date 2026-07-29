@@ -3,33 +3,20 @@ import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 import LoanCalculator from '@/components/loan/LoanCalculator';
 import {
-  Breadcrumb, Toc, FaqSection, SourcesAndDisclaimer, TableScroll, ArticleUpdatedAt, ArticleVisual,
+  ArticleHeader, Toc, FaqSection, SourcesAndDisclaimer, TableScroll,
   buildArticleJsonLd, buildArticleMetadata, tableCls, thCls, tdCls,
-  type Faq, type TocItem, type MainVisual,
+  type Faq, type TocItem,
 } from '@/components/loan/LoanArticle';
+import { getLoanArticle } from '@/lib/loan/articles';
 
-/* ===== メタ情報 ===== */
-const PAGE_PATH = '/loan/hendo-kotei';
-const PAGE_TITLE = '住宅ローンは変動と固定どちらがいいか｜2026年7月の金利で試算';
-const PAGE_DESCRIPTION =
-  '2026年7月時点で変動は年1%前後、固定（フラット35）は3.14%。金利差は約2.1%です。いま固定に切り替えると月2〜4万円増え、変動が3.3%前後まで上がって初めて総支払額が並びます。残高・残り年数別の表で示します。';
-const DATE_PUBLISHED = '2026-07-28';
-const DATE_MODIFIED = '2026-07-28';
-/* メインビジュアル（H1・最終更新日の下に表示し、Article の image にも使う） */
-const VISUAL: MainVisual = {
-  src: '/loan/hendo-kotei.webp',
-  alt: '変動金利と固定金利の分かれ道を表した図',
-};
+/* ===== メタ情報 =====
+ * 実体は lib/loan/articles.ts（レジストリ）が持つ。ここでは参照するだけ。 */
+const ARTICLE = getLoanArticle('/loan/hendo-kotei');
+const PAGE_PATH = ARTICLE.path;
 
 /* metadata（canonical / OGP / Twitter / OGP画像）はテンプレート側で組み立てる。
  * 記事ごとに画像や日付書式を書かないための共通化。 */
-export const metadata = buildArticleMetadata({
-  path: PAGE_PATH,
-  title: PAGE_TITLE,
-  description: PAGE_DESCRIPTION,
-  datePublished: DATE_PUBLISHED,
-  dateModified: DATE_MODIFIED,
-});
+export const metadata = buildArticleMetadata(ARTICLE);
 
 /* ===== 目次（H2 と対応） ===== */
 const TOC: TocItem[] = [
@@ -73,19 +60,7 @@ const FAQS: Faq[] = [
   },
 ];
 
-const jsonLd = buildArticleJsonLd({
-  path: PAGE_PATH,
-  title: PAGE_TITLE,
-  description: PAGE_DESCRIPTION,
-  datePublished: DATE_PUBLISHED,
-  dateModified: DATE_MODIFIED,
-  crumbs: [
-    { name: '住宅ローン', path: '/loan' },
-    { name: '変動と固定どちらがいいか', path: PAGE_PATH },
-  ],
-  faqs: FAQS,
-  visual: VISUAL,
-});
+const jsonLd = buildArticleJsonLd({ article: ARTICLE, faqs: FAQS });
 
 const h2 = 'mt-10 scroll-mt-20 text-[20px] font-bold text-slate-900 sm:text-[22px]';
 const h3 = 'mt-6 text-[16px] font-bold text-slate-900 sm:text-[17px]';
@@ -98,18 +73,7 @@ export default function HendoKoteiPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <GuideHeader />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6">
-        <Breadcrumb
-          crumbs={[
-            { name: '住宅ローン', path: '/loan' },
-            { name: '変動と固定どちらがいいか', path: PAGE_PATH },
-          ]}
-        />
-
-        <h1 className="text-[24px] font-bold leading-tight text-slate-900 sm:text-[30px]">
-          住宅ローンは変動と固定どちらがいいか｜2026年7月の金利で試算して比べる
-        </h1>
-        <ArticleUpdatedAt dateModified={DATE_MODIFIED} />
-        <ArticleVisual visual={VISUAL} />
+        <ArticleHeader article={ARTICLE} />
 
         <Toc items={TOC} />
 

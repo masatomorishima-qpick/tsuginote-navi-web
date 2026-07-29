@@ -1,13 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import GuideCtaLink from '@/components/guide/GuideCtaLink';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 
 export const metadata: Metadata = {
-  title: 'コラム｜デジタル資産との付き合い方を考える読み物 | つぎの手ナビ デジタル資産',
+  title: 'コラム｜デジタル資産との付き合い方を考える読み物 | つぎの手ナビ',
   description:
     'サブスク・ネット銀行・スマホの写真——暮らしを支えるデジタルの仕組みに隠れた、知られていない性質を解き明かす読み物。公的機関の事例と数字をもとに、前向きな備え方まで考えます。',
   alternates: { canonical: `${SITE_URL}/guide/column` },
@@ -152,28 +151,6 @@ export default function ColumnIndexPage() {
               もしもの備えガイド
             </Link>
             もあわせてどうぞ。
-          </p>
-        </section>
-
-        <section className="mt-16 rounded-3xl bg-slate-50 p-8 text-center sm:p-10">
-          <h2 className="text-xl font-semibold text-slate-900">
-            情報の「在りか」を、もしものときに届く形で残す
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-8 text-slate-600">
-            あなたにもしもがあったとき、家族が「どこに何があるか」にたどり着けるように。「つぎの手ナビ デジタル資産」は、パスワードや口座・契約・写真の在りかを、生きている間は誰にも見せず、もしものときだけ選んだ人へ届ける準備ができるサービスです。登録・PDF出力・定期リマインドは無料。あなたにできる、いちばんやさしい準備です。
-          </p>
-          <div className="mt-6">
-            <GuideCtaLink
-              href="/signup?next=/digital"
-              className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
-            >
-              無料で始める（新規登録）
-            </GuideCtaLink>
-          </div>
-          <p className="mt-4 text-sm">
-            <Link href="/" className="text-blue-600 hover:underline">
-              サービスの詳しい紹介を見る &rsaquo;
-            </Link>
           </p>
         </section>
       </div>

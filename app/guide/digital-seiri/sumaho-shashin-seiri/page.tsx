@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import GuideCtaLink from '@/components/guide/GuideCtaLink';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 
@@ -13,7 +12,7 @@ const PAGE_DESCRIPTION =
   'スマホの写真整理のやり方を「減らす→分類→バックアップ→溜めない」の手順で解説。iPhone・Android両対応、無料の容量や重複削除のコツも。最後に、多くの人が見落とす「整理した写真を、もしものとき家族が取り出せるか」という視点まで。';
 
 export const metadata: Metadata = {
-  title: `${PAGE_TITLE} | つぎの手ナビ デジタル資産`,
+  title: `${PAGE_TITLE} | つぎの手ナビ`,
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}${PAGE_PATH}`,
@@ -72,7 +71,7 @@ const faqs = [
   },
   {
     q: '「在りかを残す」とは具体的にどうすることですか？',
-    a: '「写真はGoogleフォトに保存」「ログインはこのメールアドレス」といった“どこに何があるか”の情報を、引き継ぎ用のサービス（当サイトを運営する「つぎの手ナビ デジタル資産」など）に登録しておくことです。写真そのものをアップロードするのではなく、保存先やアカウントの場所の手がかりだけを預けます。もしものときに、それが指定した家族へ届きます。',
+    a: '「写真はGoogleフォトに保存」「ログインはこのメールアドレス」といった“どこに何があるか”の情報を、引き継ぎ用のサービスに登録しておくことです。写真そのものをアップロードするのではなく、保存先やアカウントの場所の手がかりだけを預けます。もしものときに、それが指定した家族へ届きます。',
   },
   {
     q: '「つぎの手ナビ」に在りかを登録したら、今すぐ家族に見られてしまいますか？',
@@ -94,7 +93,7 @@ const jsonLd = {
       inLanguage: 'ja',
       author: {
         '@type': 'Organization',
-        name: 'つぎの手ナビ デジタル資産',
+        name: 'つぎの手ナビ',
         url: SITE_URL,
       },
       publisher: {
@@ -427,29 +426,6 @@ export default function SumahoShashinSeiriPage() {
             もどうぞ。
           </p>
         </Section>
-
-        <section className="mt-14 rounded-3xl bg-slate-50 p-8 text-center sm:p-10">
-          <h2 className="text-xl font-semibold text-slate-900">
-            整理した思い出を、もしものときに届く形で残すには
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-8 text-slate-600">
-            あなたにもしもがあったとき、家族が「どこに何があるか」にたどり着けるように。「つぎの手ナビ デジタル資産」は、パスワードや口座・契約・写真の在りかを、生きている間は誰にも見せず、もしものときだけ選んだ人へ届ける準備ができるサービスです。登録・PDF出力・定期リマインドは無料。あなたにできる、いちばんやさしい準備です。
-          </p>
-          <div className="mt-6">
-            <GuideCtaLink
-              href="/signup?next=/digital"
-              className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
-            >
-              無料で始める（新規登録）
-            </GuideCtaLink>
-          </div>
-          <p className="mt-4 text-sm">
-            <Link href="/" className="text-blue-600 hover:underline">
-              サービスの詳しい紹介を見る &rsaquo;
-            </Link>
-          </p>
-        </section>
-
         <section className="mt-14">
           <h2 className="border-b border-slate-200 pb-3 text-xl font-semibold text-slate-900">
             あわせて確認したい記事

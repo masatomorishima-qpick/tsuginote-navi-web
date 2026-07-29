@@ -6,7 +6,7 @@ import { SITE_URL, ORG_NAME, formatJaDate, toIsoJst, ogImageUrl } from '@/compon
 import { LOAN_ARTICLES } from '@/lib/loan/articles';
 
 /**
- * / — サイトのトップページ（2026-07-30 に実体化）
+ * / — サイトのトップページ（2026-07-29 に実体化）
  *
  * 経緯：2026-07-15 のピボット以降、"/" は middleware で /shisan にリダイレクトされ、
  * サイトの顔が「老後資金の診断ツール」になっていた。主軸である /loan（記事5本＋

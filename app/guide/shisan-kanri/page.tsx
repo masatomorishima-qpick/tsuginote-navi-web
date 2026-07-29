@@ -128,7 +128,7 @@ export default function ShisanKanriIndexPage() {
           </p>
         </section>
 
-        {/* 2026-07-30 追加：/loan への導線。
+        {/* 2026-07-29 追加：/loan への導線。
             7/29 に /digital の獲得CTAを撤去した位置に、お金に関わる記事だけへ置く。
             /guide は唯一オーガニック流入がある領域だが、主軸である /loan への
             接続がゼロだったため。デジタル遺品・パスワード・思い出系の記事には

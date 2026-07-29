@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(hubUrl, 301);
   }
 
-  /* --- TOP（"/"）のリダイレクトは 2026-07-30 に廃止 ---
+  /* --- TOP（"/"）のリダイレクトは 2026-07-29 に廃止 ---
    *
    * 経緯：2026-07-15 のピボットで TOP を /shisan に移管し、"/" は
    *   ・auth Cookie あり → /digital
@@ -103,7 +103,7 @@ export const config = {
    * 既存の `/souzoku-houki` `/tokyo/*` `/souzoku-tetsuzuki` 等は完全に素通りします。
    */
   matcher: [
-    // 2026-07-30：'/' を除外した。TOP のリダイレクトを廃止したため middleware で
+    // 2026-07-29：'/' を除外した。TOP のリダイレクトを廃止したため middleware で
     // 行う処理がなくなり、残したままだと毎回 Supabase の getUser() が走って
     // トップの初期表示が遅くなる（広告流入はほぼ未ログインで、その通信は無駄）。
     // 中カテゴリ廃止に伴う 301（配下の記事 /loan/karikae/* は含まないので素通りする）

@@ -29,7 +29,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
-      // 2026-07-30：TOP を実体化したので sitemap に載せる（リダイレクト廃止）。
+      // 2026-07-29：TOP を実体化したので sitemap に載せる（リダイレクト廃止）。
       url: baseUrl,
       lastModified: now,
       changeFrequency: "weekly",

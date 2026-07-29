@@ -7,6 +7,14 @@ export const metadata: Metadata = {
   title: "利用規約 | つぎの手ナビ",
   description:
     "つぎの手ナビ の利用規約です。中立的な候補表示、連絡方法、免責、禁止事項などを記載しています。",
+  openGraph: {
+    title: "利用規約 | つぎの手ナビ",
+    siteName: "つぎの手ナビ",
+    type: "website",
+    locale: "ja_JP",
+    images: [{ url: "https://www.tsuginotenavi.jp/og?title=%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84%20%7C%20%E3%81%A4%E3%81%8E%E3%81%AE%E6%89%8B%E3%83%8A%E3%83%93", width: 1200, height: 630, alt: "利用規約" }],
+  },
+  twitter: { card: "summary_large_image", images: ["https://www.tsuginotenavi.jp/og?title=%E5%88%A9%E7%94%A8%E8%A6%8F%E7%B4%84%20%7C%20%E3%81%A4%E3%81%8E%E3%81%AE%E6%89%8B%E3%83%8A%E3%83%93"] },
 };
 
 export default function TermsPage() {

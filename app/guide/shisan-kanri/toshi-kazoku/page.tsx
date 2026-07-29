@@ -78,8 +78,8 @@ const jsonLd = {
       description: PAGE_DESCRIPTION,
       image: `${SITE_URL}/images/guide/shisan-kanri/toshi-kazoku-main.webp`,
       mainEntityOfPage: `${SITE_URL}${PAGE_PATH}`,
-      datePublished: '2026-06-07',
-      dateModified: '2026-06-07',
+      datePublished: '2026-06-07T09:00:00+09:00',
+      dateModified: '2026-06-07T09:00:00+09:00',
       inLanguage: 'ja',
       author: {
         '@type': 'Organization',

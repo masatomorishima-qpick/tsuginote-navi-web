@@ -794,7 +794,7 @@ export default function AssetConciergeMvp() {
   if (screen === "input") {
     return (
       <main className="max-w-2xl mx-auto px-4 pt-6 pb-24 text-slate-800">
-        <h1 className="text-[20px] font-extrabold leading-tight mb-1">つぎの手ナビ 資産づくり<span className="text-[12px] font-bold text-slate-400 ml-2">β</span></h1>
+        <h1 className="text-[20px] font-extrabold leading-tight mb-1">つぎの手ナビの家計診断</h1>
         <p className="text-slate-500 text-[13px] mb-4">あなたの数字を入れると、今月の“次の一手”が見えてきます（2〜3分）。</p>
 
         <div className={card}>

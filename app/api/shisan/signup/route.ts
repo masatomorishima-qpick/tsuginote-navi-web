@@ -181,7 +181,7 @@ export async function POST(req: NextRequest) {
     subject: "【つぎの手ナビ】診断結果と決めたことを保存しました",
     fromDisplayName: "つぎの手ナビ",
     html: [
-      "<p>つぎの手ナビ 資産づくり（β）をご利用いただきありがとうございます。</p>",
+      "<p>つぎの手ナビの家計診断をご利用いただきありがとうございます。</p>",
       "<p>診断結果と、決めたことを保存しました。</p>",
       summaryHtml,
       `<p style="margin-top:16px"><a href="${loginLink}">AIに相談を始める（ログイン）</a><br/>`,
@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
       `<p><a href="${SITE_URL}/shisan">つぎの手ナビ 資産づくり</a></p>`,
     ].join(""),
     text: [
-      "つぎの手ナビ 資産づくり（β）をご利用いただきありがとうございます。",
+      "つぎの手ナビの家計診断をご利用いただきありがとうございます。",
       "診断結果と、決めたことを保存しました。",
       summaryText,
       `AIに相談を始める（ログイン）: ${loginLink}`,

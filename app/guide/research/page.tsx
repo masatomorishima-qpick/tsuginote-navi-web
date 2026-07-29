@@ -73,7 +73,7 @@ const jsonLd = {
       description: PAGE_DESCRIPTION,
       url: `${SITE_URL}${PAGE_PATH}`,
       inLanguage: 'ja',
-      datePublished: '2026-06-14',
+      datePublished: '2026-06-14T09:00:00+09:00',
       temporalCoverage: '2026-04',
       measurementTechnique: '調査会社によるインターネットアンケート調査',
       variableMeasured: [

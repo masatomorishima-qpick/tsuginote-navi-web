@@ -7,6 +7,14 @@ export const metadata: Metadata = {
   title: "プライバシーポリシー | つぎの手ナビ",
   description:
     "つぎの手ナビ における情報の取扱い、匿名データの利用目的、Cookie等の利用について記載しています。",
+  openGraph: {
+    title: "プライバシーポリシー | つぎの手ナビ",
+    siteName: "つぎの手ナビ",
+    type: "website",
+    locale: "ja_JP",
+    images: [{ url: "https://www.tsuginotenavi.jp/og?title=%E3%83%97%E3%83%A9%E3%82%A4%E3%83%90%E3%82%B7%E3%83%BC%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%20%7C%20%E3%81%A4%E3%81%8E%E3%81%AE%E6%89%8B%E3%83%8A%E3%83%93", width: 1200, height: 630, alt: "プライバシーポリシー" }],
+  },
+  twitter: { card: "summary_large_image", images: ["https://www.tsuginotenavi.jp/og?title=%E3%83%97%E3%83%A9%E3%82%A4%E3%83%90%E3%82%B7%E3%83%BC%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%20%7C%20%E3%81%A4%E3%81%8E%E3%81%AE%E6%89%8B%E3%83%8A%E3%83%93"] },
 };
 
 export default function PrivacyPage() {

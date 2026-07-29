@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# OS / エディタが生成する副産物（2026-07-29 追加）
+.DS_Store
+.~lock.*#

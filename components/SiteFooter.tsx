@@ -33,6 +33,14 @@ export default function SiteFooter() {
             </Link>
           </nav>
         </div>
+
+        {/* 2026-07-29 追加：中立性の免責。もともと /shisan 専用の ShisanFooter にだけ
+            あったものを、フッター統一にあわせて全ページ共通に移した。
+            記事ごとの免責は読み切った人にしか届かないが、フッターの一文は
+            どのページでも、どの深さで離脱しても目に入るため。 */}
+        <p className="mt-6 border-t border-slate-100 pt-4 text-center text-xs leading-relaxed text-slate-500 sm:text-left">
+          本サイトは一般的な情報と、入力された数字にもとづく試算のみを提供します。特定の金融商品・保険・サービスの推奨や、投資助言・金融商品の販売勧誘は行いません。すべて目安です。
+        </p>
       </div>
     </footer>
   );

@@ -84,8 +84,8 @@ const jsonLd = {
       description: PAGE_DESCRIPTION,
       image: `${SITE_URL}/images/guide/kazoku-kyoyu/password-account-kyoyu-main.webp`,
       mainEntityOfPage: `${SITE_URL}${PAGE_PATH}`,
-      datePublished: '2026-06-06',
-      dateModified: '2026-06-11',
+      datePublished: '2026-06-06T09:00:00+09:00',
+      dateModified: '2026-06-11T09:00:00+09:00',
       inLanguage: 'ja',
       author: {
         '@type': 'Organization',

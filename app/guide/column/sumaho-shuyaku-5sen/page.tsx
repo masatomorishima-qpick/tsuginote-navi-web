@@ -75,8 +75,8 @@ const jsonLd = {
       description: PAGE_DESCRIPTION,
       image: PAGE_IMAGE,
       mainEntityOfPage: `${SITE_URL}${PAGE_PATH}`,
-      datePublished: '2026-06-18',
-      dateModified: '2026-06-18',
+      datePublished: '2026-06-18T09:00:00+09:00',
+      dateModified: '2026-06-18T09:00:00+09:00',
       inLanguage: 'ja',
       author: {
         '@type': 'Organization',

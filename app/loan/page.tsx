@@ -3,7 +3,7 @@ import Link from 'next/link';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 import LoanCalculator from '@/components/loan/LoanCalculator';
-import { Breadcrumb, SITE_URL, ORG_NAME, formatJaDate, toIsoJst } from '@/components/loan/LoanArticle';
+import { Breadcrumb, SITE_URL, ORG_NAME, formatJaDate, toIsoJst, ogImageUrl } from '@/components/loan/LoanArticle';
 import { LOAN_ARTICLES } from '@/lib/loan/articles';
 
 /**
@@ -25,6 +25,9 @@ const PAGE_TITLE = '住宅ローンの判断に迷ったら｜変動と固定・
 const PAGE_DESCRIPTION =
   '住宅ローンで迷いやすい判断を、あなたの数字で比べられる形にまとめています。変動と固定どちらがいいか、借り換えの費用と損益分岐、借り換えのタイミングとデメリットなど。特定の金融機関・商品は推奨しません。';
 
+/* OGP画像は記事と同じ /og の動的生成カードを使う（2026-07-29 追加） */
+const OG_IMAGE = ogImageUrl(PAGE_TITLE);
+
 export const metadata: Metadata = {
   title: `${PAGE_TITLE} | つぎの手ナビ`,
   description: PAGE_DESCRIPTION,
@@ -36,8 +39,14 @@ export const metadata: Metadata = {
     siteName: 'つぎの手ナビ',
     type: 'website',
     locale: 'ja_JP',
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: PAGE_TITLE }],
   },
-  twitter: { card: 'summary', title: PAGE_TITLE, description: PAGE_DESCRIPTION },
+  twitter: {
+    card: 'summary_large_image',
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
 };
 
 const jsonLd = {

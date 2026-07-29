@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
 import AssetConciergeMvp from "./AssetConciergeMvp";
-import { ShisanHeader, ShisanFooter } from "./ShisanChrome";
+import GuideHeader from "@/components/GuideHeader";
+import SiteFooter from "@/components/SiteFooter";
 
 // ピボット（2026-07-15）：本ルートを新TOPに移管。/ は /shisan へリダイレクト（middleware）。
 // オーガニック解禁のため noindex を解除（canonical は自己参照 /shisan）。GA4 / Clarity は app/layout.tsx を継承。
-const SHISAN_TITLE = "つぎの手ナビ 資産づくり（β）";
+/* 2026-07-29：サイト全体の方針（住宅ローンとお金の判断）に合わせ、ベータ版の表記を廃止。
+ * title は全角30文字前後・「住宅ローン」を含めるという条件で設定。 */
+const SHISAN_TITLE = "家計診断｜老後資金と住宅ローンを自分の数字で試算";
 const SHISAN_DESCRIPTION =
-  "資産づくりの質問に答えると、今月の“次の一手”が見えてくる。繰り上げ・投資・借り換え・教育費を、あなたの数字で中立に。";
+  "年齢・収入・資産・住宅ローンを入力すると、65歳時点の見通しと、住宅ローンの借り換えで軽くできる金額の目安が分かります。繰り上げ・投資・教育費も、あなたの数字で中立に試算します。登録不要。";
 const SHISAN_URL = "https://www.tsuginotenavi.jp/shisan";
+/* OGP画像は /og の動的生成カードを使う（記事と同じ仕組み）。 */
+const SHISAN_OG_IMAGE = `https://www.tsuginotenavi.jp/og?title=${encodeURIComponent(SHISAN_TITLE)}`;
 
 export const metadata: Metadata = {
   title: SHISAN_TITLE,
   description: SHISAN_DESCRIPTION,
   // ピボットでオーガニック解禁：インデックス許可（noindex 解除）。
   robots: { index: true, follow: true },
-  // SNS（X・コミュニティ）配布時のプレビューを資産づくり用に上書き。
-  // これがないと app/layout.tsx の共通 OG（デジタル資産）が継承され食い違う。
+  // SNS配布時のプレビューをこのページ用に上書きする（共通 OG の継承だと食い違うため）。
   openGraph: {
     title: SHISAN_TITLE,
     description: SHISAN_DESCRIPTION,
@@ -23,26 +27,28 @@ export const metadata: Metadata = {
     siteName: "つぎの手ナビ",
     type: "website",
     locale: "ja_JP",
+    images: [{ url: SHISAN_OG_IMAGE, width: 1200, height: 630, alt: SHISAN_TITLE }],
   },
-  // 専用 OG 画像が無いため card は summary（large_image にすると空の画像枠が出る）。
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: SHISAN_TITLE,
     description: SHISAN_DESCRIPTION,
+    images: [SHISAN_OG_IMAGE],
   },
   alternates: {
     canonical: SHISAN_URL,
   },
 };
 
-// ヘッダー・フッターは ShisanChrome.tsx に共有化（追加要件B：チャット・マイページと統一）
+// 2026-07-29：ヘッダー・フッターをサイト共通（GuideHeader / SiteFooter）に統一。
+// ヘッダーが4種類に分かれていたことが、ベータ版の表記の削除漏れの原因だったため。
 
 export default function Page() {
   return (
     <>
-      <ShisanHeader />
+      <GuideHeader />
       <AssetConciergeMvp />
-      <ShisanFooter />
+      <SiteFooter />
     </>
   );
 }

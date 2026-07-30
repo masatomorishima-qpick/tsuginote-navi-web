@@ -321,6 +321,10 @@ export function SourcesAndDisclaimer({
         <Link href="/company" className="text-blue-700 hover:underline">運営会社・お問い合わせ</Link>
         ／
         <Link href="/privacy" className="text-blue-700 hover:underline">プライバシーポリシー</Link>
+        ／
+        {/* 2026-07-30 追加：広告掲載の開始に先立ち、記事末尾の信頼導線にも中立性ポリシー
+            （/policy）を置く。区切りは既存にあわせて全角「／」。 */}
+        <Link href="/policy" className="text-blue-700 hover:underline">中立性ポリシー</Link>
         ）
       </p>
     </section>

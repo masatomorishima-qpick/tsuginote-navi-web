@@ -25,6 +25,13 @@ export default function SiteFooter() {
             <Link href="/privacy" className="hover:text-slate-700">
               プライバシーポリシー
             </Link>
+            {/* 2026-07-30 追加：中立性ポリシー（/policy）。ASP経由の広告リンクを掲載する前に
+                「広告が結論を変えない」ためのルールを公開する方針（後付けは信頼を毀損するため）。
+                信頼表記の並び（プライバシーポリシーと利用規約の間）に置き、全ページの
+                サーバー出力HTMLから辿れるようにする。 */}
+            <Link href="/policy" className="hover:text-slate-700">
+              中立性ポリシー
+            </Link>
             <Link href="/terms" className="hover:text-slate-700">
               利用規約
             </Link>

@@ -74,6 +74,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.3,
     },
+    {
+      // 2026-07-30 追加：中立性ポリシー（広告掲載と運営の方針）。ASP広告の掲載開始前に
+      // 公開する静的ページ。記事ではないためレジストリ（lib/loan/articles.ts）には載せず、
+      // 他の静的ページ（/privacy 等）と同じ扱いにする。
+      url: `${baseUrl}/policy`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.3,
+    },
     // 役立ちガイドTOP（コンテンツのハブ）
     {
       url: `${baseUrl}/guide`,

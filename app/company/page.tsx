@@ -77,9 +77,11 @@ export default function CompanyPage() {
 
               <div className="grid gap-2 px-5 py-4 sm:grid-cols-[180px_1fr] sm:px-6">
                 <dt className="font-semibold text-slate-900">事業内容</dt>
+                {/* 2026-07-30 更新：旧事業（デジタル終活・相談先候補の表示）の記載が残って
+                    いたため、現行事業（住宅ローン領域＋試算ツール）に合わせて差し替え。
+                    代表者名・所在地・メールアドレス等の他項目は変更しない（指示書2-5）。 */}
                 <dd className="text-slate-700">
-                  相続・手続きに関する情報整理支援、
-                  相談先候補の中立的な表示サービスの企画・運営
+                  住宅ローンとお金の判断に関する情報提供、および試算ツールの企画・運営
                 </dd>
               </div>
             </dl>

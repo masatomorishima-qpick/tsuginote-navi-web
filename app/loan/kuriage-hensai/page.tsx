@@ -257,6 +257,11 @@ export default function KuriageHensaiPage() {
           <p className={p}>
             節約率が金額とともにわずかに下がるのは、大きく繰り上げるほど返済期間が短くなり、利息が発生する期間そのものが減っていくためです。
           </p>
+          {/* 2026-08-01 追加：記事8（返済予定表をエクセルで作る）への相互参照。
+              金額別の効果を見た読者を、自分の表で確かめる方法へ送る。節の切れ目に配置。 */}
+          <p className={p}>
+            → 繰り上げ返済を自分の返済予定表に組み込んで確かめる方法は、<Link href="/loan/hensai-yoteihyo-excel" className={linkCls}>住宅ローンの返済予定表をエクセルで作る方法</Link>で扱っています。
+          </p>
         </section>
 
         {/* 住宅ローン控除 */}

@@ -238,6 +238,10 @@ export default function KojoShuryoKuriagePage() {
           <p className={p}>
             期間短縮型と返済額軽減型の違い(利息の減りは短縮型が約2倍、軽減型は毎月の余力が増える)は<Link href="/loan/kuriage-hensai" className={linkCls}>繰り上げ返済の記事</Link>で扱っています。控除が終わった後の選択でも、この使い分けは同じです。
           </p>
+          {/* 2026-08-01 追加：記事8（返済予定表をエクセルで作る）への相互参照。節の切れ目に配置。 */}
+          <p className={p}>
+            → 繰り上げ返済の効果を自分の返済予定表で確かめたい場合は、<Link href="/loan/hensai-yoteihyo-excel" className={linkCls}>住宅ローンの返済予定表をエクセルで作る方法</Link>をご覧ください。
+          </p>
         </section>
 
         {/* 一括返済 */}

@@ -253,6 +253,12 @@ export default function GonenRulePage() {
               </tbody>
             </table>
           </TableScroll>
+          {/* 2026-08-01 追加：記事8（返済予定表をエクセルで作る）への相互参照。
+              ラインの計算式を示した直後に、それを自分の表の列として持たせる方法へ送る。
+              相互参照は節の切れ目に置く方針のため、節の最後・次のh2の直前に置いた。 */}
+          <p className={p}>
+            → このラインを自分の返済予定表に列として持たせる方法は、「<Link href="/loan/hensai-yoteihyo-excel" className="text-blue-700 underline hover:no-underline">住宅ローンの返済予定表をエクセルで作る方法</Link>」で扱っています。
+          </p>
         </section>
 
         {/* リスクが高い人 */}

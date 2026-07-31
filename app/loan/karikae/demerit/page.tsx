@@ -309,6 +309,11 @@ export default function KarikaeDemeritPage() {
           <p className={p}>
             <strong>逆に、残りの返済期間が10年前後、金利差が0.3%未満、住宅ローン控除の期間がまだ残っている</strong>——このいずれかに当てはまるなら、慎重に計算してください。<strong>借り換えないことも、立派な選択です。</strong>
           </p>
+          {/* 2026-07-31 追加：記事6（繰り上げ返済）への相互参照。
+              「借り換えないことも立派な選択」の直後に、では手元の資金をどう使うかを示す。 */}
+          <p className={p}>
+            → 借り換えないと決めた場合に手元の資金をどう使うかは、「<Link href="/loan/kuriage-hensai" className="text-blue-700 underline hover:no-underline">住宅ローンの繰り上げ返済は得か</Link>」で扱っています。
+          </p>
         </section>
 
         {/* 計算ツール */}

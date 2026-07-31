@@ -361,6 +361,13 @@ export default function GonenRulePage() {
           <p className={p}>
             → 「<Link href="/loan/karikae/hiyou" className="text-blue-700 underline hover:no-underline">住宅ローンの借り換え費用はいくら？</Link>」
           </p>
+          {/* 2026-07-31 追加：記事6（繰り上げ返済）への相互参照を3本目として追加。
+              ここは選択肢を中立に並べる場所なので、既存2本と同じ「→ 「リンク」」の形に揃え、
+              説明は付けない（3本目だけ長いと並びが崩れる。効果の限界＝100万円で0.11ポイントと
+              いう但し書きは、主張をしている記事6の本文側にある）。 */}
+          <p className={p}>
+            → 「<Link href="/loan/kuriage-hensai" className="text-blue-700 underline hover:no-underline">住宅ローンの繰り上げ返済は得か</Link>」
+          </p>
         </section>
 
         {/* 計算ツール */}

@@ -271,6 +271,13 @@ export default function KarikaeHiyouPage() {
               </tbody>
             </table>
           </TableScroll>
+          {/* 2026-07-31 追加：記事6（繰り上げ返済）への相互参照。
+              上の表は残り5年の列がすべてマイナスで、費用倒れの条件がここで確定する。
+              その直後に「同じ資金を繰り上げ返済に回す」選択肢を示すのが最も効く。
+              相互参照は節の切れ目に置く方針のため、表のあと・次のh2の直前に置いた。 */}
+          <p className={p}>
+            → 借り換えが費用倒れになる条件でも、手元の資金を繰り上げ返済に回せば効果が出る場合があります。「<Link href="/loan/kuriage-hensai" className="text-blue-700 underline hover:no-underline">住宅ローンの繰り上げ返済は得か</Link>」で比較しています。
+          </p>
         </section>
 
         {/* 目安の検証 */}

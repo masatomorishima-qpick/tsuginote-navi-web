@@ -213,6 +213,11 @@ export default function KarikaeTimingPage() {
           <p className={p}>
             <strong>住宅ローン控除を受けている人</strong>も、動く前に確認が必要です。借り換え後の返済期間を10年未満にすると控除の対象から外れ、残高2,000万円で控除期間があと5年なら約70万円を失います。「<Link href="/loan/karikae/demerit" className="text-blue-700 underline hover:no-underline">住宅ローン借り換えのデメリット</Link>」で整理しています。
           </p>
+          {/* 2026-07-31 追加：記事6（繰り上げ返済）への相互参照。
+              「いま動かなくていい人」を読み終えた読者に、では手元の資金をどうするかを示す。 */}
+          <p className={p}>
+            → 借り換えを見送る場合、手元の資金を繰り上げ返済に回すという選択肢があります。「<Link href="/loan/kuriage-hensai" className="text-blue-700 underline hover:no-underline">住宅ローンの繰り上げ返済は得か</Link>」で扱っています。
+          </p>
         </section>
 
         {/* 節目 */}
@@ -226,6 +231,13 @@ export default function KarikaeTimingPage() {
           </p>
           <p className={p}>
             <strong>収入や家族構成が変わる前。</strong>転職、独立、出産、配偶者の退職など、審査に影響しうる変化の<strong>前</strong>に検討しておくと選択肢が広がります。
+          </p>
+          {/* 2026-07-31 追加：記事5（5年ルール）への相互参照。
+              「変動金利の見直しがあったとき」の段落の直後ではなく、節の最後に置いた。
+              3つの節目を並列に列挙している構成を途中で割らないため（相互参照は節の切れ目に置く）。
+              節全体が変動金利の話を含むので、最後でも接続は成立する。 */}
+          <p className={p}>
+            → 金利が変わっても一定期間は返済額が据え置かれる仕組みがあります。「<Link href="/loan/5nen-rule" className="text-blue-700 underline hover:no-underline">住宅ローンの5年ルール・125%ルールとは</Link>」で解説しています。
           </p>
         </section>
 

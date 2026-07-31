@@ -341,7 +341,9 @@ export default function HendoKoteiPage() {
           <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px] leading-relaxed text-slate-700">
             <li>残りの返済期間が10年前後、またはそれより短い</li>
             <li>残高が年収に対して小さく、金利が2%上がっても返済を続けられる</li>
-            <li>繰上げ返済に回せる資金があり、金利が上がったら残高を減らせる</li>
+            {/* 2026-07-31：記事6（繰り上げ返済）への内部リンクを追加。
+                指示書3-3のとおり、文言・数値・リストの構成は変更していない。 */}
+            <li><Link href="/loan/kuriage-hensai" className="text-blue-700 underline hover:no-underline">繰上げ返済</Link>に回せる資金があり、金利が上がったら残高を減らせる</li>
             <li>借り換えの審査に通る見込みが立たない（転職直後、健康状態など）</li>
           </ul>
           <p className={p}>

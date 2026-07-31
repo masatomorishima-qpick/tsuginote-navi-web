@@ -312,9 +312,11 @@ export default function KojoShuryoKuriagePage() {
           <p className={p}>
             ここまでの表は代表的なケースです。実際の判断は、あなたの残高・残り年数・現在の金利で計算する必要があります。
           </p>
-          <LoanCalculator articlePath={PAGE_PATH} />
+          {/* 2026-07-31：この記事の主題に合わせて繰り上げ返済モードを初期表示にする
+              （記事1〜5と /loan ハブは指定しないので従来どおり借り換え・金利モード）。 */}
+          <LoanCalculator articlePath={PAGE_PATH} defaultMode="kuriage" />
           <p className={p}>
-            入力するのは、残高・残り年数・現在の金利・金利タイプの4つだけです。年収・資産・生活費はお聞きしません。
+            入力するのは、残高・残り年数・現在の金利・金利タイプと繰り上げ額の5つだけです。年収・資産・生活費はお聞きしません。
           </p>
         </section>
 

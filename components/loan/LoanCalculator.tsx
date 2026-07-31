@@ -8,6 +8,9 @@ import { refinanceTo, breakEvenVariableRate, paymentAtRate } from "@/lib/loan/re
 /* 2026-07-31 追加：繰り上げ返済モード。計算は lib/loan/prepay.ts（calc.ts の部品の組み替え）。 */
 import { prepayShorten, prepayReduce, unpaidInterestLine, formatMonths, manDetail } from "@/lib/loan/prepay";
 import { TOOL_MODE, CALC_RESULT, rateTypeCodeOf, type ToolMode } from "@/lib/loan/tool";
+/* 2026-07-31 追加（v2.1）：Excel出力。生成ロジックは UI から独立した純関数（lib/loan/excel.ts）。
+ * ライブラリ本体はボタン押下時に動的import するので、記事の初期表示のバンドルは増えない。 */
+import { buildLoanWorkbook, todayJst, workbookFileName } from "@/lib/loan/excel";
 import Link from "next/link";
 
 /**
@@ -217,6 +220,39 @@ export default function LoanCalculator({
 
   const show = submitted && calc;
   const showPrepay = submitted && mode === TOOL_MODE.KURIAGE;
+
+  /* ===== Excel出力（2026-07-31 追加・v2.1） =====
+   * 結果が出ている状態のときだけボタンを出す。全額返済の案内中は計算していないので出さない。 */
+  const canDownload =
+    mode === TOOL_MODE.KURIAGE ? Boolean(showPrepay && !isFullRepay && prepayCalc) : Boolean(show);
+  const [downloading, setDownloading] = useState(false);
+
+  const onDownloadExcel = async () => {
+    if (downloading) return;
+    setDownloading(true);
+    // GAイベントは既存の流儀（track）で。この件数が Excel 需要の実測データになる。
+    track("shisan_loan_tool_excel", { article_path: articlePath, mode });
+    try {
+      // 出力日は JST 固定（サイトの日付表記に揃える。海外からのアクセスで1日ずれると
+      // 「いつの試算か」を後から照合するときに混乱するため）。
+      const dateJst = todayJst(new Date());
+      const sheets = buildLoanWorkbook({
+        mode,
+        balance: B,
+        years: Y,
+        rate: R,
+        rateType: type,
+        prepay: mode === TOOL_MODE.KURIAGE ? A : undefined,
+        dateJst,
+      });
+      const { default: writeXlsxFile } = await import("write-excel-file/browser");
+      await writeXlsxFile(sheets as never).toFile(workbookFileName(dateJst));
+    } catch {
+      /* 生成に失敗しても計算結果の表示には影響させない（best-effort） */
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <div className="my-6 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 sm:p-5">
@@ -624,6 +660,27 @@ export default function LoanCalculator({
               </p>
             </section>
           )}
+        </div>
+      )}
+
+      {/* ===== Excel出力（2026-07-31 追加・v2.1） =====
+          位置は結果ブロックの末尾・免責の上。結果を見終えた直後という導線で、
+          免責が常に最後に来る形も崩さない。既存の「計算する」と主従が逆転しないよう副次ボタンにする。 */}
+      {canDownload && (
+        <div className="mt-5">
+          <button
+            type="button"
+            onClick={onDownloadExcel}
+            disabled={downloading}
+            className="w-full rounded-xl border border-emerald-600 bg-white py-3 text-[15px] font-bold text-emerald-700 transition hover:bg-emerald-50 disabled:opacity-60"
+          >
+            {downloading ? "作成しています…" : "Excelでダウンロード（数式つき）"}
+          </button>
+          <p className="mt-2 text-[12px] leading-relaxed text-slate-500">
+            入力シートの数字を書き換えると、返済予定表もあわせて計算し直されます。
+            {mode === TOOL_MODE.KARIKAE &&
+              "ファイルには、いまのローンの返済予定表が入ります（借り換えの試算は金利の前提が変わるため含みません）。"}
+          </p>
         </div>
       )}
 

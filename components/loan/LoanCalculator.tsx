@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { track } from "@/lib/shisan/track";
 import { manOku, manHint } from "@/lib/shisan/format";
-import { yen, refinance, REFI_BASE, FLAT35_RATE } from "@/lib/shisan/calc";
+/* 2026-08-01 追加（v2.2）：REFI_MARKET_BAND・REFI_COST_* は「計算の中身」の表示専用。
+ * 時変の値を文言にベタ書きせず定数を参照する（金利更新時にここだけ古く残る事故を防ぐ・指示書2-5）。 */
+import { yen, refinance, REFI_BASE, FLAT35_RATE, REFI_MARKET_BAND, REFI_COST_RATE, REFI_COST_FIXED } from "@/lib/shisan/calc";
 import { refinanceTo, breakEvenVariableRate, paymentAtRate } from "@/lib/loan/refi";
 /* 2026-07-31 追加：繰り上げ返済モード。計算は lib/loan/prepay.ts（calc.ts の部品の組み替え）。 */
 import { prepayShorten, prepayReduce, unpaidInterestLine, formatMonths, manDetail } from "@/lib/loan/prepay";
@@ -57,6 +59,73 @@ const chipCls = "px-4 py-2 rounded-full text-sm font-semibold border transition"
 const btnCls =
   "w-full mt-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-base font-bold transition";
 const rowCls = "flex items-baseline justify-between gap-3 border-t border-slate-200 py-2";
+
+/* ===== 計算式の見える化（2026-08-01 追加・v2.2） =====
+ * 中立性ポリシー第5項「試算の前提（金利・費用・税率など）は、記事とツールの中ですべて開示します」の
+ * ツール側の実装。各結果ブロックの末尾に <details>「この計算の中身を見る」を置く。
+ * - 素の details/summary。radix は使わず、JSなしで開閉できるネイティブ要素のまま
+ * - 表示のための再計算はしない。calc / prepayCalc の計算済みの値を文字列に組むだけ
+ * - 開閉は GA4 に送らない（過剰計測を避ける・指示書2-1）
+ * - 数式の見た目は記事8のコードブロックに合わせるが、whitespace-pre-wrap で「折り返す」点だけ違う。
+ *   記事8は横スクロール（whitespace-pre）だが、ツールの完了条件は「375pxで折り返して読める」なので要件が逆 */
+const detailsCls = "group mt-3 border-t border-slate-100 pt-2";
+const summaryCls = "cursor-pointer list-none select-none text-[13px] text-slate-500 hover:text-slate-700";
+const formulaCls =
+  "mt-1.5 whitespace-pre-wrap break-words rounded-lg bg-slate-50 px-3 py-2 font-mono text-[12.5px] leading-relaxed text-slate-800";
+const explainCls = "mt-2 text-[13px] leading-relaxed text-slate-600";
+
+/** 月利（年利% ÷ 100 ÷ 12）の表示用文字列。1.5% なら 0.00125。有効数字3桁・表示専用で、計算には使わない。 */
+function monthlyRateStr(ratePct: number): string {
+  if (ratePct <= 0) return "0";
+  return String(Number((ratePct / 100 / 12).toPrecision(3)));
+}
+
+/** 「この計算の中身を見る」開閉ブロック。＋/− の切り替えは /souzoku-houki のFAQと同じ group-open 方式。 */
+function CalcInside({ children }: { children: ReactNode }) {
+  return (
+    <details className={detailsCls}>
+      <summary className={summaryCls}>
+        <span className="mr-1 inline font-semibold group-open:hidden">＋</span>
+        <span className="mr-1 hidden font-semibold group-open:inline">−</span>
+        この計算の中身を見る
+      </summary>
+      {children}
+    </details>
+  );
+}
+
+/** 借り換えの正味メリットの「計算の中身」。②（変動）・固定切替時・繰り上げモードDの3箇所で同じ内容を出す。
+ *  値は計算済みの refi オブジェクトから受け取るだけで、ここでは何も計算しない（費用率などの定数参照と表示整形のみ）。 */
+function RefiInside({
+  balance,
+  years,
+  refi,
+}: {
+  balance: number;
+  years: number;
+  refi: { mNow: number; mNew: number; dMonthly: number; dInterest: number; cost: number; months: number };
+}) {
+  const n = years * 12;
+  const costRatePct = (REFI_COST_RATE * 100).toFixed(1);
+  return (
+    <CalcInside>
+      <p className={explainCls}>
+        借り換えで減る返済額の合計から、借り換えにかかる費用を引いたものが正味のメリットです。費用は借入額に比例する部分（事務手数料と登録免許税）と、比例しない部分（司法書士報酬・印紙税など）に分かれます。
+      </p>
+      <div className={formulaCls}>{`借り換え費用 = 残高 × ${costRatePct}% + ${yen(REFI_COST_FIXED)}円
+正味メリット = (いまの毎月 − 借り換え後の毎月) × 回数 − 借り換え費用`}</div>
+      <div className={formulaCls}>{`あなたの場合：費用 = ${yen(balance)} × ${costRatePct}% + ${yen(REFI_COST_FIXED)} = ${yen(refi.cost)}円
+借り換え後の毎月 = ${yen(refi.mNew)}円（月々 ${yen(refi.dMonthly)}円 減る）
+正味メリット = ${yen(refi.dMonthly)} × ${n}回 − ${yen(refi.cost)} = ${yen(refi.dInterest - refi.cost)}円`}</div>
+      {/* 2026-08-01（A案・masato確定）：途中の金額は円未満を丸めるため、読者が電卓で検算すると数十円ずれる。
+          その説明を1行添える（記事8の「銀行の表と数十円ずれるのは正常」と同じ整理）。 */}
+      <p className="mt-1.5 text-[12px] leading-relaxed text-slate-500">
+        ※途中の金額は円未満を丸めて表示しているため、掛け算の結果とは数十円ずれることがあります。※借り換え先の金利は年
+        {REFI_BASE.toFixed(1)}%を想定しています（当サイトの基準値。市場の実勢は「{REFI_MARKET_BAND}」）。
+      </p>
+    </CalcInside>
+  );
+}
 
 function digits(v: string) {
   return v.replace(/[^\d]/g, "");
@@ -161,7 +230,9 @@ export default function LoanCalculator({
     // 参考表示：同じ資金を借り換えに使った場合の正味メリット（既存モードと同じ定数・同じ関数）。
     const refi = refinance(B, R, Y);
     const refiNet = refi ? refi.dInterest - refi.cost : null;
-    return { shorten, reduce, now, lineNow, lineAfter, refiNet, zeroRate: R === 0 };
+    /* 2026-08-01（v2.2）：Dの「計算の中身」で費用・借り換え後の毎月を見せるため、refiNet だけでなく
+     * refi オブジェクトごと公開する。ここで計算済みの値の公開であり、表示のための再計算ではない。 */
+    return { shorten, reduce, now, lineNow, lineAfter, refi, refiNet, zeroRate: R === 0 };
   }, [B, Y, R, A]);
 
   const onSubmit = () => {
@@ -413,6 +484,24 @@ export default function LoanCalculator({
                 </span>
               </div>
             </div>
+            {/* 2026-08-01（v2.2）：計算式の見える化。値は calc から取るだけで再計算しない。 */}
+            <CalcInside>
+              <p className={explainCls}>
+                毎月の返済額は、残高・1か月あたりの利率・返済の回数から決まります。1か月あたりの利率（月利）は、年利を12で割ったものです。金利が上がった場合の行は、同じ式で月利だけを変えて計算しています。
+              </p>
+              {R > 0 ? (
+                <>
+                  <div className={formulaCls}>{"毎月の返済額 = 残高 × 月利 ÷ (1 − (1 + 月利)^−回数)"}</div>
+                  <div className={formulaCls}>{`あなたの場合：月利 = ${R}% ÷ 100 ÷ 12 = ${monthlyRateStr(R)}、回数 = ${Y}年 × 12 = ${Y * 12}回
+→ 毎月の返済額 ${yen(calc.now)}円
+金利+1%（${(R + 1).toFixed(2)}%）なら月利 ${monthlyRateStr(R + 1)} → ${yen(calc.up1)}円
+金利+2%（${(R + 2).toFixed(2)}%）なら月利 ${monthlyRateStr(R + 2)} → ${yen(calc.up2)}円`}</div>
+                </>
+              ) : (
+                <div className={formulaCls}>{`金利0%のため、毎月の返済額 = 残高 ÷ 回数 = ${yen(B)} ÷ ${Y * 12} = ${yen(calc.now)}円
+金利が上がった場合の行は、上の式（残高 × 月利 ÷ (1 − (1 + 月利)^−回数)）で月利だけを変えて計算しています。`}</div>
+              )}
+            </CalcInside>
           </section>
 
           {/* ② より低い変動へ借り換えたら（＝この記事群の主題） */}
@@ -453,6 +542,8 @@ export default function LoanCalculator({
                 )}
               </p>
             )}
+            {/* 2026-08-01（v2.2）：計算式の見える化（変動②と固定切替時の両方に同じ内容を出す）。 */}
+            <RefiInside balance={B} years={Y} refi={calc.refi} />
             {/* 送客枠：提携先が決まったらここにリンクを置く。決まるまでは何も出さない（「準備中」も出さない）。 */}
           </section>
 
@@ -487,6 +578,15 @@ export default function LoanCalculator({
                 </span>
               )}
             </p>
+            {/* 2026-08-01（v2.2）：損益分岐は閉じた式がない（breakEvenVariableRate の二分探索）ので、
+                何を等しくする金利を探しているかを言葉で開示する。 */}
+            <CalcInside>
+              <p className={explainCls}>
+                変動金利が何%まで上がると、いま固定（フラット35 年{FLAT35_RATE}%）に切り替えた場合と総支払額が並ぶかを求めています。「切り替えにかかる費用を、金利差で取り返せる水準」がこの数字です。ひとつの式では書けないため、「変動のまま完済したときの利息の総額」が「固定に切り替えたときの利息の総額＋切り替え費用」と等しくなる金利を、計算エンジンが数値的に探しています。
+              </p>
+              <div className={formulaCls}>{`あなたの場合：固定（フラット35）を年${FLAT35_RATE}%として、損益分岐は 年${calc.breakEven.toFixed(2)}%
+ここまで上がって完済まで続く場合に、いま固定へ切り替えた方が総支払額は少なくなります。`}</div>
+            </CalcInside>
           </section>
         </div>
       )}
@@ -529,6 +629,8 @@ export default function LoanCalculator({
                 )}
               </p>
             )}
+            {/* 2026-08-01（v2.2）：計算式の見える化（固定金利タイプでも借り換えの中身は同じ）。 */}
+            <RefiInside balance={B} years={Y} refi={calc.refi} />
             {/* 送客枠：提携先が決まったらここにリンクを置く。 */}
           </section>
         </div>
@@ -578,6 +680,31 @@ export default function LoanCalculator({
                 <span className="font-bold">{formatMonths(prepayCalc.shorten.monthsShortened)}</span>
               </div>
             </div>
+            {/* 2026-08-01（v2.2）：計算式の見える化。指示書2-3の「毎月の返済額（A・B両方の前提として最初に置く）」は、
+                繰り上げモードの画面に毎月の返済額のブロックが無いため、最初のブロックであるAの中身の冒頭に置いた。 */}
+            <CalcInside>
+              <p className={explainCls}>
+                前提として、毎月の返済額は、残高・1か月あたりの利率・返済の回数から決まります。1か月あたりの利率（月利）は、年利を12で割ったものです。
+              </p>
+              {prepayCalc.zeroRate ? (
+                <div className={formulaCls}>{`金利0%のため、毎月の返済額 = 残高 ÷ 回数 = ${yen(B)} ÷ ${Y * 12} = ${yen(prepayCalc.now)}円
+利息が発生していないため、減る利息は0円です。短縮される期間 = 繰り上げ額 ÷ 毎月の返済額 で求めています。`}</div>
+              ) : (
+                <>
+                  <div className={formulaCls}>{"毎月の返済額 = 残高 × 月利 ÷ (1 − (1 + 月利)^−回数)"}</div>
+                  <div className={formulaCls}>{`あなたの場合：月利 = ${R}% ÷ 100 ÷ 12 = ${monthlyRateStr(R)}、回数 = ${Y}年 × 12 = ${Y * 12}回
+→ 毎月の返済額 ${yen(prepayCalc.now)}円`}</div>
+                  <p className={explainCls}>
+                    繰り上げ返済した分は、全額が元金（借入の残高そのもの）に充てられます。毎月の返済額を変えないので、返済の回数が減ります。回数は「毎月の返済額で、減った残高を何回で返し終わるか」を逆算して求めます。
+                  </p>
+                  <div className={formulaCls}>{`繰り上げ後の残高 = 残高 − 繰り上げ額
+減る利息 = (繰り上げ前の総利息) − (繰り上げ後の総利息)`}</div>
+                  <div className={formulaCls}>{`あなたの場合：繰り上げ後の残高 = ${yen(B)} − ${yen(A)} = ${yen(B - A)}円
+残り回数 = ${Y * 12}回 → ${(Y * 12 - prepayCalc.shorten.monthsShortened).toFixed(1)}回（${prepayCalc.shorten.monthsShortened.toFixed(1)}か月短縮）
+減る利息 = ${yen(prepayCalc.shorten.interestSaved)}円（約${manDetail(prepayCalc.shorten.interestSaved)}円）`}</div>
+                </>
+              )}
+            </CalcInside>
           </section>
 
           <section className="rounded-xl bg-white p-4">
@@ -594,6 +721,22 @@ export default function LoanCalculator({
                 <span className="font-bold">{yen(prepayCalc.reduce.monthlyReduction)}円 軽くなる</span>
               </div>
             </div>
+            {/* 2026-08-01（v2.2）：計算式の見える化。 */}
+            <CalcInside>
+              <p className={explainCls}>
+                返済の回数は変えずに、繰り上げで減った残高をもとに毎月の返済額を計算し直します。式は毎月の返済額を求める式と同じで、残高だけが小さくなります。
+              </p>
+              {prepayCalc.zeroRate ? (
+                <div className={formulaCls}>{`金利0%のため、新しい毎月の返済額 = (残高 − 繰り上げ額) ÷ 回数 です。
+利息が発生していないため、減る利息は0円です。`}</div>
+              ) : (
+                <>
+                  <div className={formulaCls}>{"新しい毎月の返済額 = (残高 − 繰り上げ額) × 月利 ÷ (1 − (1 + 月利)^−回数)"}</div>
+                  <div className={formulaCls}>{`あなたの場合：新しい毎月の返済額 = ${yen(prepayCalc.now - prepayCalc.reduce.monthlyReduction)}円（${yen(prepayCalc.reduce.monthlyReduction)}円 軽くなる）
+減る利息 = ${yen(prepayCalc.reduce.interestSaved)}円（約${manDetail(prepayCalc.reduce.interestSaved)}円）`}</div>
+                </>
+              )}
+            </CalcInside>
           </section>
 
           <p className="rounded-lg bg-slate-100 p-3 text-[14px] leading-relaxed text-slate-800">
@@ -632,6 +775,15 @@ export default function LoanCalculator({
                 </Link>
                 で扱っています。
               </p>
+              {/* 2026-08-01（v2.2）：計算式の見える化。lineNow / lineAfter は上の描画条件で非null確定。 */}
+              <CalcInside>
+                <p className={explainCls}>
+                  未払利息とは、毎月の返済額でその月の利息をまかないきれなくなったときに、不足分が残高に上乗せされることです。1年分の返済額が、残高に対して何%にあたるかで、発生し始める金利の目安が出ます。
+                </p>
+                <div className={formulaCls}>{"未払利息が発生する金利 = 毎月の返済額 × 12 ÷ 残高 × 100"}</div>
+                <div className={formulaCls}>{`あなたの場合：${yen(prepayCalc.now)} × 12 ÷ ${yen(B)} × 100 = ${prepayCalc.lineNow.toFixed(2)}%
+期間短縮型で繰り上げた後：${yen(prepayCalc.now)} × 12 ÷ ${yen(B - A)} × 100 = ${prepayCalc.lineAfter.toFixed(2)}%`}</div>
+              </CalcInside>
             </section>
           )}
 
@@ -658,6 +810,8 @@ export default function LoanCalculator({
                 </Link>
                 で比較しています。
               </p>
+              {/* 2026-08-01（v2.2）：計算式の見える化。refi は prepayCalc で計算済みのオブジェクト。 */}
+              {prepayCalc.refi && <RefiInside balance={B} years={Y} refi={prepayCalc.refi} />}
             </section>
           )}
         </div>

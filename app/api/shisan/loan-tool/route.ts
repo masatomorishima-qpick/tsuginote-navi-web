@@ -14,8 +14,9 @@
  * データ品質：?ga_debug=1 / ?debug=1 での操作は debug_flag=true で保存し、分析時に除外する。
  * （テスト行が実データに混ざる事故を過去に起こしているため、この除外は必須）
  *
- * is_operator について：会員モデルが廃止済みで /loan にログインがないため、判定手段がない。
- * 常に false のままとし、列だけ将来のために残す（2026-07-31 masato 確定）。
+ * is_operator について：2026-08-03（テストA指示書1-4）に修理。?op=1 で立てた端末フラグ
+ * （lib/shisan/op.ts・localStorage）をクライアントが body.operator として送り、ここで保存する。
+ * 旧方針「判定手段がないため常に false」は 7/31〜8/1 のオペレータ入力24行が素通りした実害により廃止。
  *
  * 保存先テーブル shisan_loan_tool_inputs は supabase/migrations には含まれない。
  * DDL は リポジトリ外の DDL_shisan_loan_tool_inputs_20260731.sql で管理し、
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
       article_path: strCap(body.articlePath, 200),
       // データ品質
       debug_flag: boolOf(body.debug),
-      is_operator: false, // 判定手段がないため常に false
+      is_operator: boolOf(body.operator), // 2026-08-03（テストA指示書1-4）：?op=1 の端末フラグ（自己申告・テスト除外用）
       referrer: strCap(body.referrer, 500),
       utm_source: strCap(body.utmSource, 120),
       utm_medium: strCap(body.utmMedium, 120),

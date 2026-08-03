@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { track } from "@/lib/shisan/track";
+/* 2026-08-02 追加（顧客の声・指示書2-4）：運営者フラグ。?op=1 で立てた localStorage フラグを
+ * 入力保存の body に載せ、is_operator を確実に立てる（3経路共通の修理）。 */
+import { captureOpParam, isOperatorClient } from "@/lib/shisan/op";
 import { manOku, manHint } from "@/lib/shisan/format";
 /* 2026-08-01 追加（v2.2）：REFI_MARKET_BAND・REFI_COST_* は「計算の中身」の表示専用。
  * 時変の値を文言にベタ書きせず定数を参照する（金利更新時にここだけ古く残る事故を防ぐ・指示書2-5）。 */
@@ -168,6 +171,7 @@ export default function LoanCalculator({
       utmSource: p.get("utm_source") || "", utmMedium: p.get("utm_medium") || "", utmCampaign: p.get("utm_campaign") || "",
       debug: p.get("ga_debug") === "1" || p.get("debug") === "1",
     };
+    captureOpParam(); // 2026-08-02（指示書2-4）：?op=1/?op=0 を localStorage に永続化
   }, []);
 
   // 表示イベントは1回だけ（StrictMode の二重実行で2件送られないようにする）
@@ -280,6 +284,7 @@ export default function LoanCalculator({
           rateType: rateTypeCodeOf(type),
           prepayAmount: mode === TOOL_MODE.KURIAGE ? A : null,
           debug: t.debug,
+          operator: isOperatorClient(), // 2026-08-02（指示書2-4）：運営者フラグ（3経路共通）
           referrer: t.referrer,
           utmSource: t.utmSource,
           utmMedium: t.utmMedium,

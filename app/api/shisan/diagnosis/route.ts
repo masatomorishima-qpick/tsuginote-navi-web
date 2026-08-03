@@ -112,7 +112,9 @@ export async function POST(req: NextRequest) {
       duration_sec: (() => { const d = numOr(body.durationSec, -1); return d >= 0 && d < 86400 ? Math.round(d) : null; })(),
       is_reenter: boolOf(body.isReenter),
       is_new: boolOf(body.isNew),
-      is_operator: isOperator,
+      // 2026-08-03（テストA指示書1-4・修理再実装）：?op=1 の端末フラグ（body.operator）を
+      // 従来のセッション判定と OR で併用。会員モデル廃止でセッション判定は事実上機能していないが壊さない。
+      is_operator: boolOf(body.operator) || isOperator,
       debug_flag: boolOf(body.debug),
       referrer: strCap(body.referrer, 500),
       utm_source: strCap(body.utmSource, 120),

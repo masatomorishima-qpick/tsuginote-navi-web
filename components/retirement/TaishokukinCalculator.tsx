@@ -86,12 +86,34 @@ export default function TaishokukinCalculator({ articlePath }: { articlePath: st
     captureOpParam(); // ?op=1/?op=0 を localStorage に永続化（テスト行除外）
   }, []);
 
-  // 表示イベントは1回だけ（StrictMode の二重実行対策の ref ガード・既存の流儀）
+  // 表示イベントは1回だけ（StrictMode の二重実行対策の ref ガード・既存の流儀）。
+  // 発火条件はマウント時（shisan_loan_tool_view と同じ useRef 一回）。
+  //
+  // ただし GA(gtag) は @next/third-parties により afterInteractive で読み込まれるため、
+  // マウント直後は window.gtag が未定義のことがある。track() は window.gtag?.() で
+  // 送るだけでキュー/再送しないので、そのまま呼ぶと view が無音で欠落する
+  // （本番で実測・2026-08-03。shisan_loan_tool_view も同じ理由で欠落していた）。
+  // そこで「1回だけ」を保ったまま、gtag が関数になってから送る（未ロードなら短時間待つ）。
   const viewed = useRef(false);
   useEffect(() => {
     if (viewed.current) return;
-    viewed.current = true;
-    track("retirement_tool_view", { article_path: articlePath });
+    const w = window as unknown as { gtag?: unknown };
+    const fire = (): boolean => {
+      if (viewed.current) return true;
+      if (typeof w.gtag === "function") {
+        viewed.current = true;
+        track("retirement_tool_view", { article_path: articlePath });
+        return true;
+      }
+      return false;
+    };
+    if (fire()) return;
+    // gtag 未ロードなら 200ms 間隔で最大約10秒だけ待つ（読み込めなければ諦める）。
+    let tries = 0;
+    const id = window.setInterval(() => {
+      if (fire() || ++tries >= 50) window.clearInterval(id);
+    }, 200);
+    return () => window.clearInterval(id);
   }, [articlePath]);
 
   const years = Number(digits(yearsStr) || 0);

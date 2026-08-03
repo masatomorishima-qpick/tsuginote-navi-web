@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { LOAN_ARTICLES } from "@/lib/loan/articles";
+import { RETIREMENT_ARTICLES } from "@/lib/retirement/articles";
 
 /**
  * sitemap.xml — Phase 1 ローンチ準備にあわせて刷新
@@ -51,6 +52,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     ...LOAN_ARTICLES.map((a) => ({
+      url: `${baseUrl}${a.path}`,
+      lastModified: new Date(`${a.dateModified}T09:00:00+09:00`),
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    })),
+    // 退職金・年金（2026-08-03 新設・駅1）。/loan と同じくレジストリ参照。
+    // 記事は lib/retirement/articles.ts に1件足すだけでここにも自動で載る。
+    {
+      url: `${baseUrl}/retirement`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    ...RETIREMENT_ARTICLES.map((a) => ({
       url: `${baseUrl}${a.path}`,
       lastModified: new Date(`${a.dateModified}T09:00:00+09:00`),
       changeFrequency: "monthly" as const,

@@ -263,6 +263,12 @@ export default function KojoShuryoKuriagePage() {
           <p className={p}>
             「利息229.6万円の節約」は、「2,006万円を今後22年拘束されずに済むことと、団信」との交換です。どちらが重いかは家計と家族構成によって変わります。<strong>全額ではなく一部を繰り上げて、現金と団信を残す中間の選択もあります。</strong>
           </p>
+          {/* 2026-08-03 追加：記事9（退職金の受け取り方）への相互参照（駅1指示書5-2）。
+              既存の本文・数値・見出しは変更していない。dateModified も更新しない。 */}
+          <p className={p}>
+            → 退職金の受け取り方によって、手元に残る金額そのものが変わります。
+            <Link href="/retirement/taishokukin-uketorikata" className={linkCls}>「退職金は一時金と年金どっちで受け取るか」</Link>をご覧ください。
+          </p>
         </section>
 
         {/* 借り換えの確認 */}

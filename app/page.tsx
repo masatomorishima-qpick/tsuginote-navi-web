@@ -4,6 +4,7 @@ import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { SITE_URL, ORG_NAME, formatJaDate, toIsoJst, ogImageUrl } from '@/components/loan/LoanArticle';
 import { LOAN_ARTICLES } from '@/lib/loan/articles';
+import { RETIREMENT_ARTICLES } from '@/lib/retirement/articles';
 
 /**
  * / — サイトのトップページ（2026-07-29 に実体化）
@@ -16,9 +17,10 @@ import { LOAN_ARTICLES } from '@/lib/loan/articles';
  * 構成の意図：
  *   1. 導入 — **中立であることを最初に明示する**（このサイトのブランドの核）
  *   2. 住宅ローン（最も大きく・最も上に。レジストリから自動生成）
- *   3. 家計・老後資金の診断
- *   4. 役立ちガイド
- *   5. 運営者情報
+ *   3. 退職金・年金（2026-08-03 新設・駅1。レジストリから自動生成）
+ *   4. 家計・老後資金の診断
+ *   5. 役立ちガイド
+ *   6. 運営者情報
  *
  * 技術要件：**すべてサーバー側でHTMLとして出力する。** トップはサイトで最も重要な
  * ページで、クローラーとAI検索から確実に読める必要がある（/shisan がJS依存で
@@ -123,7 +125,31 @@ export default function HomePage() {
           </p>
         </section>
 
-        {/* 3. 家計・老後資金の診断 */}
+        {/* 3. 退職金・年金（2026-08-03 新設・駅1。住宅ローンと家計診断のあいだに置く） */}
+        <section className="mt-12">
+          <h2 className={h2}>退職金・年金の受け取り方</h2>
+          <p className={lead}>
+            退職金や年金は、受け取り方で税金と社会保険料が変わり、手元に残る金額そのものが動きます。会社の案内は税引き前の額面で、手取りで比べると結論が入れ替わることがあります。記事と計算ツールの両方で扱っています。
+          </p>
+          <div className="mt-5 space-y-4">
+            {RETIREMENT_ARTICLES.map((a) => (
+              <article key={a.path} className="rounded-xl border border-slate-200 p-4">
+                <h3 className="text-[17px] font-bold leading-snug text-slate-900">
+                  <Link href={a.path} className="text-blue-700 hover:underline">{a.title}</Link>
+                </h3>
+                <p className="mt-1.5 text-[14px] leading-relaxed text-slate-700">{a.summary}</p>
+                <p className="mt-2 text-[12px] text-slate-500">
+                  最終更新：<time dateTime={toIsoJst(a.dateModified)}>{formatJaDate(a.dateModified)}</time>
+                </p>
+              </article>
+            ))}
+          </div>
+          <p className="mt-5 text-[15px]">
+            → <Link href="/retirement" className={linkCls}>退職金・年金の記事一覧</Link>
+          </p>
+        </section>
+
+        {/* 4. 家計・老後資金の診断 */}
         <section className="mt-12">
           <h2 className={h2}>家計・老後資金の診断</h2>
           <p className={lead}>
@@ -134,7 +160,7 @@ export default function HomePage() {
           </p>
         </section>
 
-        {/* 4. 役立ちガイド */}
+        {/* 5. 役立ちガイド */}
         <section className="mt-12">
           <h2 className={h2}>役立ちガイド</h2>
           <p className={lead}>
@@ -145,7 +171,7 @@ export default function HomePage() {
           </p>
         </section>
 
-        {/* 5. 運営者情報 */}
+        {/* 6. 運営者情報 */}
         <section className="mt-12 rounded-xl border border-slate-200 bg-slate-50 p-5">
           <h2 className="text-[17px] font-bold text-slate-900">このサイトについて</h2>
           <p className="mt-2 text-[14px] leading-relaxed text-slate-700">

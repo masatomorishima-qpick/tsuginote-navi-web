@@ -19,6 +19,11 @@ export default function SiteFooter() {
             <Link href="/loan" className="hover:text-slate-700">
               住宅ローンの判断
             </Link>
+            {/* 2026-08-03 追加：退職金・年金セクション（駅1）の入口。/loan と同じく、
+                サーバー出力HTMLから /retirement へ辿れるようにする。 */}
+            <Link href="/retirement" className="hover:text-slate-700">
+              退職金・年金の判断
+            </Link>
             <Link href="/guide" className="hover:text-slate-700">
               役立ちガイド
             </Link>

@@ -1,4 +1,5 @@
 import { LOAN_ARTICLES } from "@/lib/loan/articles";
+import { RETIREMENT_ARTICLES } from "@/lib/retirement/articles";
 
 /**
  * /llms.txt — AI検索・LLM向けのサイト案内（2026-07-29 に動的生成へ移行）
@@ -27,6 +28,10 @@ export function GET() {
   const loanLines = LOAN_ARTICLES.map(
     (a) => `- [${a.title}](${SITE_URL}${a.path}): ${a.topic}`,
   ).join("\n");
+  // 退職金・年金セクションも topic で生成（数値は書かない・2026-08-03 駅1）。
+  const retirementLines = RETIREMENT_ARTICLES.map(
+    (a) => `- [${a.title}](${SITE_URL}${a.path}): ${a.topic}`,
+  ).join("\n");
 
   const body = `# つぎの手ナビ
 
@@ -40,6 +45,13 @@ export function GET() {
 
 - [住宅ローンの判断に迷ったら](${SITE_URL}/loan): 住宅ローンの記事一覧と計算ツール。
 ${loanLines}
+
+## 退職金・年金
+
+退職金や年金の受け取り方を、税金と社会保険料を引いた後の手取りで比べられる形で解説しています。記事に、勤続年数・退職金額・規程の利率などから一時金・年金・併用の手取りを比べる計算ツールを埋め込んでいます。
+
+- [退職金・年金の受け取り方](${SITE_URL}/retirement): 退職金・年金の記事一覧。
+${retirementLines}
 
 ## 家計診断
 

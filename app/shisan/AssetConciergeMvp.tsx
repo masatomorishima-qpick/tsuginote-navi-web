@@ -26,6 +26,8 @@ import {
   judgeScenario, deriveBuckets, computeResult, surplusBand,
 } from "@/lib/shisan/calc";
 import { track } from "@/lib/shisan/track";
+/* 2026-08-03 追加（テストA指示書1-4・修理再実装）：運営者フラグ。?op=1 の localStorage フラグを全送信に載せる。 */
+import { captureOpParam, isOperatorClient } from "@/lib/shisan/op";
 import { manOku, manUnitToOku, manHint } from "@/lib/shisan/format";
 import { ExecuteReportPanel, type ExecReportProps, type ReportSaveResult } from "./ExecuteReportPanel";
 
@@ -264,6 +266,7 @@ export default function AssetConciergeMvp() {
         utmSource: p.get("utm_source") || "", utmMedium: p.get("utm_medium") || "", utmCampaign: p.get("utm_campaign") || "",
         debug: p.get("ga_debug") === "1" || p.get("debug") === "1",
       };
+      captureOpParam(); // 2026-08-03（テストA指示書1-4）：?op=1/?op=0 を localStorage に永続化（テスト行除外）
       visitKind.current = reenter && s?.inputs ? "reenter" : s?.inputs ? "return" : "new";
       formStartAt.current = Date.now();
     }
@@ -334,6 +337,7 @@ export default function AssetConciergeMvp() {
           durationSec,
           referrer: t.referrer, utmSource: t.utmSource, utmMedium: t.utmMedium, utmCampaign: t.utmCampaign,
           debug: t.debug,
+          operator: isOperatorClient(), // 2026-08-03（テストA指示書1-4）：運営者フラグ（diagnosis・loan-tool の2経路共通）
           isReenter: visitKind.current === "reenter",
           isNew: visitKind.current === "new",
         }),
@@ -546,25 +550,37 @@ export default function AssetConciergeMvp() {
    * calc.ts は不変。金額はすべてエンジン由来（フロントで金額式を持たない）。
    * 分岐：assets_only（毎月0でも届く）／enough（今の額で届く・減らせる余地）／short（不足）／unreachable（上限でも届かない）。 */
   const REVERSE_MAX_YEN = 1000000; // 探索上限（月100万円）
-  const targetCalc = useMemo(() => {
-    if (!inputs || !result || !targetTouched || inputs.target <= 0) return null;
-    const futureAt = (s: number) => computeResult({ ...inputs, surplus: s }, decisions)?.future ?? 0;
-    const goal = inputs.target;
-    if (futureAt(0) >= goal) {
-      return { kind: "assets_only" as const, needYen: 0, curYen: inputs.surplus, gapYen: 0 };
-    }
-    if (futureAt(REVERSE_MAX_YEN) < goal) {
-      return { kind: "unreachable" as const, needYen: 0, curYen: inputs.surplus, gapYen: 0 };
-    }
+  /* 逆算の共有ヘルパ（2026-08-03・テストA指示書1-2 A案）：targetCalc の二分探索をそのまま関数化。
+   * ロジックは移動のみ（探索上限・60回・>=判定とも従来と同一）。戻り値：
+   *   0    = 資産だけで届く（従来の assets_only 相当）
+   *   null = 月上限まで増やしても届かない（従来の unreachable 相当）
+   *   n    = 目標に届く最小の毎月額（従来の needYen） */
+  const solveNeedYen = (base: Inputs, goal: number): number | null => {
+    const futureAt = (s: number) => computeResult({ ...base, surplus: s }, decisions)?.future ?? 0;
+    if (futureAt(0) >= goal) return 0;
+    if (futureAt(REVERSE_MAX_YEN) < goal) return null;
     let lo = 0, hi = REVERSE_MAX_YEN;
     for (let k = 0; k < 60 && hi - lo > 1; k++) {
       const mid = Math.floor((lo + hi) / 2);
       if (futureAt(mid) >= goal) hi = mid; else lo = mid;
     }
-    const needYen = hi;
+    return hi;
+  };
+
+  const targetCalc = useMemo(() => {
+    if (!inputs || !result || !targetTouched || inputs.target <= 0) return null;
+    const solved = solveNeedYen(inputs, inputs.target);
+    if (solved === 0) {
+      return { kind: "assets_only" as const, needYen: 0, curYen: inputs.surplus, gapYen: 0 };
+    }
+    if (solved === null) {
+      return { kind: "unreachable" as const, needYen: 0, curYen: inputs.surplus, gapYen: 0 };
+    }
+    const needYen = solved;
     const gapYen = Math.max(0, needYen - inputs.surplus);
     const kind = inputs.surplus >= needYen ? ("enough" as const) : ("short" as const);
     return { kind, needYen, curYen: inputs.surplus, gapYen };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputs, result, decisions, targetTouched]);
 
   // GA：逆算の表示（分岐種別ごとに1回）。
@@ -575,6 +591,38 @@ export default function AssetConciergeMvp() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen, targetCalc]);
+
+  /* ===== テストA：許可フレーム（2026-08-03 指示書2章） =====
+   * H2「余裕群が求めるのは増やす答えではなく『もう大丈夫、使ってよい』という許可」の行動検証。
+   * - 表示条件は future >= target（余裕群のみ・指示書2-1）。緩める余地のない人には出さない
+   * - 文言は測定変数：ボタン表示300回に達するまで一字も変更しない（指示書0章）
+   * - 金額は solveNeedYen（既存逆算の共有ヘルパ）の3%/0%の2回のみ＝新規計算式なし（A案・masato確定）
+   * - タップ時に遅延計算してキャッシュ。開くタップだけを click として数える（厳しめの shisan_harsh_view と同じ数え方） */
+  const [permOpen, setPermOpen] = useState(false);
+  const [permCalc, setPermCalc] = useState<{ need3: number; need0: number | null } | null>(null);
+  const permissionEligible = !!(inputs && result && inputs.target > 0 && result.future >= inputs.target);
+  const permViewed = useRef(false);
+  useEffect(() => {
+    if (screen === "dash" && permissionEligible && !permViewed.current) {
+      permViewed.current = true;
+      track("shisan_permission_view", { scenario: scenario ?? "" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, permissionEligible]);
+  const togglePermission = () => {
+    if (!inputs) return;
+    const opening = !permOpen;
+    if (opening) {
+      track("shisan_permission_click", { scenario: scenario ?? "" });
+      if (!permCalc) {
+        const need3 = solveNeedYen(inputs, inputs.target);
+        const need0 = solveNeedYen({ ...inputs, r: 0 }, inputs.target);
+        // 表示条件（future >= target）を満たす限り need3 は null にならないが、防御的に 0 に落とす
+        setPermCalc({ need3: need3 ?? 0, need0 });
+      }
+    }
+    setPermOpen(opening);
+  };
 
   /* 満足度（変更4・7/20）：診断1件に紐づけて best-effort 保存。連打・二重記録はサーバー側の上書きで防ぐ。 */
   const saveSat = (patch: { answer?: string | null; reason?: string | null; helpful?: string | null; free?: string }) => {
@@ -980,6 +1028,28 @@ export default function AssetConciergeMvp() {
             )}
           </div>
         )}
+        {/* テストA：許可フレーム（2026-08-03 指示書2-2）。厳しめと同じブロック構造・同一のボタンクラス
+            ＝視覚的重みを揃える（指示書1-1・比較の公平性）。ボタン文言は測定変数のため変更禁止。 */}
+        {permissionEligible && (
+          <div className="mt-3">
+            <button type="button" onClick={togglePermission}
+              className="w-full py-2 rounded-lg bg-white/15 text-white text-[13px] font-bold hover:bg-white/25 transition">
+              {permOpen ? "閉じる" : "あと毎月いくら使っても届くかを見る"}
+            </button>
+            {permOpen && permCalc && inputs && (
+              <div className="mt-2 p-3 rounded-lg bg-white/15 text-[12px] leading-relaxed">
+                目標<b className="font-extrabold">{manOku(inputs.target)}円</b>には、毎月<b className="font-extrabold">{yen(permCalc.need3)}円</b>で届く見込みです。
+                いまの毎月<b className="font-extrabold">{yen(inputs.surplus)}円</b>から、<b className="font-extrabold">あと{yen(Math.max(0, inputs.surplus - permCalc.need3))}円減らしても届く</b>計算になります。
+                <div className="opacity-75 mt-1 text-[10px]">
+                  {permCalc.need0 !== null
+                    ? <>※いま持っている資産が年{inputs.r}%でふえた場合の目安です。ふえなかった場合は{yen(permCalc.need0)}円です。</>
+                    : <>※いま持っている資産が年{inputs.r}%でふえた場合の目安です。ふえなかった場合（0%）は、この目標には届かない計算です。</>}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* 変更5：目標を上回る見込みの人への出口 */}
         {result && result.achieve > 100 && (
           <div className="mt-3 p-3 rounded-lg bg-white/15 text-[12px] leading-relaxed">

@@ -386,6 +386,13 @@ export default function TaishokukinUketorikataPage() {
           <p className={p}>
             いずれも別の記事で扱います。該当する可能性がある場合、この記事の計算をそのまま当てはめないでください。
           </p>
+          {/* 2026-08-04 追加：記事11（iDeCoと退職金の受け取り順）への相互参照（駅1-2指示書3章）。
+              既存の本文・数値・見出しは変更していない。dateModified も更新しない。 */}
+          <p className={p}>
+            → このうち、iDeCo・企業型DCと退職金の受け取り時期については、
+            <Link href="/retirement/ideco-taishokukin-juntan" className="text-blue-700 underline hover:no-underline">「iDeCoと退職金は、受け取る順番と間隔で手取りが変わります」</Link>
+            で扱っています。
+          </p>
         </section>
 
         {/* 出典 */}

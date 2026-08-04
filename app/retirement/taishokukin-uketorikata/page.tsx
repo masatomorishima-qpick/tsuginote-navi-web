@@ -393,6 +393,16 @@ export default function TaishokukinUketorikataPage() {
             <Link href="/retirement/ideco-taishokukin-juntan" className="text-blue-700 underline hover:no-underline">「iDeCoと退職金は、受け取る順番と間隔で手取りが変わります」</Link>
             で扱っています。
           </p>
+          {/* 2026-08-04 追加：記事12（退職金の年金受け取りと公的年金の繰下げ）への相互参照
+              （駅1-4指示書4章）。記事11への相互参照と同じ位置（節の切れ目＝</section> の直前）。
+              記事11のリンク文と違い「このうち」で始めない：直前の <ul> の3項目（iDeCo/企業型DC・
+              勤続5年以下と役員等・障害/死亡退職）に繰下げが含まれていないため（追補① Q1・masato確定）。
+              既存の本文・数値・見出しは変更していない。dateModified も更新しない。 */}
+          <p className={p}>
+            → 退職金を年金形式で受け取る場合の、公的年金の受け取り開始年齢との組み合わせは、
+            <Link href="/retirement/taishokukin-nenkin-kurisage" className="text-blue-700 underline hover:no-underline">「退職金を年金で受け取るなら、公的年金の受け取り開始年齢と一緒に決めます」</Link>
+            で扱っています。
+          </p>
         </section>
 
         {/* 出典 */}

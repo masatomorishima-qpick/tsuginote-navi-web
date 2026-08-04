@@ -5,8 +5,8 @@ import { track } from "@/lib/shisan/track";
 /* 運営者フラグ（?op=1）。テスト行除外の共通機構（lib/shisan/op.ts・2026-08-03 修理済み） */
 import { captureOpParam, isOperatorClient } from "@/lib/shisan/op";
 import {
-  comparePlans, manDisp,
-  type TaishokukinInput, type PlanComparison,
+  comparePlans, manDisp, pensionStartComparison,
+  type TaishokukinInput, type PlanComparison, type PensionStartComparison,
 } from "@/lib/retirement/taishokukin";
 
 /**
@@ -47,6 +47,11 @@ const summaryCls = "cursor-pointer list-none select-none text-[13px] text-slate-
 const formulaCls =
   "mt-1.5 whitespace-pre-wrap break-words rounded-lg bg-slate-50 px-3 py-2 font-mono text-[12.5px] leading-relaxed text-slate-800";
 const explainCls = "mt-2 text-[13px] leading-relaxed text-slate-600";
+/* v2.0 比較ブロックの表（375px では overflow-x-auto で横スクロール。min-width は控えめ） */
+const cmpTableCls = "w-full min-w-[460px] border-collapse text-[13px]";
+const cmpThCls = "border border-slate-200 bg-slate-50 px-2 py-1.5 text-left align-bottom font-semibold text-slate-600";
+const cmpThRowCls = "border border-slate-200 px-2 py-1.5 text-left font-semibold text-slate-700 whitespace-nowrap";
+const cmpTdCls = "border border-slate-200 px-2 py-1.5 text-slate-700 whitespace-nowrap";
 
 const PLAN_LABEL = { lump: "全額一時金", pension: "全額年金", heiyo: "併用（控除まで一時金＋残りを年金）" } as const;
 
@@ -137,6 +142,14 @@ export default function TaishokukinCalculator({ articlePath }: { articlePath: st
     return comparePlans(input);
   }, [warn, years, amount, ratePct, receiveYears, publicPension]);
 
+  /* v2.0：年金の受け取り開始年齢の比較（全額年金前提の生涯手取り）。3案比較とは別の量。
+   * 追加入力なしで現行の5項目から計算する。 */
+  const pensionCompare: PensionStartComparison | null = useMemo(() => {
+    if (warn.length > 0) return null;
+    const input: TaishokukinInput = { years, amount, ratePct, receiveYears, publicPension };
+    return pensionStartComparison(input);
+  }, [warn, years, amount, ratePct, receiveYears, publicPension]);
+
   const onSubmit = () => {
     setSubmitted(true);
     track("retirement_tool_calc", {
@@ -144,6 +157,9 @@ export default function TaishokukinCalculator({ articlePath }: { articlePath: st
       result: calc ? "ok" : "invalid",
       top: calc ? calc.ranking[0] : "",
       heiyo_shown: calc ? calc.heiyo !== null : false,
+      // v2.0：年金開始年齢の比較ブロックが表示された（＝計算成功時に常に表示）ことを示す。
+      // 新規イベントは作らず既存 calc にパラメータを1つ追加（v2.0指示書8・masato確定）。
+      pension_compare: !!calc,
     });
     /* 入力の匿名保存（fire-and-forget・失敗は無音。loan-tool と同じ） */
     try {
@@ -354,6 +370,112 @@ export default function TaishokukinCalculator({ articlePath }: { articlePath: st
             </section>
           )}
 
+          {/* ===== v2.0：年金の受け取り開始年齢との組み合わせ（指示書2-3） =====
+              3案比較（企業年金の受取期間だけの手取り）とは別の量：全額年金を選んだ場合の、
+              老齢年金の開始年齢による「生涯手取り（企業年金＋老齢年金を想定寿命まで合計）」。 */}
+          {pensionCompare && (
+            <section className="rounded-xl bg-white p-4">
+              <h4 className="text-[15px] font-bold text-slate-900">年金の受け取り開始年齢と組み合わせると</h4>
+              <p className="mt-1 text-[13px] leading-relaxed text-slate-600">
+                ここからは<strong>全額年金で受け取った場合</strong>の、老齢年金の開始年齢による<strong>生涯手取り</strong>の比較です。上の3案（企業年金だけの手取り）とは別で、企業年金と老齢年金を<strong>想定寿命まで合計</strong>した金額です。
+              </p>
+
+              {/* 表1：生涯手取り */}
+              <p className="mt-4 text-[14px] font-bold text-slate-900">何歳まで生きるかで結論が変わります。</p>
+              <div className="mt-2 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+                <table className={cmpTableCls}>
+                  <thead>
+                    <tr>
+                      <th className={cmpThCls}>想定寿命<br /><span className="font-normal text-slate-400">（その年齢まで受け取った合計）</span></th>
+                      <th className={cmpThCls}>65歳から受け取る</th>
+                      <th className={cmpThCls}>70歳まで繰り下げる</th>
+                      <th className={cmpThCls}>75歳まで繰り下げる</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pensionCompare.lifespanRows.map((row) => (
+                      <tr key={row.life}>
+                        <td className={cmpThRowCls}>{row.life}歳まで</td>
+                        {row.byStart.map((b) => {
+                          const best = b.startAge === row.bestStartAge;
+                          return (
+                            <td key={b.startAge} className={`${cmpTdCls} ${best ? "bg-emerald-50 font-bold text-slate-900" : ""}`}>
+                              {best && <span className="mr-1 rounded bg-emerald-600 px-1 py-0.5 text-[10px] font-bold text-white">最大</span>}
+                              {manDisp(b.net)}円
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {/* 万円表示の理由の開示（2026-08-04 masato確定）。社保を目安率で概算しているため、
+                  円単位で出すと「1円まで分かっている」という誤った精度の表明になる。 */}
+              <p className="mt-2 text-[12px] leading-relaxed text-slate-500">
+                社会保険料を目安の率で概算しているため、万円単位で表示しています。
+              </p>
+              <p className="mt-2 text-[12px] leading-relaxed text-slate-500">
+                想定寿命は「その年齢まで受け取った場合の合計」です。短命なら繰下げは不利、長命なら有利になり、寿命で結論の符号が変わります。
+              </p>
+
+              {/* 分解表示（指示書2-3・65歳 vs 70歳の1本） */}
+              {(() => {
+                const oap65 = pensionCompare.oapAnnuals.find((o) => o.startAge === 65)!;
+                const oap70 = pensionCompare.oapAnnuals.find((o) => o.startAge === 70)!;
+                const b65 = pensionCompare.corpPeriodBurden.find((o) => o.startAge === 65)!;
+                const b70 = pensionCompare.corpPeriodBurden.find((o) => o.startAge === 70)!;
+                return (
+                  <p className="mt-4 rounded-lg bg-emerald-50/70 p-3 text-[13px] leading-relaxed text-slate-700">
+                    70歳まで繰り下げると、老齢年金の年額は{yen(oap65.annual)}円から{yen(oap70.annual)}円に増えます。
+                    それとは別に、<strong>60〜69歳の企業年金にかかる税・社会保険料が {yen(b65.burden)}円 から {yen(b70.burden)}円 に下がります</strong>。65歳から老齢年金を受け取ると、その5年間は企業年金と合算されて課税されるためです。
+                  </p>
+                );
+              })()}
+
+              {/* 表2：老齢年金の年額 */}
+              <p className="mt-4 text-[14px] font-bold text-slate-900">老齢年金の年額</p>
+              <div className="mt-2 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+                <table className={cmpTableCls}>
+                  <thead>
+                    <tr>
+                      <th className={cmpThCls}>受け取り開始</th>
+                      <th className={cmpThCls}>年額</th>
+                      <th className={cmpThCls}>増額率</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pensionCompare.oapAnnuals.map((o) => (
+                      <tr key={o.startAge}>
+                        <td className={cmpThRowCls}>{o.startAge}歳</td>
+                        <td className={cmpTdCls}>{yen(o.annual)}円</td>
+                        <td className={cmpTdCls}>{o.increasePct === 0 ? "—" : `+${o.increasePct}%`}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <details className={detailsCls} onToggle={onFormulaToggle}>
+                <summary className={summaryCls}>
+                  <span className="mr-1 inline font-semibold group-open:hidden">＋</span>
+                  <span className="mr-1 hidden font-semibold group-open:inline">−</span>
+                  この計算の中身を見る
+                </summary>
+                <p className={explainCls}>
+                  老齢年金は受け取りを繰り下げると増えます（1か月あたり0.7%、75歳で+84%が上限）。一方で、65歳から受け取ると60〜69歳の企業年金と合算され、その期間の税・社会保険料が増えます。繰下げはこの両面を動かすため、60歳から想定寿命までの各年の手取りを合計して比べます。
+                </p>
+                <div className={formulaCls}>{`増額率 = 0.7% × 繰り下げた月数（65歳0か月が起点。上限 +84% ＝ 75歳）
+各年の雑所得 = 公的年金等控除の速算表(企業年金 + 老齢年金)　（65歳未満/以上で表が変わる）
+各年の負担 = 所得税(雑所得−48万) × 1.021 + 住民税(雑所得−43万) × 10% + 国保・介護の目安(雑所得 × 10%)
+生涯手取り = Σ[60歳〜想定寿命]（その年の収入 − その年の負担）`}</div>
+                <div className={formulaCls}>{`あなたの場合：企業年金 年額 = ${yen(pensionCompare.corpAnnual)}円（60〜${pensionCompare.corpLastAge}歳）
+老齢年金 = ${yen(publicPension)}円 → 70歳 ${yen(pensionCompare.oapAnnuals[1].annual)}円（+${pensionCompare.oapAnnuals[1].increasePct}%）／75歳 ${yen(pensionCompare.oapAnnuals[2].annual)}円（+${pensionCompare.oapAnnuals[2].increasePct}%）
+例）想定寿命90歳：65歳開始 ${manDisp(pensionCompare.lifespanRows[2].byStart[0].net)}円 ／ 70歳開始 ${manDisp(pensionCompare.lifespanRows[2].byStart[1].net)}円 ／ 75歳開始 ${manDisp(pensionCompare.lifespanRows[2].byStart[2].net)}円`}</div>
+              </details>
+            </section>
+          )}
+
           {/* 固定表示の注記（指示書3-3・内容必須） */}
           <div className="rounded-lg bg-slate-100 p-3 text-[12px] leading-relaxed text-slate-700">
             <p>※国民健康保険料・介護保険料は「増えた所得の約10%」の目安です。保険料率と算定方法は自治体により異なり、賦課限度額は考慮していません。</p>
@@ -361,6 +483,20 @@ export default function TaishokukinCalculator({ articlePath }: { articlePath: st
             <p className="mt-1">※所得控除は基礎控除のみで計算しています（配偶者控除・社会保険料控除などは考慮していません）。</p>
             <p className="mt-1">※勤続5年以下・役員等・iDeCoや企業型DCと近い時期に受け取る場合には対応していません。該当する場合はこの計算を使わないでください。</p>
             <p className="mt-1">※選べる分割の割合は制度により異なります。控除額ちょうどで区切れない場合があります。</p>
+            {/* v2.0で追加（指示書2-5・注記6〜10）。年金開始年齢の比較に関する前提。 */}
+            <p className="mt-1">※60歳で退職し、60〜64歳に他の収入がない前提です。働きながら受け取る場合、在職老齢年金により結果が変わりますが、このツールでは計算していません。</p>
+            <p className="mt-1">※加給年金（65歳未満の配偶者がいる場合の加算）は計算に含めていません。繰下げ待機中は受け取れないため、該当する場合は繰下げの有利さが小さくなります。</p>
+            <p className="mt-1">※老齢基礎年金と老齢厚生年金を分けて繰り下げることもできますが、このツールでは一括して扱っています。</p>
+            <p className="mt-1">※75歳から後期高齢者医療制度に移行しますが、保険料は全期間を通じて同じ目安率で概算しています。</p>
+            <p className="mt-1">※国民健康保険料には賦課限度額があり、高所得の場合、実際の負担はこの計算より小さくなります。</p>
+            {/* 率の明示（2026-08-04 masato確定・Aの万円表示と対になる開示）。生涯手取りの
+                社保概算は「雑所得の10%」（絶対額）で、注記1のv1側「増えた所得の約10%」（増分）とは
+                枠組みが違うため、生涯手取りにスコープして明記する。 */}
+            <p className="mt-1">※「年金の受け取り開始年齢と組み合わせると」の生涯手取りでは、国民健康保険料・介護保険料を雑所得の10%という目安で計算しています。</p>
+            {/* 開示（2026-08-04 masato確定）。繰下げ待機中の収入空白期間は生涯手取りに
+                含めていない。表1が長寿の行で繰下げを「最大」と示すため、収入ゼロ期間に
+                気づかず選ぶ誤誘導を防ぐ開示。受取年数に依存しない一般形（具体年齢は書かない）。 */}
+            <p className="mt-1">※繰り下げている間、老齢年金は受け取れません。企業年金の受け取りが終わったあと、老齢年金が始まるまでの期間は、公的年金等の収入がない期間になります。この期間の生活費をどうまかなうかは、この計算に含まれていません。</p>
           </div>
         </div>
       )}

@@ -24,6 +24,9 @@
  *   合計後も丸めない（表示側で円単位に丸める）。このため期待値と数円の差が出る（万円単位で一致）
  */
 
+// v2.0（2026-08-04）：繰下げの増額率などの制度定数は constants.ts に集約（年次改定はそこだけ）。
+import { PENSION_START_AGES, LIFESPANS, kurisageMultiplier } from './constants';
+
 /* ===== 制度パラメータ（2026-08-03 時点・出典は記事9の出典欄） ===== */
 
 /** 退職所得控除（国税庁 No.1420）。勤続年数は1年未満切り上げ済みの整数を渡す。 */
@@ -167,4 +170,119 @@ export function comparePlans(input: TaishokukinInput): PlanComparison {
 /** 表示用：円 → 「2,084万円」形式（万円未満切捨てだと期待値表とずれるため四捨五入）。 */
 export function manDisp(yenValue: number): string {
   return `${Math.round(yenValue / 10_000).toLocaleString('ja-JP')}万`;
+}
+
+/* =====================================================================
+ * v2.0：年金の受け取り開始年齢との組み合わせ（2026-08-04 追加）
+ *
+ * 退職金の受け取り方（全額年金）と、老齢年金の受け取り開始年齢は別々に決められない。
+ * 65歳から老齢年金を受け取ると 65〜69歳は企業年金と合算されて課税されるが、
+ * 繰り下げるとその期間は企業年金だけになり、企業年金の税負担も下がる——という相互作用を、
+ * 「全額年金」を選んだ場合の生涯手取りで比較する。
+ *
+ * 重要：既存の pensionPlan / comparePlans / lumpSumPlan には一切触れない（完了条件5）。
+ *   pensionPlan は「公的年金のみとの増分」を企業年金の受取期間だけ計算する別概念のため、
+ *   ここは 60歳〜想定寿命の絶対額を合計する新しい純関数として分離する（v2.0指示書1・masato確定）。
+ *
+ * 前提（v2.0指示書2-2・注記6〜10）：
+ * - 全額年金（退職金全額を受取年数で年金化）。企業年金は 60〜(60+受取年数−1) 歳に受け取る
+ * - 老齢年金は入力の「65歳からの公的年金額」を起点に、開始年齢 S で繰下げ増額する
+ * - 60〜64歳は他の収入なし（在職老齢年金・給与は未計算）。加給年金・分割繰下げも未計算
+ * - 各年：雑所得＝公的年金等控除後、負担＝所得税(基礎48万・復興税後1円未満切捨て)
+ *   ＋住民税(基礎43万・10%)＋国保介護の目安(雑所得×10%)。手取り＝収入−負担
+ * - 生涯手取り＝60歳〜想定寿命(inclusive)の手取りの合計
+ *
+ * 丸め：v1と揃える（所得税のみ復興税後に1円未満切捨て。住民税・社保目安は小数のまま
+ *   年次合計し、合計後も丸めない＝表示側で円に丸める）。
+ * ===================================================================== */
+
+/** 企業年金の年額（全額年金）。v1 pensionPlan と同じ式（annual は publicPension 非依存）。 */
+function corpAnnual(amount: number, ratePct: number, receiveYears: number): number {
+  const r = ratePct / 100;
+  return r === 0 ? amount / receiveYears : (amount * r) / (1 - Math.pow(1 + r, -receiveYears));
+}
+
+/** ある1年の負担（所得税＋住民税＋国保介護の目安）。income はその年の公的年金等の収入。 */
+function yearBurden(income: number, over65: boolean): number {
+  const z = pensionZatsu(income, over65);
+  const incomeTax = Math.floor(incomeTaxBase(Math.max(0, z - 480_000)) * 1.021);
+  const residentTax = Math.max(0, z - 430_000) * 0.10;
+  const shaho = z * 0.10; // 国保・介護の目安（増減ではなく絶対額の10%）
+  return incomeTax + residentTax + shaho;
+}
+
+/** 老齢年金の開始年齢 S を受け取ったときの、60歳〜life歳(inclusive)の生涯手取り。 */
+function lifetimeNet(
+  annual: number, receiveYears: number, publicPension: number, startAge: number, life: number,
+): number {
+  const oap = publicPension * kurisageMultiplier(startAge); // 繰下げ後の老齢年金 年額
+  const corpLastAge = 60 + receiveYears - 1;                // 企業年金の最終受取年齢
+  let sum = 0;
+  for (let age = 60; age <= life; age++) {
+    const corp = age >= 60 && age <= corpLastAge ? annual : 0;
+    const pension = age >= startAge ? oap : 0;
+    const income = corp + pension;
+    sum += income - yearBurden(income, age >= 65);
+  }
+  return sum;
+}
+
+export interface PensionStartAnnual {
+  startAge: number;   // 65 / 70 / 75
+  annual: number;     // 繰下げ後の老齢年金 年額
+  increasePct: number; // 増額率（%）。65歳は0
+}
+
+export interface LifespanRow {
+  life: number;                                  // 80 / 85 / 90 / 95
+  byStart: Array<{ startAge: number; net: number }>; // 開始年齢ごとの生涯手取り
+  bestStartAge: number;                          // その行で生涯手取りが最大の開始年齢
+}
+
+export interface PensionStartComparison {
+  corpAnnual: number;                    // 企業年金の年額（全額年金）
+  corpLastAge: number;                   // 企業年金の最終受取年齢（60+受取年数−1）
+  oapAnnuals: PensionStartAnnual[];      // 表2：老齢年金の年額（65/70/75）
+  /** 企業年金期間（60〜69歳）の税・社保の合計。開始年齢ごと（分解表示用）。 */
+  corpPeriodBurden: Array<{ startAge: number; burden: number }>;
+  /** 表1：生涯手取りの比較（想定寿命 × 開始年齢）。 */
+  lifespanRows: LifespanRow[];
+}
+
+/**
+ * 年金の受け取り開始年齢の比較（全額年金前提）。既存の3案比較とは独立した別の量。
+ * 追加入力なし（現行の5項目だけで計算できる）。
+ */
+export function pensionStartComparison(input: TaishokukinInput): PensionStartComparison {
+  const { amount, ratePct, receiveYears, publicPension } = input;
+  const annual = corpAnnual(amount, ratePct, receiveYears);
+  const corpLastAge = 60 + receiveYears - 1;
+
+  const oapAnnuals: PensionStartAnnual[] = PENSION_START_AGES.map((startAge) => {
+    const m = kurisageMultiplier(startAge);
+    return { startAge, annual: publicPension * m, increasePct: Math.round((m - 1) * 100) };
+  });
+
+  // 企業年金期間（60〜69歳・固定）の税社保合計。開始年齢で 65〜69 に老齢年金が乗るかが変わる。
+  const corpPeriodBurden = PENSION_START_AGES.map((startAge) => {
+    const oap = publicPension * kurisageMultiplier(startAge);
+    let burden = 0;
+    for (let age = 60; age <= 69; age++) {
+      const corp = age <= corpLastAge ? annual : 0;
+      const pension = age >= startAge ? oap : 0;
+      burden += yearBurden(corp + pension, age >= 65);
+    }
+    return { startAge, burden };
+  });
+
+  const lifespanRows: LifespanRow[] = LIFESPANS.map((life) => {
+    const byStart = PENSION_START_AGES.map((startAge) => ({
+      startAge,
+      net: lifetimeNet(annual, receiveYears, publicPension, startAge, life),
+    }));
+    const bestStartAge = byStart.reduce((a, b) => (b.net > a.net ? b : a)).startAge;
+    return { life, byStart, bestStartAge };
+  });
+
+  return { corpAnnual: annual, corpLastAge, oapAnnuals, corpPeriodBurden, lifespanRows };
 }

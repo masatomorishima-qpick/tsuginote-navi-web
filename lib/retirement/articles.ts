@@ -52,7 +52,9 @@ const ARTICLES: RetirementArticle[] = [
     topic:
       '退職所得控除、一時金と年金の手取り比較、併用の区切り方、規程の利率の調べ方',
     datePublished: '2026-08-03',
-    dateModified: '2026-08-03',
+    /* 2026-08-04（追随修正B）：v2.0で「年金の受け取り開始年齢と組み合わせると」の比較ブロックが
+     * 追加され、ページの情報内容が変わったため更新。datePublished は変更しない。本文の変更はなし。 */
+    dateModified: '2026-08-04',
     visual: {
       src: '/retirement/taishokukin-uketorikata.webp',
       alt: '1本の帯が途中で区切られ、左右で異なる扱いになることを表した図',

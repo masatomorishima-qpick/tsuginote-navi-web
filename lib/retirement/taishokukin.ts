@@ -84,11 +84,24 @@ export function lumpSumPlan(amount: number, years: number): LumpResult {
   return { net: amount - incomeTax - residentTax, taxable, incomeTax, residentTax, kojo };
 }
 
-/** 雑所得 z に対するその年の税（所得税＝基礎控除48万・復興税込み切捨て／住民税＝基礎控除43万・10%）。 */
+/** 公的年金等の雑所得 z にかかる所得税＋住民税（復興税込み）。
+ *  課税標準（所得税＝雑所得−48万／住民税＝雑所得−43万）に千円未満切捨てを適用する
+ *  （国税通則法118条1項・地方税法20条の4の2第1項。退職所得側 lumpSumPlan と同じ扱い・2026-08-04 C対応）。
+ *  切捨ての定義はこの1か所に集約し、v1（yearlyTax）と v2.0（yearBurden）の両方から呼ぶ。
+ *  ※国保・介護の目安（雑所得×10%）は税ではないため、この関数では扱わない（呼び出し側で加算）。 */
+function zatsuTax(z: number): { incomeTax: number; residentTax: number } {
+  const incomeBase = Math.floor(Math.max(0, z - 480_000) / 1000) * 1000;   // 課税標準の千円未満切捨て
+  const residentBase = Math.floor(Math.max(0, z - 430_000) / 1000) * 1000; // 同上（住民税）
+  return {
+    incomeTax: Math.floor(incomeTaxBase(incomeBase) * 1.021),
+    residentTax: residentBase * 0.10,
+  };
+}
+
+/** 雑所得 z に対するその年の税（所得税＋住民税）。課税標準の端数処理は zatsuTax に集約。 */
 function yearlyTax(z: number): number {
-  const income = Math.floor(incomeTaxBase(Math.max(0, z - 480_000)) * 1.021);
-  const resident = Math.max(0, z - 430_000) * 0.10;
-  return income + resident;
+  const { incomeTax, residentTax } = zatsuTax(z);
+  return incomeTax + residentTax;
 }
 
 export interface PensionResult {
@@ -202,12 +215,19 @@ function corpAnnual(amount: number, ratePct: number, receiveYears: number): numb
   return r === 0 ? amount / receiveYears : (amount * r) / (1 - Math.pow(1 + r, -receiveYears));
 }
 
+/** 繰下げ後の老齢年金 年額（円・整数）。表示（表2）と計算で同じ整数値を使うために四捨五入する。
+ *  0.007×120 が二進で 0.8399… となり publicPension×倍率 が 4,047,999.99… に落ちる浮動小数点誤差で、
+ *  課税標準の千円未満切捨てが系統的に1,000円下振れするのを防ぐ（2026-08-04 C対応・masato確定）。
+ *  ※企業年金の年額（corpAnnual）は年金原資の計算結果で丸い値にならないため丸めない（v2.1で見直し）。 */
+function roundedOap(publicPension: number, startAge: number): number {
+  return Math.round(publicPension * kurisageMultiplier(startAge));
+}
+
 /** ある1年の負担（所得税＋住民税＋国保介護の目安）。income はその年の公的年金等の収入。 */
 function yearBurden(income: number, over65: boolean): number {
   const z = pensionZatsu(income, over65);
-  const incomeTax = Math.floor(incomeTaxBase(Math.max(0, z - 480_000)) * 1.021);
-  const residentTax = Math.max(0, z - 430_000) * 0.10;
-  const shaho = z * 0.10; // 国保・介護の目安（増減ではなく絶対額の10%）
+  const { incomeTax, residentTax } = zatsuTax(z); // 課税標準の千円未満切捨ては zatsuTax に集約
+  const shaho = z * 0.10; // 国保・介護の目安（税ではないため千円未満切捨ての対象外）
   return incomeTax + residentTax + shaho;
 }
 
@@ -215,7 +235,7 @@ function yearBurden(income: number, over65: boolean): number {
 function lifetimeNet(
   annual: number, receiveYears: number, publicPension: number, startAge: number, life: number,
 ): number {
-  const oap = publicPension * kurisageMultiplier(startAge); // 繰下げ後の老齢年金 年額
+  const oap = roundedOap(publicPension, startAge); // 繰下げ後の老齢年金 年額（整数）
   const corpLastAge = 60 + receiveYears - 1;                // 企業年金の最終受取年齢
   let sum = 0;
   for (let age = 60; age <= life; age++) {
@@ -260,12 +280,12 @@ export function pensionStartComparison(input: TaishokukinInput): PensionStartCom
 
   const oapAnnuals: PensionStartAnnual[] = PENSION_START_AGES.map((startAge) => {
     const m = kurisageMultiplier(startAge);
-    return { startAge, annual: publicPension * m, increasePct: Math.round((m - 1) * 100) };
+    return { startAge, annual: roundedOap(publicPension, startAge), increasePct: Math.round((m - 1) * 100) };
   });
 
   // 企業年金期間（60〜69歳・固定）の税社保合計。開始年齢で 65〜69 に老齢年金が乗るかが変わる。
   const corpPeriodBurden = PENSION_START_AGES.map((startAge) => {
-    const oap = publicPension * kurisageMultiplier(startAge);
+    const oap = roundedOap(publicPension, startAge);
     let burden = 0;
     for (let age = 60; age <= 69; age++) {
       const corp = age <= corpLastAge ? annual : 0;

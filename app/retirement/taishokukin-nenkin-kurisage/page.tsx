@@ -63,7 +63,7 @@ export default function TaishokukinNenkinKurisagePage() {
           で扱いました。ただし、年金形式を選ぶなら、その判断はもう1つの選択と切り離せません。<strong>公的年金をいつから受け取るか</strong>です。
         </p>
         <p className={p}>
-          勤続25年・退職金2,200万円の人が、10年の年金形式を選んだとします。この人が企業年金を受け取っている10年間にかかる税と社会保険料は、公的年金を65歳から受け取る場合は<strong>5,670,418円</strong>、70歳まで繰り下げる場合は<strong>3,048,693円</strong>という計算になります。<strong>差は約262万円</strong>です。
+          勤続25年・退職金2,200万円の人が、10年の年金形式を選んだとします。この人が企業年金を受け取っている10年間にかかる税と社会保険料は、公的年金を65歳から受け取る場合は<strong>5,670,420円</strong>、70歳まで繰り下げる場合は<strong>3,048,695円</strong>という計算になります。<strong>差は約262万円</strong>です。
         </p>
         <p className={p}>
           受け取る退職金の額は同じです。企業年金の年額も同じです。変わるのは、公的年金をいつから受け取り始めるかだけです。
@@ -80,7 +80,7 @@ export default function TaishokukinNenkinKurisagePage() {
             <li>60歳で退職し、60〜64歳に他の収入はない。配偶者はいないものとし、加給年金は考慮しない</li>
             <li>所得控除は基礎控除のみで計算しています（所得税48万円・住民税43万円）。社会保険料控除や配偶者控除は含めていません</li>
             <li>所得税・住民税とも、課税標準の1,000円未満を切り捨てて計算しています。所得税には復興特別所得税（2.1%）を含み、1円未満を切り捨てます。住民税は一律10%で、均等割は含めていません</li>
-            <li>国民健康保険料・介護保険料は、雑所得の10%という目安で計算しています。<strong>この10%は法令に定められた率ではなく、当サイトが用いている概算の率です。</strong>実際の保険料は自治体や所得段階によって異なります</li>
+            <li>国民健康保険料・介護保険料は、雑所得の10%という目安で計算しています。<strong>この10%は法令に定められた率ではなく、当サイトが用いている概算の率です。</strong>実際の保険料は自治体や所得段階によって異なります。なお、年ごとに円へ丸めて計算しています</li>
             <li>国民健康保険料には<strong>賦課限度額</strong>（1年に支払う保険料の上限額）があり、所得が高い場合、実際の負担はこの計算より小さくなることがあります</li>
             <li>75歳からは後期高齢者医療制度に移りますが、この計算では全期間を同じ目安率で扱っています</li>
           </ul>
@@ -237,15 +237,15 @@ export default function TaishokukinNenkinKurisagePage() {
               <tbody>
                 <tr>
                   <td className={tdCls}>65歳</td>
-                  <td className={tdCls}><strong>5,670,418円</strong></td>
+                  <td className={tdCls}><strong>5,670,420円</strong></td>
                 </tr>
                 <tr>
                   <td className={tdCls}>70歳</td>
-                  <td className={tdCls}><strong>3,048,693円</strong></td>
+                  <td className={tdCls}><strong>3,048,695円</strong></td>
                 </tr>
                 <tr>
                   <td className={tdCls}>75歳</td>
-                  <td className={tdCls}><strong>3,048,693円</strong></td>
+                  <td className={tdCls}><strong>3,048,695円</strong></td>
                 </tr>
               </tbody>
             </table>

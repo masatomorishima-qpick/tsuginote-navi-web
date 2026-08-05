@@ -330,8 +330,15 @@ export default function TaishokukinCalculator({ articlePath }: { articlePath: st
                 年金形式は、据え置き分が規程の利率でふえる代わりに、毎年の受け取りが「公的年金等の雑所得」として課税されます。60歳から受け取り、65歳以降は公的年金と合算して、各年の税（基礎控除のみ）と国民健康保険料・介護保険料の目安（増えた雑所得の約10%）の増加分を合計しています。
               </p>
               <div className={formulaCls}>{`年額 = 元本 × r ÷ (1 − (1 + r)^−受取年数)　（r = 規程の利率。r=0 のときは 元本 ÷ 年数）
-各年の負担増 = [税(雑所得(公的年金 + 年額)) − 税(雑所得(公的年金のみ))] + 雑所得の増分 × 10%
-手取り = 受取総額 − 負担増の合計`}</div>
+各年の負担増
+ = [税(雑所得(公的年金 + 年額)) − 税(雑所得(公的年金のみ))]
+ + 雑所得の増分 × 10%
+手取り = 受取総額 − 負担増の合計
+
+※税 = 所得税(課税標準 × 税率 − 控除額) × 1.021 + 住民税(課税標準 × 10%)
+※所得税の課税標準 = 雑所得 − 48万円(1,000円未満切捨て)
+※住民税の課税標準 = 雑所得 − 43万円(1,000円未満切捨て)
+※国保・介護の目安は、10年分を合計してから円に丸めています`}</div>
               <div className={formulaCls}>{`あなたの場合：年額 = ${yen(calc.pension.annual)}円 × ${receiveYears}年 = 総額 ${yen(calc.pension.total)}円（元本より +${yen(calc.pension.growth)}円）
 60〜64歳は公的年金0円、65歳以降は公的年金${yen(publicPension)}円と合算して課税
 負担増の合計 = ${yen(calc.pension.burden)}円
@@ -467,8 +474,15 @@ export default function TaishokukinCalculator({ articlePath }: { articlePath: st
                 </p>
                 <div className={formulaCls}>{`増額率 = 0.7% × 繰り下げた月数（65歳0か月が起点。上限 +84% ＝ 75歳）
 各年の雑所得 = 公的年金等控除の速算表(企業年金 + 老齢年金)　（65歳未満/以上で表が変わる）
-各年の負担 = 所得税(雑所得−48万) × 1.021 + 住民税(雑所得−43万) × 10% + 国保・介護の目安(雑所得 × 10%)
-生涯手取り = Σ[60歳〜想定寿命]（その年の収入 − その年の負担）`}</div>
+各年の負担
+ = 所得税(課税標準 × 税率 − 控除額) × 1.021
+ + 住民税(課税標準 × 10%)
+ + 国保・介護の目安(雑所得 × 10%)
+生涯手取り = Σ[60歳〜想定寿命]（その年の収入 − その年の負担）
+
+※所得税の課税標準 = 雑所得 − 48万円(1,000円未満切捨て)
+※住民税の課税標準 = 雑所得 − 43万円(1,000円未満切捨て)
+※国保・介護の目安は、年ごとに円へ丸めています`}</div>
                 <div className={formulaCls}>{`あなたの場合：企業年金 年額 = ${yen(pensionCompare.corpAnnual)}円（60〜${pensionCompare.corpLastAge}歳）
 老齢年金 = ${yen(publicPension)}円 → 70歳 ${yen(pensionCompare.oapAnnuals[1].annual)}円（+${pensionCompare.oapAnnuals[1].increasePct}%）／75歳 ${yen(pensionCompare.oapAnnuals[2].annual)}円（+${pensionCompare.oapAnnuals[2].increasePct}%）
 例）想定寿命90歳：65歳開始 ${manDisp(pensionCompare.lifespanRows[2].byStart[0].net)}円 ／ 70歳開始 ${manDisp(pensionCompare.lifespanRows[2].byStart[1].net)}円 ／ 75歳開始 ${manDisp(pensionCompare.lifespanRows[2].byStart[2].net)}円`}</div>
@@ -494,7 +508,7 @@ export default function TaishokukinCalculator({ articlePath }: { articlePath: st
             {/* 率の明示（2026-08-04 masato確定・Aの万円表示と対になる開示）。生涯手取りの
                 社保概算は「雑所得の10%」（絶対額）で、注記1のv1側「増えた所得の約10%」（増分）とは
                 枠組みが違うため、生涯手取りにスコープして明記する。 */}
-            <p className="mt-1">※「年金の受け取り開始年齢と組み合わせると」の生涯手取りでは、国民健康保険料・介護保険料を雑所得の10%という目安で計算しています。</p>
+            <p className="mt-1">※「年金の受け取り開始年齢と組み合わせると」の生涯手取りでは、国民健康保険料・介護保険料を雑所得の10%という目安で計算しています。なお、年ごとに円へ丸めて計算しています。</p>
             {/* 開示（2026-08-04 masato確定）。繰下げ待機中の収入空白期間は生涯手取りに
                 含めていない。表1が長寿の行で繰下げを「最大」と示すため、収入ゼロ期間に
                 気づかず選ぶ誤誘導を防ぐ開示。受取年数に依存しない一般形（具体年齢は書かない）。 */}

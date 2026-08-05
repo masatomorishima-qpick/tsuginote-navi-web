@@ -20,19 +20,32 @@
  * 丸め仕様（完了条件2の報告対象）：
  * - 課税退職所得：千円未満切捨て
  * - 一時金の所得税：復興税を乗じた後に1円未満切捨て。住民税は課税退職所得×10%（整数）
- * - 年金の各年の所得税：復興税を乗じた後に1円未満切捨て。住民税・社保目安は小数のまま年次合計し、
- *   合計後も丸めない（表示側で円単位に丸める）。このため期待値と数円の差が出る（万円単位で一致）
+ * - 年金の各年の所得税：復興税を乗じた後に1円未満切捨て。
+ * - v1（3案比較・pensionPlan）の住民税・社保目安は小数のまま年次合計し、合計後も丸めない
+ *   （年ごとの値を画面に出していないため）。このため期待値と数円の差が出る（万円単位で一致）
+ * - v2.0（繰下げブロック・yearBurden）の社保目安は、年ごとに円へ丸めてから合計する
+ *   （1年あたりの値を画面に出しているため）。v2.1a（2026-08-05・指示書2-1）
+ * - 企業年金の年額は pensionPlan / corpAnnual の両方で円へ丸める（v2.1a・指示書2-2）
+ *
+ * 丸めの原則（2026-08-05 masato確定）：
+ *   「画面に出す値は、出す粒度で丸め、丸めた値を計算にも使う。画面に出さない中間値は丸めない。」
  */
 
 // v2.0（2026-08-04）：繰下げの増額率などの制度定数は constants.ts に集約（年次改定はそこだけ）。
-import { PENSION_START_AGES, LIFESPANS, kurisageMultiplier } from './constants';
-
-/* ===== 制度パラメータ（2026-08-03 時点・出典は記事9の出典欄） ===== */
+// v2.1a（2026-08-05・指示書2-4）：速算表・控除・税率・丸めの処理も constants.ts に集約した。
+// このファイルには「計算の手順」だけを置き、「制度の数値」は持たない。
+import {
+  PENSION_START_AGES, LIFESPANS, kurisageMultiplier,
+  TAISHOKU_KOJO, INCOME_TAX_BRACKETS, FUKKO_MULTIPLIER, PENSION_KOJO,
+  BASIC_DEDUCTION, RESIDENT_TAX_RATE, SHAHO_RATE,
+  floorToThousand, floorToYen, roundToYen,
+} from './constants';
 
 /** 退職所得控除（国税庁 No.1420）。勤続年数は1年未満切り上げ済みの整数を渡す。 */
 export function taishokuKojo(years: number): number {
-  if (years <= 20) return Math.max(800_000, 400_000 * years);
-  return 8_000_000 + 700_000 * (years - 20);
+  const { BOUNDARY_YEARS, MIN, PER_YEAR_UNDER20, BASE_OVER20, PER_YEAR_OVER20 } = TAISHOKU_KOJO;
+  if (years <= BOUNDARY_YEARS) return Math.max(MIN, PER_YEAR_UNDER20 * years);
+  return BASE_OVER20 + PER_YEAR_OVER20 * (years - BOUNDARY_YEARS);
 }
 
 /** 所得税の速算表（復興税抜き・国税庁）。
@@ -40,28 +53,23 @@ export function taishokuKojo(years: number): number {
  *  約4,960万円に達しうるため、40%・45%の2区分を追加した（2026-08-03 masato承認）。 */
 export function incomeTaxBase(taxable: number): number {
   if (taxable <= 0) return 0;
-  if (taxable <= 1_950_000) return taxable * 0.05;
-  if (taxable <= 3_300_000) return taxable * 0.10 - 97_500;
-  if (taxable <= 6_950_000) return taxable * 0.20 - 427_500;
-  if (taxable <= 9_000_000) return taxable * 0.23 - 636_000;
-  if (taxable <= 18_000_000) return taxable * 0.33 - 1_536_000;
-  if (taxable <= 40_000_000) return taxable * 0.40 - 2_796_000;
-  return taxable * 0.45 - 4_796_000;
+  const last = INCOME_TAX_BRACKETS[INCOME_TAX_BRACKETS.length - 1];
+  const bracket = INCOME_TAX_BRACKETS.find((b) => taxable <= b.upTo) ?? last;
+  return taxable * bracket.rate - bracket.deduct;
 }
 
 /** 公的年金等控除後の雑所得（国税庁の速算表。収入1,000万円以下・他の所得1,000万円以下の場合）。 */
 export function pensionZatsu(income: number, over65: boolean): number {
   if (over65) {
-    if (income <= 1_100_000) return 0;
-    if (income < 3_300_000) return income - 1_100_000;
+    if (income <= PENSION_KOJO.FLAT_OVER65) return 0;
+    if (income < PENSION_KOJO.TIER_OVER65_LIMIT) return income - PENSION_KOJO.FLAT_OVER65;
   } else {
-    if (income <= 600_000) return 0;
-    if (income < 1_300_000) return income - 600_000;
+    if (income <= PENSION_KOJO.FLAT_UNDER65) return 0;
+    if (income < PENSION_KOJO.FLAT_UNDER65_LIMIT) return income - PENSION_KOJO.FLAT_UNDER65;
   }
-  if (income < 4_100_000) return income * 0.75 - 275_000;
-  if (income < 7_700_000) return income * 0.85 - 685_000;
-  if (income < 10_000_000) return income * 0.95 - 1_455_000;
-  return income - 1_955_000;
+  const tier = PENSION_KOJO.TIERS.find((t) => income < t.under);
+  if (tier) return income * tier.rate - tier.deduct;
+  return income - PENSION_KOJO.OVER_10M_DEDUCT;
 }
 
 /* ===== 各プランの計算 ===== */
@@ -78,9 +86,9 @@ export interface LumpResult {
 export function lumpSumPlan(amount: number, years: number): LumpResult {
   const kojo = taishokuKojo(years);
   const taxableRaw = Math.max(0, amount - kojo) / 2;
-  const taxable = Math.floor(taxableRaw / 1000) * 1000; // 千円未満切捨て
-  const incomeTax = Math.floor(incomeTaxBase(taxable) * 1.021);
-  const residentTax = Math.round(taxable * 0.10);
+  const taxable = floorToThousand(taxableRaw); // 千円未満切捨て
+  const incomeTax = floorToYen(incomeTaxBase(taxable) * FUKKO_MULTIPLIER);
+  const residentTax = roundToYen(taxable * RESIDENT_TAX_RATE);
   return { net: amount - incomeTax - residentTax, taxable, incomeTax, residentTax, kojo };
 }
 
@@ -90,11 +98,11 @@ export function lumpSumPlan(amount: number, years: number): LumpResult {
  *  切捨ての定義はこの1か所に集約し、v1（yearlyTax）と v2.0（yearBurden）の両方から呼ぶ。
  *  ※国保・介護の目安（雑所得×10%）は税ではないため、この関数では扱わない（呼び出し側で加算）。 */
 function zatsuTax(z: number): { incomeTax: number; residentTax: number } {
-  const incomeBase = Math.floor(Math.max(0, z - 480_000) / 1000) * 1000;   // 課税標準の千円未満切捨て
-  const residentBase = Math.floor(Math.max(0, z - 430_000) / 1000) * 1000; // 同上（住民税）
+  const incomeBase = floorToThousand(z - BASIC_DEDUCTION.INCOME_TAX);   // 課税標準の千円未満切捨て
+  const residentBase = floorToThousand(z - BASIC_DEDUCTION.RESIDENT_TAX); // 同上（住民税）
   return {
-    incomeTax: Math.floor(incomeTaxBase(incomeBase) * 1.021),
-    residentTax: residentBase * 0.10,
+    incomeTax: floorToYen(incomeTaxBase(incomeBase) * FUKKO_MULTIPLIER),
+    residentTax: residentBase * RESIDENT_TAX_RATE,
   };
 }
 
@@ -112,10 +120,14 @@ export interface PensionResult {
   burden: number;   // 税・社保（目安）の増加合計
 }
 
-/** 全額年金（60歳受け取り開始）。元本 P を利率 r・n 年の年金現価で年額化する。 */
+/** 全額年金（60歳受け取り開始）。元本 P を利率 r・n 年の年金現価で年額化する。
+ *  v2.1a（2026-08-05・指示書2-2）：年額を円へ丸めてから以降の計算に使う。
+ *  この年額は画面に「年額 ◯◯円」として出しているため、丸めの原則
+ *  （画面に出す値は出す粒度で丸め、丸めた値を計算にも使う）の対象になる。
+ *  丸める前は 2,481,329.028567 を計算に使いながら画面には 2,481,329 と表示していた。 */
 export function pensionPlan(P: number, ratePct: number, n: number, publicPension: number): PensionResult {
   const r = ratePct / 100;
-  const annual = r === 0 ? P / n : (P * r) / (1 - Math.pow(1 + r, -n));
+  const annual = roundToYen(r === 0 ? P / n : (P * r) / (1 - Math.pow(1 + r, -n)));
   const total = annual * n;
   let burden = 0;
   for (let y = 0; y < n; y++) {
@@ -124,7 +136,7 @@ export function pensionPlan(P: number, ratePct: number, n: number, publicPension
     const zWith = pensionZatsu(base + annual, over65);
     const zBase = pensionZatsu(base, over65);
     // 負担増 = 税の増分 + 社保目安（増えた雑所得の10%）
-    burden += yearlyTax(zWith) - yearlyTax(zBase) + (zWith - zBase) * 0.10;
+    burden += yearlyTax(zWith) - yearlyTax(zBase) + (zWith - zBase) * SHAHO_RATE;
   }
   return { net: total - burden, annual, total, growth: total - P, burden };
 }
@@ -209,16 +221,19 @@ export function manDisp(yenValue: number): string {
  *   年次合計し、合計後も丸めない＝表示側で円に丸める）。
  * ===================================================================== */
 
-/** 企業年金の年額（全額年金）。v1 pensionPlan と同じ式（annual は publicPension 非依存）。 */
+/** 企業年金の年額（全額年金）。v1 pensionPlan と同じ式（annual は publicPension 非依存）。
+ *  v2.1a（2026-08-05・指示書2-2）：pensionPlan と揃えて円へ丸める。 */
 function corpAnnual(amount: number, ratePct: number, receiveYears: number): number {
   const r = ratePct / 100;
-  return r === 0 ? amount / receiveYears : (amount * r) / (1 - Math.pow(1 + r, -receiveYears));
+  return roundToYen(r === 0 ? amount / receiveYears : (amount * r) / (1 - Math.pow(1 + r, -receiveYears)));
 }
 
 /** 繰下げ後の老齢年金 年額（円・整数）。表示（表2）と計算で同じ整数値を使うために四捨五入する。
  *  0.007×120 が二進で 0.8399… となり publicPension×倍率 が 4,047,999.99… に落ちる浮動小数点誤差で、
  *  課税標準の千円未満切捨てが系統的に1,000円下振れするのを防ぐ（2026-08-04 C対応・masato確定）。
- *  ※企業年金の年額（corpAnnual）は年金原資の計算結果で丸い値にならないため丸めない（v2.1で見直し）。 */
+ *  ※企業年金の年額（corpAnnual）も v2.1a（2026-08-05）で円へ丸めるようにした。
+ *    v2.0 の時点では「年金原資の計算結果で丸い値にならないため丸めない」としていたが、
+ *    画面に「年額 ◯◯円」と出している以上、表示と計算を一致させるべきという判断（masato確定）。 */
 function roundedOap(publicPension: number, startAge: number): number {
   return Math.round(publicPension * kurisageMultiplier(startAge));
 }
@@ -227,7 +242,10 @@ function roundedOap(publicPension: number, startAge: number): number {
 function yearBurden(income: number, over65: boolean): number {
   const z = pensionZatsu(income, over65);
   const { incomeTax, residentTax } = zatsuTax(z); // 課税標準の千円未満切捨ては zatsuTax に集約
-  const shaho = z * 0.10; // 国保・介護の目安（税ではないため千円未満切捨ての対象外）
+  // v2.1a（2026-08-05・指示書2-1）：年ごとに円へ丸めてから合計する。
+  // このブロックは1年あたりの社保を画面に出しているため、表示の粒度（年・円）で丸める。
+  // v1（pensionPlan）は年ごとの社保を画面に出さない（10年分の合計だけ）ので丸めない。
+  const shaho = roundToYen(z * SHAHO_RATE); // 国保・介護の目安（税ではないため千円未満切捨ての対象外）
   return incomeTax + residentTax + shaho;
 }
 

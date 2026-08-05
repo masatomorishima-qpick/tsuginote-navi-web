@@ -403,6 +403,16 @@ export default function TaishokukinUketorikataPage() {
             <Link href="/retirement/taishokukin-nenkin-kurisage" className="text-blue-700 underline hover:no-underline">「退職金を年金で受け取るなら、公的年金の受け取り開始年齢と一緒に決めます」</Link>
             で扱っています。
           </p>
+          {/* 2026-08-05 追加：記事13（早期退職の割増退職金）への相互参照（駅1-5指示書4章・追補E）。
+              位置は既存の相互参照段落の直後＝節の切れ目（</section> の直前）。
+              記事11には張らない：早期退職の割増は、記事11（iDeCoと退職金の受け取り順）の読者が
+              「扱われていない」と感じる論点ではないため（追補E・masato確定）。
+              既存の本文・数値・見出しは変更していない。dateModified も更新しない。 */}
+          <p className={p}>
+            → 早期退職や希望退職で割増退職金を受け取る場合は、退職金の額が増える一方で、勤続年数が短くなるぶん退職所得控除は減ります。この比べ方は
+            <Link href="/retirement/souki-taishoku-warimashi" className="text-blue-700 underline hover:no-underline">「早期退職の割増退職金は、手取りでいくら残るかで比べます」</Link>
+            で扱っています。
+          </p>
         </section>
 
         {/* 出典 */}

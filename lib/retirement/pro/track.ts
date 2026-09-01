@@ -339,6 +339,138 @@ type ReservedCheck<T> = T extends Reserved | ReservedPrefix ? never : T;
 const _reservedGuard: AllKeys extends ReservedCheck<AllKeys> ? true : never = true;
 void _reservedGuard;
 
+/* ======================================================================
+ * 溜め場（`gtag` が来る前のぶんを、順に持っておく）
+ * ----------------------------------------------------------------------
+ * 【なぜ要るか・2026-09-01】
+ *   `/retirement/pro` を**直接開いた**方では、`pro_lp_view`（§8-2 #1）が
+ *   GA4に1件も届いていませんでした。本番で測りました
+ *   （`kaihatsu_20260901f.md` 11,725 / 3d64e514214fa12349a815183391b705）。
+ *     直接開く 3回 … 届かない ／ アプリの中から移る 2回 … 届く
+ *   `getProSessionId()` は動いていて `dataLayer` が空でしたので、
+ *   **落ちているのは下の `window.gtag?.(…)` の行**です。
+ *   GA4のタグは `app/layout.tsx` があとから読み込みます。
+ *   **`?.` は、`gtag` がまだ無ければ黙って何もしません。**
+ *
+ * 【決めたこと】（`senjutsu_20260901f.md` 20,954 / b8a42add0b88b23fae5e4e49c8fd9ffd）
+ *   ・上限 **20本**。超えたら**新しいほうを落とす**
+ *     （`pro_lp_view` がいちばん先に入るので、古いほうを残すと漏斗の1段目が守られます。
+ *      入力画面にいる間に出せるものは、数えて **8本**でした）
+ *   ・時間切れ **10秒**。過ぎたら諦めて、溜め場を空にします（溜め続けて重くなりません）
+ *   ・落とした本数は **GA4に出しません**。`?ga_debug=1` のときだけ Console に出します
+ *   ・**Clarity は溜めません**（同じ形で落ちているかを、まだ誰も測っていないため）
+ *
+ * 【触っていないもの】
+ *   ・`lib/shisan/track.ts`（禁止34本）／`lib/analytics/ga4.ts`（サイト全体）
+ *   ・`ProApp.tsx` の `sendPageView()`。**`track()` を通らない別の道**です。
+ *     ここでは直りません（`senjutsu_20260901f.md` の決め1・案ア）
+ *
+ * 【検査のための口を、わざと作っていません】
+ *   時間切れの秒数を外から差し替える口を作ると、**本番では誰も通らない道**ができます。
+ *   通らない道は、壊れても気づけません。検査は `kensa/track_tamari.mjs` が
+ *   **偽の `window` を道具の中で作り、このファイルを素のまま読み込んで**当てます。
+ * ====================================================================== */
+
+type Tamari = { name: string; payload: Record<string, unknown> };
+
+/** 溜め場。**先に入れたものが、先に出ます** */
+const tamari: Tamari[] = [];
+/** 上限（本）。超えたら**新しいほうを落とします** */
+const TAMARI_JOUGEN = 20;
+/** 時間切れ（ミリ秒） */
+const MACHI_MS = 10000;
+/** 見張りの間隔（ミリ秒） */
+const MIHARI_MS = 100;
+
+let mihariId: ReturnType<typeof setInterval> | null = null;
+let mihariHajime = 0;
+/** 諦めたか。**諦めたあとは、もう溜めません** */
+let akirameta = false;
+/** 落とした本数。**GA4には出しません** */
+let otoshita = 0;
+
+/** `?ga_debug=1` のときだけ Console に出す（`track()` の中の書き方に合わせています） */
+function debugLog(...a: unknown[]): void {
+  if (typeof location === 'undefined') return;
+  if (!location.search.includes('ga_debug')) return;
+  console.log('[pro:track]', ...a);
+}
+
+/** `gtag` が、呼べる形で在るか */
+function gtagAru(): boolean {
+  return typeof window !== 'undefined' && typeof window.gtag === 'function';
+}
+
+/** 1本を、その場で `gtag` に渡す */
+function sokuOkuru(name: string, payload: Record<string, unknown>): void {
+  try {
+    window.gtag?.('event', name, payload);
+  } catch { /* no-op */ }
+}
+
+/**
+ * 溜め場に入れる。**必ずここを通します。**
+ * 「`gtag` が在れば直に送る」道を残すと、**溜まっているものを追い越して順番が入れ替わります。**
+ */
+function ireru(name: string, payload: Record<string, unknown>): void {
+  if (akirameta) {
+    // 諦めたあと。溜め場はもう使いません。**`gtag` が来ていれば、その場で送ります**
+    if (gtagAru()) { sokuOkuru(name, payload); return; }
+    otoshita += 1;
+    debugLog('落としました（諦めたあと）', name, '落とした本数', otoshita);
+    return;
+  }
+  // ★上限で落とす前に、**`gtag` が在れば先に流します**（`senjutsu_20260901g.md` 決め2）。
+  //   ほかの落ち方は「**送り先が無いから落ちる**」です。ここだけは、
+  //   **送り先が在るのに落ちて**いました（見張りの100ミリ秒が回る前）。
+  //   流してから入れますので、**順番は壊れません**（この1本は必ずあとになります）。
+  //   `gtag` がまだ無いときは、`nagasu()` は見張りを立てて戻るだけです。
+  if (tamari.length >= TAMARI_JOUGEN) nagasu();
+  if (tamari.length >= TAMARI_JOUGEN) {
+    // 上限。**新しいほうを落とします**（古いほう＝漏斗の上を残します）
+    otoshita += 1;
+    debugLog('落としました（上限', TAMARI_JOUGEN, '本）', name, '落とした本数', otoshita);
+    return;
+  }
+  tamari.push({ name, payload });
+  nagasu();
+}
+
+/** 溜まっているものを、**溜めた順に**流す。`gtag` がまだ無ければ、見張りを立てる */
+function nagasu(): void {
+  if (tamari.length === 0) { mihariYameru(); return; }
+  if (!gtagAru()) { mihariTateru(); return; }
+  mihariYameru();
+  while (tamari.length > 0) {
+    const t = tamari.shift();
+    if (t === undefined) break;
+    sokuOkuru(t.name, t.payload);
+  }
+}
+
+/** `gtag` が来たかを見張る。**1本だけ立てます** */
+function mihariTateru(): void {
+  if (mihariId !== null || akirameta) return;
+  if (typeof setInterval !== 'function') return;
+  mihariHajime = Date.now();
+  mihariId = setInterval(() => {
+    if (gtagAru()) { nagasu(); return; }
+    if (Date.now() - mihariHajime < MACHI_MS) return;
+    akirameta = true;
+    otoshita += tamari.length;
+    tamari.length = 0;
+    mihariYameru();
+    debugLog('諦めました（', MACHI_MS, 'ミリ秒）。落とした本数', otoshita);
+  }, MIHARI_MS);
+}
+
+function mihariYameru(): void {
+  if (mihariId === null) return;
+  clearInterval(mihariId);
+  mihariId = null;
+}
+
+
 /**
  * イベントを1本送る。**名前とパラメータの組み合わせは型で固定されている。**
  *
@@ -360,7 +492,7 @@ export function track<K extends ProEvent>(
     console.log('[pro:track]', name, payload);
   }
   try {
-    window.gtag?.('event', name, payload);
+    ireru(name, payload);
     (window as unknown as { clarity?: (...a: unknown[]) => void }).clarity?.('event', name);
   } catch { /* no-op */ }
 }

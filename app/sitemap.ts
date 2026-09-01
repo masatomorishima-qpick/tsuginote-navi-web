@@ -65,6 +65,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.9,
     },
+    // 受け取り方シミュレーション（無料版・2026-08-31 新設）。
+    // /retirement/pro/result と /retirement/pro/buy は載せない（どちらも noindex）。
+    {
+      url: `${baseUrl}/retirement/pro`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
     ...RETIREMENT_ARTICLES.map((a) => ({
       url: `${baseUrl}${a.path}`,
       lastModified: new Date(`${a.dateModified}T09:00:00+09:00`),

@@ -15,9 +15,11 @@
  *   ・記録にメールアドレスを書かない（この口はメールを受け取りません）
  *   ・★記録に「知らない鍵の名前」を書かない。数だけ書く（senjutsu_20260902h.md 5番 足し1）
  *   ・★記録の重み … info＝通ったこと／warn＝途中で止めたこと／error＝書けなかったこと・こちらの落ち
+ *   ・★★栓は記録に何も書きません（外から叩かれても、記録が1行も増えないようにするため）
  *
- * ★★この口は、本番に出ても**閉じています**（栓・senjutsu_20260902k.md 6番）。
+ * ★★この口は、本番に出ても**閉じています**（栓・senjutsu_20260902k.md 6番／同 m.md 1番）。
  *   PRO_RETIREMENT_CHECKOUT_ENABLED が '1' でなければ 404 を返します。
+ *   ★★栓は**いちばん前**に置いています。本番では、何を送っても **404 の一色**です。
  *   ★「画面から呼ばれない」と「誰も叩けない」は別のことです。口はボタンとは別に開きます。
  *   ★画面5-6の「有料版購入」は /retirement/pro/buy のままです（A-2 で繋ぎます）。
  */
@@ -48,7 +50,20 @@ function sitoNoMoto(): string {
 type Session = { id?: string; url?: string };
 
 export async function POST(req: Request) {
-  // ① JSON が読めるか
+  // ① ★★栓（senjutsu_20260902m.md 1番）
+  //   PRO_RETIREMENT_CHECKOUT_ENABLED が '1' でなければ、この口は開いていません。
+  //   ★★いちばん前に置きます。★本番では、何を送っても **404 の一色**になります。
+  //     ④に置くと「正しい5項目→404／でたらめ→400」となり、**口の在りかが漏れます**。
+  //   ★記録には**何も書きません**。404 を返して終わります
+  //     （外から繰り返し叩かれても、記録が1行も増えないようにするためです）。
+  //   ★Production には入れません（入れるのは A-2）。Preview にだけ '1' を入れて、当てます。
+  //   ★既定値は「閉じている」です（無ければ動かない＝「既定値を作らない」と同じ向き）。
+  //   ★404 にします。503 や 501 だと「あるけれど閉じている」と分かってしまいます。
+  if (process.env.PRO_RETIREMENT_CHECKOUT_ENABLED !== '1') {
+    return new NextResponse(null, { status: 404 });
+  }
+
+  // ② JSON が読めるか
   let moto: unknown;
   try {
     moto = await req.json();
@@ -56,7 +71,7 @@ export async function POST(req: Request) {
     return new NextResponse(null, { status: 400 });
   }
 
-  // ② 5項目を確かめる
+  // ③ 5項目を確かめる
   const t = freeInputWoTashikameru(moto);
   if (!t.ok) {
     // ★どの鍵がだめかは記録にだけ書きます（画面には出しません）
@@ -70,7 +85,7 @@ export async function POST(req: Request) {
     return new NextResponse(null, { status: 400 });
   }
 
-  // ③ 環境変数
+  // ④ 環境変数
   let price: string;
   let moto2: string;
   try {
@@ -81,18 +96,6 @@ export async function POST(req: Request) {
       name: e instanceof Error ? e.message : 'unknown',
     });
     return new NextResponse(null, { status: 500 });
-  }
-
-  // ④ ★★栓（senjutsu_20260902k.md 6番）
-  //   PRO_RETIREMENT_CHECKOUT_ENABLED が '1' でなければ、この口は開いていません。
-  //   ★Vercel には入れません。入れるのは A-2（画面から呼ぶようにする回）です。
-  //   ★既定値は「閉じている」です（無ければ動かない＝「既定値を作らない」と同じ向き）。
-  //   ★404 にします。503 や 501 だと「あるけれど閉じている」と分かってしまいます。
-  //   ★見る順番は ①JSON ②5項目 ③環境変数 ④栓 ⑤Stripe。
-  //     ③のあとに置いています（Preview には PRICE が無いので③で止まり、当てが変わりません）
-  if (process.env.PRO_RETIREMENT_CHECKOUT_ENABLED !== '1') {
-    console.info('[pro/checkout] ★口はまだ開いていません');
-    return new NextResponse(null, { status: 404 });
   }
 
   // ⑤ Stripe に Session を作らせる

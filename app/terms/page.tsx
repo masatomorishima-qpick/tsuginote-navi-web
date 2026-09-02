@@ -37,15 +37,24 @@ export default function TermsPage() {
           </h1>
 
           <p className="mt-6 text-sm leading-7 text-slate-600 sm:text-base">
-            この利用規約（以下、「本規約」といいます。）は、BlueAdventures
-            が運営する「つぎの手ナビ」（以下、「当サイト」といいます。）の利用条件を定めるものです。
+            この利用規約（以下、「本規約」といいます。）は、BlueAdventures が運営する「つぎの手ナビ」
+            （以下、「当サイト」といいます。）の利用条件を定めるものです。
             当サイトをご利用になる方は、本規約に同意したものとみなします。
+            有料のサービスについては、「有料版購入」のボタンを押した時点で、本規約に同意したものとみなします。
           </p>
-
           <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
-            当サイトは、(i) 匿名アンケートによる相談先候補の案内機能（以下、「<strong>候補案内機能</strong>」といいます。）
-            と、(ii) ログインしてご利用いただくデジタル資産の整理・共有機能（<code>/digital/*</code>。以下、「<strong>デジタル資産機能</strong>」といいます。）
-            の2つの機能を提供しています。第1条〜第12条は両機能に共通する内容ですが、デジタル資産機能の特性（ログインや家族共有など）に関する個別事項については、第13条に定めます。
+            当サイトは、次の機能を提供しています。
+          </p>
+          <ul className="mt-2 list-none space-y-1 pl-4 text-sm leading-7 text-slate-600 sm:text-base">
+            <li>(i) 匿名アンケートによる相談先候補の案内機能（以下、「<strong>候補案内機能</strong>」といいます。）</li>
+            <li>(ii) ログインしてご利用いただくデジタル資産の整理・共有機能（<code>/digital/*</code>。以下、「<strong>デジタル資産機能</strong>」といいます。）</li>
+            <li>(iii) 資産づくり診断（/shisan）</li>
+            <li>(iv) 退職金とiDeCoの受け取り方シミュレーション（/retirement/pro。有料版を含みます。）</li>
+          </ul>
+          <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
+            第1条〜第13条は各機能に共通する内容です。
+            デジタル資産機能に固有の事項は第14条に、退職金とiDeCoの受け取り方シミュレーション（有料版）に固有の事項は第15条に定めます。
+            各特則と第1条〜第13条で異なる内容が定められている場合、その機能については特則が優先します。
           </p>
 
           <div className="mt-10 space-y-10 text-sm leading-7 text-slate-700 sm:text-base">
@@ -54,7 +63,7 @@ export default function TermsPage() {
                 1. 当サイトの内容
               </h2>
               <p className="mt-3">
-                当サイトは、利用者によるアンケート回答その他の客観条件に基づき、
+                当サイトの候補案内機能は、利用者によるアンケート回答その他の客観条件に基づき、
                 相談先候補を中立的に表示するWebサービスです。
               </p>
               <p className="mt-3">
@@ -97,6 +106,7 @@ export default function TermsPage() {
               </h2>
               <p className="mt-3">
                 当サイトは、アンケートにおいて、氏名、メールアドレス、電話番号その他の個人を特定できる情報を取得・保存しません。
+                ただし、第14条および第15条に定めるものを除きます。
                 また、自由記述欄は設けておらず、個人情報の入力を前提としていません。
               </p>
               <p className="mt-3">
@@ -194,17 +204,29 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-xl font-semibold text-slate-900">
-                12. 準拠法・管轄
+                12. 反社会的勢力の排除
               </h2>
               <p className="mt-3">
-                本規約は日本法に準拠します。
-                当サイトに関して生じた紛争については、東京地方裁判所を第一審の専属的合意管轄裁判所とします。
+                利用者は、自らが暴力団、暴力団員、暴力団準構成員、暴力団関係企業、総会屋、社会運動等標ぼうゴロ、
+                特殊知能暴力集団その他これらに準ずる者（以下、「反社会的勢力」といいます。）に該当しないこと、
+                および反社会的勢力と社会的に非難されるべき関係を有しないことを表明し、保証します。
+                利用者がこれに反することが判明した場合、当社は、事前の通知なく当サイトの利用をお断りすることがあります。
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-slate-900">
-                13. デジタル資産機能に関する特則
+                13. 準拠法・管轄
+              </h2>
+              <p className="mt-3">
+                本規約は日本法に準拠します。
+                当サイトに関して生じた紛争については、横浜地方裁判所を第一審の専属的合意管轄裁判所とします。
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-slate-900">
+                14. デジタル資産機能に関する特則
               </h2>
               <p className="mt-3">
                 本条は、デジタル資産機能に限り適用される特則です。本条と前各条で異なる内容が定められている場合、
@@ -212,7 +234,7 @@ export default function TermsPage() {
               </p>
 
               <h3 className="mt-6 text-base font-semibold text-slate-900">
-                13-1. 機能の内容
+                14-1. 機能の内容
               </h3>
               <p className="mt-3">
                 デジタル資産機能は、ご本人にログインしていただいたうえで、ご利用中のデジタルサービスについて
@@ -223,7 +245,7 @@ export default function TermsPage() {
               </p>
 
               <h3 className="mt-6 text-base font-semibold text-slate-900">
-                13-2. パスワード等の取扱い（暗号化保管）
+                14-2. パスワード等の取扱い（暗号化保管）
               </h3>
               <p className="mt-3">
                 パスワード保管機能では、入力された情報を
@@ -234,7 +256,7 @@ export default function TermsPage() {
               </p>
 
               <h3 className="mt-6 text-base font-semibold text-slate-900">
-                13-3. 連携とアカウント
+                14-3. 連携とアカウント
               </h3>
               <ul className="mt-3 list-disc space-y-2 pl-6">
                 <li>アカウントの取得には、メールリンク認証または Google アカウントでのログインが必要です。アカウントの管理は、ご本人の責任において行ってください。</li>
@@ -244,7 +266,7 @@ export default function TermsPage() {
               </ul>
 
               <h3 className="mt-6 text-base font-semibold text-slate-900">
-                13-4. 料金・お支払い
+                14-4. 料金・お支払い
               </h3>
               <ul className="mt-3 list-disc space-y-2 pl-6">
                 <li>連携機能は、連携 1 名あたり月額 110 円（税込）の有料機能です。最初の招待から 30 日間は無料でご利用いただけます。</li>
@@ -253,7 +275,7 @@ export default function TermsPage() {
               </ul>
 
               <h3 className="mt-6 text-base font-semibold text-slate-900">
-                13-5. 禁止事項（デジタル資産機能に固有の事項）
+                14-5. 禁止事項（デジタル資産機能に固有の事項）
               </h3>
               <p className="mt-3">前各条の禁止事項に加え、デジタル資産機能のご利用にあたっては、以下の行為も禁止します。</p>
               <ul className="mt-3 list-disc space-y-2 pl-6">
@@ -264,7 +286,7 @@ export default function TermsPage() {
               </ul>
 
               <h3 className="mt-6 text-base font-semibold text-slate-900">
-                13-6. データの削除（退会時・ご逝去後）
+                14-6. データの削除（退会時・ご逝去後）
               </h3>
               <p className="mt-3">
                 ご本人は、設定画面から退会手続（アカウント削除）を行うことができます。
@@ -278,7 +300,7 @@ export default function TermsPage() {
               </p>
 
               <h3 className="mt-6 text-base font-semibold text-slate-900">
-                13-7. 免責
+                14-7. 免責
               </h3>
               <p className="mt-3">
                 運営会社は、デジタル資産機能の利用または利用不能により生じた損害（登録漏れがあったこと、PDF の印刷内容が想定と異なったこと等を含みます）について、
@@ -287,7 +309,7 @@ export default function TermsPage() {
               </p>
 
               <h3 className="mt-6 text-base font-semibold text-slate-900">
-                13-8. 死亡通知（逝去申請）に関する禁止事項
+                14-8. 死亡通知（逝去申請）に関する禁止事項
               </h3>
               <p className="mt-3">
                 デジタル資産機能における死亡通知（逝去申請）の手続にあたっては、
@@ -317,7 +339,7 @@ export default function TermsPage() {
               </p>
 
               <h3 className="mt-6 text-base font-semibold text-slate-900">
-                13-9. 死亡通知の確認期間
+                14-9. 死亡通知の確認期間
               </h3>
               <p className="mt-3">
                 運営会社は、連携先の方から死亡通知を受け付けた後、原則として
@@ -332,6 +354,96 @@ export default function TermsPage() {
                 本人確認・逝去確認は、提出書類等に基づき合理的な範囲で行うものであり、その正確性・真正性を保証するものではありません。
                 運営会社は、申請者による虚偽申請、書類の偽造、または連携先ご本人の故意・過失に起因する誤った開示について、
                 運営会社に故意または重過失がある場合を除き責任を負いません。
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-slate-900">
+                15. 退職金とiDeCoの受け取り方シミュレーション（有料版）に関する特則
+              </h2>
+              <p className="mt-3">
+                本条は、当サイトが提供する「退職金とiDeCoの受け取り方シミュレーション（有料版）」
+                （以下、「本ツール」といいます。）に限り適用される特則です。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                15-1. 機能の内容
+              </h3>
+              <p className="mt-3">
+                本ツールは、利用者がご入力になった内容にもとづき、退職金・確定拠出年金等・公的年金の受け取り方について、
+                税額と手取り額を計算してお示しするものです。
+                本ツールは、金融商品の勧誘・販売を行いません。また、税務代理・税務相談・書類の作成の代行を行うものではありません。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                15-2. 料金・お支払い・返金・適格請求書
+              </h3>
+              <p className="mt-3">
+                本ツールの料金、お支払いの方法と時期、返金の取り扱い、および適格請求書（インボイス）の取り扱いは、
+                当サイトの「特定商取引法に基づく表記」に定めるとおりとします。同表記のこれらの定めは、本条の一部を構成します。
+                なお、クレジットカード情報は、当社のサーバーに保存しません。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                15-3. ご利用いただける期間
+              </h3>
+              <p className="mt-3">
+                お支払いの完了後、1年間、計算結果の閲覧と再計算を何度でもご利用いただけます。
+                計算結果を開くためのリンクは、ご購入時のメールアドレスにお送りします。
+                このリンクは、ご購入いただいた方ご本人とそのご家族のためのものです。第三者に譲渡または貸与することはできません。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                15-4. ご利用いただける範囲
+              </h3>
+              <p className="mt-3">
+                本ツールは、ご本人またはご家族のためにご利用いただけます。業として第三者のために利用することはできません。
+                ご家族の情報をご入力になる場合は、そのご家族の了解を得たうえでご入力ください。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                15-5. 計算の前提
+              </h3>
+              <p className="mt-3">
+                本ツールの計算は、ご入力いただいた内容と、当社が計算の時点で確認できた法令にもとづきます。
+                制度は改正されることがあります。制度の改正があった場合、当社は速やかに反映するよう努めます。
+                反映までの間は、改正前の制度にもとづく計算結果である旨を画面に表示します。
+                また、実際のお受け取りの条件は、勤め先・運営管理機関・お住まいの市区町村・税務署によって取り扱いが異なる場合があります。
+                実際のお手続きの前に、各機関にご確認ください。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                15-6. 計算結果のご利用
+              </h3>
+              <p className="mt-3">
+                本ツールがお示しする計算結果は、ご入力いただいた条件にもとづく試算です。
+                どの受け取り方を選ぶかのご判断と、そのご判断にもとづくお手続きは、利用者ご自身の責任で行っていただきます。
+                当社は、そのご判断とお手続きの結果について責任を負いません。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                15-7. 賠償の上限
+              </h3>
+              <p className="mt-3">
+                本ツールについて、当社の責めに帰すべき事由により利用者に損害が生じた場合、当社は、
+                当社に故意または重過失がある場合を除き、利用者が本ツールについてお支払いいただいた額を上限として賠償の責任を負います。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                15-8. 計算結果の権利と利用の範囲
+              </h3>
+              <p className="mt-3">
+                本ツールの画面、計算結果の表示の形式、および文章に関する権利は、当社に帰属します。
+                計算結果は、ご本人およびご家族の範囲で、印刷・保存・共有していただけます。
+                計算結果を販売、配布、または業として第三者に提供することはできません。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                15-9. 入力内容の取り扱い
+              </h3>
+              <p className="mt-3">
+                ご入力いただいた内容は、計算と再計算のために保存します。
+                ご利用いただける期間の経過後、60日以内に、メールアドレスとご入力の内容を削除します。
+                ただし、法令により保存が必要な取引の記録は、この限りではありません。
+                期間内に削除をご希望の場合は、お問い合わせ先までご連絡ください。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">
+                15-10. やむを得ない事情によるサービスの終了
+              </h3>
+              <p className="mt-3">
+                当社が、やむを得ない事情により本ツールの提供を終了する場合、少なくとも30日前に、ご購入時のメールアドレスと当サイト上でお知らせします。
+                ご利用いただける期間が残っている方には、残りの期間に応じて、お支払いいただいた額を日割りで返金します。
               </p>
             </section>
           </div>

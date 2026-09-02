@@ -73,6 +73,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.9,
     },
+    // 特定商取引法に基づく表記（有料版・2026-09-02 新設）。/terms と同じ扱い（monthly・0.3）。
+    {
+      url: `${baseUrl}/retirement/pro/tokushoho`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.3,
+    },
     ...RETIREMENT_ARTICLES.map((a) => ({
       url: `${baseUrl}${a.path}`,
       lastModified: new Date(`${a.dateModified}T09:00:00+09:00`),

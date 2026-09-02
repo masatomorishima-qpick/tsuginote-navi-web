@@ -318,15 +318,22 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
           特定商取引法15条の3ただし書「顧客にとって見やすい箇所において明瞭に判読できるように表示する」
         */}
         <div className="mt-4 rounded-xl bg-slate-50 p-4">
-          <p className="text-base leading-relaxed text-slate-900">
-            <b className="font-bold">お客様のご都合による返金は、お受けしていません。</b>
-            ご購入後すぐに計算結果をご覧いただけるためです。
+          <p className="text-base font-bold text-slate-900">返金について</p>
+          <p className="mt-2 text-base leading-relaxed text-slate-900">
+            <b className="font-bold">お客様のご都合による返金は、お受けしていません。</b>ご購入後すぐに計算結果をご覧いただけるためです。
           </p>
           <p className="mt-2 text-base leading-relaxed text-slate-900">
-            ただし、<b className="font-bold">当社の側に原因がある場合（計算に誤りがあった場合など）は、この限りではありません。</b>
-            お問い合わせください。
+            当社に原因のある不具合があったときは、お支払いいただいた額の全額を返金します。計算に誤りがあった、画面が表示されない、お支払いいただいたのにご利用いただけない、などです。info@blueadventures.jp までご連絡ください。
+          </p>
+          <p className="mt-2 text-base leading-relaxed text-slate-900">
+            推奨する動作環境の外でのご利用と、保守のための一時的な停止は、上記の不具合に含みません。
           </p>
         </div>
+
+        {/* B-1b の3：購入で同意。ボタンの直前。折りたたまない・小さくしない（§6の12と同じ扱い） */}
+        <p className="mt-4 text-base leading-relaxed text-slate-900">
+          「有料版購入」を押すと、利用規約と特定商取引法に基づく表記に同意したものとみなします。
+        </p>
 
         {/* §7-4：橙はこのボタンにだけ */}
         <button
@@ -344,6 +351,16 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
           <li>都度のお支払いです。自動更新はありません。</li>
           <li>決済はStripeを利用します。あなたのメールアドレスは米国のStripe, Inc.およびResendに送られます。</li>
         </ul>
+
+        {/* B-1b の2：3つのリンク。★必ず別のタブで開く（同じタブで移ると、戻ったときに入力が消えるため） */}
+        <p className="mt-3 text-[13px] leading-relaxed text-[#5b6470]">
+          <a href="/retirement/pro/tokushoho" target="_blank" rel="noopener noreferrer" className="underline">特定商取引法に基づく表記</a>
+          ・
+          <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline">利用規約</a>
+          ・
+          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline">プライバシーポリシー</a>
+          （別のタブで開きます）
+        </p>
       </div>
     </section>
   );

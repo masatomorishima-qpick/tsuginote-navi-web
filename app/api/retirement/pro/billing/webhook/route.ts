@@ -42,6 +42,10 @@
  *   層4・欠けても作る … email が無い→null ／ metadata が読めない→{} ／
  *                      created が無い→受け取った時刻                          → 200・★作る
  *                      ★記録は「★通行証は作りました。」を必ず入れる
+ * ★2026-09-02 時点で有効な支払い方法は6つ（JCB・カード・カード分割払い・Apple Pay・Link・MB WAY）。
+ *   すべてカード／ウォレットで、`unpaid` になる道はありません。
+ *   ★ただし設定は画面で変わります。ここは設定に頼らず、`async_payment_succeeded` も受けます。
+ *
  * ★purchased_at は**イベントの created**（＝支払いが完了した知らせの時刻）から作ります。
  *   session.created（押した時刻）ではありません（規約15-3「お支払いの完了後、1年間」）。
  */
@@ -118,7 +122,7 @@ export async function POST(req: Request) {
 
   // ② 種類。★2つ受けます（senjutsu_20260902j.md 1番）
   //   checkout.session.completed               … カード等、その場で払い終わるもの
-  //   ★checkout.session.async_payment_succeeded … コンビニ払い等、**あとでお金が着いた**ときの知らせ
+  //   ★checkout.session.async_payment_succeeded … ★**あとからお金が着く**ものの、着いたときの知らせ
   //     ★checkout.session.completed は payment_status が 'unpaid' でも飛びます
   //       （Stripe の説明 … status complete は「Payment processing may still be in progress」）。
   //       この知らせを受けないと、あとでお金が着いても通行証が出ません

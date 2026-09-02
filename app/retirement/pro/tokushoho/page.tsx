@@ -7,7 +7,7 @@
  * ★BackButton は置きません（別のタブで開かれたとき、戻り先が無いため。senjutsu_20260902b.md 3番の5）。
  * ★この頁では track() を呼びません（買う前に読む頁です）。
  * ★動作環境は DOUSA_KANKYOU の1か所だけ。実際に動かして確かめたものだけを書きます（senjutsu_20260902c.md 3番）。
- *   【版】が残ったまま本番に出しません。
+ *   版の置き字が残ったまま本番に出しません。
  */
 
 import type { Metadata } from 'next';
@@ -26,11 +26,11 @@ export const metadata: Metadata = {
 
 /** 実際に動かして確かめた環境だけ。確かめていないものは書きません */
 /**
- * 動作環境の前半の1文（senjutsu_20260902c.md 3番の形）。
- * ★【版】は、森嶋さんから版が届いたら埋めます。★【版】が1つでも残ったまま本番に出しません。
+ * 動作環境の前半の1文（senjutsu_20260902d.md 2番・案B の字）。
+ * ★実際に動かして確かめた版だけです（Mac の Safari 26.2・iPhone は iOS 26.6・Mac の Chrome 151）。
  */
 const DOUSA_KANKYOU =
-  'Safari 【版】（Mac）、Safari 【版】（iPhone・iOS 【版】）、Google Chrome 151（Mac）でご利用いただけることを確かめています。';
+  'Safari 26.2（Mac）、Safari（iPhone・iOS 26.6）、Google Chrome 151（Mac）でご利用いただけることを確かめています。';
 
 /** 第5版b §1 の表（16行）。項目名も中身も、そのままの順番です */
 const KOUMOKU: ReadonlyArray<readonly [string, string]> = [

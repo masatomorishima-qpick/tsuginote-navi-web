@@ -32,8 +32,7 @@ create table if not exists public.retirement_pro_passes (
 
   -- Stripe の決済画面でご入力いただいたもの（customer_details.email）
   -- ★この事業が自分で持つ、はじめての個人情報
-  -- ★null を許します。取れなかったときも通行証は作り、あとで手で連絡します（senjutsu_20260902h.md 2番）
-  email                       text,
+  email                       text        not null,
 
   -- ★Stripe の知らせ（event）の created から。サーバーの「いま」は使わない
   purchased_at                timestamptz not null,

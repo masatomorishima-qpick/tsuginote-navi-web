@@ -5,7 +5,8 @@
  *
  * ★7段（仕様のとおり）
  *   1 raw body を取り、Stripe-Signature を STRIPE_WEBHOOK_SECRET_PRO_RETIREMENT で確かめる。外れたら 400
- *   2 type が checkout.session.completed でなければ 200 を返して何もしない
+ *   2 type が checkout.session.completed / checkout.session.async_payment_succeeded の
+ *     どちらでもなければ 200 を返して何もしない
  *   3 mode==='payment' かつ payment_status==='paid' でなければ 200（記録に cs_… を書く）
  *   4 amount_total===19800 かつ currency==='jpy' でなければ 200（通行証を作らない。記録に cs_… と数を書く）
  *   5 通行証を1枚作る。★cs が無ければ 500。
@@ -29,11 +30,18 @@
  *           ・作れなかった   … 「★通行証を作れませんでした。」で始めます
  *           ・作ったが欠けた … 「★通行証は作りました。」を必ず文の中に入れます
  *
- * ★★通行証を作らずに終わってよいのは3つだけです（senjutsu_20260902i.md 2番）
- *   1 金額が違う（当社の口が作った支払いではない）  → 200
- *   2 もう作ってある（二重）                        → 200
- *   3 送り直しで直る見込みがあるもの                → 500
- *     （環境変数が無い／cs が無い／DBに書けない／署名が合わない〈これは 400〉）
+ * ★★層の表（senjutsu_20260902j.md 2番。i.md 2番の3つを、4つの層に置き換えました）
+ *   層1・受け取る前  … 見出しが無い／署名が合わない／JSON が読めない          → 400
+ *                      ★記録は「★知らせを受け取れませんでした」で始める
+ *   層2・作らずに終わる … ①まだ払い終わっていない（あとの知らせを待つ）
+ *                        ②金額が違う（当社の口が作った支払いではない）
+ *                        ③もう作ってある（二重）                              → 200
+ *   層3・あとで作る／気づく … ④環境変数が無い ⑤DBに書けない（送り直しで直る）
+ *                            ⑥cs が無い（★直りません。500 は気づくためです）  → 500
+ *                            ★記録は「★通行証を作れませんでした。」で始める
+ *   層4・欠けても作る … email が無い→null ／ metadata が読めない→{} ／
+ *                      created が無い→受け取った時刻                          → 200・★作る
+ *                      ★記録は「★通行証は作りました。」を必ず入れる
  * ★purchased_at は**イベントの created**（＝支払いが完了した知らせの時刻）から作ります。
  *   session.created（押した時刻）ではありません（規約15-3「お支払いの完了後、1年間」）。
  */
@@ -95,7 +103,7 @@ export async function POST(req: Request) {
   try {
     verifyStripeSignature(rawBody, sig, secret);
   } catch (e) {
-    console.warn('[pro/webhook] 署名が合いません', {
+    console.warn('[pro/webhook] ★知らせを受け取れませんでした。署名が合いません', {
       message: e instanceof Error ? e.message : 'unknown',
     });
     return kara(400);
@@ -108,15 +116,28 @@ export async function POST(req: Request) {
     return kara(400);
   }
 
-  // ② 種類
-  if (ev.type !== 'checkout.session.completed') return kara(200);
+  // ② 種類。★2つ受けます（senjutsu_20260902j.md 1番）
+  //   checkout.session.completed               … カード等、その場で払い終わるもの
+  //   ★checkout.session.async_payment_succeeded … コンビニ払い等、**あとでお金が着いた**ときの知らせ
+  //     ★checkout.session.completed は payment_status が 'unpaid' でも飛びます
+  //       （Stripe の説明 … status complete は「Payment processing may still be in progress」）。
+  //       この知らせを受けないと、あとでお金が着いても通行証が出ません
+  //     ★cs（Session の id）は同じですので、unique の二重よけがそのまま効きます
+  //     ★ev.created は「お金が着いた時刻」になり、purchased_at として正しくなります（規約15-3）
+  //   ★checkout.session.async_payment_failed は受けません（口を小さく保ちます・書き置き）
+  if (
+    ev.type !== 'checkout.session.completed' &&
+    ev.type !== 'checkout.session.async_payment_succeeded'
+  ) {
+    return kara(200);
+  }
 
   const s = ev.data?.object ?? {};
   const cs = typeof s.id === 'string' ? s.id : null;
 
   // ③ 払い終わっているか
   if (s.mode !== 'payment' || s.payment_status !== 'paid') {
-    console.warn('[pro/webhook] 払い終わっていません', {
+    console.warn('[pro/webhook] ★まだ払い終わっていません。あとの知らせを待ちます', {
       cs,
       mode: s.mode ?? null,
       payment_status: s.payment_status ?? null,

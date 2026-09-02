@@ -17,6 +17,20 @@
  *   6 DB に書けなかったときだけ 500（Stripe が送り直します）
  *   7 返すのは常に空の 200／400／500。文は出さない
  *
+ * ★★B-3 で足したもの（senjutsu_20260902s.md 4番ウ）
+ *   ・通行証を作れたら、そのまま**ご購入のメールを1通**送り、送れたら `mail_sent_at` を書く
+ *   ・★23505（もう作ってある）でも、**`mail_sent_at` が null なら送る**
+ *     → ★Stripe の送り直しが、そのまま**メールの取り返し**になります
+ *   ・★★**メールで 500 にしません。**どの道でも返りは 200（★通行証はもう在ります）
+ *   ・★メールを送る前に、必ず `mail_sent_at` を見ます
+ *   ・★★同じ知らせが**同時に**2つ来ると、両方が「null」を読み、**2通いくことがあります**。
+ *     ★同じリンクが2通届くだけですので、そのままにしています。★メールの文で受けています
+ *     （「同じ内容のメールが2通届くことがあります。お支払いは1回だけです。」）
+ *   ・★書き置き … `mail_sent_at` の更新に失敗すると、送ったのに null のままになり、もう1通いきます
+ *   ・★書き置き … Resend が遅いと、その分だけ Stripe への返事が遅れます。
+ *     ★Stripe の説明頁は「複雑な処理の前に 2xx を返せ」「非同期の待ち行列で処理せよ」と書いています。
+ *     ★★いまの形は、その字と逆を向いています。**C-4 で、メールを webhook の外に出します**
+ *
  * ★digital の webhook と、そろえたところ／変えたところ（senjutsu_20260902g.md 5番）
  *   そろえた … runtime='nodejs' ／ dynamic='force-dynamic' ／ req.text() ／ verifyStripeSignature()
  *   変えた   … 二重を避けるのは `retirement_pro_passes.stripe_checkout_session_id` の unique（イベントの表は作りません）
@@ -59,6 +73,7 @@ import {
   kigenWoKimeru,
   metadataKaraModosu,
 } from '@/lib/retirement/pro/pass';
+import { kounyuMailWoOkuru } from '@/lib/retirement/pro/mail';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -79,6 +94,114 @@ type Session = {
 type Event = { id?: string; type?: string; created?: number; data?: { object?: Session } };
 
 const kara = (status: number) => new NextResponse(null, { status });
+
+type Admin = ReturnType<typeof createAdminSupabaseClient>;
+
+/** メールに載せるリンクの元。★既定値を作りません */
+function sitoNoMoto(): string | null {
+  const u = process.env.NEXT_PUBLIC_APP_URL;
+  if (!u) return null;
+  return u.replace(/\/+$/, '');
+}
+
+/** 鍵つきの道のリンク */
+function linkWoTsukuru(moto: string, kagi: string): string {
+  return `${moto}/retirement/pro/hiraku?key=${encodeURIComponent(kagi)}`;
+}
+
+/**
+ * ご購入のメールを1通送り、送れたら `mail_sent_at` を書きます。
+ *
+ * ★★この本は、けっして throw しません。★呼んだ側は、いつでも 200 を返せます
+ *   （★通行証はもう在ります。メールで 500 にしません）。
+ */
+async function mailWoOkuru(
+  admin: Admin,
+  x: { cs: string; pi: string | null; kagi: string; email: string | null; kigen: Date },
+): Promise<void> {
+  if (x.email === null) {
+    console.error('[pro/webhook] ★通行証は作りました。送り先がありません', { cs: x.cs });
+    return;
+  }
+  const moto = sitoNoMoto();
+  if (moto === null) {
+    console.error('[pro/webhook] ★通行証は作りました。メールの宛先の元がありません', {
+      name: 'NEXT_PUBLIC_APP_URL',
+      cs: x.cs,
+    });
+    return;
+  }
+
+  const r = await kounyuMailWoOkuru({
+    to: x.email,
+    link: linkWoTsukuru(moto, x.kagi),
+    kigen: x.kigen,
+  });
+  if (!r.ok) {
+    console.error('[pro/webhook] ★通行証は作りました。メールを送れませんでした', {
+      cs: x.cs,
+      error: r.error,
+    });
+    return;
+  }
+
+  const { error } = await admin
+    .from('retirement_pro_passes')
+    .update({ mail_sent_at: new Date().toISOString() })
+    .eq('stripe_checkout_session_id', x.cs);
+  if (error) {
+    // ★送れた印を書けなかった → 次の送り直しで、もう1通いきます（★文で受けています）
+    console.error('[pro/webhook] ★メールは送りましたが、送れた印を書けませんでした', {
+      cs: x.cs,
+      code: error.code ?? null,
+    });
+    return;
+  }
+
+  console.info('[pro/webhook] ★メールを送りました', { cs: x.cs, pi: x.pi });
+}
+
+/**
+ * ★もう作ってある（23505）ときの道。
+ * その行を1つ読み、**まだ送っていなければ送ります**（★送り直しを取り返しにするため）。
+ */
+async function madaOkuttenaiNaraOkuru(admin: Admin, cs: string, pi: string | null): Promise<void> {
+  const { data, error } = await admin
+    .from('retirement_pro_passes')
+    .select('pass_key, email, expires_at, mail_sent_at')
+    .eq('stripe_checkout_session_id', cs)
+    .maybeSingle();
+
+  if (error) {
+    console.error('[pro/webhook] ★通行証は作りました。送ったかどうかを読めませんでした', {
+      cs,
+      code: error.code ?? null,
+    });
+    return;
+  }
+  if (!data) {
+    console.error('[pro/webhook] ★通行証は作りました。その行を読めませんでした', { cs });
+    return;
+  }
+  if (data.mail_sent_at) {
+    console.info('[pro/webhook] メールは、もう送ってあります', { cs });
+    return;
+  }
+
+  const kigen = new Date(data.expires_at as string);
+  if (!Number.isFinite(kigen.getTime())) {
+    console.error('[pro/webhook] ★通行証は作りました。期限を日付にできませんでした', { cs });
+    return;
+  }
+
+  await mailWoOkuru(admin, {
+    cs,
+    pi,
+    kagi: data.pass_key as string,
+    email: (data.email as string | null) ?? null,
+    kigen,
+  });
+}
 
 export async function POST(req: Request) {
   // ★受け取った時刻。★ここで1回だけ作り、下へ渡します。
@@ -198,8 +321,10 @@ export async function POST(req: Request) {
       : (s.payment_intent && typeof s.payment_intent === 'object' && s.payment_intent.id) || null;
 
   const admin = createAdminSupabaseClient();
+  // ★鍵は、あとでメールのリンクに使いますので、変数に置きます
+  const kagi = tsuukoushoKagi();
   const { error } = await admin.from('retirement_pro_passes').insert({
-    pass_key: tsuukoushoKagi(),
+    pass_key: kagi,
     stripe_checkout_session_id: cs,
     stripe_payment_intent_id: pi,
     email,
@@ -213,6 +338,8 @@ export async function POST(req: Request) {
     // ★同じ支払いの2度目の知らせ。unique（23505）なら、もう1枚作りません
     if (error.code === '23505') {
       console.info('[pro/webhook] もう作ってあります', { cs });
+      // ★まだメールを送っていなければ、ここで送ります（★送り直しを取り返しにします）
+      await madaOkuttenaiNaraOkuru(admin, cs, pi);
       return kara(200);
     }
     // ⑥ 書けなかった → 500。Stripe が送り直します
@@ -244,5 +371,9 @@ export async function POST(req: Request) {
   }
 
   console.info('[pro/webhook] 通行証を1枚作りました', { cs, pi });
+
+  // ★★ご購入のメールを1通。★送れなくても、通行証は消しません。返りは 200 のままです
+  await mailWoOkuru(admin, { cs, pi, kagi, email, kigen });
+
   return kara(200);
 }

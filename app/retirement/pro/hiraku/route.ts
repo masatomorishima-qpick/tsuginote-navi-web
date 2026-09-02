@@ -25,27 +25,14 @@
 
 import 'server-only';
 import { NextResponse } from 'next/server';
+// ★Cookie の決め（名前・形・path・7日）は `lib/retirement/pro/cookie.ts` に1か所（A-2a・口も同じものを読みます）
+import { KAGI_NO_KATACHI, COOKIE_NA, COOKIE_NO_KATA, NANOKA } from '@/lib/retirement/pro/cookie';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-/** 通行証の鍵の形（base64url の字だけ・1〜200文字） */
-const KAGI_NO_KATACHI = /^[A-Za-z0-9_-]{1,200}$/;
-
 /** 302 の行き先（★クエリなし） */
 const IKISAKI = '/retirement/pro/kekka';
-
-/** Cookie の置き方。★消すときも同じ形で（path が違うと消えません） */
-const COOKIE_NA = 'pro_pass';
-const COOKIE_NO_KATA = {
-  httpOnly: true,
-  secure: true,
-  sameSite: 'lax',
-  path: '/retirement/pro',
-} as const;
-
-/** 7日（秒） */
-const NANOKA = 604800;
 
 export async function GET(req: Request) {
   let key: string | null = null;
@@ -67,7 +54,6 @@ export async function GET(req: Request) {
     res.cookies.set(COOKIE_NA, '', { ...COOKIE_NO_KATA, maxAge: 0 });
   }
 
-  // ★鍵も key の字も書きません
-  console.info('[pro/hiraku] 扉を通りました');
+  // ★鍵も key の字も書きません。★記録も出しません（A-2a・senjutsu_20260902t.md 2番の2「扉の記録は黙らせる」・栓と同じ）
   return res;
 }

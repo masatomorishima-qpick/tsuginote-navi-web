@@ -31,8 +31,9 @@
  *   **ですので、この行の文は呼び出し側から受け取ります**（`hitogotoBun`）。
  *   **受け取れなければ、例外で止めます。**別の文へ静かに落ちません（★76・E-23 と同じ形）。
  *
- *   **いま、この文を作る場所がありません。**必要な値のうち3つが、エンジンの外に出ていません。
- *   詳しくは 開発Cowork → 戦術Cowork の便に書いています。
+ *   ★2026-09-02（A-2a）── **8種類とも、エンジン（`KeikaRow`）から取れます**（`gamen13Bun.ts` の注記のとおり・
+ *   判断ログ82）。口が `Hitogoto13` を作り、親が `hitogotoBun()` で文にして渡します。
+ *   ★縮めた年が無い方（⑲が0件の方など）は `hitogotoAri=false` で、この行を行ごと出しません。
  * ──────────────────────────────────────────────────────────
  */
 
@@ -50,6 +51,12 @@ type Props = {
    * **エンジンが出した値から作ってください。**画面側では作りません（§2の「実装側に式を持たせない」）。
    */
   hitogotoBun: Readonly<Record<string, string>>;
+  /**
+   * ★その方に「縮めた年」があるか（A-2a・senjutsu_20260902ae.md 3番）。
+   *   false … その行を**行ごと出しません**（見出しも出さない）。⑲が0件の方はこちら
+   *   true  … 文が無ければ例外で止めます（黙って見本の数字を出さない・いままでどおり）
+   */
+  hitogotoAri: boolean;
 };
 
 /** 表の1行。**左は見出し、右は本文** */
@@ -62,7 +69,7 @@ function Gyou({ hidari, migi }: { hidari: string; migi: string }) {
   );
 }
 
-export default function Screen13({ genzaiNen, hitogotoBun }: Props) {
+export default function Screen13({ genzaiNen, hitogotoBun, hitogotoAri }: Props) {
   const sentRef = useRef(false);
   useEffect(() => {
     if (sentRef.current) return;
@@ -74,6 +81,7 @@ export default function Screen13({ genzaiNen, hitogotoBun }: Props) {
     if (b.kind !== 'hyo') return;
     for (const g of b.gyou) {
       if (!g.hitogoto) continue;
+      if (!hitogotoAri) continue;           // ★縮めた年が無い方 ── 行を出さないので、文も要りません
       if (!hitogotoBun[g.hidari]) {
         /**
          * **黙って見本の数字を出しません。**
@@ -129,7 +137,10 @@ export default function Screen13({ genzaiNen, hitogotoBun }: Props) {
         }
         return (
           <div key={i} className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-            {b.gyou.map((g) => (
+            {b.gyou
+              // ★縮めた年が無い方には、その方によって変わる行を**行ごと**出しません（見出しも）
+              .filter((g) => !g.hitogoto || hitogotoAri)
+              .map((g) => (
               <Gyou
                 key={g.hidari}
                 hidari={g.hidari}

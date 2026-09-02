@@ -14,19 +14,18 @@
  *       メールアドレスが取れない → null で作る／入力が読めない → inputs は空 {} で作る／
  *       知らせに created が無い → 受け取った時刻で作る。いずれも作れたあとに記録へ1行
  *     stripe_checkout_session_id の unique で衝突したら何もしない → 200
- *   6 DB に書けなかったときだけ 500（Stripe が送り直します）
+ *   6 DB に書けなかったときだけ 500（Stripe が送り直します）。★A-2a からは、メールの道でも 500 を返すことがあります（環境の変数が無い／Resend まで届かない）
  *   7 返すのは常に空の 200／400／500。文は出さない
  *
  * ★★B-3 で足したもの（senjutsu_20260902s.md 4番ウ）
  *   ・通行証を作れたら、そのまま**ご購入のメールを1通**送り、送れたら `mail_sent_at` を書く
  *   ・★23505（もう作ってある）でも、**`mail_sent_at` が null なら送る**
  *     → ★Stripe の送り直しが、そのまま**メールの取り返し**になります
- *   ・★★**メールで 500 にしません。**どの道でも返りは 200（★通行証はもう在ります）
- *   ・★メールを送る前に、必ず `mail_sent_at` を見ます
- *   ・★★同じ知らせが**同時に**2つ来ると、両方が「null」を読み、**2通いくことがあります**。
- *     ★同じリンクが2通届くだけですので、そのままにしています。★メールの文で受けています
- *     （「同じ内容のメールが2通届くことがあります。お支払いは1回だけです。」）
- *   ・★書き置き … `mail_sent_at` の更新に失敗すると、送ったのに null のままになり、もう1通いきます
+ *   ・★A-2a（2026-09-02・senjutsu_20260902ad.md 6番）で**決め直し** ── 返りは道で決めます（`mailNoMichi()` の注記）
+ *       送り先が無い → 200／環境の変数が無い → 500／Resend まで届かない（network_error）→ 500／Resend が断った → 200
+ *   ・★メールを送る前に、必ず `mail_error='sending'` を**条件つきの1本の update**で書きます（★同時に2つ来ても送るのは1つ）
+ *   ・★メールの文「同じ内容のメールが2通届くことがあります。お支払いは1回だけです。」はそのまま（手で送り直したときの2通が0ではないため）
+ *   ・★行の見え方6つ（`mail_sent_at`／`mail_error`）は `mailNoMichi()` の注記。手順書 `tejun_mail_okurinaoshi.md`（戦術）が読みます
  *   ・★書き置き … Resend が遅いと、その分だけ Stripe への返事が遅れます。
  *     ★Stripe の説明頁は「複雑な処理の前に 2xx を返せ」「非同期の待ち行列で処理せよ」と書いています。
  *     ★★いまの形は、その字と逆を向いています。**C-4 で、メールを webhook の外に出します**
@@ -110,62 +109,128 @@ function linkWoTsukuru(moto: string, kagi: string): string {
 }
 
 /**
- * ご購入のメールを1通送り、送れたら `mail_sent_at` を書きます。
- *
- * ★★この本は、けっして throw しません。★呼んだ側は、いつでも 200 を返せます
- *   （★通行証はもう在ります。メールで 500 にしません）。
+ * ★送り直してよい `mail_error` の字（★定数1つ・字を2か所に書かない・senjutsu_20260902ab.md 2番）。
+ *   `network_error` … Resend まで届かなかった＝1通も出ていない。★Stripe の送り直しで、もう一度送る道に入れます
+ *   ★`send_failed`・`no_message_id`・`email_null`・`sending` は送り直しません（出ているかもしれない／永久に出ない）
  */
-async function mailWoOkuru(
+const OKURINAOSHI_OK = ['network_error'] as const;
+
+/**
+ * ★★メールの道（A-2a-6・senjutsu_20260902ad.md 6番・ab.md・ac.md・ad.md）。返りは 200 か 500。
+ *
+ *   a  email が null → `mail_error='email_null'`（書けなくても 200）→ **200**（送る道に入らない・送り直しても永久に送れない）
+ *   b  `NEXT_PUBLIC_APP_URL` 無し／`RESEND_API_KEY` 無し → **500**（行は触らない。環境を直せば送り直しが通る）
+ *   c  ★条件つき update … `mail_error='sending' where mail_sent_at is null and (mail_error is null or in OKURINAOSHI_OK)`
+ *        更新できた行数 0 → **送らずに 200**（もう誰かが送る道に入っている／もう送れている／別の理由の字が立っている）
+ *        update 自体が失敗 → **送らずに 500**（まだ送っていないので、送り直しで取り返せる）
+ *        ★★同じ知らせが同時に2つ来ても、この update は1本の原子な文なので、**送るのは1つだけ**です
+ *   d  送る（`mail.ts` の形のまま）
+ *   e  ok:true  → `mail_sent_at=now(), mail_error=null` → **200**（書けなくても 200・error 1行。行は 'sending' のまま＝手順書）
+ *      ok:false → `mail_error=<error の字>` → `network_error` なら **500**、それ以外は **200**
+ *                 （★この update が書けなければ、どちらも 200・error 1行。'sending' のまま残る＝手順書で拾う）
+ *
+ * ★★通行証（`pass_key`・`inputs`・`kekka`）には触りません。★記録に `to`（メールアドレス）を書きません。
+ * ★行の見え方（手順書）… null/null＝送る道に未到達（または環境の変数が無くて500）／null/'email_null'／null/'sending'＝送ったかもしれない／
+ *   null/'network_error'＝送り直しで通る／null/'send_failed'・'no_message_id'＝Resend が断った／now()/null＝送れた
+ */
+export async function mailNoMichi(
   admin: Admin,
   x: { cs: string; pi: string | null; kagi: string; email: string | null; kigen: Date },
-): Promise<void> {
+): Promise<200 | 500> {
+  const gyou = () => admin.from('retirement_pro_passes');
+
+  // a
   if (x.email === null) {
     console.error('[pro/webhook] ★通行証は作りました。送り先がありません', { cs: x.cs });
-    return;
+    const { error } = await gyou()
+      .update({ mail_error: 'email_null' })
+      .eq('stripe_checkout_session_id', x.cs)
+      .is('mail_sent_at', null);
+    if (error) {
+      console.error('[pro/webhook] ★送り先が無い印を書けませんでした', { cs: x.cs, code: error.code ?? null });
+    }
+    return 200;
   }
+
+  // b（★行は触らない）
   const moto = sitoNoMoto();
   if (moto === null) {
     console.error('[pro/webhook] ★通行証は作りました。メールの宛先の元がありません', {
       name: 'NEXT_PUBLIC_APP_URL',
       cs: x.cs,
     });
-    return;
+    return 500;
+  }
+  if (!process.env.RESEND_API_KEY) {
+    console.error('[pro/webhook] ★通行証は作りました。メールの鍵がありません', {
+      name: 'RESEND_API_KEY',
+      cs: x.cs,
+    });
+    return 500;
   }
 
+  // c（★条件つき・原子・行数は .select('id') で見る）
+  const { data: totta, error: sendingErr } = await gyou()
+    .update({ mail_error: 'sending' })
+    .eq('stripe_checkout_session_id', x.cs)
+    .is('mail_sent_at', null)
+    .or(`mail_error.is.null,mail_error.in.(${OKURINAOSHI_OK.join(',')})`)
+    .select('id');
+  if (sendingErr) {
+    console.error('[pro/webhook] ★通行証は作りました。送る印を書けませんでした。送らずに送り直しを待ちます', {
+      cs: x.cs,
+      code: sendingErr.code ?? null,
+    });
+    return 500;
+  }
+  if (!totta || totta.length === 0) {
+    console.info('[pro/webhook] メールは、もう送る道に入っているか、送ってあります', { cs: x.cs });
+    return 200;
+  }
+
+  // d
   const r = await kounyuMailWoOkuru({
     to: x.email,
     link: linkWoTsukuru(moto, x.kagi),
     kigen: x.kigen,
   });
-  if (!r.ok) {
-    console.error('[pro/webhook] ★通行証は作りました。メールを送れませんでした', {
-      cs: x.cs,
-      error: r.error,
-    });
-    return;
+
+  // e
+  if (r.ok) {
+    const { error } = await gyou()
+      .update({ mail_sent_at: new Date().toISOString(), mail_error: null })
+      .eq('stripe_checkout_session_id', x.cs);
+    if (error) {
+      // ★送れた印を書けなかった → 'sending' のまま。手順書（受信箱で確かめる → 戻す）で拾います
+      console.error('[pro/webhook] ★メールは送りましたが、送れた印を書けませんでした', {
+        cs: x.cs,
+        code: error.code ?? null,
+      });
+      return 200;
+    }
+    console.info('[pro/webhook] ★メールを送りました', { cs: x.cs, pi: x.pi });
+    return 200;
   }
 
-  const { error } = await admin
-    .from('retirement_pro_passes')
-    .update({ mail_sent_at: new Date().toISOString() })
+  console.error('[pro/webhook] ★通行証は作りました。メールを送れませんでした', {
+    cs: x.cs,
+    error: r.error,
+  });
+  const { error } = await gyou()
+    .update({ mail_error: r.error })
     .eq('stripe_checkout_session_id', x.cs);
   if (error) {
-    // ★送れた印を書けなかった → 次の送り直しで、もう1通いきます（★文で受けています）
-    console.error('[pro/webhook] ★メールは送りましたが、送れた印を書けませんでした', {
-      cs: x.cs,
-      code: error.code ?? null,
-    });
-    return;
+    console.error('[pro/webhook] ★送れなかった理由を書けませんでした', { cs: x.cs, code: error.code ?? null });
+    return 200;
   }
-
-  console.info('[pro/webhook] ★メールを送りました', { cs: x.cs, pi: x.pi });
+  return (OKURINAOSHI_OK as readonly string[]).includes(r.error) ? 500 : 200;
 }
 
 /**
  * ★もう作ってある（23505）ときの道。
- * その行を1つ読み、**まだ送っていなければ送ります**（★送り直しを取り返しにするため）。
+ * その行を1つ読み、**まだ送っていなければ送る道へ**（★送り直しを取り返しにするため）。返りは 200 か 500。
  */
-async function madaOkuttenaiNaraOkuru(admin: Admin, cs: string, pi: string | null): Promise<void> {
+async function madaOkuttenaiNaraOkuru(admin: Admin, cs: string, pi: string | null): Promise<200 | 500> {
   const { data, error } = await admin
     .from('retirement_pro_passes')
     .select('pass_key, email, expires_at, mail_sent_at')
@@ -177,24 +242,24 @@ async function madaOkuttenaiNaraOkuru(admin: Admin, cs: string, pi: string | nul
       cs,
       code: error.code ?? null,
     });
-    return;
+    return 500;
   }
   if (!data) {
     console.error('[pro/webhook] ★通行証は作りました。その行を読めませんでした', { cs });
-    return;
+    return 500;
   }
   if (data.mail_sent_at) {
     console.info('[pro/webhook] メールは、もう送ってあります', { cs });
-    return;
+    return 200;
   }
 
   const kigen = new Date(data.expires_at as string);
   if (!Number.isFinite(kigen.getTime())) {
     console.error('[pro/webhook] ★通行証は作りました。期限を日付にできませんでした', { cs });
-    return;
+    return 200;
   }
 
-  await mailWoOkuru(admin, {
+  return mailNoMichi(admin, {
     cs,
     pi,
     kagi: data.pass_key as string,
@@ -338,9 +403,8 @@ export async function POST(req: Request) {
     // ★同じ支払いの2度目の知らせ。unique（23505）なら、もう1枚作りません
     if (error.code === '23505') {
       console.info('[pro/webhook] もう作ってあります', { cs });
-      // ★まだメールを送っていなければ、ここで送ります（★送り直しを取り返しにします）
-      await madaOkuttenaiNaraOkuru(admin, cs, pi);
-      return kara(200);
+      // ★まだメールを送っていなければ、ここで送ります（★送り直しを取り返しにします）。★返りはメールの道が決めます（200／500）
+      return kara(await madaOkuttenaiNaraOkuru(admin, cs, pi));
     }
     // ⑥ 書けなかった → 500。Stripe が送り直します
     console.error('[pro/webhook] ★通行証を作れませんでした。DBに書けませんでした', {
@@ -372,8 +436,6 @@ export async function POST(req: Request) {
 
   console.info('[pro/webhook] 通行証を1枚作りました', { cs, pi });
 
-  // ★★ご購入のメールを1通。★送れなくても、通行証は消しません。返りは 200 のままです
-  await mailWoOkuru(admin, { cs, pi, kagi, email, kigen });
-
-  return kara(200);
+  // ★★ご購入のメールを1通。★送れなくても、通行証は消しません。★返りはメールの道が決めます（200／500・A-2a-6）
+  return kara(await mailNoMichi(admin, { cs, pi, kagi, email, kigen }));
 }

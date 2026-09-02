@@ -109,7 +109,8 @@ export async function POST(req: Request) {
         customer_creation: 'if_required',
         locale: 'ja',
         metadata: metadataNiNoseru(t.value),
-        success_url: `${moto2}/retirement/pro/arigatou?session_id={CHECKOUT_SESSION_ID}`,
+        // ★`?session_id=` は付けません（A-2a・senjutsu_20260902u.md 2番ウ）。★お礼の頁は cs_ を使わず、GA4 の page_view に乗せないため
+        success_url: `${moto2}/retirement/pro/arigatou`,
         cancel_url: `${moto2}/retirement/pro`,
       },
     });

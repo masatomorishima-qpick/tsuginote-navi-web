@@ -8,7 +8,7 @@
  *
  * 画面13（この計算の根拠と、入れていないもの）。**条文の逐語がそのまま入ります。**
  *
- * もと: hikiwatashi/tsuginote_gamen_base_20260812.html（164,458バイト）
+ * もと: bin/senjutsu/tsuginote_gamen_base_20260831b.html（164,868バイト・印つき。★文の基準は hikiwatashi/tsuginote_gamen_base_20260812.html（155,413・印なし）で、字は同じ・2026-09-02）
  */
 
 /** 表の1行 */

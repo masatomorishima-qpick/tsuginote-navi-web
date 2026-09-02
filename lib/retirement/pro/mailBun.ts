@@ -62,7 +62,7 @@ export function kounyuMail(hikisu: KounyuMailNoHikisu): KounyuMailNoBun {
 
 ${link}
 
-ご利用いただける期間は、${kigen} までです。
+ご利用いただける期間は、${kigen}までです。
 この期間のあいだは、何度でも計算し直せます。
 
 ──────────
@@ -108,7 +108,7 @@ https://www.tsuginotenavi.jp
   </p>
   <p style="margin:0 0 24px;font-size:14px;line-height:1.8;color:${MOJI};word-break:break-all;">${linkE}</p>
 
-  <p style="${p}">ご利用いただける期間は、${escapeHtml(kigen)} までです。<br>この期間のあいだは、何度でも計算し直せます。</p>
+  <p style="${p}">ご利用いただける期間は、${escapeHtml(kigen)}までです。<br>この期間のあいだは、何度でも計算し直せます。</p>
 
   <hr style="${hr}">
 
@@ -124,7 +124,7 @@ https://www.tsuginotenavi.jp
 
   <p style="${p}">つぎの手ナビ<br>BlueAdventures<br><a href="https://www.tsuginotenavi.jp" style="${a}">https://www.tsuginotenavi.jp</a></p>
 
-  <p style="margin:0;font-size:14px;line-height:1.9;color:${MOJI};">
+  <p style="margin:0;font-size:16px;line-height:1.9;color:${MOJI};">
     <a href="https://www.tsuginotenavi.jp/retirement/pro/tokushoho" style="${a}">特定商取引法に基づく表記</a><br>
     <a href="https://www.tsuginotenavi.jp/terms" style="${a}">利用規約</a><br>
     <a href="https://www.tsuginotenavi.jp/privacy" style="${a}">プライバシーポリシー</a>

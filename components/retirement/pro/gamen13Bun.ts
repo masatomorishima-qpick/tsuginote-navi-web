@@ -37,8 +37,18 @@
 
 import { HITOGOTO_KATA, HITOGOTO_MIDASHI } from './gamen13';
 
-/** 型に入れる8種類の値。**すべて文字列**（見せ方はここで決めます） */
-export type Hitogoto13 = {
+/**
+ * 型に入れる8種類の値。**すべて文字列**（見せ方はここで決めます）
+ *
+ * ★★2026-09-02・A-2a（senjutsu_20260902ae.md 3番）── **2つの形**にしました。
+ *   `{ ari: true, …8値 }` … 縮めた年がある方（`keika` に `minashi_nensu !== null` の年がある）
+ *   `{ ari: false }`      … 縮めた年が無い方（★⑲が0件の方はここに入ります。400人中277人・見本の方も）
+ *   ★「前に受け取った額が少ない場合」の条文は、前に受け取っていない方には当たりません。
+ *   ★`ari:false` のとき、画面13はその行を**行ごと出しません**（見出しも出さない）。
+ *   ★`ari:true` で値が空なら、いままでどおり例外で止めます（黙って落とさない）。
+ */
+export type Hitogoto13 = { ari: false } | {
+  ari: true;
   /** 前に受け取った額の合計。**`KeikaRow.shunyu_mae`** を「20,000,000円」の形に */
   maeGaku: string;
   /** 前の期間の退職所得控除（本則）。**`KeikaRow.kojo_mae`** を「20,600,000円」の形に */
@@ -66,6 +76,8 @@ export const HITOGOTO_NA: readonly string[] =
  * **入れ残しが1つでもあれば例外で止めます。**黙って `{名前}` を画面に出しません。
  */
 export function hitogotoBun(v: Hitogoto13): Record<string, string> {
+  // ★縮めた年が無い方 ── 文を作らず、空を返します（画面13は行ごと出しません）
+  if (!v.ari) return {};
   let bun = HITOGOTO_KATA;
   for (const na of HITOGOTO_NA) {
     const atai = (v as unknown as Record<string, string>)[na];

@@ -36,6 +36,9 @@ type Props = {
   onSusumu?: (saki: Saki) => void;
   /** 「結果をダウンロード（Excel）」 */
   onDownload?: () => void;
+  /** ★ファイルを作っている間（A-2a）。ボタンを押せなくし、下に1行（字は親から・戦術の字） */
+  downloadMatteiru?: boolean;
+  downloadBun?: string;
 };
 
 /** `\n` を `<br>` にする。**文の中の改行は `gamen8Bun()` が決めています** */
@@ -62,7 +65,7 @@ const MICHI: [Saki, string, string][] = [
   ['konkyo', 'この計算の根拠', '使った法令と、入れていないもの'],
 ];
 
-export default function Screen8({ b, pattern, onSusumu, onDownload }: Props) {
+export default function Screen8({ b, pattern, onSusumu, onDownload, downloadMatteiru = false, downloadBun }: Props) {
   // §8-3。`pattern` は `gamen8()` の `kado_su` をそのまま渡してください（画面で数えない）
   useEffect(() => { track('pro_result8_view', { pattern }); }, [pattern]);
 
@@ -181,11 +184,15 @@ export default function Screen8({ b, pattern, onSusumu, onDownload }: Props) {
       </p>
       <button
         type="button"
-        onClick={onDownload}
-        className="mt-3 w-full rounded-xl border-2 border-[#127a63] bg-white px-4 py-3.5 text-[17px] font-bold text-[#127a63]"
+        onClick={() => { if (!downloadMatteiru) onDownload?.(); }}
+        disabled={downloadMatteiru}
+        className="mt-3 w-full rounded-xl border-2 border-[#127a63] bg-white px-4 py-3.5 text-[17px] font-bold text-[#127a63] disabled:cursor-not-allowed disabled:opacity-60"
       >
         結果をダウンロード（Excel）
       </button>
+      {downloadMatteiru && downloadBun ? (
+        <p className="mt-2 text-base leading-relaxed text-slate-800">{downloadBun}</p>
+      ) : null}
       <table className="mt-4 w-full text-base">
         <thead>
           <tr className="border-b border-slate-300 text-left">

@@ -33,12 +33,17 @@ export const MIKATA = [
  */
 const AGE_FROM = 55, AGE_TO = 100;
 
-type Row = {
+/**
+ * 全通りの1行（画面8が見る形）。
+ * ★2026-09-02（senjutsu_20260902x.md 4番の1・A-2a）── 一覧（上位7行）と Excel も同じ行を使うので `export` します。
+ */
+export type Row = {
   pl: E.Plan;
   lab: string;
   zei: number;
   tedori: number;
   owari: number;
+  /** 最初の年（＝**受け取る年・退職の年**）に手元に入る額。★「今年」ではありません（ah.md 1番） */
   age0: number;
   h: S.Koeta[];
   nenkin_age: number | null;
@@ -175,19 +180,23 @@ export type Gamen8 = {
 };
 
 /**
- * 画面8に出すものを全部返す。
+ * ★全通りを、画面8が見る形（`Row[]`・保険料の判定つき）に並べ直す。
  *
- * @param R **⑳を軸にして作った `build()` の戻り**を渡してください。
- *   ⑳を軸にしないで作ると答えが変わります（公的年金350万・⑳=60歳の方で、
- *   手取りの最大が 36,671,034円 ↔ 37,388,268円。差 717,234円）。
- *   **呼び出し側が作ったものを渡します。**ここで作り直すと待ち時間が2倍になります。
+ * 【2026-09-02・A-2a（senjutsu_20260902x.md 4番の1）】`gamen8()` の中にあったものを、そのまま関数に切り出しました。
+ *   ★一覧（上位7行）と Excel（シート2）も同じ行を使います。★41,216通りで約6秒かかる部分ですので、
+ *   ★口は1回だけ回して `gamen8(…, { d })` に渡します（二度作りません）。
+ *   ★中身は1文字も変えていません（`gamen8()` の出力は同じ・golden もそのまま）。
+ *
+ * 【2026-09-02・A-2a（senjutsu_20260902ah.md 1番）】3つ目の引数の名前を `genzaiNen` から **`uketoriNen`** に変えました。
+ *   ★★意味は「**受け取る年（＝退職の年）**」です。「今年」ではありません。
+ *   ★`gamen8.py` 131行の注記は最初から「受け取る年」でした。TS 側が「今年」を渡していたので、
+ *     ⑤が先の方（退職の年が今年より後）は `age0`（最初の年に入る額）が全案 0 になっていました。
+ *   ★`gamen8()` の `genzaiNen`（今年）は ④A（`koteki_sudeni`）だけが使います。**2つを混ぜないでください。**
+ *
+ * @param uketoriNen **受け取る年（＝退職の年）**。★呼び出し側から渡します（既定値を作りません）
  */
-export function gamen8(p: E.Jinbutsu, genzaiNen: number,
-                       R: [E.Plan, E.EvalResult][],
-                       opts: { taishokuNen: number; taishokuAge: number;
-                               taiName: string; idecoName?: string }): Gamen8 {
-  const idecoName = opts.idecoName ?? 'iDeCo等';
-
+export function zenToori(R: [E.Plan, E.EvalResult][], p: E.Jinbutsu, uketoriNen: number,
+                         idecoName = 'iDeCo等'): Row[] {
   /**
    * この受け取り方で、**新たに**超える境目があるか（§6の10）。
    * **その案の⑳で所得を組み立てます。入力された⑳ではありません。**
@@ -211,15 +220,38 @@ export function gamen8(p: E.Jinbutsu, genzaiNen: number,
     const nen = E.nenkinByYear(p, pl);
     const years = [...Object.keys(nen).map(Number), ...r.keika.map((k) => k.year)];
     const owari = p.age(Math.max(...years));
-    const age0 = r.keika.filter((k) => k.year === genzaiNen)
+    const age0 = r.keika.filter((k) => k.year === uketoriNen)
                         .reduce((a, k) => a + k.shunyu, 0)
-                 + (nen[genzaiNen] ?? 0);
+                 + (nen[uketoriNen] ?? 0);
     D.push({
       pl, lab: pl.label.replace(`${idecoName}を`, ''),
       zei: r.zei, tedori: r.tedori, owari, age0,
       h: hoken(pl), nenkin_age: pl.nenkin_kaishi_age,
     });
   }
+  return D;
+}
+
+/**
+ * 画面8に出すものを全部返す。
+ *
+ * @param R **⑳を軸にして作った `build()` の戻り**を渡してください。
+ *   ⑳を軸にしないで作ると答えが変わります（公的年金350万・⑳=60歳の方で、
+ *   手取りの最大が 36,671,034円 ↔ 37,388,268円。差 717,234円）。
+ *   **呼び出し側が作ったものを渡します。**ここで作り直すと待ち時間が2倍になります。
+ * @param genzaiNen ★**今年**です。★この関数の中で使うのは **④A（`koteki_sudeni`）だけ**です
+ *   （senjutsu_20260902ah.md 1番）。★`zenToori()` に渡すのは「受け取る年（＝`opts.taishokuNen`）」で、別のものです。
+ * @param opts.d ★`zenToori(R, p, opts.taishokuNen)` の戻り。★渡せば中で作り直しません（A-2a・二度作らないため）。
+ *   ★渡さなければ中で作ります（いままでと同じ動き・署名は変わりません）。
+ */
+export function gamen8(p: E.Jinbutsu, genzaiNen: number,
+                       R: [E.Plan, E.EvalResult][],
+                       opts: { taishokuNen: number; taishokuAge: number;
+                               taiName: string; idecoName?: string; d?: Row[] }): Gamen8 {
+  const idecoName = opts.idecoName ?? 'iDeCo等';
+
+  // ★3つ目は「受け取る年」です（今年ではありません・senjutsu_20260902ah.md 1番）
+  const D: Row[] = opts.d ?? zenToori(R, p, opts.taishokuNen, idecoName);
   if (!D.length) throw new Error('受け取り方が1つもありません。build() の呼び方を確かめてください');
 
   const hayai = Math.min(...D.map((x) => x.owari));

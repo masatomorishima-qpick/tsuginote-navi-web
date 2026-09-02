@@ -9,8 +9,8 @@ export const KYUFU_JIMU_TESURYO = 440;   // 給付事務手数料（1回の振�
 export const KOZA_KANRI_TSUKI = 66;      // 運用指図者の口座管理手数料（月額）
 export const KAISEI_10NEN = 2026;        // 10年ルールの施行（令和8年1月1日）
 
-/** 年月を通し月数に変換 */
-export function ym(year: number, month = 4): number { return year * 12 + month; }
+/** 年月を通し月数に変換。★月に既定値を作りません（2026-09-02・senjutsu_20260902ag.md 2番。engine.py 24行と同じ） */
+export function ym(year: number, month: number): number { return year * 12 + month; }
 /**
  * 通し月数を「1988年4月」の形にする。`ym()` の逆。**12月を「0月」と書かないこと**
  *
@@ -882,7 +882,8 @@ export function evaluate(p: Jinbutsu, plan: Plan, shinkoku = true,
   let kozaTsuki: number | null = null;
   if (ideco) {
     const cand = [...dcIchijiYears, ...Object.keys(nen).map(Number)];
-    const dcOwari = cand.length ? Math.max(...cand) : fdiv(ideco.kikan[1], 12);
+    // ★`ym(y, 12)` を 12 で割ると y+1 になるため、−1 してから割ります（2026-09-02・senjutsu_20260902ag.md 2番。engine.py 799行と同じ）
+    const dcOwari = cand.length ? Math.max(...cand) : fdiv(ideco.kikan[1] - 1, 12);
     const hajime = fdiv(ideco.kikan[1] - 1, 12);   // A-6
     kozaTsuki = Math.max(0, dcOwari - hajime) * 12;
     tesuryo += kozaTsuki * KOZA_KANRI_TSUKI;

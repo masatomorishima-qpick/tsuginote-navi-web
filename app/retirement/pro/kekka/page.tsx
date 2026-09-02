@@ -4,16 +4,17 @@
  * ★★文は戦術Coworkが `senjutsu_20260902s.md` 5番で出した字です。1文字も変えていません。
  *   変えたいときは、消す前に戦術Coworkへ投げてください。
  *
- * ★4つの姿
+ * ★4つの姿（①②③の字は B-3 の戦術の字のまま。④は A-2a で親に差し替え）
  *   ① Cookie が無い（リンクから来ていない）
  *   ② 見つからない（表に無い）
  *   ③ 期限が切れている
- *   ④ 通る（★B-3 では「置きの1画面」。A-2 で画面7〜13に差し替えます）
+ *   ④ 通る（★A-2a で、置きの1画面から**有料版の親 `PaidApp`（画面7 → 口 → 画面8 → 画面13）を描く頁**になりました）
  *
  * ★決め
  *   ・見た目は B-1a（tokushoho）と同じ骨（`GuideHeader`／max-w-4xl の白い箱／`SiteFooter`）。layout は足しません
  *   ・★`track()` を呼びません（A-2 で決め直します）
- *   ・★表から引くのは `id` と `expires_at` だけ。★`email` も `inputs` も引きません（要らないものを持ってこない）
+ *   ・★表から引くのは `id, expires_at, inputs, kekka`（A-2a・senjutsu_20260902ad.md 1-1）。★`email`・`pass_key` は引きません
+ *     ★`kekka` を引く本は、この頁と保存の口だけ（363番）。★`inputs`・`kekka` は親に渡し、形は親が確かめます
  *   ・★①②③④のどれにも「鍵」「key」「Cookie」「エラー」の字を出しません
  *   ・★どれにも、利用者を下げる字を出しません
  *   ・★`dynamic = 'force-dynamic'` を明示します（★別の方の結果が配られることだけは、起こしてはいけません）
@@ -27,12 +28,14 @@ import SiteFooter from '@/components/SiteFooter';
 import { SITE_URL } from '@/components/loan/LoanArticle';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { kigenNoJi, hidukeNoJi } from '@/lib/retirement/pro/hyouji';
+import { tokyoYear } from '@/lib/retirement/pro/now';
+import { COOKIE_NA } from '@/lib/retirement/pro/cookie';
+import PaidApp from '@/components/retirement/pro/PaidApp';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const PRO_PATH = '/retirement/pro';
-const COOKIE_NA = 'pro_pass';
 
 export const metadata: Metadata = {
   title: '計算結果 | つぎの手ナビ',
@@ -44,7 +47,7 @@ type Sugata =
   | { kind: 'nashi' }
   | { kind: 'mitsukaranai' }
   | { kind: 'kigen'; kigen: Date }
-  | { kind: 'tooru'; kigen: Date };
+  | { kind: 'tooru'; kigen: Date; inputs: unknown; kekka: unknown };
 
 async function sugataWoKimeru(): Promise<Sugata> {
   const c = await cookies();
@@ -54,7 +57,7 @@ async function sugataWoKimeru(): Promise<Sugata> {
   const admin = createAdminSupabaseClient();
   const { data, error } = await admin
     .from('retirement_pro_passes')
-    .select('id, expires_at')
+    .select('id, expires_at, inputs, kekka')
     .eq('pass_key', kagi)
     .maybeSingle();
 
@@ -71,7 +74,7 @@ async function sugataWoKimeru(): Promise<Sugata> {
     return { kind: 'mitsukaranai' };
   }
   if (kigen.getTime() <= Date.now()) return { kind: 'kigen', kigen };
-  return { kind: 'tooru', kigen };
+  return { kind: 'tooru', kigen, inputs: data.inputs ?? null, kekka: data.kekka ?? null };
 }
 
 const H1 = 'text-[24px] font-bold leading-tight text-slate-900 sm:text-[28px]';
@@ -136,20 +139,13 @@ export default async function KekkaPage() {
           )}
 
           {s.kind === 'tooru' && (
-            <>
-              <h1 className={H1}>ご購入ありがとうございます</h1>
-              <p className={P}>
-                あなたの計算結果をご覧いただく画面は、いま準備しています。
-                <br />
-                準備ができましたら、このページで開けるようになります。
-              </p>
-              <p className={P}>
-                ご利用いただける期間は、{kigenNoJi(s.kigen)} までです。
-                <br />
-                この期間のあいだは、何度でも計算し直せます。
-              </p>
-              <p className={P}>ご不明な点は、info@blueadventures.jp までご連絡ください。</p>
-            </>
+            // ★「現在の年」は、この頁が `tokyoYear(new Date())` で作って渡します（既定値を作らない・§4-4-2）
+            <PaidApp
+              genzaiNen={tokyoYear(new Date())}
+              kigen={kigenNoJi(s.kigen)}
+              inputs={s.inputs}
+              kekka={s.kekka}
+            />
           )}
 
           <div className="h-16" aria-hidden="true" />

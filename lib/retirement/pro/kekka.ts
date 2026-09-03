@@ -7,11 +7,11 @@
  * ★決め（senjutsu_20260902ad.md 2番・ae.md 3番・af.md 4番の2）
  *   ・`build()` の `taishokuNen` は **⑥の生年＋⑤**（`Kumitate.taishokuNen`）。`genzaiNen`（今年・口が受け取った時刻の年）は**別の数**
  *   ・★`R`（157MB）と `D` は `kekka` に**入れません**。サーバーの中で使い切ります
- *   ・`Hitogoto13` は `{ ari:true, …8値 } | { ari:false }`。★縮めた年（`keika` に `minashi_nensu !== null`）が無ければ `ari:false`
- *   ・★縮めた年があるのに8値のどれかが null → 例外（口は 422）。黙って出しません
+ *   ・`Hitogoto13` は `{ ari:true, …8値 } | { ari:false }`。★**縮めた期間**（`keika` に `minashi_kikan !== null`）が無ければ `ari:false`
+ *   ・★縮めた期間があるのに8値のどれかが null → 例外（口は 422）。黙って出しません
  *   ・★`zenToori()` の3つ目は **`kumitate.taishokuNen`（受け取る年）**。`gamen8()` の2つ目は **`genzaiNen`（今年・④A用）**。
  *     ★★この2つを混ぜないでください（senjutsu_20260902ah.md 1番）
- *   ・★`hitogoto13` の `ari` は「`minashi_nensu ≥ 1` の年がある」ときだけ（ah.md 4番の1）
+ *   ・★`hitogoto13` の `ari` は「`minashi_kikan !== null` の年がある」ときだけ（A-2a2・al.md 1番）
  *
  * ★`server-only` を付けます（口だけが読みます。ブラウザには入れません）。
  */
@@ -44,20 +44,25 @@ const en = (n: number): string => `${n.toLocaleString('en-US')}円`;
 
 /**
  * 画面13の「その方によって変わる行」の8値（`gamen13Bun.ts` の注記のとおり・判断ログ82）。
- * ★縮めた年が **1年以上**（`minashi_nensu ≥ 1`）でなければ `{ ari:false }`。
+ * ★**縮めた期間が無い**（`minashi_kikan === null`）方は `{ ari:false }`。
  *
- * 【2026-09-02・senjutsu_20260902ah.md 4番の1】条件を `minashi_nensu !== null` から **`≥ 1`** に細くしました。
- *   ★理由 ── 重なりが0か月の方は `minashi_nensu` が 0 になり、「0年ぶんの控除0円を減らします」という文が出ます。
- *   ★★それは「**何も起きていないことを、起きたように読ませます**」（戦術Cowork）。★その方には行ごと出しません。
+ * 【2026-09-03・A-2a2（senjutsu_20260902al.md 1番）】拾う条件を **`minashi_kikan !== null`** にしました。
+ *   ★`engine` は「みなし期間が 0 年」のとき、期間を持ちません（`engine.ts` 536行）。
+ *   ★★ですので条件は「**その行を画面に書けるか（期間があるか）**」そのものになります。
+ *   ★（それまでは `minashi_nensu >= 1` でした。★`senjutsu_20260902ah.md` 4番の1 の理由は取り下げられています）
  */
 export function hitogoto13WoTsukuru(p: E.Jinbutsu, R: [E.Plan, E.EvalResult][]): Hitogoto13 {
   // ★どの案でも「縮め」は同じ年に同じ形で起きます（前の支給源と就職の日は入力で決まる）。★最初の案の keika を見ます
   const r = R[0]?.[1];
   if (!r) throw new Error('受け取り方が1つもありません');
-  const k = r.keika.find((x) => x.minashi_nensu !== null && x.minashi_nensu >= 1);
+  // ★型にも「期間がある」と伝えます（`minashi_kikan` を下で読むため。★式ではありません）
+  const kikanAri = (x: E.KeikaRow): x is E.KeikaRow & { minashi_kikan: [number, number] } =>
+    x.minashi_kikan !== null;
+  const k = r.keika.find(kikanAri);
   if (!k) return { ari: false };
-  if (k.shunyu_mae === null || k.kojo_mae === null || k.minashi_kikan === null) {
-    throw new Error('画面13：縮めた年があるのに、前に受け取った額・控除・縮めた期間のどれかが null です');
+  // ★★ここは「あるはずのものが無い」を止める門です（「出さない」は上の1行で決まっています）
+  if (k.shunyu_mae === null || k.kojo_mae === null || k.minashi_nensu === null) {
+    throw new Error('画面13：縮めた期間があるのに、前に受け取った額・控除・縮めた年数のどれかが null です');
   }
   const ide = p.gens.find((g) => g.name === IDECO_NAME);
   if (!ide) throw new Error(`支給源「${IDECO_NAME}」がありません`);

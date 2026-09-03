@@ -13,8 +13,9 @@
  *     → 返事の `kekka` を state に → 画面8
  *   ・待つ間 … ボタンを押せなくし、1行（★字は戦術の・下の `BUN`）。時間の数は書かない
  *   ・口が 500／通信の失敗 … `ayamariBun` の1文を置き、画面7に戻す／口が 401 … `/retirement/pro/kekka` へ（頁が①の姿を出す）
+ *   ・★「この計算の根拠」を押したら、**差し込んだところまで画面を動かす**（A-2a2・下の `useEffect`）
  *   ・画面8の上に小さく2行（★戦術の字・基準HTMLに無い部品・判断ログに残す）
- *       `ご利用いただける期間は、{kigen}までです。`／`[ご入力の内容を直す]` → 画面7（raw を入れて戻る）
+ *       `ご利用いただける期間は、{kigen}までです。`／`[入力した内容を変える]` → 画面7（raw を入れて戻る・A-2a2 で字を直しました）
  *   ・Excel … `onDownload` → fetch → blob → 保存（ボタンを押せなくし、1行）。`kekka` が無い間はボタンが出ない（画面8が無い）
  *   ・★`track()` はここで呼びません（画面7・8・13が自分で呼びます。A-2b で決め直す分は触らない）
  *   ・★「現在の年」は頁から受けたものだけ（既定値を作らない）
@@ -22,7 +23,7 @@
 
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Screen7 from './Screen7';
 import Screen8 from './Screen8';
 import Screen13 from './Screen13';
@@ -36,7 +37,7 @@ const BUN = {
   shippai: '計算できませんでした。しばらくたってから、もう一度「計算結果を見る」を押してください。それでも計算できないときは、info@blueadventures.jp までご連絡ください。',
   excelMatteiru: 'ファイルを作っています。そのままお待ちください。',
   kigen: (k: string) => `ご利用いただける期間は、${k}までです。`,
-  naosu: 'ご入力の内容を直す',
+  naosu: '入力した内容を変える',
 } as const;
 
 const KUCHI_INPUTS = '/retirement/pro/inputs';
@@ -66,8 +67,21 @@ export default function PaidApp({ genzaiNen, kigen, inputs, kekka: kekkaMoto }: 
   const [ayamari, setAyamari] = useState<Ayamari[]>([]);
   const [ayamariBun, setAyamariBun] = useState<string | null>(null);
   const [konkyo, setKonkyo] = useState(false);
+  const konkyoRef = useRef<HTMLDivElement | null>(null);
   const [excelMatteiru, setExcelMatteiru] = useState(false);
   const okuttaRef = useRef(false);
+
+  /**
+   * ★「この計算の根拠」を押したら、**差し込んだところまで画面を動かす**（A-2a2・senjutsu_20260903b.md 3-1）。
+   *
+   * 【なぜ要るか】画面13は画面8の**下**に足すだけで、押した所と見出しの間に 136px あります。
+   *   ★★押した場所が画面の下端だと、**何も起きていないように見えます**（森嶋さんが本番で「出てこない」と言われた所）。
+   *   ★描いたあとに動かすので、`useEffect` で `konkyo` を見ます（★描く前に動かすと、まだ場所がありません）。
+   */
+  useEffect(() => {
+    if (!konkyo) return;
+    konkyoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [konkyo]);
 
   // ---- 画面7 → 口 → 画面8 -------------------------------------------------
   const onSubmit = useCallback(async (r: Record<string, string>) => {
@@ -191,7 +205,7 @@ export default function PaidApp({ genzaiNen, kigen, inputs, kekka: kekkaMoto }: 
       </div>
 
       {konkyo ? (
-        <div className="mt-10 border-t border-slate-200 pt-8">
+        <div ref={konkyoRef} className="mt-10 border-t border-slate-200 pt-8">
           <Screen13
             genzaiNen={genzaiNen}
             hitogotoBun={hitogotoBun(kekka.hitogoto13)}

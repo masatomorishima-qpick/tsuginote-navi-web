@@ -533,7 +533,10 @@ export function taishokuByYear(p: Jinbutsu, plan: Plan): [Record<number, number>
         maeTsuki = new Set<number>();
         for (let m = hajime; m < hajime + nMinashi * 12; m++) maeTsuki.add(m);
         minashiNensu = nMinashi;
-        minashiKikan = [hajime, hajime + nMinashi * 12 - 1];
+        // 【2026-09-03・A-2a2（senjutsu_20260902ak.md 1番）】**縮めた年数が 0 年のときは「期間が無い」ので `null`。**
+        //   ★0 年で `[hajime, hajime - 1]` を作ると、字にしたとき「1988年4月〜1988年3月」と**逆さま**に出ます。
+        //   ★★「無いもの」を、逆さまの期間として持たせません（画面13は `minashi_kikan === null` で行ごと出しません）。
+        minashiKikan = nMinashi > 0 ? [hajime, hajime + nMinashi * 12 - 1] : null;
       }
     }
     // 施行令70条3項：重複期間の1年未満の端数は切捨て
@@ -823,6 +826,25 @@ export interface EvalResult {
   /** 手数料の内訳（画面11）。**`evaluate()` は必ず返します** */
   tesuryo_uchiwake?: TesuryoUchiwake;
   cash?: Record<number, number>; ruikei?: Record<number, number>; harau?: Record<number, number>;
+  /**
+   * 【2026-09-03・A-2a2（senjutsu_20260903b.md 3-2・c.md 5番）】**年ごとの手数料**（鍵は年・値は円の整数）。
+   *
+   * ★Excel のシート3が「その年の手数料」の列に出します。★実装側で割り振らせないため、ここで返します。
+   *   給付事務手数料 … その年に受け取った回数 × 440円（★`dc` の支給源だけ。一時金は1回・年金は⑱の回数）
+   *   口座管理手数料 … 拠出が終わった年の**翌年**から、最後に受け取る年まで、**12か月 × 66円 ずつ**
+   * ★★`Σ tesuryo_by_year` は `tesuryo` と1円も違いません（下の門で止めます）。
+   * ★**0 の年は入れません**（senjutsu_20260903c.md 4番）。読む側は `?? 0` で受けてください。
+   */
+  tesuryo_by_year?: Record<number, number>;
+  /**
+   * 【2026-09-03・A-2a2（senjutsu_20260903c.md 2番）】**年ごとの額面**（鍵は年・値は円の整数）。
+   *
+   * ★その年に受け取る額そのもの（**税も手数料も引く前**）。`cash` は税と掛金を引いたあとで、別の数です。
+   * ★Excel のシート3が「その年に手元に入る額」の列に出します。
+   *   ★`cash + harau` の**逆算に頼らない**ため、ここで返します（判断ログ・A-2a2 の止め①）。
+   * ★**0 の年は入れません**。読む側は `?? 0` で受けてください。
+   */
+  haitta_by_year?: Record<number, number>;
 }
 
 /** この受け取り方をしたときに、公的年金だけの世界と比べて何円多く引かれるか
@@ -877,6 +899,14 @@ export function evaluate(p: Jinbutsu, plan: Plan, shinkoku = true,
   for (const k of keika) if (k.gens.some(n => dcNames.has(n))) dcIchijiYears.add(k.year);
   const kaisu = dcIchijiYears.size + Object.keys(nen).length * plan.nenkin_kaisu;
   let tesuryo = kaisu * KYUFU_JIMU_TESURYO;
+  /**
+   * 【2026-09-03・A-2a2】**年ごとの手数料**。★合計（`tesuryo`）と同じものを、年に割って持ちます。
+   *   ★合計の式には手を入れていません。★下の門で `Σ` が `tesuryo` と一致することを確かめます。
+   */
+  const tesuryoByYear: Record<number, number> = {};
+  const tasu = (y: number, en: number) => { if (en) tesuryoByYear[y] = (tesuryoByYear[y] ?? 0) + en; };
+  for (const y of dcIchijiYears) tasu(y, KYUFU_JIMU_TESURYO);                       // 一時金は1回
+  for (const y of Object.keys(nen).map(Number)) tasu(y, plan.nenkin_kaisu * KYUFU_JIMU_TESURYO);  // 年金は⑱の回数
   const ideco = p.gens.find(g => g.dc);
   /** 口座管理手数料のかかる月数。**確定拠出年金が無い方には存在しません。0にしません** */
   let kozaTsuki: number | null = null;
@@ -887,6 +917,8 @@ export function evaluate(p: Jinbutsu, plan: Plan, shinkoku = true,
     const hajime = fdiv(ideco.kikan[1] - 1, 12);   // A-6
     kozaTsuki = Math.max(0, dcOwari - hajime) * 12;
     tesuryo += kozaTsuki * KOZA_KANRI_TSUKI;
+    // ★年に割る … 拠出が終わった年の翌年から、最後に受け取る年まで、12か月ずつ（★`kozaTsuki` は年数×12 なので端数は出ません）
+    for (let y = hajime + 1; y <= dcOwari; y++) tasu(y, 12 * KOZA_KANRI_TSUKI);
   }
   /** **その方にその手数料がかかるか。**`null` も `0` も `false`（`engine.py` 844〜845行の写し） */
   const kyufuGyou = kaisu > 0;
@@ -913,14 +945,28 @@ export function evaluate(p: Jinbutsu, plan: Plan, shinkoku = true,
       throw new Error(`手数料の合計が、画面に出す行の合計と合いません（合計 ${tesuryo} ／ 行の合計 ${gyouKei}）`);
     }
   }
+  /**
+   * 【2026-09-03・A-2a2】**年ごとの手数料の合計は、手数料の合計と必ず一致します。**
+   * ★合わないまま Excel に出すと、「入る額 − 税 − 手数料 ＝ 手取り」が合わなくなります。
+   *   ★利用者は「どこかの年が抜けている」とは読まず、**手取りのほうを疑います。**
+   */
+  {
+    const nenKei = Object.values(tesuryoByYear).reduce((a, b) => a + b, 0);
+    if (tesuryo !== nenKei) {
+      throw new Error(`年ごとの手数料の合計が、手数料の合計と合いません（合計 ${tesuryo} ／ 年ごとの合計 ${nenKei}）`);
+    }
+  }
 
   // --- ⑪の判定に使う「年ごとに手元に入る額」と累計（B-14 で納める年に付け替え済み） ---
   const cash: Record<number, number> = {}, ruikei: Record<number, number> = {};
+  /** 【2026-09-03・A-2a2】**年ごとの額面**（税も手数料も引く前）。★0 の年は入れません */
+  const haittaByYear: Record<number, number> = {};
   let ru = 0;
   const allY = [...new Set<number>([...years, ...Object.keys(harau).map(Number)])].sort((a, b) => a - b);
   for (const y of allY) {
     let haitta = nen[y] ?? 0;
     for (const k of keika) if (k.year === y) haitta += k.shunyu;
+    if (haitta) haittaByYear[y] = haitta;
     const z = (harau[y] ?? 0) + (kk[y] ?? 0);
     cash[p.age(y)] = haitta - z;
     ru += haitta - z;
@@ -929,7 +975,8 @@ export function evaluate(p: Jinbutsu, plan: Plan, shinkoku = true,
 
   return { zei, uketori, tesuryo, tesuryo_uchiwake: tesuryoUchiwake,
            tedori: uketori - zei - tesuryo, detail, keika,
-           saishu_nen: Math.max(...years), cash, ruikei, harau };
+           saishu_nen: Math.max(...years), cash, ruikei, harau,
+           tesuryo_by_year: tesuryoByYear, haitta_by_year: haittaByYear };
 }
 
 // ---------------------------------------------------------------- 全通りの列挙

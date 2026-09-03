@@ -5,7 +5,9 @@
  *   1 結果のまとめ　　　画面8と同じ内容（あなたの受け取り方・税金・手取り・保険料が上がる年齢）── `Gamen8`・`Bun8` から
  *   2 受け取り方の一覧　全通り（`D`）。受け取り方／税金／手取り／最初の年に入る額／受け取り終わる年齢／保険料が上がる年齢
  *   3 年ごとの内訳　　　★この便では「結論の案」と「⑳をそろえた一時金の案」の2本だけ（9〜12 の便で「画面に出た受け取り方」に広げる）。
- *                        番号・年・年齢・その年に手元に入る額・その年に納める税金（1歳きざみの通し）
+ *                        番号・年・年齢・その年に手元に入る額（**額面**）・その年に納める税金・その年の手数料（1歳きざみの通し）
+ *                        ★★案ごとに `合計` と `手取り` の2行（`入る額 − 税 − 手数料 ＝ 手取り`。★シート1の手取りと同じ数）。
+ *                          ★案と案の間に空の行を1つ。★年の範囲は `nenNoHani()`（A-2a2）
  *   4 計算の内容と根拠　ご入力の28項目（ラベルは `PAID_FIELDS` の字・値は raw）＋ 根拠にした条文（`gamen13.ts`）。★「計算の全ステップ」は 9〜12 の便
  *
  * ★★ここに式はありません。数は全部 `D`・`R`・`Gamen8` から写すだけです。
@@ -20,10 +22,48 @@ import ExcelJS from 'exceljs';
 import type { Keisan } from './kekka';
 import type { PaidInput } from './paidInput';
 import type { Row } from './gamen8';
+import type * as E from './engine';
 import { PAID_FIELDS } from '@/components/retirement/pro/paidFields';
 import { GAMEN13 } from '@/components/retirement/pro/gamen13';
 import { hitogotoBun } from '@/components/retirement/pro/gamen13Bun';
 import { paidKou, ranWoHiku, type Kou } from './paidRules';
+
+/**
+ * ★シート3の上に置く1行（戦術の字・senjutsu_20260903c.md 1番）。
+ * ★「拠出が終わってから受け取り始めるまでの年」がある案が1つでもあるときだけ出します。
+ */
+export const JI_S3_KOZA =
+  'iDeCo等の拠出が終わったあと、受け取り始めるまでの年は、口座管理手数料だけがかかります。';
+
+/**
+ * ★シート3が出す年の範囲（senjutsu_20260903c.md 5番・d.md 1番）。
+ *
+ *   `uketoriFirst` … 最初の受け取りの年
+ *   `first` … `min(uketoriFirst, tesuryo_by_year の鍵の最小)`
+ *     ★★口座管理手数料は「拠出が終わった年の翌年」から始まるので、**最初の受け取りの年より前**に出ることがあります
+ *       （⑬〈iDeCo等の加入期間〉を退職の年より前に終えた方）。★その年を落とすと、足し算が合いません
+ *     ★★`hajime` を実装側で作りません（`engine.ts` 887行の `− 1` を写さないため）。**engine が返した鍵を見るだけ**です
+ *     ★手数料が1円もかからない方（③＝0 など）は鍵が空になるので、`uketoriFirst` をそのまま使います
+ *   `last` … `max(saishu_nen, harau〈税を納める年〉の最大)`
+ *     ★★住民税の総合課税分は**翌年**に付きます（`engine.ts` 866〜867行・B-14）。★その年を落とすと、足し算が合いません
+ */
+export function nenNoHani(r: E.EvalResult): { uketoriFirst: number; first: number; last: number } {
+  const ys = [...Object.keys(r.detail).map(Number), ...r.keika.map((kk) => kk.year)];
+  const uketoriFirst = Math.min(...ys);
+  const tesuY = Object.keys(r.tesuryo_by_year ?? {}).map(Number);
+  // ★★`harau` は、値が 0 の年も鍵だけ残ります（住民税の総合課税分は翌年に入れるため。`engine.ts` 866〜867行）。
+  //   ★そのまま `last` に入れると、表のいちばん下に「入る額 0・税 0・手数料 0」の年が1行つきます
+  //   （見本の方で 3,276 / 41,216案）。★**値が 0 でない年だけ**を見ます（senjutsu_20260903e.md 1番「ア」）
+  const harauY = Object.entries(r.harau ?? {})
+    .filter(([, en]) => en !== 0)
+    .map(([y]) => Number(y));
+  return {
+    uketoriFirst,
+    first: tesuY.length ? Math.min(uketoriFirst, ...tesuY) : uketoriFirst,
+    // ★空の集合は入れません（`...[]` は何も足しません。★`saishu_nen` が必ず1つあるので `-Infinity` になりません）
+    last: Math.max(r.saishu_nen ?? Math.max(...ys), ...harauY, ...tesuY),
+  };
+}
 
 /** 保険料の字（画面9の字・2つ） */
 export function hokenNoJi(x: Row): string {
@@ -103,24 +143,31 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
 
   // ---- 3 年ごとの内訳（★この便では2本）
   const s3 = wb.addWorksheet('年ごとの内訳');
-  s3.addRow(['番号', '年', '年齢', 'その年に手元に入る額', 'その年に納める税金']).commit();
   const ketsuron = D.find((x) => x.lab === g8.houkou[0]?.lab) ?? null;
   const ichiji = ichijikinNoAn(k, 'iDeCo等');
   const an = [ketsuron, ichiji].filter((x): x is Row => x !== null);
   const seen = new Set<Row>();
-  for (const x of an) {
-    if (seen.has(x)) continue;
-    seen.add(x);
-    const i = D.indexOf(x);
-    const r = R[i][1];
-    const ys = [...Object.keys(r.detail).map(Number), ...r.keika.map((kk) => kk.year)];
-    const first = Math.min(...ys);
-    const last = r.saishu_nen ?? Math.max(...ys);
-    for (let y = first; y <= last; y++) {
-      const a = p.age(y);
-      s3.addRow([i + 1, y, a, r.cash?.[a] ?? 0, r.harau?.[y] ?? 0]).commit();
+  const anRows = an.filter((x) => { if (seen.has(x)) return false; seen.add(x); return true; })
+    .map((x) => ({ x, i: D.indexOf(x), ...nenNoHani(R[D.indexOf(x)][1]) }));
+
+  // ★注記は、拠出が終わってから受け取り始めるまでの年がある案が1つでもあるときだけ（senjutsu_20260903c.md 1番の字）
+  if (anRows.some((a) => a.first < a.uketoriFirst)) s3.addRow([JI_S3_KOZA]).commit();
+  s3.addRow(['番号', '年', '年齢', 'その年に手元に入る額', 'その年に納める税金', 'その年の手数料']).commit();
+  anRows.forEach((a, n) => {
+    if (n > 0) s3.addRow([]).commit();          // ★案と案の間に空の行を1つ（どこまでが1つの案か分かるように）
+    const r = R[a.i][1];
+    let gKei = 0, zKei = 0, tKei = 0;
+    for (let y = a.first; y <= a.last; y++) {
+      const gaku = r.haitta_by_year?.[y] ?? 0;
+      const zei = r.harau?.[y] ?? 0;
+      const tesu = r.tesuryo_by_year?.[y] ?? 0;
+      gKei += gaku; zKei += zei; tKei += tesu;
+      s3.addRow([a.i + 1, y, p.age(y), gaku, zei, tesu]).commit();
     }
-  }
+    // ★合計と手取りの2行（案ごと）。★「年」の列に語を置きます（その行が「年」の行ではないため）
+    s3.addRow([a.i + 1, '合計', '', gKei, zKei, tKei]).commit();
+    s3.addRow([a.i + 1, '手取り', '', gKei - zKei - tKei, '', '']).commit();
+  });
   s3.commit();
 
   // ---- 4 計算の内容と根拠

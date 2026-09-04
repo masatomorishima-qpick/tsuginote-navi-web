@@ -448,6 +448,25 @@ export function zaishokuTeishi(koseiNengaku: number, kyuyoNenshu: number): numbe
   return Math.min(kihon, teishi) * 12;
 }
 
+/**
+ * 【2026-09-03・A-2a4】在職老齢年金で、老齢厚生年金（報酬比例部分）が**全額支給停止**になるか。
+ *
+ * 日本年金機構「在職老齢年金の計算方法」
+ *   用語の説明 …「基本月額」＝**加給年金額を除いた**老齢厚生（退職共済）年金（報酬比例部分）の月額
+ *   留意事項  …「年金支給月額がマイナスになる場合は、老齢厚生年金（**加給年金額を含む**）は
+ *                全額支給停止となります」
+ *   https://www.nenkin.go.jp/service/jukyu/seido/roureinenkin/zaishoku/20150401-01.html
+ *
+ * ★★**式は `zaishokuTeishi` に1本だけ**。ここでは「返りが `kihon * 12` か」で全額停止を見ます
+ *   （式を2本にしない・`kaihatsu_20260903p.md` 1番）。
+ * ★`kihon` が 0 のときを全額停止と読まないこと（`0 >= 0` が真になり、報酬比例が無い方の
+ *   加給年金まで消えます・`senjutsu_20260903k.md` 4番の門A）。
+ */
+export function zaishokuZengakuTeishi(koseiNengaku: number, kyuyoNenshu: number): boolean {
+  const kihon = fdiv(Math.trunc(koseiNengaku), 12);
+  return kihon > 0 && zaishokuTeishi(koseiNengaku, kyuyoNenshu) === kihon * 12;
+}
+
 /** 加給年金額の年額（配偶者が65歳未満であることは呼ぶ側で判定する） */
 export function kakyuNenkin(ukeSeinen: number, haigushaSeinen: number | null, koNin = 0): number {
   let gaku = 0;

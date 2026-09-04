@@ -103,7 +103,26 @@ export class Jinbutsu {
   shishutsu: Record<number, number> = {}; kosei_nenkin = 0;
   haigusha_seinen: number | null = null; ko_nin = 0; kosei_20nen = false;
   sumi: [Gen, number][] = []; jinteki: Z.Jinteki = new Z.Jinteki();
-  constructor(init: JinbutsuInit) { this.seinen = init.seinen; Object.assign(this, init); }
+  constructor(init: JinbutsuInit) {
+    this.seinen = init.seinen;
+    Object.assign(this, init);
+    /**
+     * 【2026-09-03・A-2a4】★お子さんの加給年金は、人数だけでは正しく出せないので**道を塞ぎます**。
+     *
+     * `kakyuNenkin()` は `ko_nin` を**人数として足すだけ**で、**打ち切りの条件が1つもありません**。
+     * 実物では「いちばん下のお子さんが**18歳になった年度の3月31日**」（障害があるときは20歳）で終わります。
+     * 人数だけを受け取る形のままにすると、欄を作った日に静かに穴が開きます
+     * （1968年生・⑳65・お子さん1人で **26年・6,196,583円** 乗り続ける・`kaihatsu_20260903m.md` 3番）。
+     *
+     * ★お子さんの欄を作るときは、`ko_nin`（人数）ではなく**生まれた年月**を受け取る形に変えてください。
+     */
+    if (Math.trunc(this.ko_nin) !== 0) {
+      throw new Error(
+        'お子さんの加給年金は、お子さんの生まれた年月を受け取る形に作り直すまで使えません'
+        + `（ko_nin は 0 のみ。渡された値：${this.ko_nin}）。`
+        + '人数だけでは「18歳になった年度の末日で終わる」を出せません（A-2a4・2026-09-03）');
+    }
+  }
 
   /** 支給源だけを差し替えた複製（dataclasses.replace 相当） */
   withKotekiKaishiAge(age: number): Jinbutsu {
@@ -142,9 +161,18 @@ export class Jinbutsu {
 
   /** その年に支払を受ける公的年金の月数（B-21） */
   nenkinShiharaiTsukisu(year: number): number {
-    const kaishiAge = this.koteki_kaishi_age;
-    const t = this.tassuruTsuki(kaishiAge);
-    if (t === null) return year >= this.year(kaishiAge) ? 12 : 0;
+    return this.tsukisuKara(this.koteki_kaishi_age, year);
+  }
+
+  /**
+   * その年齢に達した月の**翌月分**から数えて、その年に支払を受ける月数（0〜12）。
+   *
+   * 【2026-09-03・A-2a4】`nenkinShiharaiTsukisu()` の中身をここに出しました。
+   *   ★加給年金の「65歳の門」が**同じ数え方**を使うためです。★式を2か所に書きません。
+   */
+  tsukisuKara(age: number, year: number): number {
+    const t = this.tassuruTsuki(age);
+    if (t === null) return year >= this.year(age) ? 12 : 0;
     const kaishi = t + 1;
     const lo = ym(year - 1, 12), hi = ym(year, 11);
     return Math.max(0, Math.min(12, hi - Math.max(lo, kaishi) + 1));
@@ -174,15 +202,34 @@ export class Jinbutsu {
     } else zougakuTaisho = koseiKijun;
     let kosei = fdiv(zougakuTaisho * ritsu, 10_000) + (koseiKijun - zougakuTaisho);
     const kiso = fdiv(kisoKijun * ritsu, 10_000);
-    kosei = Math.max(0, kosei - Z.zaishokuTeishi(kosei, this.shunyu_by_age[age] ?? 0));
+    /**
+     * 【2026-09-03・A-2a4】**全額支給停止の年は、報酬比例を 0 にします。**
+     *   ★式の丸めで 0〜11円（`kosei % 12`）が残りますが、制度の「全額支給停止」は 0 円です。
+     *   ★★**基礎年金（`kiso`）は止めません。**在職老齢年金で止まるのは**報酬比例部分だけ**です。
+     */
+    const kyuyo = this.shunyu_by_age[age] ?? 0;
+    const zenTeishi = Z.zaishokuZengakuTeishi(kosei, kyuyo);
+    kosei = zenTeishi ? 0 : Math.max(0, kosei - Z.zaishokuTeishi(kosei, kyuyo));
 
+    /**
+     * 加給年金。【2026-09-03・A-2a4】足したもの2つ
+     *   ・★**65歳に達した月の翌月分から**（それより前の月には乗せません）。下の `kakyuTsuki`
+     *     日本年金機構「加給年金額と振替加算」…「**65歳到達時点**（または定額部分支給開始年齢に
+     *     到達した時点）で、その方に生計を維持されている配偶者または子がいるときに加算されます」
+     *     ★⑥の下限は1951年で、その方たちに定額部分はありませんので、門は「65歳」だけで足ります。
+     *   ・★**報酬比例が全額支給停止の年は出しません**（上の `zenTeishi`）。
+     *     「年金支給月額がマイナスになる場合は、老齢厚生年金（**加給年金額を含む**）は全額支給停止」
+     */
     let kakyu = 0;
-    if (this.kosei_20nen) {
+    if (this.kosei_20nen && !zenTeishi) {
       const h = this.haigusha_seinen;
       const haigu = (h !== null && (year - h) < 65) ? h : null;
       kakyu = Z.kakyuNenkin(this.seinen, haigu, this.ko_nin);
     }
-    return fdiv((kosei + kiso + kakyu) * tsuki, 12);
+    // ★加給年金だけは「65歳から」の月数で数えます（`tsuki` と同じ数え方・`tsukisuKara`）
+    const kakyuTsuki = Math.min(tsuki, this.tsukisuKara(65, year));
+    // ★丸めは1回。★⑳≧65 のとき `kakyuTsuki === tsuki` になり、元の式と1円も違いません
+    return fdiv((kosei + kiso) * tsuki + kakyu * kakyuTsuki, 12);
   }
 
   age(year: number): number { return year - this.seinen; }

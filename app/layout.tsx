@@ -109,6 +109,26 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
         {children}
+        {/*
+          ★★調べの印 …… VERCEL_ENV の値そのものを、頁の中に1行だけ出します。
+          ★なぜ要るか（★戦術Cowork senjutsu_20260907k.md）……
+            「Preview でタグが来ないこと」だけでは、★★2つを見分けられません ──
+            ①Vercel が VERCEL_ENV を出している（正しい）②出していない（★本番の計測が止まる）。
+            ★どちらも Preview では同じ「タグが来ない」になります。
+          ★この印は `VERCEL_ENV !== "production"` のときだけ出ます。ですので ──
+            ・Preview で `preview` と出れば …… ①（正しい）
+            ・Preview で `(なし)` と出れば …… ②（★Vercel の設定が要ります）
+            ・★★本番でこの印が出ていたら …… ②（★本番の計測が止まっています）
+          ★★★本番が正しいときは、この印は出ません。★本番の姿は1バイトも変わりません。
+          ★利用者には見えません（`<meta>` です）。★値は production／preview／development だけで、
+            鍵でも住所でもありません。
+          ★★消す日 …… ★**本番に出したあと、本番の頁で GA4 と Clarity のタグが
+            読み込まれていることを確かめた日**に消します（★「本番化の日」ではありません ──
+            ★★本番化のその日が、この印がいちばん要る日です）。
+        */}
+        {honbanNoKeisokuWoYomu ? null : (
+          <meta name="keisoku-shirabe" content={process.env.VERCEL_ENV || "(なし)"} />
+        )}
         {honbanNoKeisokuWoYomu ? <ClarityScript /> : null}
       </body>
       {honbanNoKeisokuWoYomu ? (

@@ -85,24 +85,145 @@ export class Gen {
   }
 }
 
+// ⑯【2026-09-06】★★★保険料の控除（★7区分）。★`engine.py` の 119〜200行 と同じ形です。
+//
+// ★★**どの出どころの、どの形に、そろえたか**（★戦術Cowork `senjutsu_20260906l.md` 3番の決め）
+//   ・所得税の4つ（`HOKEN_SHOTOKU_*`）…… ★**国税庁の「表の形」（No.1140・No.1145）を、
+//       ★条文の書き方（`足す数 ＋（x − 前の境目）÷ 割る数`）に、こちらで書き直したもの**です。
+//       ★★**所得税法76条の条文そのものは、まだ誰も読んでいません**（★戦術Cowork も未読）。
+//   ・住民税の3つ（`HOKEN_JUMIN_*`）…… ★**地方税法34条1項5号・5号の三の条文が、もともとこの形**です。
+//   ★★★**この2つを混ぜたのが、2026-09-06 の誤りの入口**でした（★`kaihatsu_20260906h.md` 1番）。
+//
+// ★★★**なぜ JavaScript の割り算（float）でよいか**（★2026-09-06・戦術Cowork `senjutsu_20260906o.md`）
+//   ★§「金額の計算に float を使わない」は、TypeScript ではそのまま守れません（★JS の数はすべて浮動小数）。
+//   ★★**割り算に入る値は、どの段でも 50,000 以下です**。
+//     ・段の上の境目より上では**定額**に落ちて、割り算に入りません。
+//     ・いちばん大きいのは 所得税・旧の3段目 `37,500 ＋（x − 50,000）÷ 4` で x ≤ 100,000
+//       ── ★引いたあとは **50,000 以下**。★地震（住民税）の `Z ÷ 2` も **Z ≤ 50,000**。
+//   ★★JavaScript は **2の53乗**（9,007,199,254,740,992）まで整数を正確に持ちます。
+//   ★★★ですので `Math.ceil` は **1円も狂いません**（★下の当てで 2,100,007個 を突き合わせています）。
+
+/** ★段の表 …… [境目, 足す数, 割る数]。★最後の段は 境目 `null`（★定額） */
+export type HokenHyou = readonly (readonly [number | null, number, number])[];
+
+/** ★所得税・新契約（国税庁 No.1140）。★上限 40,000 */
+export const HOKEN_SHOTOKU_SHIN: HokenHyou =
+  [[20_000, 0, 1], [40_000, 20_000, 2], [80_000, 30_000, 4], [null, 40_000, 0]];
+/** ★所得税・旧契約（同）。★上限 50,000 */
+export const HOKEN_SHOTOKU_KYU: HokenHyou =
+  [[25_000, 0, 1], [50_000, 25_000, 2], [100_000, 37_500, 4], [null, 50_000, 0]];
+/** ★住民税・新契約（地方税法34条1項5号イ(1)）。★上限 28,000 */
+export const HOKEN_JUMIN_SHIN: HokenHyou =
+  [[12_000, 0, 1], [32_000, 12_000, 2], [56_000, 22_000, 4], [null, 28_000, 0]];
+/** ★住民税・旧契約（同 イ(2)）。★上限 35,000 */
+export const HOKEN_JUMIN_KYU: HokenHyou =
+  [[15_000, 0, 1], [40_000, 15_000, 2], [70_000, 27_500, 4], [null, 35_000, 0]];
+/** ★所得税・旧長期損害保険料（国税庁 No.1145）。★上限 15,000 */
+export const HOKEN_SHOTOKU_KYUCHOUKI: HokenHyou =
+  [[10_000, 0, 1], [20_000, 10_000, 2], [null, 15_000, 0]];
+/**
+ * ★★住民税・旧長期損害保険料。★上限 10,000
+ * ★★★**この3段だけは、条文では確かめていません**（★中央区のページまで・`senjutsu_20260906j.md` 8番）
+ */
+export const HOKEN_JUMIN_KYUCHOUKI: HokenHyou =
+  [[5_000, 0, 1], [15_000, 5_000, 2], [null, 10_000, 0]];
+/** ★住民税・地震保険料（地方税法34条1項5号の三）。★支払額 ÷ 2・上限 25,000 */
+export const HOKEN_JUMIN_JISHIN: HokenHyou =
+  [[50_000, 0, 2], [null, 25_000, 0]];
+
+/**
+ * ★★★⑯-6（地震保険料の控除額）の上限 ── **50,000円**
+ *
+ * ★★【なぜ要るか・2026-09-06・戦術Cowork `senjutsu_20260906q.md` 止め(B)】
+ *   ★★**⑯-6 だけが「控除額」**です（★ほかの6つは「支払額」）。★`hokenKojoShotoku()` は
+ *     `Math.min(120_000, 生命) + this.jishin_kojo` と、★**そのまま足しています**。
+ *   ★★★ですので**上限が無ければ、1桁多く写した額がそのまま通ります**。
+ *     ★戦術Coworkが測った数 …… ⑯-6 を `500,000` に置き換えると
+ *     ★**手取りが動いた方 326 / 400人（81.5%）・まん中 136,815円・いちばん大きい方 732,974円**。
+ *   ★★**出どころ** …… 国税庁 タックスアンサー **No.1145**（地震保険料控除）。
+ *     ★地震保険料分（最高50,000円）と旧長期損害保険料分（最高15,000円）の合計で
+ *     ★★**最高 50,000円**。★ですので源泉徴収票の「地震保険料の控除額」欄は 50,000円を超えません。
+ *
+ * ★★★**実装側（`paidRules.ts`）に `50_000` を書きません。★ここから呼びます**
+ *   （★§「画面に出す数字と分岐は、計算エンジン（Python）側に置く」）。
+ * ★★`engine.py` の `JISHIN_KOJO_JOGEN` と**同じ数**です。
+ */
+export const JISHIN_KOJO_JOGEN = 50_000;
+
+/**
+ * ★1区分の控除額。★段の式で出して、★**その場で切り上げます**
+ * ★`tasu ＋（x − saki）÷ waru` を、★**通分して1回だけ割ります**（★`engine.py` の `hoken_dan` と同じ形）
+ */
+export function hokenDan(x: number, hyou: HokenHyou): number {
+  let saki = 0;
+  for (const [owari, tasu, waru] of hyou) {
+    if (owari === null) return tasu;
+    if (x <= owari) return Math.ceil((tasu * waru + (x - saki)) / waru);
+    saki = owari;
+  }
+  throw new Error(`★段の表に定額の段（境目 null）がありません： ${JSON.stringify(hyou)}`);
+}
+
+/**
+ * ★★「新のみ／旧のみ／新旧の合計（上限 `ueGoukei`）」の3通りのうち、いちばん大きい額
+ * ★★所得税も住民税も、★**この1本**です（★違うのは表と `ueGoukei` だけ）。
+ */
+export function hoken3toori(
+  shin: number, kyu: number, hyouShin: HokenHyou, hyouKyu: HokenHyou, ueGoukei: number,
+): number {
+  const a = hokenDan(shin, hyouShin);
+  const b = hokenDan(kyu, hyouKyu);
+  return Math.max(a, b, Math.min(ueGoukei, a + b));
+}
+
 export interface JinbutsuInit {
   seinen: number; umare?: Umare; gens?: Gen[];
   koteki_nenkin?: number; koteki_kaishi_age?: number;
   shunyu_by_age?: Record<number, number>; ideco_gen?: string;
-  shakai_hoken?: number; fuyou_nin?: number; seimei_hoken?: number; kyuchi?: number;
+  shakai_hoken?: number; fuyou_nin?: number; kyuchi?: number;
   shishutsu?: Record<number, number>; kosei_nenkin?: number;
   haigusha_seinen?: number | null; ko_nin?: number; kosei_20nen?: boolean;
   sumi?: [Gen, number][]; jinteki?: Z.Jinteki;
+  haigusha_teishi?: boolean;
+  // ⑯【2026-09-06】★★2欄 → 7欄（★受け口ア・`senjutsu_20260906k.md`）。
+  //   ★★⑯-6（`jishin_kojo`）だけが**控除額**、ほかの6つは**支払額**です
+  hoken_shin_ippan?: number; hoken_kyu_ippan?: number; hoken_kaigo?: number;
+  hoken_shin_nenkin?: number; hoken_kyu_nenkin?: number;
+  jishin_kojo?: number; kyu_chouki?: number;
 }
 
 export class Jinbutsu {
   seinen: number; umare: Umare = null; gens: Gen[] = [];
   koteki_nenkin = 0; koteki_kaishi_age = 65;
   shunyu_by_age: Record<number, number> = {}; ideco_gen = 'iDeCo等';
-  shakai_hoken = 0; fuyou_nin = 0; seimei_hoken = 0; kyuchi = 1;
+  shakai_hoken = 0; fuyou_nin = 0; kyuchi = 1;
   shishutsu: Record<number, number> = {}; kosei_nenkin = 0;
   haigusha_seinen: number | null = null; ko_nin = 0; kosei_20nen = false;
   sumi: [Gen, number][] = []; jinteki: Z.Jinteki = new Z.Jinteki();
+  /**
+   * ⑯【2026-09-06】★★★**2欄（`seimei_hoken`・`jishin_hoken`）を 7欄に分けました**
+   *   （★戦術Cowork `senjutsu_20260906k.md` ── ★受け口は ア）。
+   *
+   * ★★**⑯-1〜⑯-5 と ⑯-7 は「支払額」**、★★**⑯-6（`jishin_kojo`）だけが「控除額」**です。
+   *   ★名前で見分けます（★`_kojo` が付いているのは `jishin_kojo` だけ）。
+   * ★★**前の姿の何が悪かったか** …… ★`seimei_hoken` は名前が「保険料」なのに**控除額**でした。
+   *   ★そこが 2026-09-06 の病の入口です（★判断ログ754番）。
+   */
+  hoken_shin_ippan = 0;   // ⑯-1 新生命保険料の金額（★支払額）
+  hoken_kyu_ippan = 0;    // ⑯-2 旧生命保険料の金額（★支払額）
+  hoken_kaigo = 0;        // ⑯-3 介護医療保険料の金額（★支払額・★新契約だけ）
+  hoken_shin_nenkin = 0;  // ⑯-4 新個人年金保険料の金額（★支払額）
+  hoken_kyu_nenkin = 0;   // ⑯-5 旧個人年金保険料の金額（★支払額）
+  jishin_kojo = 0;        // ⑯-6 地震保険料の**控除額**（★地震＋旧長期・上限5万が効いた後）
+  kyu_chouki = 0;         // ⑯-7 旧長期損害保険料の金額（★支払額）
+  /**
+   * ㉘【回1・1-1・2026-09-04・森嶋さんの決め7】配偶者側の支給停止（厚年法46条）。
+   *   あなたが65歳になる時点で、配偶者が20年以上の老齢厚生年金等の**受給権**を持つとき、
+   *   加給年金は支給停止（受け取っていなくても、権利があれば止まります）。
+   *   ★受給権は消えませんので、真なら**加給年金の期間ぜんぶ**止めます。
+   *   ★「わからない」は止めません（画面の側で決めます。ここは真偽だけを受け取ります）。
+   */
+  haigusha_teishi = false;
   constructor(init: JinbutsuInit) {
     this.seinen = init.seinen;
     Object.assign(this, init);
@@ -133,12 +254,92 @@ export class Jinbutsu {
   }
 
   kojoShotokuzei(goukei = 0): number {
-    return this.shakai_hoken + 380_000 * this.fuyou_nin + this.seimei_hoken
+    return this.shakai_hoken + 380_000 * this.fuyou_nin
+      + this.hokenKojoShotoku()                       // ⑯【2026-09-06】★7欄
       + this.jinteki.shotokuzei(goukei);
   }
   kojoJumin(goukei = 0): number {
     return this.shakai_hoken + 330_000 * this.fuyou_nin
-      + Math.min(70_000, this.seimei_hoken) + this.jinteki.jumin(goukei);
+      + this.hokenKojoJumin()                         // ⑯【2026-09-06】★7欄
+      + this.jinteki.jumin(goukei);
+  }
+
+  /**
+   * ⑯ 所得税の控除額（★生命 上限120,000 ＋ 地震側〔⑯-6 をそのまま〕）
+   *
+   * ★出どころ …… 国税庁 **No.1140**（生命保険料控除）・**No.1145**（地震保険料控除）
+   * ★★**⑯-7（旧長期）は、ここでは読みません** ── ★⑯-6 の中に旧長期の控除額が**既に入っている**ためです
+   *   （★2026-09-06 に測りました …… ★⑯-7 を1円足しても所得税の控除が動いた記録 **0件 ／ 母数 151件**）。
+   */
+  /**
+   * ★★★⑯-6 が上限（50,000円）を超えていないか ── **超えていれば投げます**
+   *
+   * ★★【なぜ 0 に丸めず、投げるか・2026-09-06・戦術Cowork `senjutsu_20260906q.md` 止め(B)】
+   *   ★制度では 50,000円を超える「地震保険料の控除額」は源泉徴収票に載りません。
+   *   ★★ですので、これは**利用者の写し違い**です。★入口（`paidRules.ts`）で 400 で止めます。
+   *   ★★★**ここへ届いた時点で、その入口の検査が抜けたということ**です（★`Z < 0` と同じ形）。
+   */
+  private jishinKojoTashikame(): void {
+    if (this.jishin_kojo > JISHIN_KOJO_JOGEN) {
+      throw new Error(
+        `★⑯-6（地震保険料の控除額 ${this.jishin_kojo.toLocaleString()}円）が、`
+        + `★上限 ${JISHIN_KOJO_JOGEN.toLocaleString()}円 を超えています。`
+        + '★制度では起こりません（国税庁 No.1145 ── 地震保険料分と旧長期損害保険料分の合計で最高50,000円）。'
+        + '★入口の検査（paidRules.ts）が抜けています');
+    }
+  }
+
+  hokenKojoShotoku(): number {
+    this.jishinKojoTashikame();
+    const ippan = hoken3toori(this.hoken_shin_ippan, this.hoken_kyu_ippan,
+      HOKEN_SHOTOKU_SHIN, HOKEN_SHOTOKU_KYU, 40_000);
+    const kaigo = hokenDan(this.hoken_kaigo, HOKEN_SHOTOKU_SHIN);   // ★介護医療は新契約だけ
+    const nenkin = hoken3toori(this.hoken_shin_nenkin, this.hoken_kyu_nenkin,
+      HOKEN_SHOTOKU_SHIN, HOKEN_SHOTOKU_KYU, 40_000);
+    return Math.min(120_000, ippan + kaigo + nenkin) + this.jishin_kojo;
+  }
+
+  /**
+   * ⑯ 住民税の控除額（★生命 上限70,000 ＋ 地震側 上限25,000）
+   *
+   * ★出どころ …… 地方税法 **34条1項5号**（生命保険料控除）・**34条1項5号の三**（地震保険料控除）。
+   * ★★★**旧長期損害保険料の住民税の式（`HOKEN_JUMIN_KYUCHOUKI`）だけは、条文では確かめていません**。
+   *
+   * ★★**地震側の逆算**（★総当たり736,340通りで一意を確認済み）
+   *   ・⑯-6（A）は「地震の控除額 ＋ 旧長期の控除額」で、上限50,000が効いた後の額
+   *   ・A < 50,000 …… 地震保険料の支払額 Z ＝ A − g(⑯-7)　★一意に決まります
+   *   ・A ≥ 50,000 …… Z は決まりませんが、★**住民税の合計は必ず 25,000 で頭打ち**になります
+   */
+  hokenKojoJumin(): number {
+    this.jishinKojoTashikame();
+    const ippan = hoken3toori(this.hoken_shin_ippan, this.hoken_kyu_ippan,
+      HOKEN_JUMIN_SHIN, HOKEN_JUMIN_KYU, 28_000);
+    const kaigo = hokenDan(this.hoken_kaigo, HOKEN_JUMIN_SHIN);
+    const nenkin = hoken3toori(this.hoken_shin_nenkin, this.hoken_kyu_nenkin,
+      HOKEN_JUMIN_SHIN, HOKEN_JUMIN_KYU, 28_000);
+    const seimei = Math.min(70_000, ippan + kaigo + nenkin);
+    const h = hokenDan(this.kyu_chouki, HOKEN_JUMIN_KYUCHOUKI);     // 旧長期（住民税）
+    let jishin: number;
+    if (this.jishin_kojo >= 50_000) {
+      jishin = 25_000;                                              // ★頭打ち
+    } else {
+      const g = hokenDan(this.kyu_chouki, HOKEN_SHOTOKU_KYUCHOUKI); // 旧長期（所得税）
+      const z = this.jishin_kojo - g;                               // ★地震保険料の支払額
+      if (z < 0) {
+        // ★★★**0 に丸めません**（★戦術Cowork `senjutsu_20260906l.md` 3番・8番）。
+        //   ★Z が負になるのは制度では起こりません（★旧長期の控除額は地震保険料の控除額に含まれます）。
+        //   ★★ですので、これは**利用者の写し違い**です。★入口（`paidRules.ts`）で 400 で止めます。
+        //   ★★★**ここへ届いた時点で、その入口の検査が抜けたということ**です。
+        throw new Error(
+          `★⑯-7（旧長期損害保険料 ${this.kyu_chouki.toLocaleString()}円）から出した`
+          + `所得税の控除額 ${g.toLocaleString()}円 が、`
+          + `★⑯-6（地震保険料の控除額 ${this.jishin_kojo.toLocaleString()}円）を超えています。`
+          + '★制度では起こりません（旧長期の控除額は地震保険料の控除額に含まれます）。'
+          + '★入口の検査（paidRules.ts）が抜けています');
+      }
+      jishin = Math.min(25_000, hokenDan(z, HOKEN_JUMIN_JISHIN) + h);
+    }
+    return seimei + jishin;
   }
   fuyouKei(): number { return this.fuyou_nin + this.jinteki.nin(); }
 
@@ -221,7 +422,8 @@ export class Jinbutsu {
      *     「年金支給月額がマイナスになる場合は、老齢厚生年金（**加給年金額を含む**）は全額支給停止」
      */
     let kakyu = 0;
-    if (this.kosei_20nen && !zenTeishi) {
+    // ★★㉘【回1・1-1・2026-09-04・決め7】配偶者側に受給権があるなら、加給年金は出ません（厚年法46条）
+    if (this.kosei_20nen && !zenTeishi && !this.haigusha_teishi) {
       const h = this.haigusha_seinen;
       const haigu = (h !== null && (year - h) < 65) ? h : null;
       kakyu = Z.kakyuNenkin(this.seinen, haigu, this.ko_nin);
@@ -241,7 +443,15 @@ export class Plan {
   uketori_nen: Record<string, number> = {};
   nenkin_gen: string | null = null;
   nenkin_kaishi_nen: number | null = null;
-  nenkin_kikan = 0; nenkin_kaisu = 1; ichiji_wariai = 0;
+  nenkin_kikan = 0;
+  /**
+   * ⑱ 年間の受取回数。★★【回1・1-1・2026-09-04】**この既定に頼らないでください。**
+   *   `build()` は `opts.nenkinKaisu` を**必ず**受け取り、ここに渡します（★渡さないと止まります）。
+   *   ★既定を消せないのは、`Plan` を `Object.assign` で作っているためです。
+   *     ★★呼ぶ側（`kekka.ts`・`free.ts`）は、必ず明示で渡してください。
+   */
+  nenkin_kaisu = 1;
+  ichiji_wariai = 0;
   nenkin_kaishi_age: number | null = null;
   label = '';
   constructor(init: Partial<Plan> = {}) { Object.assign(this, init); }
@@ -918,6 +1128,31 @@ export function evaluate(p: Jinbutsu, plan: Plan, shinkoku = true,
     return { zei: 0, uketori: p.gens.reduce((a, g) => a + g.shunyu, 0), tesuryo: 0,
              tedori: 0, detail: {}, keika: [], saishu_nen: null };
 
+  /**
+   * ★★【止め・2026-09-05・戦術Cowork `senjutsu_20260904r.md` 6番】
+   *   ★下の `zei` は「**その受け取り方をしたから増えた税**」です（`w − wo`）。
+   *     `w`  … その年に退職所得・iDeCo等の年金・掛金が**ある**世界
+   *     `wo` … その年にそれらが**無い**世界（★給与と公的年金は、`w` にも `wo` にも**そのまま入っています**）
+   *   ★★**実際に納める税ではありません。**`wo` が 0 でない年がある方（★1,000人中 **905人**）は、
+   *     納める税はこれより大きいです。
+   *     ★★「給与や公的年金がある方は」とは書けません …… ★給与や公的年金があっても `wo` ＝ 0 の方が
+   *       **95人**います。★向きの字ですので、ここは締めてあります。
+   *       ★95人の内わけ（★見立てではなく**数えました**）…… 画面に出る年に給与または公的年金は
+   *         あるが**非課税の線の下** **94人** ／ 画面に出る年に給与も公的年金も**1円も無い** **1人**。
+   *     ★`harau[y]` も同じで、「その年に増えるぶん」です。
+   *
+   *   ★★ところが画面と Excel の字は、「増えたぶん」だとは書いていません
+   *     `gamen8Bun.ts` 96行 …「あなたの税金」／`excel.ts` 131・140行 …「税金」／
+   *     `excel.ts` 155行 …「その年に納める税金」
+   *   ★誰に効くか …… 答え合わせ 1,000人のうち、★**`wo` が 0 でない年が1年でもある方は 905人**
+   *     （heavy 250人では 233人。`v5/_wo_kazoe.py` で数えました）。★ほぼ全員です。
+   *   ★★字は**戦術Coworkの宿題**です。★字が決まるまで、`gamen8Bun.ts`・`excel.ts` の
+   *     税金の字を**触らないでください**（★⑯・㉘と同じ止めです）。
+   *
+   *   ★`tedori`（＝ `uketori − zei − tesuryo`）は**正しい**です。`uketori` は退職金と iDeCo等の
+   *     総額（絶対の額）ですので、「その受け取り方で手元に残る額」で筋が通っています。
+   *     ★★**計算は正しく、字が追いついていません。**
+   */
   let zei = 0;
   const detail: Record<number, DetailRow> = {};
   const harau: Record<number, number> = {};
@@ -1181,6 +1416,11 @@ export function build(p: Jinbutsu, taishokuGenNames: string[], idecoGenName: str
                       taishokuNen: number, opts: {
                         heikyuWariai?: number[]; nenkinAges?: number[] | null;
                         idecoAgeRange?: [number, number] | null; genzaiNen: number;
+                        /**
+                         * ⑱ 年間の受取回数。★★【回1・1-1・2026-09-04】**必須です**（`?` を付けません）。
+                         *   ★既定を作りません。★呼ぶ側から必ず渡してください（`kekka.ts`・`free.ts`）。
+                         */
+                        nenkinKaisu: number;
                       }): [Plan, EvalResult][] {
   const heikyuWariai = opts.heikyuWariai ?? [];
   const genzaiNen = opts.genzaiNen;
@@ -1204,6 +1444,24 @@ export function build(p: Jinbutsu, taishokuGenNames: string[], idecoGenName: str
       + '（既定値を作らない・2026-08-30）。');
   }
   const nenkinAges = opts.nenkinAges;
+  /**
+   * ⑱【回1・1-1・2026-09-04】★**`nenkinKaisu` も必ず渡してください**（★既定を作りません）。
+   *
+   *   型では必須にしていますが、`kekka.ts` は画面から来た値を組み立てて渡します。
+   *   ★画面の欄が未入力のまま `undefined` や `0` が来ると、**手数料が静かに変わります**
+   *     （★年金で受け取る案は全部・実測で最大 96,800円・`kaihatsu_20260904f.md` 3番）。
+   *   ★ですので、値そのものも見ます。**1以上の整数**でなければ止めます
+   *     （★給付事務手数料 440円／回 × 回数 × 年数 で効きます）。
+   *   ★★**画面に出す選択肢（1・2・3・4・6・12 など）は、ここでは決めません。**戦術Coworkの決めです。
+   *     ここで狭い一覧に縛ると、選択肢が増えた日に本番が静かに止まります。
+   */
+  if (!Number.isInteger(opts.nenkinKaisu) || opts.nenkinKaisu < 1) {
+    throw new Error('build() の nenkinKaisu が 1以上の整数ではありません'
+      + `（渡された値：${opts.nenkinKaisu}）。`
+      + '年金の受取回数は、呼び出し側から必ず渡してください'
+      + '（既定値を作らない・回1 1-1・2026-09-04）。');
+  }
+  const nenkinKaisu = opts.nenkinKaisu;
   const out: [Plan, EvalResult][] = [];
   const ide = p.gens.find(g => g.name === idecoGenName)!;
   // 【E-14】**月で渡す。**kikanNensu() は所得税法の数え方（切り上げ）なので使わない
@@ -1224,13 +1482,14 @@ export function build(p: Jinbutsu, taishokuGenNames: string[], idecoGenName: str
 
       // 全額を一時金で
       let plan = new Plan({ uketori_nen: { ...baseUketori, [idecoGenName]: iNen },
-        label: `${idecoGenName}を${iAge}歳で一時金${fuki}`, nenkin_kaishi_age: nAge });
+        label: `${idecoGenName}を${iAge}歳で一時金${fuki}`, nenkin_kaishi_age: nAge,
+        nenkin_kaisu: nenkinKaisu });   // ⑱【1-1】★一時金だけの案でも、値は素通しで持たせます
       out.push([plan, evaluate(q, plan, true, null, baseCache, taiCache)]);
 
       // 全額を年金で（5〜20年）
       for (let k = 5; k <= 20; k++) {
         plan = new Plan({ uketori_nen: { ...baseUketori }, nenkin_gen: idecoGenName,
-          nenkin_kaishi_nen: iNen, nenkin_kikan: k,
+          nenkin_kaishi_nen: iNen, nenkin_kikan: k, nenkin_kaisu: nenkinKaisu,   // ⑱【1-1】
           label: `${idecoGenName}を${iAge}歳から年金${k}年${fuki}`, nenkin_kaishi_age: nAge });
         out.push([plan, evaluate(q, plan, true, null, baseCache, taiCache)]);
       }
@@ -1239,6 +1498,7 @@ export function build(p: Jinbutsu, taishokuGenNames: string[], idecoGenName: str
       for (const w of heikyuWariai) for (let k = 5; k <= 20; k++) {
         plan = new Plan({ uketori_nen: { ...baseUketori, [idecoGenName]: iNen },
           nenkin_gen: idecoGenName, nenkin_kaishi_nen: iNen, nenkin_kikan: k, ichiji_wariai: w,
+          nenkin_kaisu: nenkinKaisu,   // ⑱【1-1】
           label: `${idecoGenName}を${iAge}歳で${w}%一時金＋残り年金${k}年${fuki}`,
           nenkin_kaishi_age: nAge });
         out.push([plan, evaluate(q, plan, true, null, baseCache, taiCache)]);

@@ -12,11 +12,18 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base_20260831b.html（164,868バイト・印つき。★文の基準は hikiwatashi/tsuginote_gamen_base_20260812.html（155,413・印なし）で、字は同じ・2026-09-02）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（174,179バイト ／ md5 ca118915aff2dd184e7b53e1d8aa0745）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
-export type Gyou9 = { cells: readonly string[]; na: readonly string[] };
+export type Gyou9 = {
+  cells: readonly string[];
+  na: readonly string[];
+  /** ★セルごと・行ごとの名前（`cells` を `\n` で割った順）。**基準HTMLの `class` そのまま**。無い所は null */
+  kazari: readonly (readonly (string | null)[])[];
+  /** ★行そのものの名前（`sum`・`shikiri`）。無ければ入りません */
+  gyoKazari?: string;
+};
 
 export type Block9 =
   | { kind: 'midashi'; lv: 2 | 3; bun: string }
@@ -29,27 +36,35 @@ export type Block9 =
 export const GAMEN9: readonly Block9[] = [
   { kind: 'midashi', lv: 2, bun: "退職金受け取りパターン一覧" },
   { kind: 'hako', bun: "並び順", na: [] },
-  { kind: 'hako', bun: "手取りが多い順税金が少ない順早く受け取り終える順最初の年に多く受け取る順", na: [] },
+  { kind: 'hako', bun: "手取りが多い順増える税金が少ない順早く受け取り終える順最初の年に多く受け取る順", na: [] },
   { kind: 'hako', bun: "絞り込み", na: [] },
   { kind: 'hon', bun: "✓保険料・医療費が上がらない受け取り方だけ", na: [] },
   { kind: 'hon', bun: "{nenkin_gen}を{ideco_jogen_age}歳までに受け取り終える", na: ["nenkin_gen","ideco_jogen_age"] },
   { kind: 'hyo', gyou: [
     { cells: ["あなたの受け取り方","手取り","差"],
-      na: [] },
-    { cells: ["{an_label}{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"] },
-    { cells: ["{an_label}{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"] },
-    { cells: ["{an_label}{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"] },
-    { cells: ["{an_label}{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"] },
-    { cells: ["{an_label}{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"] },
-    { cells: ["{an_label}{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"] },
-    { cells: ["{an_label}{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"] },
+      na: [],
+      kazari: [[null],[null],[null]] },
+    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
+      na: ["an_label","hoken_bun","tedori","sa"],
+      kazari: [[null,"same"],[null],[null]] },
+    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
+      na: ["an_label","hoken_bun","tedori","sa"],
+      kazari: [[null,"up"],[null],[null]] },
+    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
+      na: ["an_label","hoken_bun","tedori","sa"],
+      kazari: [[null,"up"],[null],[null]] },
+    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
+      na: ["an_label","hoken_bun","tedori","sa"],
+      kazari: [[null,"same"],[null],[null]] },
+    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
+      na: ["an_label","hoken_bun","tedori","sa"],
+      kazari: [[null,"up"],[null],[null]] },
+    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
+      na: ["an_label","hoken_bun","tedori","sa"],
+      kazari: [[null,"up"],[null],[null]] },
+    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
+      na: ["an_label","hoken_bun","tedori","sa"],
+      kazari: [[null,"up"],[null],[null]] },
   ] },
   { kind: 'hon', bun: "この一覧は、選んだ並び順の上位を並べています。すべての受け取り方は、下のファイルでご覧いただけます。", na: [] },
   { kind: 'hako', bun: "・この表の手取りには、公的医療保険料・介護保険料は含めていません\n・あなたの退職金を一時金で受け取ることは、保険料には影響しません", na: [] },

@@ -94,6 +94,17 @@ export function keisan(v: PaidInput, genzaiNen: number, now: Date): Keisan {
     heikyuWariai: [...HEIKYU_WARIAI],
     nenkinAges,
     genzaiNen,
+    /**
+     * ⑱【回1・1-1・2026-09-04】★★**ここが抜けていました。**
+     *
+     *   `PaidInput.nenkinKaisu`（画面7の⑱）は `toJinbutsu()` が `Kumitate.nenkinKaisu` に
+     *   入れていましたが、**`build()` に渡していませんでした。**その結果、`Plan.nenkin_kaisu` は
+     *   ずっと既定の 1 のままで、**利用者が「年6回」と選んでも手数料が変わりませんでした**
+     *   （★給付事務手数料 440円／回。★実測で 41,216案のうち 40,960案が動き、
+     *     手数料は最大 +96,800円・手取りは最大 −161,196円・`kaihatsu_20260904f.md` 3番）。
+     *   ★`build()` 側で 1以上の整数でなければ止まります（既定値を作らない）。
+     */
+    nenkinKaisu: kumitate.nenkinKaisu,
   });
   const msBuild = Date.now() - t0;
 

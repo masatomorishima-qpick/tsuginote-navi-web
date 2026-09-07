@@ -34,6 +34,9 @@ import { FIELDS, type FreeInput } from '@/components/retirement/pro/types';
 import { PAID_FIELDS } from '@/components/retirement/pro/paidFields';
 import type { PaidInput, Kikan, Sumi, Nengetsu, Kyuchi } from './paidInput';
 import { kurisageJogenAge } from './zeisei';
+// ⑯【2026-09-06】★入口の検査で、旧長期（所得税）の段の式を使います。
+//   ★★**式をここに書き写しません**（★`engine.ts` の1本を呼びます・§「実装側に式を持たせない」）
+import { hokenDan, HOKEN_SHOTOKU_KYUCHOUKI, JISHIN_KOJO_JOGEN } from './engine';
 
 // ---------------------------------------------------------------- 欄の種類
 export type RanShurui = 'man' | 'en' | 'kazu' | 'erabu' | 'hai';
@@ -84,6 +87,21 @@ export const JI = {
   taishokuMae: '⑤の年齢では、あなたが退職金を受け取る年が今年より前になります。⑤か⑥をご確認ください。',
   taishokuSaki: '⑤の年齢では、あなたが退職金を受け取る年が今から15年より先になります。この計算は、15年先までの方を対象にしています。',
   kurisageJogen: '⑳は、{上限}歳までお選びいただけます。生まれた日で上限が変わります。',
+  /**
+   * ⑯【2026-09-06】★入口の検査（★戦術Cowork `senjutsu_20260906l.md` 8番の字の案を、そのまま使いました）
+   *   ★★**400 で返します**（★422 は「入力が正しいのに計算が止まった」ときだけ・判断ログ383番）
+   */
+  //   ★★【2026-09-06・戦術Cowork `senjutsu_20260906q.md` 6番】★字を差し替えました（★戦術Coworkの直し）
+  //     ★前 …… 「⑯-7 の額から計算した控除額が、⑯-6 の額を超えています。……」
+  //     ★理由3つ ── ①その方はいま源泉徴収票を見ているので、**紙の欄の名前**で言う
+  //       ②§5「主語に**あなたの**を入れる」が入っていなかった ③見直す所が2つのうちどちらかで決まる
+  hoken16Chouki: 'あなたの⑯-7（旧長期損害保険料の金額）から計算した控除額が、⑯-6（地震保険料の控除額）を超えています。源泉徴収票の2つの欄を、もう一度ご確認ください。',
+  /**
+   * ⑯-6【2026-09-06】★上限の検査（★戦術Cowork `senjutsu_20260906q.md` 止め(B) の字の案を、そのまま使いました）
+   *   ★★**⑯-6 だけが「控除額」**です。★上限が無ければ、1桁多く写した額がそのまま通ります
+   *     （★戦術Coworkが測った数 …… 326 / 400人・まん中 136,815円・いちばん大きい方 732,974円）。
+   */
+  hoken16Jishin: 'あなたの⑯-6（地震保険料の控除額）が、50,000円を超えています。源泉徴収票の「地震保険料の控除額」欄は50,000円を超えませんので、もう一度ご確認ください。',
   owari8: '⑧の「何歳まで」は、⑤の翌年以降の年齢をご入力ください。',
   /** 複数件のボタン（ae.md 2-3・戦術の字） */
   tsuika: 'もう1件追加する',
@@ -262,7 +280,15 @@ export function paidKou(genzaiNen: number): readonly Kou[] {
     ] },
     { no: '⑭', katachi: 'tan', ran: nin('⑭') },
     { no: '⑮', katachi: 'tan', ran: { kagi: '⑮', shurui: 'en', kara: 'nashi', min: 0, max: EN_MAX, tani: TANI.en } },
-    { no: '⑯', katachi: 'tan', ran: { kagi: '⑯', shurui: 'en', kara: 'nashi', min: 0, max: EN_MAX, tani: TANI.en } },
+    // ⑯【2026-09-06】★★1つの欄 → **7つ**（★戦術Cowork `senjutsu_20260906i.md` 2番の字のまま）。
+    //   ★★⑯-6 だけが**控除額**、ほかの6つは**支払額**です
+    { no: '⑯-1', katachi: 'tan', ran: { kagi: '⑯-1', shurui: 'en', kara: 'nashi', min: 0, max: EN_MAX, tani: TANI.en } },
+    { no: '⑯-2', katachi: 'tan', ran: { kagi: '⑯-2', shurui: 'en', kara: 'nashi', min: 0, max: EN_MAX, tani: TANI.en } },
+    { no: '⑯-3', katachi: 'tan', ran: { kagi: '⑯-3', shurui: 'en', kara: 'nashi', min: 0, max: EN_MAX, tani: TANI.en } },
+    { no: '⑯-4', katachi: 'tan', ran: { kagi: '⑯-4', shurui: 'en', kara: 'nashi', min: 0, max: EN_MAX, tani: TANI.en } },
+    { no: '⑯-5', katachi: 'tan', ran: { kagi: '⑯-5', shurui: 'en', kara: 'nashi', min: 0, max: EN_MAX, tani: TANI.en } },
+    { no: '⑯-6', katachi: 'tan', ran: { kagi: '⑯-6', shurui: 'en', kara: 'nashi', min: 0, max: EN_MAX, tani: TANI.en } },
+    { no: '⑯-7', katachi: 'tan', ran: { kagi: '⑯-7', shurui: 'en', kara: 'nashi', min: 0, max: EN_MAX, tani: TANI.en } },
     { no: '⑱', katachi: 'tan', ran: { kagi: '⑱', shurui: 'erabu', kara: 'hissu', sentaku: KAISU_SENTAKU } },
     { no: '⑳', katachi: 'tan', ran: { kagi: '⑳', shurui: 'erabu', kara: 'hissu', sentaku: KOTEKI_SENTAKU } },
     { no: '㉕', katachi: 'kumi', nai: { kagi: '㉕/nai', ji: JI.haigushaNai, kakusu: ['㉕/shotoku', '㉕/rojin', '㉑/nen'] }, ran: [
@@ -506,7 +532,47 @@ export function rawToPaidInput(raw: Record<string, string>, genzaiNen: number): 
   // ---- ⑭⑮⑯
   const fuyouIppan = kazu('⑭', tan('⑭')) ?? 0;
   const shakaiHoken = kazu('⑮', tan('⑮')) ?? 0;
-  const seimeiHoken = kazu('⑯', tan('⑯')) ?? 0;
+  // ⑯【2026-09-06】★★1つの欄 → **7つ**（★受け口ア・`senjutsu_20260906k.md`）
+  const hokenShinIppan = kazu('⑯-1', tan('⑯-1')) ?? 0;
+  const hokenKyuIppan = kazu('⑯-2', tan('⑯-2')) ?? 0;
+  const hokenKaigo = kazu('⑯-3', tan('⑯-3')) ?? 0;
+  const hokenShinNenkin = kazu('⑯-4', tan('⑯-4')) ?? 0;
+  const hokenKyuNenkin = kazu('⑯-5', tan('⑯-5')) ?? 0;
+  const jishinKojo = kazu('⑯-6', tan('⑯-6')) ?? 0;
+  const kyuChouki = kazu('⑯-7', tan('⑯-7')) ?? 0;
+
+  /**
+   * ⑯【2026-09-06】★★★**入口の検査 ── ⑯-7 から出した所得税の控除額が、⑯-6 を超えていないこと**
+   *   （★戦術Cowork `senjutsu_20260906l.md` 3番・8番・判断ログ783番）
+   *
+   * ★★なぜ止めるか …… ★⑯-6（地震保険料の**控除額**）の中には、
+   *   ★**旧長期損害保険料の控除額が、すでに入っています**（★国税庁 No.1145）。
+   *   ★ですので「⑯-7 から出した控除額 > ⑯-6」は、★★**制度では起こりません**。
+   *   ★★★**利用者が源泉徴収票の2つの欄を写し違えた**ということです。
+   * ★★**ここで止めないと** …… ★`engine.ts` の `hokenKojoJumin()` が `throw` します。
+   *   ★★**画面には数が出ず、利用者には何が悪いのか分かりません**。
+   * ★★★**ですので、入口で止めて、どこを見ればよいかを字で伝えます**。
+   */
+  /**
+   * ⑯-6【2026-09-06】★★★**上限 50,000円**（★戦術Cowork `senjutsu_20260906q.md` 止め(B)）
+   *
+   * ★★**なぜ ⑯-6 だけか** …… ★⑯-6 は**控除額**で、`engine.ts` の `hokenKojoShotoku()` が
+   *   `Math.min(120_000, 生命) + jishin_kojo` と、★**そのまま足します**。
+   *   ★★ほかの6つ（⑯-1〜⑯-5・⑯-7）は**支払額**で、★制度に上限がありません
+   *     （★段の式が控除額を頭打ちにします）。★ですので `EN_MAX` のままで正しいです。
+   * ★★**出どころ** …… 国税庁 No.1145 ── ★地震保険料分（最高50,000円）と
+   *   旧長期損害保険料分（最高15,000円）の合計で **最高 50,000円**。
+   * ★★★**`50_000` をここに書きません**。★`engine.ts` の `JISHIN_KOJO_JOGEN` を呼びます
+   *   （★§「画面に出す数字と分岐は、計算エンジン側に置く」）。
+   * ★★**この検査を先に置きます** …… ★⑯-6 が 500,000 のようなときに
+   *   「⑯-7 から出した控除額 > ⑯-6」は鳴りませんので、★**上限のほうが先に当たります**。
+   */
+  if (jishinKojo > JISHIN_KOJO_JOGEN) dame('⑯-6', '⑯-6', 'koe', JI.hoken16Jishin);
+
+  {
+    const g = hokenDan(kyuChouki, HOKEN_SHOTOKU_KYUCHOUKI);
+    if (g > jishinKojo) dame('⑯-6', '⑯-6', 'koe', JI.hoken16Chouki);
+  }
 
   // ---- ⑱⑳
   const kaisu = erabu('⑱', tan('⑱'));
@@ -568,7 +634,9 @@ export function rawToPaidInput(raw: Record<string, string>, genzaiNen: number): 
       taishokukin, kinzokuNensu, ideco, kanyuNensu, taishokuAge,
       seinen, umare, shunyuTaishokuNen, shunyuYokutoshiIkou, shunyuOwariAge,
       kigyoNenkin, koseiNenkin, kisoNenkin, shishutsu, kinzokuKikan, kanyuKikan, sumi,
-      fuyouIppan, shakaiHoken, seimeiHoken,
+      fuyouIppan, shakaiHoken,
+      // ⑯【2026-09-06】★7つ（★⑯-6 だけが控除額）
+      hokenShinIppan, hokenKyuIppan, hokenKaigo, hokenShinNenkin, hokenKyuNenkin, jishinKojo, kyuChouki,
       nenkinKaisu: Number(kaisu), kotekiKaishiAge,
       haigushaShotoku, haigushaRojin, fuyouTokutei, fuyouRojin, fuyouDokyoRojin,
       shogaiIppan, shogaiTokubetsu, shogaiDokyoTokubetsu, kafu, hitorioya, shogaiTaishoku,

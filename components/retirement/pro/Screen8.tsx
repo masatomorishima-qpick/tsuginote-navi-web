@@ -122,9 +122,13 @@ export default function Screen8({ b, pattern, onSusumu, onDownload, downloadMatt
             </p>
             <table className="mt-3 w-full text-base">
               <tbody>
-                {c.hyo.map(([na, v]) => (
+                {c.hyo.map(([na, v, soe]) => (
                   <tr key={na} className="border-t border-slate-200">
-                    <td className="py-2 text-slate-700">{na}</td>
+                    <td className="py-2 text-slate-700">
+                      {na}
+                      {/* ★添え字（税金の字の型・senjutsu_20260905g.md 1番①）。Screen2 の Row の note と同じ形 */}
+                      {soe ? <span className="mt-0.5 block text-[13px] text-[#5b6470]">{soe}</span> : null}
+                    </td>
                     <td className="py-2 text-right font-bold tabular-nums text-slate-900">{v}</td>
                   </tr>
                 ))}
@@ -133,7 +137,7 @@ export default function Screen8({ b, pattern, onSusumu, onDownload, downloadMatt
           </div>
           {i === 1 && b.sa ? (
             <div className="mt-3 rounded-xl bg-slate-100 p-4 text-center">
-              <p className="text-[15px] text-slate-700">税金の差</p>
+              <p className="text-[15px] text-slate-700">増える税金の差</p>
               <p className="text-[22px] font-bold tabular-nums text-slate-900">{b.sa.zei}</p>
               <p className="mt-1 text-[15px] text-slate-700">
                 手取りの差 {b.sa.tedori}（手数料の差を含みます）

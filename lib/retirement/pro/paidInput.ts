@@ -114,8 +114,23 @@ export type PaidInput = {
   fuyouIppan: number;
   /** ⑮ 社会保険料の年間支払額（円） */
   shakaiHoken: number;
-  /** ⑯ 生命保険料控除・地震保険料控除の額（円）。**所得税の額をそのまま**（取り違え5） */
-  seimeiHoken: number;
+  // ⑯【2026-09-06】★★1つの欄 → **7つ**（★受け口ア・`senjutsu_20260906k.md`）。
+  //   ★★★**⑯-6（`jishinKojo`）だけが「控除額」、ほかの6つは「支払額」**です。
+  //   ★名前で見分けます（★`Kojo` が付いているのは `jishinKojo` だけ）。
+  /** ⑯-1 新生命保険料（円）*/
+  hokenShinIppan: number;
+  /** ⑯-2 旧生命保険料（円）*/
+  hokenKyuIppan: number;
+  /** ⑯-3 介護医療保険料（円）*/
+  hokenKaigo: number;
+  /** ⑯-4 新個人年金保険料（円）*/
+  hokenShinNenkin: number;
+  /** ⑯-5 旧個人年金保険料（円）*/
+  hokenKyuNenkin: number;
+  /** ⑯-6 地震保険料の控除額（円）*/
+  jishinKojo: number;
+  /** ⑯-7 旧長期損害保険料（円）*/
+  kyuChouki: number;
 
   // ---- そのほか --------------------------------------------------------
   /** ⑱ iDeCo等を年金で受け取る場合の、年間の回数 */
@@ -274,7 +289,34 @@ export function toJinbutsu(v: PaidInput): Kumitate {
     shunyu_by_age: shunyuByAge,
     shakai_hoken: Math.trunc(v.shakaiHoken),
     fuyou_nin: Math.trunc(v.fuyouIppan),               // 取り違え2：一般だけ
-    seimei_hoken: Math.trunc(v.seimeiHoken),           // 取り違え5：所得税の額のまま
+    // ⑯【2026-09-06】★★**7つを写すだけ**です（★戦術Cowork `senjutsu_20260906j.md` 12番）。
+    //   ★★★**式はここに置きません** ── ★段の表も3通り最大も上限も、ぜんぶ `engine.ts` の中です
+    //     （★§「画面に出す数字と分岐は計算エンジン側に置く。実装側に式を持たせない」）。
+    //   ★★⑯-6（`jishinKojo`）だけが**控除額**、ほかの6つは**支払額**です。
+    //   ★★★`Z`（＝⑯-6 − 旧長期の控除額）が負になる入れ方は、
+    //     ★**`paidRules.ts` の入口で 400 で止めています**（★ここには届きません）。
+    hoken_shin_ippan: Math.trunc(v.hokenShinIppan),
+    hoken_kyu_ippan: Math.trunc(v.hokenKyuIppan),
+    hoken_kaigo: Math.trunc(v.hokenKaigo),
+    hoken_shin_nenkin: Math.trunc(v.hokenShinNenkin),
+    hoken_kyu_nenkin: Math.trunc(v.hokenKyuNenkin),
+    jishin_kojo: Math.trunc(v.jishinKojo),
+    kyu_chouki: Math.trunc(v.kyuChouki),
+    /**
+     * ㉘【回1・1-1・2026-09-04・決め7】★**いまは false を明示で渡します**（★既定に頼りません）。
+     *   ★★**画面7に㉘の欄は、まだありません。**ですので false のままにします。
+     *
+     * ★★【止め・2026-09-04・戦術Cowork `senjutsu_20260904q.md` 8番】
+     *   ★**㉘の欄は、いま作らないでください。**★字と出し分けが先です（★戦術Coworkの宿題）。
+     *   ★理由（★数で）…… 答え合わせ 1,000人のうち㉘がある方は 84人。★そのうち **28人**は、
+     *     配偶者がすでに65歳以上などで**もともと加給年金が乗っていません**
+     *     （★公的年金が実際に動くのは **56 / 84**）。
+     *     ★★その28人に㉘の欄を出すと、★**答えが1円も変わらない質問を1つ増やす**ことになります。
+     *   ★仕様（★戦術Coworkの手番）…… ㉘の欄は、**加給年金が乗る方にだけ**出す。
+     *     出す条件（案）…… 厚生年金20年以上（㉒）かつ、あなたが65歳になる時点で配偶者が65歳未満。
+     *   ★★**字と出し分けが決まるまで、この行は false のまま**にしてください。
+     */
+    haigusha_teishi: false,
     kyuchi: kyuchiToEngine(v.kyuchi),                  // E-24：既定値に頼らず明示で渡す
     shishutsu: v.shishutsu,
     haigusha_seinen: v.haigushaSeinen,

@@ -63,10 +63,32 @@ function Hitotsu({ b }: { b: BlockKyotsu }) {
     <table>
       <tbody>
         {b.gyou.map((g, i) => (
-          <tr key={i}>
+          // ★行そのものの名前（`sum`・`shikiri`）。★基準HTMLの `class` そのままです
+          <tr key={i} className={g.gyoKazari}>
             {g.cells.map((c, j) => (
               // 2つめ以降のセルは数字なので右寄せ（基準HTMLの `class="n"` と同じ）
-              <td key={j} className={j === 0 ? undefined : 'n'}>{c}</td>
+              <td key={j} className={j === 0 ? undefined : 'n'}>
+                {/**
+                  * ★★【イ・2026-09-05・戦術Cowork `senjutsu_20260905r.md` 2〜3番・森嶋さんの承認】
+                  *   ★セルの中の改行を、★**行に分けて出します**（★`hako` と同じ形です）。
+                  *   ★★測った数（Chromium に描かせて数えました）
+                  *     基準HTML（もと）…… **2行**・セルの高さ 68px
+                  *     直す前の画面 ……… **1行**・49px（★`<td>` の中の改行は、空白1つになります）
+                  *     この直しのあと … **2行**・71px
+                  *   ★★基準HTMLが2行でしたので、★**画面を基準に合わせます**（★もとが正です・判断ログ 644番）。
+                  *   ★残る 3px は、`<div class="same">` の**名前が落ちている**ぶんです（★別の段・便の6番）。
+                  */}
+                {/**
+                  * ★★【2026-09-05・戦術Cowork `senjutsu_20260905u.md` 6番・森嶋さんの承認】
+                  *   ★行ごとの名前（`kazari`）を、★**基準HTMLの `class` のまま**付けます。
+                  *   ★1行目に名前があるときは `<span>`、2行目からは `<div>`（★行が変わります）。
+                  */}
+                {c.split('\n').map((l, k) => {
+                  const na = g.kazari?.[j]?.[k] ?? undefined;
+                  if (k === 0) return na ? <span key={k} className={na}>{l}</span> : l;
+                  return <div key={k} className={na}>{l}</div>;
+                })}
+              </td>
             ))}
           </tr>
         ))}

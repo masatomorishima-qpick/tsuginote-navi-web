@@ -34,6 +34,11 @@ import { paidKou, ranWoHiku, type Kou } from './paidRules';
  */
 export const JI_S3_KOZA =
   'iDeCo等の拠出が終わったあと、受け取り始めるまでの年は、口座管理手数料だけがかかります。';
+/**
+ * ★シート3の先頭の添え字（森嶋さんの決め「ア」・senjutsu_20260905g.md 1番②）。★こちらで書き直さないこと
+ */
+export const JI_S3_SOEJI =
+  'あなたの給与と公的年金はそのままにして、退職金とiDeCo等をこの受け取り方にしたときに、その年に増える税金です。給与や公的年金にかかる税は、この額に入っていません';
 
 /**
  * ★シート3が出す年の範囲（senjutsu_20260903c.md 5番・d.md 1番）。
@@ -150,9 +155,11 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
   const anRows = an.filter((x) => { if (seen.has(x)) return false; seen.add(x); return true; })
     .map((x) => ({ x, i: D.indexOf(x), ...nenNoHani(R[D.indexOf(x)][1]) }));
 
+  // ★添え字（税金の字の型・senjutsu_20260905g.md 1番②）。★シート3の先頭の行に1つ
+  s3.addRow([JI_S3_SOEJI]).commit();
   // ★注記は、拠出が終わってから受け取り始めるまでの年がある案が1つでもあるときだけ（senjutsu_20260903c.md 1番の字）
   if (anRows.some((a) => a.first < a.uketoriFirst)) s3.addRow([JI_S3_KOZA]).commit();
-  s3.addRow(['番号', '年', '年齢', 'その年に手元に入る額', 'その年に納める税金', 'その年の手数料']).commit();
+  s3.addRow(['番号', '年', '年齢', 'その年に手元に入る額', 'その年に増える税金', 'その年の手数料']).commit();
   anRows.forEach((a, n) => {
     if (n > 0) s3.addRow([]).commit();          // ★案と案の間に空の行を1つ（どこまでが1つの案か分かるように）
     const r = R[a.i][1];

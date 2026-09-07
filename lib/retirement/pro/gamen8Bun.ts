@@ -17,6 +17,12 @@
 import * as Z from './zeisei';
 import type { Gamen8, Houkou } from './gamen8';
 
+/**
+ * ★画面8の見出し「この受け取り方で増える税金」の添え字（森嶋さんの決め「ア」・senjutsu_20260905g.md 1番①）。
+ * ★字は基準HTML（tsuginote_gamen_base_20260905.html）と同じ。★こちらで書き直さないこと
+ */
+export const JI_SOEJI_ZEI = 'あなたの給与と公的年金はそのままにして、退職金とiDeCo等をこの受け取り方にしたときに、増える税金です。給与や公的年金にかかる税は、この額に入っていません';
+
 /** 金額。**表とカードは円**（§7-8） */
 export const y = (n: number): string => `${n.toLocaleString('en-US')}円`;
 
@@ -28,7 +34,7 @@ export type Bun8 = {
   /** 方向の数の文 */
   judge: { hon: string; hosoku: string };
   /** カード（手取りの多い順） */
-  cards: { why: string; how: string; hyo: [string, string][] }[];
+  cards: { why: string; how: string; hyo: [string, string, string?][] }[];
   /** 2枚目のカードの**後**に置く差（オーナー判断・2026-08-13） */
   sa: { zei: string; tedori: string } | null;
   /**
@@ -93,7 +99,7 @@ export function gamen8Bun(
     why: h.mikata.join('　'),
     how: howOf(h.lab),
     hyo: [
-      ['あなたの税金', y(h.zei)],
+      ['この受け取り方で増える税金', y(h.zei), JI_SOEJI_ZEI],
       ['あなたの手取り', y(h.tedori)],
       ['最初の年に入る額', y(h.age0)],
       ['受け取り終わる年齢', `${h.owari}歳`],
@@ -183,12 +189,12 @@ export function gamen8Bun(
       + 'このツールは出した場合で計算しています。',
     fileNakami: [
       ['1　結果のまとめ',
-       'この画面と同じ内容（あなたの受け取り方・税金・手取り・保険料が上がる年齢）'],
+       'この画面と同じ内容（あなたの受け取り方・増える税金・手取り・保険料が上がる年齢）'],
       ['2　受け取り方の一覧',
-       `${g.toorisu.toLocaleString('en-US')}通りすべて。受け取り方／税金／手取り／`
+       `${g.toorisu.toLocaleString('en-US')}通りすべて。受け取り方／増える税金／手取り／`
        + '最初の年に入る額／受け取り終わる年齢／保険料が上がる年齢'],
       ['3　年ごとの内訳',
-       '選んだ受け取り方について、あなたの年齢ごとに手元に入る額と、その年に納める税金'],
+       '選んだ受け取り方について、あなたの年齢ごとに手元に入る額と、その年に増える税金'],
       ['4　計算の内容と根拠',
        'あなたがご入力になった内容、計算の全ステップ、根拠にした条文'],
     ],

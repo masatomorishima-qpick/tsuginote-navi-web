@@ -12,11 +12,18 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base_20260831b.html（164,868バイト・印つき。★文の基準は hikiwatashi/tsuginote_gamen_base_20260812.html（155,413・印なし）で、字は同じ・2026-09-02）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（174,179バイト ／ md5 ca118915aff2dd184e7b53e1d8aa0745）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
-export type Gyou12 = { cells: readonly string[]; na: readonly string[] };
+export type Gyou12 = {
+  cells: readonly string[];
+  na: readonly string[];
+  /** ★セルごと・行ごとの名前（`cells` を `\n` で割った順）。**基準HTMLの `class` そのまま**。無い所は null */
+  kazari: readonly (readonly (string | null)[])[];
+  /** ★行そのものの名前（`sum`・`shikiri`）。無ければ入りません */
+  gyoKazari?: string;
+};
 
 export type Block12 =
   | { kind: 'midashi'; lv: 2 | 3; bun: string }

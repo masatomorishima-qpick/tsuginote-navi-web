@@ -12,11 +12,18 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base_20260831b.html（164,868バイト・印つき。★文の基準は hikiwatashi/tsuginote_gamen_base_20260812.html（155,413・印なし）で、字は同じ・2026-09-02）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（174,179バイト ／ md5 ca118915aff2dd184e7b53e1d8aa0745）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
-export type Gyou11 = { cells: readonly string[]; na: readonly string[] };
+export type Gyou11 = {
+  cells: readonly string[];
+  na: readonly string[];
+  /** ★セルごと・行ごとの名前（`cells` を `\n` で割った順）。**基準HTMLの `class` そのまま**。無い所は null */
+  kazari: readonly (readonly (string | null)[])[];
+  /** ★行そのものの名前（`sum`・`shikiri`）。無ければ入りません */
+  gyoKazari?: string;
+};
 
 export type Block11 =
   | { kind: 'midashi'; lv: 2 | 3; bun: string }
@@ -32,41 +39,56 @@ export const GAMEN11: readonly Block11[] = [
   { kind: 'midashi', lv: 3, bun: "あなたの{tai_gen}（{tai_age}）" },
   { kind: 'hyo', gyou: [
     { cells: ["{kojo_shiki}","{kojo}"],
-      na: ["kojo_shiki","kojo"] },
+      na: ["kojo_shiki","kojo"],
+      kazari: [[null],[null]] },
     { cells: ["あなたの{tai_gen}","{shunyu}"],
-      na: ["tai_gen","shunyu"] },
+      na: ["tai_gen","shunyu"],
+      kazari: [[null],[null]] },
     { cells: ["→ 控除に収まるので、あなたの退職所得","{shotoku}"],
-      na: ["shotoku"] },
+      na: ["shotoku"],
+      kazari: [[null],[null]] },
   ] },
   { kind: 'midashi', lv: 3, bun: "あなたの{nenkin_gen}（{nenkin_kikan_bun}）" },
   { kind: 'hyo', gyou: [
     { cells: ["あなたが1年に受け取る額","{nenkin_shunyu}"],
-      na: ["nenkin_shunyu"] },
+      na: ["nenkin_shunyu"],
+      kazari: [[null],[null]] },
     { cells: ["公的年金等控除（{nenkin_kojo_kubun}）","{nenkin_kojo}"],
-      na: ["nenkin_kojo_kubun","nenkin_kojo"] },
+      na: ["nenkin_kojo_kubun","nenkin_kojo"],
+      kazari: [[null],[null]] },
     { cells: ["あなたの雑所得","{zatsu}"],
-      na: ["zatsu"] },
-    { cells: ["所得税の基礎控除{kiso_shiki}","{kiso_shotoku}"],
-      na: ["kiso_shiki","kiso_shotoku"] },
+      na: ["zatsu"],
+      kazari: [[null],[null]] },
+    { cells: ["所得税の基礎控除\n{kiso_shiki}","{kiso_shotoku}"],
+      na: ["kiso_shiki","kiso_shotoku"],
+      kazari: [[null,"tbls"],[null]] },
     { cells: ["→ あなたの雑所得を上回るので、所得税","{shotokuzei}"],
-      na: ["shotokuzei"] },
+      na: ["shotokuzei"],
+      kazari: [[null],[null]] },
     { cells: ["住民税の非課税限度額（{setai_kubun}）","{hikazei_gendo}"],
-      na: ["setai_kubun","hikazei_gendo"] },
+      na: ["setai_kubun","hikazei_gendo"],
+      kazari: [[null],[null]] },
     { cells: ["→ あなたの合計所得が収まるので、住民税","{jumin}"],
-      na: ["jumin"] },
+      na: ["jumin"],
+      kazari: [[null],[null]] },
     { cells: ["国民健康保険の基礎控除","{kokuho_kiso}"],
-      na: ["kokuho_kiso"] },
+      na: ["kokuho_kiso"],
+      kazari: [[null],[null]] },
     { cells: ["→ あなたの保険料の増加","{hoken_zou}"],
-      na: ["hoken_zou"] },
+      na: ["hoken_zou"],
+      kazari: [[null],[null]] },
   ] },
   { kind: 'midashi', lv: 3, bun: "あなたの手数料" },
   { kind: 'hyo', gyou: [
     { cells: ["給付事務手数料 440円×{kyufu_kaisu}","{kyufu_kei}"],
-      na: ["kyufu_kaisu","kyufu_kei"] },
+      na: ["kyufu_kaisu","kyufu_kei"],
+      kazari: [[null],[null]] },
     { cells: ["口座管理手数料 {koza_tanka}×{koza_tsuki}","{koza_kei}"],
-      na: ["koza_tanka","koza_tsuki","koza_kei"] },
+      na: ["koza_tanka","koza_tsuki","koza_kei"],
+      kazari: [[null],[null]] },
     { cells: ["合計","{tesuryo}"],
-      na: ["tesuryo"] },
+      na: ["tesuryo"],
+      kazari: [[null],[null]] },
   ] },
   { kind: 'kousin', bun: "この画面の根拠にした資料\n国税庁「令和8年4月 源泉所得税の改正のあらまし」注1・注2「所得税法第86条の規定による基礎控除額62万円（改正前：58万円）に、租税特別措置法第41条の16の２の規定による加算額を加算した額となります」「62万円にそれぞれ、42万円、５万円、37万円を加算した金額」" },
 ] as const;

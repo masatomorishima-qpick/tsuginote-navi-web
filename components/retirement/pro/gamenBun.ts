@@ -33,8 +33,22 @@
  *   金額は本物らしく見えるので、**受け取った方には見分けられません。**
  */
 
-/** 表の1行。`cells` は左から順のセル */
-export type GyouKyotsu = { cells: readonly string[]; na: readonly string[] };
+/**
+ * 表の1行。`cells` は左から順のセル
+ *
+ * ★★【2026-09-05・戦術Cowork `senjutsu_20260905u.md` 6番・森嶋さんの承認】
+ *   ★`kazari` …… ★**セルごと・行ごとの名前**（`cells` を `\n` で割った順）。
+ *     ★★**基準HTMLの `class` をそのまま**運びます（`tbls`／`up`／`same`）。★無い所は `null`。
+ *     ★意味の名前に置き換えると**対応表**が要り、★「もと」が2つになります（609・613・617・636番）。
+ *   ★`gyoKazari` …… ★**行そのものの名前**（`sum`／`shikiri`）。★無ければ入りません。
+ *   ★★`cells` は **1文字も変えていません**（★門 `kensa/gyousu_mon.mjs` はそのまま動きます）。
+ */
+export type GyouKyotsu = {
+  cells: readonly string[];
+  na: readonly string[];
+  kazari: readonly (readonly (string | null)[])[];
+  gyoKazari?: string;
+};
 
 /**
  * かたまり。`kensa/gamen_chushutsu.mjs` が作る `BlockN` と**同じ形**です
@@ -212,7 +226,8 @@ export function kumitate(
     };
 
     if (b.kind === 'hyo') {
-      dasu.push({ kind: 'hyo', gyou: b.gyou.map((g) => ({ cells: g.cells.map(ire), na: g.na })) });
+      // ★`kazari`・`gyoKazari` は、**そのまま**運びます（★値を入れるのは `cells` だけです）
+      dasu.push({ kind: 'hyo', gyou: b.gyou.map((g) => ({ cells: g.cells.map(ire), na: g.na, kazari: g.kazari, gyoKazari: g.gyoKazari })) });
     } else if (b.kind === 'ret') {
       dasu.push({ kind: 'ret', koumoku: b.koumoku.map((k) => ({ bun: ire(k.bun), na: k.na })) });
     } else if (b.kind === 'midashi') {

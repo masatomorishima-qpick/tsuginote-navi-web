@@ -7,7 +7,9 @@
  *   鍵を Cookie に移して、**クエリの無い頁へ 302 で送る**だけの口です。
  *
  * ★★なぜ2本に分けるか
- *   `app/layout.tsx` の105行に `<GoogleAnalytics …/>` があり、**サイトの全部の頁**に入ります。
+ *   `app/layout.tsx` に `<GoogleAnalytics …/>` があり、**サイトの全部の頁**に入ります
+ *   （★2026-09-07 から、`VERCEL_ENV === "production"` のときだけ読み込みます ──
+ *     ★行番号を書くのはやめました。★動くたびに古びますので）。
  *   GA4 の自動 `page_view` は `page_location` に**クエリごと**URLを送ります。
  *   → ★`?key=…` のまま頁を出すと、**通行証の鍵が Google に渡ります。**
  *   ★302 の**あと**に GA4 が動くので、`page_location` は `/retirement/pro/kekka`（クエリなし）になります。

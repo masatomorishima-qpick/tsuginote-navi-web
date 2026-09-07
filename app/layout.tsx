@@ -92,6 +92,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // ★計測（GA4・Microsoft Clarity）は、本番の入れ物のときだけ読み込みます。
+  // ★Vercel の画面の設定には頼りません。設定はあとから誰でも変えられますが、
+  //   この条件はコードの中にあるので、門で数えられます。
+  // ★VERCEL_ENV は Vercel が入れる値で、本番は 'production'、Preview は 'preview' です
+  //   （Vercel「System environment variables」── build と runtime の両方で使えます）。
+  // ★この本はサーバ側の本なので、NEXT_PUBLIC_ が付かない環境変数も読めます
+  //   （Next.js 16.2.7 の説明書 01-app/02-guides/environment-variables.md）。
+  const honbanNoKeisokuWoYomu = process.env.VERCEL_ENV === "production";
+
   return (
     <html lang="ja" className={cn("font-sans", geist.variable)}>
       <body className="bg-white font-sans text-slate-900 antialiased">
@@ -100,9 +109,11 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
         {children}
-        <ClarityScript />
+        {honbanNoKeisokuWoYomu ? <ClarityScript /> : null}
       </body>
-      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
+      {honbanNoKeisokuWoYomu ? (
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
+      ) : null}
     </html>
   );
 }

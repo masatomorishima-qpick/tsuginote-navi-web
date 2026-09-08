@@ -98,6 +98,12 @@ export type Kumi = {
   gyouNashiKazu: number;
   /** その行を落とす理由になった名前 */
   gyouNashiNa: string[];
+  /**
+   * ★★★**空になったので出さなかったかたまりの数**（★決め940・2026-09-08）。
+   *   ★行・項目が `gyouNashi` で全部落ちた `hyo` / `ret` です。
+   *   ★★**`ochita` には数えません**（★`data-mada` でも `null` でもない、ふつうの分岐です）。
+   */
+  karaOchi: number;
   /** 入れた印の数（か所） */
   ireta: number;
 };
@@ -160,6 +166,7 @@ export function kumitate(
   let ochitaMada = 0;
   let ochitaNashi = 0;
   let gyouNashiKazu = 0;
+  let karaOchi = 0;
   let ireta = 0;
 
   /** 1つの文の中に、行を落とす名前があるか */
@@ -175,6 +182,23 @@ export function kumitate(
         return true;
       });
       if (nokosu.length !== b.gyou.length) b = { kind: 'hyo', gyou: nokosu };
+      /**
+       * ★★★【2026-09-08・戦術Cowork `senjutsu_20260908f.md` 決め940（道ア）】
+       *   **行が1つも残らなかった表は、出しません。**
+       *
+       *   ★★前は、空のまま `dasu` に入れていました。★`ScreenBlocks` はそれを
+       *     `<table><tbody></tbody></table>` と描きます（★**空の箱**が画面に出ます）。
+       *   ★実測（`golden_light_20260906`・代表案10,000・画面12）……
+       *     ・空の `<table>` が出る案 …… **6案（0.1%）**
+       *     ・空の `<ul>` が出る案 …… ★★**4,417案（44.2%）**
+       *   ★★開発Coworkが**描いて目で見て**見つけました（★読みでは出ませんでした・判断ログ938番）。
+       *
+       *   ★★**`ochita` には数えません。**★これは `gyouNashi` と同じ「ふつうの分岐」で、
+       *     ★`data-mada`（出口が無い）でも `null`（その方に存在しない）でもありません。
+       *     ★★数えると、その方の帯が永久に消えません（★`gyouNashi` と同じ理由）。
+       *   ★★★別に **`karaOchi`** で数えます。
+       */
+      if (b.gyou.length === 0) { karaOchi++; continue; }
     } else if (b.kind === 'ret') {
       const nokosu = b.koumoku.filter((k) => {
         const o = gyouOchiru(k.bun);
@@ -182,6 +206,8 @@ export function kumitate(
         return true;
       });
       if (nokosu.length !== b.koumoku.length) b = { kind: 'ret', koumoku: nokosu };
+      // ★★項目が1つも残らなかった箇条書きは、出しません（★上と同じ・決め940）
+      if (b.koumoku.length === 0) { karaOchi++; continue; }
     } else {
       const o = gyouOchiru(b.bun);
       if (o.length) {
@@ -241,7 +267,7 @@ export function kumitate(
 
   return { dasu, ochita: ochitaMada + ochitaNashi, ochitaMada, ochitaNashi,
            ochitaNa: [...ochitaNa], nashiNa: [...nashiNa],
-           gyouNashiKazu, gyouNashiNa: [...gyouNashiNa], ireta };
+           gyouNashiKazu, gyouNashiNa: [...gyouNashiNa], karaOchi, ireta };
 }
 
 /** 円の表記。**エンジンは数を返し、コンマはここで付けます** */

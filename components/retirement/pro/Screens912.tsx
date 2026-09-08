@@ -61,9 +61,30 @@ export type Moto912 = {
   plan: E.Plan;
   /** 年金で受け取る支給源の名前（「iDeCo等」「小規模企業共済」など）。**入力から** */
   nenkinGen: string;
-  /** 確定申告が要るか。**エンジンの `shinkokuIru()` が出したもの** */
-  shinkoku: E.ShinkokuKekka;
+  /**
+   * ★★★確定申告（所得税法121条3項）。**一時金を受け取る年ごと**・年の小さい順。
+   *
+   * ★エンジンの **`shinkokuIchiran(p, r)`** が出したものを、そのまま運びます
+   *   （★戦術Cowork `senjutsu_20260908d.md` 決め904・`senjutsu_20260908b.md` 決め916・917）。
+   * ★★**ここで `shinkokuIru()` を呼びません**（★§画面に出す数字と分岐は計算エンジン側に置く）。
+   * ★★★**空の並びのことがあります**（★一時金を受け取る年が1つも無い方 …… 実測 6案／10,000案・0.1%）。
+   * ★★**いちばん多くても2つ**です（★実測 …… 全通り 38,157通りで3つ以上は0案・決め925）。
+   */
+  shinkoku: E.ShinkokuGyou[];
 };
+
+/** ★当てはまらない理由の字（★6通り・戦術Cowork `senjutsu_20260908d.md` 4節。**こちらでは書きません**） */
+const RIYU_BUN: Record<E.ShinkokuRiyu, string> = {
+  あ: 'この決まりは、公的年金等を受け取っている年のためのものです。あなたのこの年は、公的年金等の受け取りが0円です',
+  い: 'あなたの公的年金等が、その年に400万円を超えます',
+  う: 'あなたの公的年金等以外の所得が、その年に20万円を超えます',
+  あう: 'この決まりは、公的年金等を受け取っている年のためのものです。あなたのこの年は、公的年金等の受け取りが0円で、公的年金等以外の所得が20万円を超えます',
+  いう: 'あなたの公的年金等が400万円を超え、公的年金等以外の所得も20万円を超えます',
+};
+
+/** ★説明の後半（★年があるとき／無いとき。★戦術Cowork `senjutsu_20260908d.md` 4節） */
+const BUN_ARU = 'あなたが一時金を受け取る年ごとに、この決まりに当てはまるかどうかを見ました。';
+const BUN_NASHI = 'あなたは、退職金やiDeCo等を一時金で受け取る年がありません。ですので、この決まりの判定はしていません。';
 
 /**
  * `data-mada` の無い印に、エンジンの値を入れる。
@@ -74,7 +95,7 @@ export type Moto912 = {
 export function atai912(m: Moto912): Record<string, string | null> {
   const t = m.r.tesuryo_uchiwake;
   if (!t) throw new Error('`evaluate()` が `tesuryo_uchiwake` を返していません。');
-  return {
+  const out: Record<string, string | null> = {
     // 画面10・画面9（表の中は `data-mada` があるので、実際には出ません）
     tedori: en(m.r.tedori),
     /**
@@ -92,8 +113,43 @@ export function atai912(m: Moto912): Record<string, string | null> {
     // 画面12
     nenkin_gen: m.nenkinGen,
     nenkin_kikan: `${m.plan.nenkin_kikan}年`,
-    shinkoku_iru: m.shinkoku.iru ? '必要です' : '不要です',
+    // ★★★確定申告の説明（★年が1つも無い方は、別の字になります）
+    shinkoku_bun: m.shinkoku.length ? BUN_ARU : BUN_NASHI,
   };
+
+  /**
+   * ★★★確定申告の11個のうち、年ごとの10個（`nen`・`age`・`gens`・`ataru`・`riyu` × 2）。
+   *
+   * ★★**無い年の分も、字を入れます。**★`null` にしません。
+   *   ★理由 …… `null` は「その方には存在しない」で、`kumitate()` が**かたまりごと**落とします。
+   *     ★★確定申告の表は**1つのかたまり**ですので、`null` にすると**1年の方の1行目まで消えます**。
+   *   ★★★出すか出さないかは、**`gyouNashi912()` が行ごとに決めます**（★下）。
+   *     ★ここで入れた字は、落とされる行のものですので、**画面には出ません**。
+   */
+  for (const i of [0, 1]) {
+    const g = m.shinkoku[i];
+    const n = i + 1;
+    if (!g) {
+      // ★その年が無いとき …… `gyouNashi912()` が行ごと落とします。★空文字にしません
+      //   （★`kumitate()` は空文字を「入れ忘れ」として止めます）
+      out[`shinkoku_nen${n}`] = '―';
+      out[`shinkoku_age${n}`] = '―';
+      out[`shinkoku_gens${n}`] = '―';
+      out[`shinkoku_ataru${n}`] = '―';
+      out[`shinkoku_riyu${n}`] = '―';
+      continue;
+    }
+    const d = m.r.detail[g.nen];
+    if (!d) throw new Error(`\`detail\` に ${g.nen}年 がありません（\`keika\` と \`detail\` が食い違っています）。`);
+    out[`shinkoku_nen${n}`] = `${g.nen}年`;
+    out[`shinkoku_age${n}`] = `${d.age}歳`;
+    // ★支給源が2つ以上のときは「と」でつなぎます（★戦術Cowork `senjutsu_20260908e.md` お願い(1)）
+    out[`shinkoku_gens${n}`] = g.gens.join('と');
+    out[`shinkoku_ataru${n}`] = g.ataru ? '当てはまります' : '当てはまりません';
+    // ★理由は、当てはまらない年だけ。★当てはまる年は `gyouNashi912()` が落とします
+    out[`shinkoku_riyu${n}`] = g.riyu ? `${g.nen}年 …… ${RIYU_BUN[g.riyu]}` : '―';
+  }
+  return out;
 }
 
 /**
@@ -114,6 +170,24 @@ export function gyouNashi912(m: Moto912): string[] {
   const out: string[] = [];
   if (!t.kyufu_gyou) out.push('kyufu_tanka', 'kyufu_kaisu', 'kyufu_kei');
   if (!t.koza_gyou) out.push('koza_tanka', 'koza_tsuki', 'koza_kei');
+  /**
+   * ★★★確定申告（★戦術Cowork `senjutsu_20260908d.md` 4節の表）
+   *
+   *   一時金を受け取る年が **1つ** …… 表の**2行目**と `shinkoku_riyu2` を落とす
+   *   その年の `ataru` が **真** ……… その年の **`shinkoku_riyu`** を落とす
+   *   一時金を受け取る年が **0** …… 表の**2行とも**と `riyu1`・`riyu2` を落とす
+   *
+   * ★★`kumitate()` は、**表の行**と**箇条書きの項目**だけを落とします（`gamenBun.ts` 171〜185行）。
+   *   ★確定申告の表の1行は、その行の中の名前を1つでも渡せば落ちます。
+   */
+  for (const i of [0, 1]) {
+    const g = m.shinkoku[i];
+    const n = i + 1;
+    // ★その年が無い → 表の行ごと落とす（★行の中の名前を渡します）
+    if (!g) out.push(`shinkoku_nen${n}`, `shinkoku_age${n}`, `shinkoku_gens${n}`, `shinkoku_ataru${n}`);
+    // ★当てはまる年、または年が無い → 理由の項目を落とす
+    if (!g || g.ataru) out.push(`shinkoku_riyu${n}`);
+  }
   return out;
 }
 

@@ -978,6 +978,84 @@ export function shinkokuIru(p: Jinbutsu, year: number, idecoNenkin: number,
   };
 }
 
+/** 当てはまらない理由の名前（★式ではありません。**分岐の名前**です） */
+export type ShinkokuRiyu = 'あ' | 'い' | 'う' | 'あう' | 'いう';
+
+/** 退職所得が生じた1つの年ぶんの、確定申告の答え */
+export interface ShinkokuGyou {
+  /** ★判定した所得の年（★「退職所得が生じた年」。★**その翌年ではありません**） */
+  nen: number;
+  /** `true` ＝ 申告をしなくてよい決まり（所得税法121条3項）に**当てはまる** */
+  ataru: boolean;
+  /** 当てはまらない理由。★`ataru` が `true` のときは **`null`** */
+  riyu: ShinkokuRiyu | null;
+}
+
+/**
+ * `shinkokuIru()` の答えから、**当てはまらない理由の名前**を作ります。
+ *
+ * ★あ … 公的年金等の収入が 0円（★この規定の対象外。★3項では決まりません）
+ * ★い … 公的年金等の収入が 400万円を超える
+ * ★う … 公的年金等以外の所得が 20万円を超える
+ *
+ * ★★「あ」と「い」は**同時に立ちません**（★0円か、400万円超か、どちらかです）。
+ * ★★★当てはまるとき（`iru` が `false`）は **`null`** を返します。0にも空文字にもしません。
+ */
+export function shinkokuRiyu(s: ShinkokuKekka): ShinkokuRiyu | null {
+  if (!s.iru) return null;
+  let w = '';
+  if (s.nenkin_shunyu === 0) w += 'あ';
+  else if (!s.joken_nenkin) w += 'い';
+  if (!s.joken_ta) w += 'う';
+  // ★ここに来たら、`iru` の作り方と食い違っています。**黙って空を返しません**
+  if (!w) throw new Error(`iru が true なのに理由が0個です（${JSON.stringify(s)}）`);
+  return w as ShinkokuRiyu;
+}
+
+/**
+ * ★★★その受け取り方について、**退職所得が生じた年ごと**の確定申告の答え。
+ *
+ * ★戦術Cowork `senjutsu_20260907p.md` 決め903・904（2026-09-08）。
+ * ★★`v5/engine.py` の `shinkoku_ichiran()` と**同じもの**です
+ *   （★金の当てで、代表案12,500の**年ごと・理由まで**突き合わせています）。
+ *
+ * ──────────────────────────────────────────────────────────
+ * ★★★【どの年を見るか】**「退職所得が生じた年」です。「その翌年」ではありません。**
+ *
+ *   ★画面12の節の見出しは「あなたが退職した翌年」ですが、これは**手続きをする時期**です。
+ *   ★確定申告は「**その年の所得について、翌年に申告する**」ものですから、
+ *     **判定する所得の年は、退職所得が生じた年**になります。
+ *   ★★★`shinkokuIru(p, year, …)` に**翌年を渡すと誤ります。**
+ * ──────────────────────────────────────────────────────────
+ *
+ * ★★【空の並びを返すとき】`r.detail` に**退職所得金額が0より大きい年が1つも無い**とき。
+ *   ★★★このときは、**画面12のこの節そのものを出しません**（★決め903の③）。
+ *   ★実測（`golden_light_20260906`・代表案10,000）…… **1,047案（10.5%）**がこれです。
+ *
+ * ★★【年が2つになることがあります】実測 …… **2,193案（21.9%）／いちばん多い案でも2つ**。
+ *   ★★★そのうち**2つの年で答えが違う案が 1,164案（53.1%）**あります
+ *     （★2つの年の離れ方は **1年あき〜20年あき**）。★1つにまとめられません（★決め903の②）。
+ */
+export function shinkokuIchiran(p: Jinbutsu, r: EvalResult): ShinkokuGyou[] {
+  const out: ShinkokuGyou[] = [];
+  for (const y of Object.keys(r.detail).map(Number).sort((a, b) => a - b)) {
+    const d = r.detail[y];
+    // ★★「退職所得が生じた年」＝ 課税される退職所得金額が0より大きい年
+    //   ★0の年は入れません（★退職所得控除で消えた年です）。
+    if (d.tai_shotoku <= 0) continue;
+    const s = shinkokuIru(p, y, d.ideco_nenkin, d.tai_shotoku);
+    out.push({ nen: y, ataru: !s.iru, riyu: shinkokuRiyu(s) });
+  }
+  return out;
+}
+
+/**
+ * ★金の当ての鍵に入れる数（★理由まで見るため。★`0か1` では理由が違っても鳴りません）。
+ * ★戦術Cowork `senjutsu_20260907p.md` お願い(1)の3。
+ */
+export const SHINKOKU_FUGO: Record<string, number> =
+  { '': 0, 'あ': 1, 'い': 2, 'う': 3, 'あう': 4, 'いう': 5 };
+
 export interface ZeiUchiwake { shotokuzei: number; jumin_sougou: number; jumin_taishoku: number; }
 
 /** その年の所得にかかる税の内訳（所得税／住民税総合＝翌年度／住民税退職＝その年） */

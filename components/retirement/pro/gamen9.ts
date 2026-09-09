@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（176,514バイト ／ md5 add010d1e6218d2931aa67e36fcc8a6c）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（176,854バイト ／ md5 08fa7c414960f7374612597753351d23）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -41,7 +41,7 @@ export const GAMEN9: readonly Block9[] = [
   { kind: 'hon', bun: "保険料・医療費が上がらない受け取り方だけ", na: [] },
   { kind: 'hon', bun: "{nenkin_gen}を{ideco_jogen_age}歳までに受け取り終える", na: ["nenkin_gen","ideco_jogen_age"] },
   { kind: 'hyo', gyou: [
-    { cells: ["あなたの受け取り方","手取り","差"],
+    { cells: ["あなたの受け取り方","手取り","いちばん上との差"],
       na: [],
       kazari: [[null],[null],[null]] },
     { cells: ["{an_label1}\n{hoken_bun1}","{tedori1}","{sa1}"],
@@ -67,7 +67,7 @@ export const GAMEN9: readonly Block9[] = [
       kazari: [[null,null],[null],[null]] },
   ] },
   { kind: 'hon', bun: "この一覧は、選んだ並び順の上から{ichiran_kensu}を並べています。この{ichiran_kensu}のうち、手取りがいちばん多いものといちばん少ないものの差は{ichiran_haba}です。あなたが選べる{toori_kazu}全部で見ると、この差は{zenbu_haba}になります。並び順を変えると、ここに出る受け取り方も変わります。すべての受け取り方は、下のファイルでご覧いただけます。", na: ["ichiran_kensu","ichiran_haba","toori_kazu","zenbu_haba"] },
-  { kind: 'hako', bun: "・この表の手取りは、あなたの退職金とiDeCo等から、税金と手数料を引いた額です。公的年金の受取額は入っていません\n・公的年金を受け取り始める年齢を変えると、あなたが受け取る公的年金の額も変わりますが、それはこの表に入っていません。公的年金を含めた比べ方は、このあとの「受け取り方の比較」でお出しします\n・この表の手取りには、公的医療保険料・介護保険料は含めていません\n・あなたの退職金を一時金で受け取ることは、保険料には影響しません", na: [] },
+  { kind: 'hako', bun: "・この表の手取りは、あなたの退職金とiDeCo等から、税金と手数料を引いた額です。公的年金の受取額は入っていません\n・公的年金を受け取り始める年齢を変えると、あなたが受け取る公的年金の額も変わりますが、それはこの表に入っていません。公的年金を含めた比べ方は、このあとの「受け取り方の比較」でお出しします\n・この表の手取りには、公的医療保険料・介護保険料は含めていません\n・あなたの退職金を一時金で受け取ることは、保険料には影響しません\n・「＋」は、この表のいちばん上の行より手取りが多いという意味です（「手取りが多い順」以外の並び順で出ることがあります）", na: [] },
   { kind: 'hako', bun: "結果をダウンロード（Excel）", na: [] },
   { kind: 'hon', bun: "すべての受け取り方と、年ごとの内訳、計算の根拠までを1つのファイルにまとめてお渡しします。", na: [] },
 ] as const;
@@ -79,5 +79,5 @@ export const HITOGOTO_SHURUI: readonly string[] = ["nenkin_gen","ideco_jogen_age
 export const HITOGOTO_KASHO = 35;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
-export const MADA_NA: readonly string[] = ["ideco_jogen_age","ichiran_kensu","ichiran_haba","toori_kazu","zenbu_haba"];
+export const MADA_NA: readonly string[] = ["ideco_jogen_age"];
 

@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（175,669バイト ／ md5 8ec8fbfd24d3327e0257944eb8ebcb19）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（175,691バイト ／ md5 f80523c26d36149051df6f66f62ca61d）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -38,33 +38,33 @@ export const GAMEN9: readonly Block9[] = [
   { kind: 'hako', bun: "並び順", na: [] },
   { kind: 'hako', bun: "手取りが多い順増える税金が少ない順早く受け取り終える順最初の年に多く受け取る順", na: [] },
   { kind: 'hako', bun: "絞り込み", na: [] },
-  { kind: 'hon', bun: "✓保険料・医療費が上がらない受け取り方だけ", na: [] },
+  { kind: 'hon', bun: "保険料・医療費が上がらない受け取り方だけ", na: [] },
   { kind: 'hon', bun: "{nenkin_gen}を{ideco_jogen_age}歳までに受け取り終える", na: ["nenkin_gen","ideco_jogen_age"] },
   { kind: 'hyo', gyou: [
     { cells: ["あなたの受け取り方","手取り","差"],
       na: [],
       kazari: [[null],[null],[null]] },
-    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"],
-      kazari: [[null,"same"],[null],[null]] },
-    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"],
-      kazari: [[null,"up"],[null],[null]] },
-    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"],
-      kazari: [[null,"up"],[null],[null]] },
-    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"],
-      kazari: [[null,"same"],[null],[null]] },
-    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"],
-      kazari: [[null,"up"],[null],[null]] },
-    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"],
-      kazari: [[null,"up"],[null],[null]] },
-    { cells: ["{an_label}\n{hoken_bun}","{tedori}","{sa}"],
-      na: ["an_label","hoken_bun","tedori","sa"],
-      kazari: [[null,"up"],[null],[null]] },
+    { cells: ["{an_label1}\n{hoken_bun1}","{tedori1}","{sa1}"],
+      na: ["an_label1","hoken_bun1","tedori1","sa1"],
+      kazari: [[null,null],[null],[null]] },
+    { cells: ["{an_label2}\n{hoken_bun2}","{tedori2}","{sa2}"],
+      na: ["an_label2","hoken_bun2","tedori2","sa2"],
+      kazari: [[null,null],[null],[null]] },
+    { cells: ["{an_label3}\n{hoken_bun3}","{tedori3}","{sa3}"],
+      na: ["an_label3","hoken_bun3","tedori3","sa3"],
+      kazari: [[null,null],[null],[null]] },
+    { cells: ["{an_label4}\n{hoken_bun4}","{tedori4}","{sa4}"],
+      na: ["an_label4","hoken_bun4","tedori4","sa4"],
+      kazari: [[null,null],[null],[null]] },
+    { cells: ["{an_label5}\n{hoken_bun5}","{tedori5}","{sa5}"],
+      na: ["an_label5","hoken_bun5","tedori5","sa5"],
+      kazari: [[null,null],[null],[null]] },
+    { cells: ["{an_label6}\n{hoken_bun6}","{tedori6}","{sa6}"],
+      na: ["an_label6","hoken_bun6","tedori6","sa6"],
+      kazari: [[null,null],[null],[null]] },
+    { cells: ["{an_label7}\n{hoken_bun7}","{tedori7}","{sa7}"],
+      na: ["an_label7","hoken_bun7","tedori7","sa7"],
+      kazari: [[null,null],[null],[null]] },
   ] },
   { kind: 'hon', bun: "この一覧は、選んだ並び順の上位を並べています。すべての受け取り方は、下のファイルでご覧いただけます。", na: [] },
   { kind: 'hako', bun: "・この表の手取りには、公的医療保険料・介護保険料は含めていません\n・あなたの退職金を一時金で受け取ることは、保険料には影響しません", na: [] },
@@ -73,11 +73,11 @@ export const GAMEN9: readonly Block9[] = [
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["nenkin_gen","ideco_jogen_age","an_label","hoken_bun","tedori","sa"];
+export const HITOGOTO_SHURUI: readonly string[] = ["nenkin_gen","ideco_jogen_age","an_label1","hoken_bun1","tedori1","sa1","an_label2","hoken_bun2","tedori2","sa2","an_label3","hoken_bun3","tedori3","sa3","an_label4","hoken_bun4","tedori4","sa4","an_label5","hoken_bun5","tedori5","sa5","an_label6","hoken_bun6","tedori6","sa6","an_label7","hoken_bun7","tedori7","sa7"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
 export const HITOGOTO_KASHO = 30;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
-export const MADA_NA: readonly string[] = ["ideco_jogen_age","an_label","hoken_bun","sa"];
+export const MADA_NA: readonly string[] = ["ideco_jogen_age","an_label1","hoken_bun1","sa1","an_label2","hoken_bun2","sa2","an_label3","hoken_bun3","sa3","an_label4","hoken_bun4","sa4","an_label5","hoken_bun5","sa5","an_label6","hoken_bun6","sa6","an_label7","hoken_bun7","sa7"];
 

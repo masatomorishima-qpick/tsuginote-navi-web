@@ -194,17 +194,17 @@ export function atai912(m: Moto912): Record<string, string | null> {
     const g = m.ichiran[i];
     const n = i + 1;
     if (!g) {
-      out[`an_label${n}`] = '―';
-      out[`hoken_bun${n}`] = '―';
-      out[`tedori${n}`] = '―';
-      out[`sa${n}`] = '―';
+      out[`an_label${n}`] = '\u2014';
+      out[`hoken_bun${n}`] = '\u2014';
+      out[`tedori${n}`] = '\u2014';
+      out[`sa${n}`] = '\u2014';
       continue;
     }
     out[`an_label${n}`] = g.lab;
     out[`hoken_bun${n}`] = g.hokenBun;
     out[`tedori${n}`] = g.tedori.toLocaleString('en-US');
     // ★1行目は差がありません（`sa` は `null`）。★見本と同じ「—」（U+2014）を入れます
-    out[`sa${n}`] = g.sa === null ? '\u2014' : `\u2212${g.sa.toLocaleString('en-US')}`;
+    out[`sa${n}`] = g.sa === null ? '\u2014' : g.sa === 0 ? '0' : `\u2212${g.sa.toLocaleString('en-US')}`;
   }
   return out;
 }
@@ -247,7 +247,13 @@ export function gyouNashi912(m: Moto912): string[] {
   }
   /**
    * ★★★画面9（一覧）…… **その方の通り数が7未満のとき**、足りない行を落とします。
-   *   ★実測（`golden_light_20260906`・1,000人）…… ★通り数がいちばん少ない方でも **161通り**でした。
+   *   ★★★実測（`golden_heavy_20260906`・**250人**・★`omoi=True`＝**⑳を軸に入れています**）
+   *     …… ★通り数がいちばん少ない方でも **161通り**でした（★平均 17,934.1 ／ 最大 41,216）。
+   *     ★★**本番は⑳を軸に入れます**（`kekka.ts` 91行 `E.nenkinKouho(p, genzaiNen)`）ので、
+   *        ★★★**こちらが本番の姿の数です**（★戦術Cowork 決め992）。
+   *   ★（★`golden_light_20260906`・1,000人 は `omoi=False` で⑳を軸に入れていません。
+   *      ★そちらでも最小は 161通りでしたが、平均は 1,619.0 で、**本番の数ではありません**。
+   *      ★250人は light の1,000人に含まれ、入力は1文字も違いません ── 測って当てました。）
    *   ★★ですので、いまの見本の方々では1行も落ちません。★**それでも書きます**
    *     （★入力しだいで7未満になりうるためです。★空の行を出さない）。
    */

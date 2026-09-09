@@ -150,6 +150,13 @@ export function keisan(v: PaidInput, genzaiNen: number, now: Date): Keisan {
    */
   const ICHIRAN_KENSU = 7;
 
+  /**
+   * ★★★入力の⑳（公的年金を受け取り始める年齢）。
+   *   ★戦術Cowork `senjutsu_20260909h.md` 決め1000 …… **まとめた行の代表は、この年齢にいちばん近いもの**。
+   * ★★`ichiranMatome()` には、ここから渡します（★あちらで既定値を作らないため）。
+   */
+  const NYURYOKU_AGE = p.koteki_kaishi_age;
+
   const kekka: Kekka = {
     v: 2,
     tsukutta: now.toISOString(),
@@ -161,7 +168,8 @@ export function keisan(v: PaidInput, genzaiNen: number, now: Date): Keisan {
     bun8,
     hitogoto13,
     // ★★★一覧の8通り（★並び順4つ × 絞り込み①の入／切・決め989）。★口がここで作ります
-    ichiran: ichiranMatome(D, ICHIRAN_KENSU),
+    //   ★★行は (ウ) でまとめたあとのものです（★決め999・決め1000・決め1001）
+    ichiran: ichiranMatome(D, ICHIRAN_KENSU, NYURYOKU_AGE),
   };
   return { p, taishokuNen: kumitate.taishokuNen, R, D, g8, kekka, ms: { build: msBuild, zenToori: msZen, gamen8: msG8 } };
 }

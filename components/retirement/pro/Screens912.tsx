@@ -203,8 +203,24 @@ export function atai912(m: Moto912): Record<string, string | null> {
     out[`an_label${n}`] = g.lab;
     out[`hoken_bun${n}`] = g.hokenBun;
     out[`tedori${n}`] = g.tedori.toLocaleString('en-US');
-    // ★1行目は差がありません（`sa` は `null`）。★見本と同じ「—」（U+2014）を入れます
-    out[`sa${n}`] = g.sa === null ? '\u2014' : g.sa === 0 ? '0' : `\u2212${g.sa.toLocaleString('en-US')}`;
+    /**
+     * ★★★「差」の字（★戦術Cowork `senjutsu_20260909i.md` 決め1007）。
+     *   ★`sa` は「**この行の手取り − 1行目の手取り**」です（`ichiran.ts`）。
+     *
+     * | `sa` | 字 |
+     * |---|---|
+     * | `null`（1行目） | 「—」（U+2014） |
+     * | `0` | 「0」 |
+     * | 負（1行目より少ない） | 「−」（U+2212）＋ **絶対値** |
+     * | ★正（1行目より多い） | 「＋」（**U+FF0B・全角**）＋ その値 |
+     *
+     * ★★全角の「＋」にするのは、**U+2212 と幅がそろう**ためです。★円は付けません（★決め983(2)）。
+     * ★★★正が出るのは、**手取りが多い順いがいの3つの並び順**です（★1行目が手取りの最大とはかぎりません）。
+     */
+    out[`sa${n}`] = g.sa === null ? '\u2014'
+      : g.sa === 0 ? '0'
+      : g.sa < 0 ? `\u2212${(-g.sa).toLocaleString('en-US')}`
+      : `\uFF0B${g.sa.toLocaleString('en-US')}`;
   }
   return out;
 }

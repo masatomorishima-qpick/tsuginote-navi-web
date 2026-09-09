@@ -42,6 +42,7 @@
 'use client';
 
 import * as E from '@/lib/retirement/pro/engine';
+import type { IchiranGyou } from '@/lib/retirement/pro/ichiran';
 import { GAMEN9, MADA_NA as MADA9 } from './gamen9';
 import { GAMEN9shosai, MADA_NA as MADA9S } from './gamen9shosai';
 import { GAMEN10, MADA_NA as MADA10 } from './gamen10';
@@ -71,6 +72,13 @@ export type Moto912 = {
    * ★★**いちばん多くても2つ**です（★実測 …… 全通り 38,157通りで3つ以上は0案・決め925）。
    */
   shinkoku: E.ShinkokuGyou[];
+  /**
+   * ★★★画面9（一覧）の行。**エンジンの `ichiran(D, n)` が出したものを、そのまま運びます**
+   *   （★戦術Cowork `senjutsu_20260909c.md` 4節・判断ログ980番）。
+   * ★★**ここで並べ替えも絞り込みもしません**（★§画面に出す数字と分岐は計算エンジン側に置く）。
+   * ★★★**7つに満たないことがあります**（★通り数が7未満の方）。★足りない行は `gyouNashi912()` が落とします。
+   */
+  ichiran: IchiranGyou[];
 };
 
 /** ★当てはまらない理由の字（★6通り・戦術Cowork `senjutsu_20260908d.md` 4節。**こちらでは書きません**） */
@@ -149,6 +157,35 @@ export function atai912(m: Moto912): Record<string, string | null> {
     // ★理由は、当てはまらない年だけ。★当てはまる年は `gyouNashi912()` が落とします
     out[`shinkoku_riyu${n}`] = g.riyu ? `${g.nen}年 …… ${RIYU_BUN[g.riyu]}` : '―';
   }
+  /**
+   * ★★★画面9（一覧）の7行 …… `an_labelN`・`hoken_bunN`・`tedoriN`・`saN`（★4つ × 7行 ＝ 28個）。
+   *
+   * ★★**無い行の分も、字を入れます。**★`null` にしません（★確定申告の表と同じ理由 ── 上）。
+   *   ★出すか出さないかは、**`gyouNashi912()` が行ごとに決めます**。
+   * ★`sa` …… **1行目は「—」（U+2014）**、2行目からは **「−」（U+2212）＋ 桁区切り**。
+   *   ★★この2つの字は、**基準HTMLの見本から機械で拾いました**（★898〜904行の `data-na="saN"`）。
+   *   ★★★**円は付けません。**★見本が「−25,732」で、円が付いていないためです。
+   * ★`tedori` …… 同じく**円を付けません**（★見本は「24,994,632」）。
+   *   ★★画面10の `{tedori}` は文の中ですので、そちらは `en()`（円つき）のままです。
+   * ★★★`tedori1`〜`7` は、**この回まで、どこも作っていませんでした**
+   *   （★`MADA_NA` に入っていないだけで、値を作る所が0か所でした・★戦術Cowork 判断ログ982番）。
+   */
+  for (let i = 0; i < 7; i++) {
+    const g = m.ichiran[i];
+    const n = i + 1;
+    if (!g) {
+      out[`an_label${n}`] = '―';
+      out[`hoken_bun${n}`] = '―';
+      out[`tedori${n}`] = '―';
+      out[`sa${n}`] = '―';
+      continue;
+    }
+    out[`an_label${n}`] = g.lab;
+    out[`hoken_bun${n}`] = g.hokenBun;
+    out[`tedori${n}`] = g.tedori.toLocaleString('en-US');
+    // ★1行目は差がありません（`sa` は `null`）。★見本と同じ「—」（U+2014）を入れます
+    out[`sa${n}`] = g.sa === null ? '\u2014' : `\u2212${g.sa.toLocaleString('en-US')}`;
+  }
   return out;
 }
 
@@ -187,6 +224,16 @@ export function gyouNashi912(m: Moto912): string[] {
     if (!g) out.push(`shinkoku_nen${n}`, `shinkoku_age${n}`, `shinkoku_gens${n}`, `shinkoku_ataru${n}`);
     // ★当てはまる年、または年が無い → 理由の項目を落とす
     if (!g || g.ataru) out.push(`shinkoku_riyu${n}`);
+  }
+  /**
+   * ★★★画面9（一覧）…… **その方の通り数が7未満のとき**、足りない行を落とします。
+   *   ★実測（`golden_light_20260906`・1,000人）…… ★通り数がいちばん少ない方でも **161通り**でした。
+   *   ★★ですので、いまの見本の方々では1行も落ちません。★**それでも書きます**
+   *     （★入力しだいで7未満になりうるためです。★空の行を出さない）。
+   */
+  for (let i = 0; i < 7; i++) {
+    const n = i + 1;
+    if (!m.ichiran[i]) out.push(`an_label${n}`, `hoken_bun${n}`, `tedori${n}`, `sa${n}`);
   }
   return out;
 }

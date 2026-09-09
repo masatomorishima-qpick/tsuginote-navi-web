@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（176,854バイト ／ md5 08fa7c414960f7374612597753351d23）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（176,870バイト ／ md5 4a0385253814a63bb6c3c414630b95a2）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -37,7 +37,7 @@ export const GAMEN12: readonly Block12[] = [
   { kind: 'midashi', lv: 2, bun: "確認事項の整理" },
   { kind: 'midashi', lv: 3, bun: "あなたが{tai_age}になる前に" },
   { kind: 'ret', koumoku: [
-    { bun: "ご利用の金融機関に、あなたの{nenkin_gen}を{nenkin_kikan}の年金で受け取れるかを確認する", na: ["nenkin_gen","nenkin_kikan"] },
+    { bun: "ご利用の金融機関に、あなたの{nenkin_gen}を、{uketori_katachi}受け取れるかを確認する", na: ["nenkin_gen","uketori_katachi"] },
     { bun: "あなたが年金を年に何回受け取れるかを確認する。1回ごとに440円の手数料がかかります", na: [] },
     { bun: "勤め先に、あなたの退職金の支給予定日を確認する", na: [] },
   ] },
@@ -69,11 +69,11 @@ export const GAMEN12: readonly Block12[] = [
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["tai_age","nenkin_gen","nenkin_kikan","gensen_ritsu","nenkin_kaishi_age","shinkoku_bun","shinkoku_nen1","shinkoku_age1","shinkoku_gens1","shinkoku_ataru1","shinkoku_nen2","shinkoku_age2","shinkoku_gens2","shinkoku_ataru2","shinkoku_riyu1","shinkoku_riyu2"];
+export const HITOGOTO_SHURUI: readonly string[] = ["tai_age","nenkin_gen","uketori_katachi","gensen_ritsu","nenkin_kaishi_age","shinkoku_bun","shinkoku_nen1","shinkoku_age1","shinkoku_gens1","shinkoku_ataru1","shinkoku_nen2","shinkoku_age2","shinkoku_gens2","shinkoku_ataru2","shinkoku_riyu1","shinkoku_riyu2"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
 export const HITOGOTO_KASHO = 18;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
-export const MADA_NA: readonly string[] = ["tai_age","gensen_ritsu","nenkin_kaishi_age"];
+export const MADA_NA: readonly string[] = ["tai_age","uketori_katachi","gensen_ritsu","nenkin_kaishi_age"];
 

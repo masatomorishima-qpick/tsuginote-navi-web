@@ -43,6 +43,7 @@
 
 import * as E from '@/lib/retirement/pro/engine';
 import type { IchiranGyou, IchiranMatome } from '@/lib/retirement/pro/ichiran';
+import { ritsuJi } from '@/lib/retirement/pro/gamen12Bun';
 import { GAMEN9, MADA_NA as MADA9 } from './gamen9';
 import { GAMEN9shosai, MADA_NA as MADA9S } from './gamen9shosai';
 import { GAMEN10, MADA_NA as MADA10 } from './gamen10';
@@ -58,7 +59,13 @@ import ScreenBlocks from './ScreenBlocks';
 export type Moto912 = {
   /** その方が選んでいる受け取り方の計算結果 */
   r: E.EvalResult;
-  /** その受け取り方（年金の期間などを引きます） */
+  /**
+   * その受け取り方。
+   * ★★★**2026-09-09 …… この本の中では、いま1か所も使っていません。**
+   *   ★`nenkin_kikan` を引いていた1か所（`atai912()`）を消したためです（★決め1023）。
+   *   ★★**消していないのは、呼ぶ側がまだ画面12を繋いでいないからです**（★口は `Moto912` を作っていません）。
+   *   ★繋ぐ回に、要るかどうかを数えてから決めます。
+   */
   plan: E.Plan;
   /** 年金で受け取る支給源の名前（「iDeCo等」「小規模企業共済」など）。**入力から** */
   nenkinGen: string;
@@ -90,6 +97,22 @@ export type Moto912 = {
   ichiranMatome: IchiranMatome;
   toorisu: number;
   zenbuHaba: number;
+  /**
+   * ★★★画面12の4つ（★戦術Cowork `senjutsu_20260909l.md` 決め1022・1023・1025）。
+   * ★★**どれも、ここでは作りません。**★エンジンが出したものを、そのまま受け取ります
+   *   （★分岐と式は `lib/retirement/pro/gamen12Bun.ts` に在ります）。
+   */
+  /** `{tai_age}` のもと …… `kekka.gamen8.kijun.taishoku_age`（★`gamen8.ts` 56行・119行）＝画面7の**⑤** */
+  taishokuAge: number;
+  /** `{uketori_katachi}` …… `gamen12Bun.uketoriKatachi(plan)` の戻り（★「で」まで入っています） */
+  uketoriKatachi: string;
+  /**
+   * `{gensen_ritsu}` のもと …… `gamen12Bun.gensenRitsu(nenbun)` の戻り。
+   * ★★**百分率の100倍の整数**です（★20.42% ＝ `2042`）。★字にするのは下の `ritsuJi()` です。
+   */
+  gensenRitsu: number;
+  /** `{nenkin_kaishi_age}` のもと …… その方が iDeCo等 を受け取り始める**年齢**（★`p.age(nenkinKaishiNen(...))`） */
+  nenkinKaishiAge: number;
 };
 
 /** ★当てはまらない理由の字（★6通り・戦術Cowork `senjutsu_20260908d.md` 4節。**こちらでは書きません**） */
@@ -131,7 +154,16 @@ export function atai912(m: Moto912): Record<string, string | null> {
     tesuryo: en(t.kei),
     // 画面12
     nenkin_gen: m.nenkinGen,
-    nenkin_kikan: `${m.plan.nenkin_kikan}年`,
+    /**
+     * ★★★画面12の4つ（★戦術Cowork `senjutsu_20260909l.md`）。
+     * ★★**ここでは字にするだけです。**★分岐も式もありません（★`gamen12Bun.ts` に在ります）。
+     * ★（★`nenkin_kikan` は消しました ── ★基準HTML 1141行が `{uketori_katachi}` に変わり、
+     *    ★★`nenkin_kikan` の印は**基準HTMLに0か所**になりました・決め1023）
+     */
+    tai_age: `${m.taishokuAge}歳`,
+    uketori_katachi: m.uketoriKatachi,
+    gensen_ritsu: ritsuJi(m.gensenRitsu),
+    nenkin_kaishi_age: `${m.nenkinKaishiAge}歳`,
     // ★★★確定申告の説明（★年が1つも無い方は、別の字になります）
     shinkoku_bun: m.shinkoku.length ? BUN_ARU : BUN_NASHI,
     /**

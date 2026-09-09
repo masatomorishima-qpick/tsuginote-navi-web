@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（175,481バイト ／ md5 f5a48ea59782a94460bafb7322c50c68）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（176,066バイト ／ md5 52e442749f57184646abbba8d3cf742b）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -66,18 +66,18 @@ export const GAMEN9: readonly Block9[] = [
       na: ["an_label7","hoken_bun7","tedori7","sa7"],
       kazari: [[null,null],[null],[null]] },
   ] },
-  { kind: 'hon', bun: "この一覧は、選んだ並び順の上位を並べています。すべての受け取り方は、下のファイルでご覧いただけます。", na: [] },
+  { kind: 'hon', bun: "この一覧は、選んだ並び順の上から{ichiran_kensu}を並べています。この{ichiran_kensu}のうち、手取りがいちばん多いものといちばん少ないものの差は{ichiran_haba}です。あなたが選べる{toori_kazu}全部で見ると、この差は{zenbu_haba}になります。並び順を変えると、ここに出る受け取り方も変わります。すべての受け取り方は、下のファイルでご覧いただけます。", na: ["ichiran_kensu","ichiran_haba","toori_kazu","zenbu_haba"] },
   { kind: 'hako', bun: "・この表の手取りには、公的医療保険料・介護保険料は含めていません\n・あなたの退職金を一時金で受け取ることは、保険料には影響しません", na: [] },
   { kind: 'hako', bun: "結果をダウンロード（Excel）", na: [] },
   { kind: 'hon', bun: "すべての受け取り方と、年ごとの内訳、計算の根拠までを1つのファイルにまとめてお渡しします。", na: [] },
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["nenkin_gen","ideco_jogen_age","an_label1","hoken_bun1","tedori1","sa1","an_label2","hoken_bun2","tedori2","sa2","an_label3","hoken_bun3","tedori3","sa3","an_label4","hoken_bun4","tedori4","sa4","an_label5","hoken_bun5","tedori5","sa5","an_label6","hoken_bun6","tedori6","sa6","an_label7","hoken_bun7","tedori7","sa7"];
+export const HITOGOTO_SHURUI: readonly string[] = ["nenkin_gen","ideco_jogen_age","an_label1","hoken_bun1","tedori1","sa1","an_label2","hoken_bun2","tedori2","sa2","an_label3","hoken_bun3","tedori3","sa3","an_label4","hoken_bun4","tedori4","sa4","an_label5","hoken_bun5","tedori5","sa5","an_label6","hoken_bun6","tedori6","sa6","an_label7","hoken_bun7","tedori7","sa7","ichiran_kensu","ichiran_haba","toori_kazu","zenbu_haba"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
-export const HITOGOTO_KASHO = 30;
+export const HITOGOTO_KASHO = 35;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
-export const MADA_NA: readonly string[] = ["ideco_jogen_age"];
+export const MADA_NA: readonly string[] = ["ideco_jogen_age","ichiran_kensu","ichiran_haba","toori_kazu","zenbu_haba"];
 

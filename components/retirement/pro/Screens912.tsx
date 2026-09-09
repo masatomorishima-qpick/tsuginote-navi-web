@@ -42,7 +42,7 @@
 'use client';
 
 import * as E from '@/lib/retirement/pro/engine';
-import type { IchiranGyou } from '@/lib/retirement/pro/ichiran';
+import type { IchiranGyou, IchiranMatome } from '@/lib/retirement/pro/ichiran';
 import { GAMEN9, MADA_NA as MADA9 } from './gamen9';
 import { GAMEN9shosai, MADA_NA as MADA9S } from './gamen9shosai';
 import { GAMEN10, MADA_NA as MADA10 } from './gamen10';
@@ -79,6 +79,17 @@ export type Moto912 = {
    * ★★★**7つに満たないことがあります**（★通り数が7未満の方）。★足りない行は `gyouNashi912()` が落とします。
    */
   ichiran: IchiranGyou[];
+  /**
+   * ★★★一覧の下の1文が使う数（★戦術Cowork 決め986・989）。
+   *
+   * ★`ichiranMatome` …… **いま選ばれている並び順・絞り込み**の組（★`kekka.ichiran` の8つから、親が1つ選んで渡します）。
+   *   ★★**ここで選びません。★`Math.max`／`Math.min` も取りません**（★§画面に出す数字と分岐は計算エンジン側）。
+   * ★`toorisu` …… `kekka.toorisu` をそのまま（★新しく作りません）。
+   * ★`zenbuHaba` …… `kekka.gamen8.haba` をそのまま（★`gamen8.ts` 162行に既に在ります）。
+   */
+  ichiranMatome: IchiranMatome;
+  toorisu: number;
+  zenbuHaba: number;
 };
 
 /** ★当てはまらない理由の字（★6通り・戦術Cowork `senjutsu_20260908d.md` 4節。**こちらでは書きません**） */
@@ -123,6 +134,15 @@ export function atai912(m: Moto912): Record<string, string | null> {
     nenkin_kikan: `${m.plan.nenkin_kikan}年`,
     // ★★★確定申告の説明（★年が1つも無い方は、別の字になります）
     shinkoku_bun: m.shinkoku.length ? BUN_ARU : BUN_NASHI,
+    /**
+     * ★★★画面9（一覧）の下の1文（★戦術Cowork 決め986）。
+     * ★`ichiran_kensu` …… 「7件」の形 ／ `toori_kazu` …… 「41,216通り」の形
+     * ★★`ichiran_haba`・`zenbu_haba` …… ★**円を付けます**（★文の中に出るためです。★表の `sa` 列とは別・決め983(2)）
+     */
+    ichiran_kensu: `${m.ichiranMatome.kensu}件`,
+    ichiran_haba: en(m.ichiranMatome.haba),
+    toori_kazu: `${m.toorisu.toLocaleString('en-US')}通り`,
+    zenbu_haba: en(m.zenbuHaba),
   };
 
   /**

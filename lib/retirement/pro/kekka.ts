@@ -21,6 +21,7 @@ import * as E from './engine';
 import { toJinbutsu, HEIKYU_WARIAI, type PaidInput } from './paidInput';
 import { gamen8, zenToori, type Gamen8, type Row } from './gamen8';
 import { gamen8Bun } from './gamen8Bun';
+import { ichiranMatome } from './ichiran';
 import type { Hitogoto13 } from '@/components/retirement/pro/gamen13Bun';
 import type { Kekka } from './kekkaKata';
 export type { Kekka } from './kekkaKata';
@@ -142,8 +143,15 @@ export function keisan(v: PaidInput, genzaiNen: number, now: Date): Keisan {
   const kado = g8.kado_su;
   const pattern: 1 | 2 | 3 = kado <= 1 ? 1 : kado === 2 ? 2 : 3;
 
+  /**
+   * ★★★一覧に出す件数。**基準HTMLの表が7行**ですので 7 です（★測った数。★既定値ではありません）。
+   *   ★戦術Cowork `senjutsu_20260909b.md` 決め979 …… 「① 一覧 …… **7件**」。
+   * ★★`ichiranMatome()` には、ここから渡します（★あちらでは決めません）。
+   */
+  const ICHIRAN_KENSU = 7;
+
   const kekka: Kekka = {
-    v: 1,
+    v: 2,
     tsukutta: now.toISOString(),
     genzaiNen,
     taishokuNen: kumitate.taishokuNen,
@@ -152,6 +160,8 @@ export function keisan(v: PaidInput, genzaiNen: number, now: Date): Keisan {
     gamen8: g8,
     bun8,
     hitogoto13,
+    // ★★★一覧の8通り（★並び順4つ × 絞り込み①の入／切・決め989）。★口がここで作ります
+    ichiran: ichiranMatome(D, ICHIRAN_KENSU),
   };
   return { p, taishokuNen: kumitate.taishokuNen, R, D, g8, kekka, ms: { build: msBuild, zenToori: msZen, gamen8: msG8 } };
 }

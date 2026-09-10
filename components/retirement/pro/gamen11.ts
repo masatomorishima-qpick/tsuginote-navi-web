@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（176,870バイト ／ md5 4a0385253814a63bb6c3c414630b95a2）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（177,096バイト ／ md5 f76d4658dc06c9d55e373d7c78e4d9d0）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -74,9 +74,9 @@ export const GAMEN11: readonly Block11[] = [
     { cells: ["国民健康保険の基礎控除","{kokuho_kiso}"],
       na: ["kokuho_kiso"],
       kazari: [[null],[null]] },
-    { cells: ["→ あなたの保険料の増加","{hoken_zou}"],
-      na: ["hoken_zou"],
-      kazari: [[null],[null]] },
+    { cells: ["{hoken_hantei_bun}\n保険料の額は、お住まいの市区町村で違います","{hoken_hantei}"],
+      na: ["hoken_hantei_bun","hoken_hantei"],
+      kazari: [[null,"tbls"],[null]] },
   ] },
   { kind: 'midashi', lv: 3, bun: "あなたの手数料" },
   { kind: 'hyo', gyou: [
@@ -94,11 +94,11 @@ export const GAMEN11: readonly Block11[] = [
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["an_bun","tai_gen","tai_age","kojo_shiki","kojo","shunyu","shotoku","nenkin_gen","nenkin_kikan_bun","nenkin_shunyu","nenkin_kojo_kubun","nenkin_kojo","zatsu","kiso_shiki","kiso_shotoku","shotokuzei","setai_kubun","hikazei_gendo","jumin","kokuho_kiso","hoken_zou","kyufu_kaisu","kyufu_kei","koza_tanka","koza_tsuki","koza_kei","tesuryo"];
+export const HITOGOTO_SHURUI: readonly string[] = ["an_bun","tai_gen","tai_age","kojo_shiki","kojo","shunyu","shotoku","nenkin_gen","nenkin_kikan_bun","nenkin_shunyu","nenkin_kojo_kubun","nenkin_kojo","zatsu","kiso_shiki","kiso_shotoku","shotokuzei","setai_kubun","hikazei_gendo","jumin","kokuho_kiso","hoken_hantei_bun","hoken_hantei","kyufu_kaisu","kyufu_kei","koza_tanka","koza_tsuki","koza_kei","tesuryo"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
-export const HITOGOTO_KASHO = 28;
+export const HITOGOTO_KASHO = 29;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
-export const MADA_NA: readonly string[] = ["an_bun","tai_gen","tai_age","kojo_shiki","nenkin_kikan_bun","kiso_shiki","kiso_shotoku","setai_kubun","hikazei_gendo","jumin","kokuho_kiso","hoken_zou"];
+export const MADA_NA: readonly string[] = ["an_bun","tai_gen","tai_age","kojo_shiki","nenkin_kikan_bun","kiso_shiki","kiso_shotoku","setai_kubun","hikazei_gendo","jumin","kokuho_kiso","hoken_hantei_bun","hoken_hantei"];
 

@@ -81,12 +81,16 @@ export interface Bun11 {
     nenkin_tsukisu: number | null;
     /** `nenkin_toshi_bun` が3つのうちどの字になったか */
     toshi_bun_kata: 'onaji' | 'kubun' | 'zatsu' | 'tsukisu' | 'nashi';
-    /** 字2・字3のとき、はじめて変わる年齢 */
+    /** 字②・字③のとき、はじめて変わる年齢 */
     kawaru_age: number | null;
-    /** 字1のとき、どの年も同じである最後の年齢 */
-    owari_age: number | null;
     /** その年の雑所得 */
     zatsu: number;
+    /**
+     * その年の年金収入（公的年金＋`{nenkin_gen}`）。
+     * ★`zatsu_zero_bun` の字（決め1092）は「この年の年金の収入が引ききれます」と言いますので、
+     *   ★**0円の年に出ていないか**を数えるために返します。
+     */
+    nenkin_shunyu: number;
     /** 軽減判定所得 */
     keigen_shotoku: number;
   };
@@ -152,18 +156,45 @@ export function kojoShikiJi(k: E.KeikaRow): string {
   return ji;
 }
 
-/** ★決め1057 の字1（★どの年も同じ方） */
-const TOSHI_ONAJI = (kara: number, made: number) =>
-  `下の表は、${kara}歳から${made}歳まで、どの年も同じです。`;
-/** ★決め1057 の字2（★公的年金等控除の区分が変わる方） */
-const TOSHI_KUBUN = (kara: number, kawaru: number) =>
-  `下の表は${kara}歳の年のものです。${kawaru}歳から公的年金等控除の区分が変わり、雑所得も変わります。`;
-/** ★決め1085 2-1 の字3（★はじめの年の公的年金が12か月分でない方） */
+/**
+ * ★★★`nenkin_toshi_bun` の **4つの字**（★戦術Cowork 決め1093・2026-09-12）。
+ *
+ * ★★**出す順は ① → ② → ③ → ④** です（★はじめの年が無い方には値を渡しません＝かたまりごと落ちます）。
+ *   ①（月数）を先にする理由 …… ★「次の年から額が変わります」は**理由を言わない**ので、
+ *     ★区分の変化も雑所得の変化も含みます。
+ */
+/** ★① 決め1085 2-1 …… はじめの年の公的年金が12か月分でない方（★実測 98人・39.2%） */
 const TOSHI_TSUKISU = (kara: number, tsuki: number) =>
   `下の${kara}歳の年の公的年金は${tsuki}か月分だけですので、次の年から額が変わります。`;
+/** ★② 決め1057 …… 公的年金等控除の区分が変わる方（★実測 60人・24.0%） */
+const TOSHI_KUBUN = (kara: number, kawaru: number) =>
+  `下の表は${kara}歳の年のものです。${kawaru}歳から公的年金等控除の区分が変わり、雑所得も変わります。`;
+/**
+ * ★③ 決め1093（★**新しい字**）…… 区分は変わらず、**雑所得だけ**が変わる方（★実測 84人・33.6%）。
+ *   ★★決め1057の字②は変わる理由を「区分」に置いていたため、★この84人（33.6%）に当たりませんでした。
+ */
+const TOSHI_ZATSU = (kara: number, kawaru: number) =>
+  `下の表は${kara}歳の年のものです。${kawaru}歳から、あなたが受け取る年金の額が変わりますので、雑所得も変わります。`;
+/**
+ * ★④ 決め1093（★**字を変えました**）…… どの年も同じ方（★実測 7人・2.8%）。
+ *   ★★**終了年齢を出しません** …… ★7人とも終わりが100歳で、`AGE_TO` の端が画面に出てしまいます。
+ *   ★前の字（決め1057）は「`{開始年齢}`歳から`{終了年齢}`歳まで、どの年も同じです。」でした。
+ */
+const TOSHI_ONAJI = (kara: number) =>
+  `下の表は、${kara}歳以降、どの年も同じです。`;
 
-/** ★決め1049⑥ の字（★雑所得が0円の方） */
-const ZATSU_ZERO = 'あなたの場合、公的年金等控除だけで所得がなくなりますので、この年の所得税はかかりません。';
+/**
+ * ★★★`zatsu_zero_bun` の字（★戦術Cowork 決め1092・2026-09-12）。
+ *
+ * ★★★**前の字（決め1049⑥）は誤りでした** ── 逐語 …
+ *   「あなたの場合、公的年金等控除だけで所得がなくなりますので、**この年の所得税はかかりません。**」
+ *   ★★この字が出る80人のうち **34人（42.5%）は、その年の所得税が0ではありません**
+ *     （★給与所得だけ8人／その年に退職所得だけ19人／両方5人／どちらでもない2人）。
+ *   ★★★開発Coworkが数えて、戦術Coworkが字を差し替えられました。
+ * ★★決め（1090(1)）＝**「◯◯はかかりません」と書くときは、その税の額そのものを数える。**
+ *   ★ある所得が0円であることから、税が0円であることを導きません。
+ */
+const ZATSU_ZERO = 'あなたの場合、公的年金等控除だけでこの年の年金の収入が引ききれますので、雑所得は0円になります。';
 
 /** ★決め1086 の字（★年金として受け取る所得が1つも無い方） */
 const NENKIN_NASHI = (nenkinGen: string) =>
@@ -237,37 +268,43 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
                                 true, kakekinOf(r, hyoNen));
   const jo = E.shotokuJoukyou(p, hyoNen, nen[hyoNen] ?? 0, kakekinOf(r, hyoNen));
 
-  // ── `nenkin_toshi_bun` …… 3つの字（★決め1057＋決め1085 2-1） -----------------
+  // ── `nenkin_toshi_bun` …… ★★**4つの字**（★決め1093） -----------------------
   const hyoAge = p.age(hyoNen);
   const tsukisu = nenkinNen === null ? null : p.tsukisuKara(p.koteki_kaishi_age, nenkinNen);
   /**
    * ★★**はじめの年のあと、公的年金等控除の区分と雑所得が変わる年**をさがします。
    *   ★★★**式を書いていません** …… ★`shotokuKumitate()` を年ごとに呼んで、**同じかどうかを見る**だけです。
    *   ★見る範囲は 55〜100歳（★`gamen8.ts` と同じ `AGES`）── ★公的年金は生涯続きますので、
-   *     ★★**年金の表に「終わり」はありません。**★ですので「どの年も同じ」も100歳まで見ます。
+   *     ★★**年金の表に「終わり」はありません**（★戦術Cowork 決め1093・お尋ね(6)への答え）。
+   *
+   * ★★★**はじめて変わる年で止めます**（★`break`）── ★その1つの年齢を `{変わる年齢}` に出すためです。
+   *   ★その年に**区分が変わっていれば字②**、★**雑所得だけなら字③**です。
+   *   ★同じ年に両方変わったときは**字②**です（★区分を先に見ます）。
    */
   let kawaruAge: number | null = null;
   let kawaruRiyu: 'kubun' | 'zatsu' | null = null;
-  let owariAge = hyoAge;
   for (let a = hyoAge + 1; a <= AGE_TO; a++) {
     const y = p.year(a);
     const x = E.shotokuKumitate(p, y, nen[y] ?? 0, taiShotokuOf(r, y));
     if (x.nenkin_kojo_kubun !== j.nenkin_kojo_kubun) { kawaruAge = a; kawaruRiyu = 'kubun'; break; }
     if (x.zatsu !== j.zatsu) { kawaruAge = a; kawaruRiyu = 'zatsu'; break; }
-    owariAge = a;
   }
   let toshiBun: string | null;
   let toshiKata: Bun11['shirabeta']['toshi_bun_kata'];
   if (nenkinNen === null) {
     toshiBun = null; toshiKata = 'nashi';
   } else if (tsukisu !== null && tsukisu !== 12 && p.kotekiByYear(nenkinNen) > 0) {
-    // ★字3 …… はじめの年の公的年金が12か月分でない方（★決め1085 2-1）
+    // ★字① …… はじめの年の公的年金が12か月分でない方（★決め1085 2-1）
     toshiBun = TOSHI_TSUKISU(hyoAge, tsukisu); toshiKata = 'tsukisu';
-  } else if (kawaruAge !== null) {
-    toshiBun = TOSHI_KUBUN(hyoAge, kawaruAge);
-    toshiKata = kawaruRiyu === 'kubun' ? 'kubun' : 'zatsu';
+  } else if (kawaruRiyu === 'kubun' && kawaruAge !== null) {
+    // ★字② …… 公的年金等控除の区分が変わる方（★決め1057）
+    toshiBun = TOSHI_KUBUN(hyoAge, kawaruAge); toshiKata = 'kubun';
+  } else if (kawaruRiyu === 'zatsu' && kawaruAge !== null) {
+    // ★字③ …… 区分は変わらず、雑所得だけが変わる方（★決め1093・新しい字）
+    toshiBun = TOSHI_ZATSU(hyoAge, kawaruAge); toshiKata = 'zatsu';
   } else {
-    toshiBun = TOSHI_ONAJI(hyoAge, owariAge); toshiKata = 'onaji';
+    // ★字④ …… どの年も同じ方（★決め1093・終了年齢を出しません）
+    toshiBun = TOSHI_ONAJI(hyoAge); toshiKata = 'onaji';
   }
 
   // ── 保険料の2行（★決め1033） -------------------------------------------------
@@ -311,8 +348,8 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
     shirabeta: {
       tai_nen: taiNen, nenkin_nen: nenkinNen, nenkin_tsukisu: tsukisu,
       toshi_bun_kata: toshiKata,
-      kawaru_age: kawaruAge, owari_age: toshiKata === 'onaji' ? owariAge : null,
-      zatsu: j.zatsu, keigen_shotoku: keigen,
+      kawaru_age: kawaruAge,
+      zatsu: j.zatsu, nenkin_shunyu: j.nenkinShunyu, keigen_shotoku: keigen,
     },
   };
 }

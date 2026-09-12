@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（177,314バイト ／ md5 fd651c7417700882d6d0da713aa9069d）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（177,233バイト ／ md5 873af5bb910ef7d34c6bc131a6db3a93）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -62,8 +62,8 @@ export const GAMEN9shosai: readonly Block9shosai[] = [
     { cells: ["収入の合計","{a_shunyu_kei}","{b_shunyu_kei}"],
       na: ["a_shunyu_kei","b_shunyu_kei"],
       kazari: [[null],[null],[null]] },
-    { cells: ["公的年金等控除\n{nenkin_kojo_kubun}","{a_nenkin_kojo}","{b_nenkin_kojo}"],
-      na: ["nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo"],
+    { cells: ["公的年金等控除\n{hantei_nenkin_kojo_kubun}","{a_nenkin_kojo}","{b_nenkin_kojo}"],
+      na: ["hantei_nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo"],
       kazari: [[null,"tbls"],[null],[null]] },
     { cells: ["雑所得\n{zatsu_chu}","{a_zatsu}","{b_zatsu}"],
       na: ["zatsu_chu","a_zatsu","b_zatsu"],
@@ -105,11 +105,11 @@ export const GAMEN9shosai: readonly Block9shosai[] = [
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["nenkin_gen","koteki_kaishi_age","handan_a_bun","keigen_a","handan_b_bun","keigen_b","handan_c_bun","keigen_c","an_a_bun","an_b_bun","sakaime_1","sakaime_2","sakaime_3","hantei_age","an_a_nensu","an_b_nensu","koteki_tsukisu","a_koteki","b_koteki","a_ideco","b_ideco","a_shunyu_kei","b_shunyu_kei","nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo","zatsu_chu","a_zatsu","b_zatsu","a_koujo15","b_koujo15","a_hantei_shotoku","b_hantei_shotoku","koteki_tsukisu_bun","mangaku_bun","ideco_zandaka","kokuho_kijun","a_kokuho_bun","b_kokuho_bun","setai_kubun","hikazei_gendo","a_jumin_bun","b_jumin_bun"];
+export const HITOGOTO_SHURUI: readonly string[] = ["nenkin_gen","koteki_kaishi_age","handan_a_bun","keigen_a","handan_b_bun","keigen_b","handan_c_bun","keigen_c","an_a_bun","an_b_bun","sakaime_1","sakaime_2","sakaime_3","hantei_age","an_a_nensu","an_b_nensu","koteki_tsukisu","a_koteki","b_koteki","a_ideco","b_ideco","a_shunyu_kei","b_shunyu_kei","hantei_nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo","zatsu_chu","a_zatsu","b_zatsu","a_koujo15","b_koujo15","a_hantei_shotoku","b_hantei_shotoku","koteki_tsukisu_bun","mangaku_bun","ideco_zandaka","kokuho_kijun","a_kokuho_bun","b_kokuho_bun","setai_kubun","hikazei_gendo","a_jumin_bun","b_jumin_bun"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
 export const HITOGOTO_KASHO = 66;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
-export const MADA_NA: readonly string[] = ["koteki_kaishi_age","handan_a_bun","keigen_a","handan_b_bun","keigen_b","handan_c_bun","keigen_c","an_a_bun","an_b_bun","sakaime_1","sakaime_2","sakaime_3","hantei_age","an_a_nensu","an_b_nensu","koteki_tsukisu","a_koteki","b_koteki","a_ideco","b_ideco","a_shunyu_kei","b_shunyu_kei","nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo","zatsu_chu","a_zatsu","b_zatsu","a_koujo15","b_koujo15","a_hantei_shotoku","b_hantei_shotoku","koteki_tsukisu_bun","mangaku_bun","ideco_zandaka","kokuho_kijun","a_kokuho_bun","b_kokuho_bun","setai_kubun","hikazei_gendo","a_jumin_bun","b_jumin_bun"];
+export const MADA_NA: readonly string[] = ["koteki_kaishi_age","handan_a_bun","keigen_a","handan_b_bun","keigen_b","handan_c_bun","keigen_c","an_a_bun","an_b_bun","sakaime_1","sakaime_2","sakaime_3","hantei_age","an_a_nensu","an_b_nensu","koteki_tsukisu","a_koteki","b_koteki","a_ideco","b_ideco","a_shunyu_kei","b_shunyu_kei","hantei_nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo","zatsu_chu","a_zatsu","b_zatsu","a_koujo15","b_koujo15","a_hantei_shotoku","b_hantei_shotoku","koteki_tsukisu_bun","mangaku_bun","ideco_zandaka","kokuho_kijun","a_kokuho_bun","b_kokuho_bun","setai_kubun","hikazei_gendo","a_jumin_bun","b_jumin_bun"];
 

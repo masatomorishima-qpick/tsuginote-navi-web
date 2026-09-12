@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（177,314バイト ／ md5 fd651c7417700882d6d0da713aa9069d）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（177,233バイト ／ md5 873af5bb910ef7d34c6bc131a6db3a93）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -35,7 +35,7 @@ export type Block11 =
 
 export const GAMEN11: readonly Block11[] = [
   { kind: 'midashi', lv: 2, bun: "あなたの税金の計算過程について" },
-  { kind: 'hako', bun: "いま表示しているのは「{an_bun}」場合の計算過程です。一覧で別の受け取り方を選ぶと、その受け取り方の計算過程に切り替わります。", na: ["an_bun"] },
+  { kind: 'hako', bun: "いま表示しているのは、{an_bun} の場合の計算過程です。一覧で別の受け取り方を選ぶと、その受け取り方の計算過程に切り替わります。", na: ["an_bun"] },
   { kind: 'midashi', lv: 3, bun: "あなたの{tai_gen}（{tai_age}）" },
   { kind: 'hyo', gyou: [
     { cells: ["{kojo_shiki}","{kojo}"],
@@ -105,5 +105,5 @@ export const HITOGOTO_SHURUI: readonly string[] = ["an_bun","tai_gen","tai_age",
 export const HITOGOTO_KASHO = 34;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
-export const MADA_NA: readonly string[] = ["an_bun","tai_gen","tai_age","kojo_shiki","tai_hantei_bun","nenkin_kikan_bun","nenkin_toshi_bun","kyuyo","kojo_uchiwake","kojo_goukei","setai_kubun","hikazei_gendo","jumin_hantei_bun","jumin","kokuho_kiso","hoken_hantei_bun","hoken_kekka","zatsu_zero_bun"];
+export const MADA_NA: readonly string[] = ["an_bun","tai_gen","kojo_shiki","tai_hantei_bun","nenkin_kikan_bun","nenkin_toshi_bun","kyuyo","kojo_uchiwake","kojo_goukei","setai_kubun","hikazei_gendo","jumin_hantei_bun","jumin","kokuho_kiso","hoken_hantei_bun","hoken_kekka","zatsu_zero_bun"];
 

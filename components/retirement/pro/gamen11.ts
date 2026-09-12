@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（177,102バイト ／ md5 58c6e1e8b7a957d42f68e92e5a55c088）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（177,401バイト ／ md5 1fa37eae25b7db4c4f1ecbf0426c360b）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -78,6 +78,7 @@ export const GAMEN11: readonly Block11[] = [
       na: ["hoken_hantei_bun","hoken_kekka"],
       kazari: [[null,"tbls"],[null]] },
   ] },
+  { kind: 'hon', bun: "{zatsu_zero_bun}", na: ["zatsu_zero_bun"] },
   { kind: 'midashi', lv: 3, bun: "あなたの手数料" },
   { kind: 'hyo', gyou: [
     { cells: ["給付事務手数料 440円×{kyufu_kaisu}","{kyufu_kei}"],
@@ -94,11 +95,11 @@ export const GAMEN11: readonly Block11[] = [
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["an_bun","tai_gen","tai_age","kojo_shiki","kojo","shunyu","shotoku","nenkin_gen","nenkin_kikan_bun","nenkin_shunyu","nenkin_kojo_kubun","nenkin_kojo","zatsu","kiso_shiki","kiso_shotoku","shotokuzei","setai_kubun","hikazei_gendo","jumin","kokuho_kiso","hoken_hantei_bun","hoken_kekka","kyufu_kaisu","kyufu_kei","koza_tanka","koza_tsuki","koza_kei","tesuryo"];
+export const HITOGOTO_SHURUI: readonly string[] = ["an_bun","tai_gen","tai_age","kojo_shiki","kojo","shunyu","shotoku","nenkin_gen","nenkin_kikan_bun","nenkin_shunyu","nenkin_kojo_kubun","nenkin_kojo","zatsu","kiso_shiki","kiso_shotoku","shotokuzei","setai_kubun","hikazei_gendo","jumin","kokuho_kiso","hoken_hantei_bun","hoken_kekka","zatsu_zero_bun","kyufu_kaisu","kyufu_kei","koza_tanka","koza_tsuki","koza_kei","tesuryo"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
-export const HITOGOTO_KASHO = 29;
+export const HITOGOTO_KASHO = 30;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
-export const MADA_NA: readonly string[] = ["an_bun","tai_gen","tai_age","kojo_shiki","nenkin_kikan_bun","kiso_shiki","kiso_shotoku","setai_kubun","hikazei_gendo","jumin","kokuho_kiso","hoken_hantei_bun","hoken_kekka"];
+export const MADA_NA: readonly string[] = ["an_bun","tai_gen","tai_age","kojo_shiki","nenkin_kikan_bun","kiso_shiki","kiso_shotoku","setai_kubun","hikazei_gendo","jumin","kokuho_kiso","hoken_hantei_bun","hoken_kekka","zatsu_zero_bun"];
 

@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（177,102バイト ／ md5 58c6e1e8b7a957d42f68e92e5a55c088）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（177,401バイト ／ md5 1fa37eae25b7db4c4f1ecbf0426c360b）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -65,8 +65,8 @@ export const GAMEN9shosai: readonly Block9shosai[] = [
     { cells: ["公的年金等控除\n{nenkin_kojo_kubun}","{a_nenkin_kojo}","{b_nenkin_kojo}"],
       na: ["nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo"],
       kazari: [[null,"tbls"],[null],[null]] },
-    { cells: ["雑所得\n0円より下がりません","{a_zatsu}","{b_zatsu}"],
-      na: ["a_zatsu","b_zatsu"],
+    { cells: ["雑所得\n{zatsu_chu}","{a_zatsu}","{b_zatsu}"],
+      na: ["zatsu_chu","a_zatsu","b_zatsu"],
       kazari: [[null,"tbls"],[null],[null]] },
     { cells: ["↓ ここから保険料の話です（税金の計算には出てきません）"],
       na: [],
@@ -80,7 +80,7 @@ export const GAMEN9shosai: readonly Block9shosai[] = [
       kazari: [[null],[null],[null]],
       gyoKazari: "sum" },
   ] },
-  { kind: 'hon', bun: "公的年金が{a_koteki}しかないのは、あなたが{hantei_age}になる年に支払を受けるのが{koteki_tsukisu}分だけだからです。あなたは{umare}生まれなので公的年金は{koteki_hajime_tsuki}分から始まり、しかも年金は偶数月に前月までの分をまとめて支払うので、その年に届くのは{koteki_owari_tsuki}分までになります。満額の{koteki_nenkin}が入るのは{mangaku_age}からです（{a_koteki} ＝ {koteki_nenkin} × {koteki_tsukisu} ÷ 12か月・1円未満は切り捨て）。\n{nenkin_gen} {b_ideco} ＝ {ideco_zandaka} ÷ {an_b_nensu}（割り切れない分は最後の年に足します）。\nいちばん下の「保険料の判定に使う所得」で、国民健康保険料の軽減（7割・5割・2割）を受けられるかどうかが決まります。税金の計算に使う所得とは別のものです。", na: ["a_koteki","hantei_age","koteki_tsukisu","umare","koteki_hajime_tsuki","koteki_owari_tsuki","koteki_nenkin","mangaku_age","nenkin_gen","b_ideco","ideco_zandaka","an_b_nensu"] },
+  { kind: 'hon', bun: "公的年金が{a_koteki}しかないのは、あなたが{hantei_age}になる年に支払を受けるのが{koteki_tsukisu}分だけだからです。あなたは{umare}生まれなので公的年金は{koteki_hajime_tsuki}分から始まり、しかも年金は偶数月に前月までの分をまとめて支払うので、その年に届くのは{koteki_owari_tsuki}分までになります。{mangaku_bun}（{a_koteki} ＝ {koteki_nenkin} × {koteki_tsukisu} ÷ 12か月・1円未満は切り捨て）。\n{nenkin_gen} {b_ideco} ＝ {ideco_zandaka} ÷ {an_b_nensu}（割り切れない分は最後の年に足します）。\nいちばん下の「保険料の判定に使う所得」で、国民健康保険料の軽減（7割・5割・2割）を受けられるかどうかが決まります。税金の計算に使う所得とは別のものです。", na: ["a_koteki","hantei_age","koteki_tsukisu","umare","koteki_hajime_tsuki","koteki_owari_tsuki","mangaku_bun","koteki_nenkin","nenkin_gen","b_ideco","ideco_zandaka","an_b_nensu"] },
   { kind: 'midashi', lv: 3, bun: "この所得が、どの基準を超えるか" },
   { kind: 'hon', bun: "上で出した所得（{an_a_nensu}なら{a_hantei_shotoku}、{an_b_nensu}なら{b_hantei_shotoku}）を、国の定める基準と比べたものです。超えると、その行の負担が上がります。", na: ["an_a_nensu","a_hantei_shotoku","an_b_nensu","b_hantei_shotoku"] },
   { kind: 'hyo', gyou: [
@@ -90,8 +90,8 @@ export const GAMEN9shosai: readonly Block9shosai[] = [
     { cells: ["国民健康保険料などの軽減\n基準 {kokuho_kijun}","{a_kokuho_bun}","{b_kokuho_bun}"],
       na: ["kokuho_kijun","a_kokuho_bun","b_kokuho_bun"],
       kazari: [[null,"tbls"],[null],[null]] },
-    { cells: ["住民税の非課税\n基準 {hikazei_gendo}","{a_jumin_bun}","{b_jumin_bun}"],
-      na: ["hikazei_gendo","a_jumin_bun","b_jumin_bun"],
+    { cells: ["住民税の非課税\n基準（{setai_kubun}） {hikazei_gendo}","{a_jumin_bun}","{b_jumin_bun}"],
+      na: ["setai_kubun","hikazei_gendo","a_jumin_bun","b_jumin_bun"],
       kazari: [[null,"tbls"],[null],[null]] },
   ] },
   { kind: 'hon', bun: "{handan_b_bun}、こうなります。", na: ["handan_b_bun"] },
@@ -105,11 +105,11 @@ export const GAMEN9shosai: readonly Block9shosai[] = [
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["nenkin_gen","koteki_kaishi_age","handan_a_bun","keigen_a","handan_b_bun","keigen_b","handan_c_bun","keigen_c","an_a_bun","an_b_bun","sakaime_1","sakaime_2","sakaime_3","hantei_age","an_a_nensu","an_b_nensu","koteki_tsukisu","a_koteki","b_koteki","a_ideco","b_ideco","a_shunyu_kei","b_shunyu_kei","nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo","a_zatsu","b_zatsu","a_koujo15","b_koujo15","a_hantei_shotoku","b_hantei_shotoku","umare","koteki_hajime_tsuki","koteki_owari_tsuki","koteki_nenkin","mangaku_age","ideco_zandaka","kokuho_kijun","a_kokuho_bun","b_kokuho_bun","hikazei_gendo","a_jumin_bun","b_jumin_bun"];
+export const HITOGOTO_SHURUI: readonly string[] = ["nenkin_gen","koteki_kaishi_age","handan_a_bun","keigen_a","handan_b_bun","keigen_b","handan_c_bun","keigen_c","an_a_bun","an_b_bun","sakaime_1","sakaime_2","sakaime_3","hantei_age","an_a_nensu","an_b_nensu","koteki_tsukisu","a_koteki","b_koteki","a_ideco","b_ideco","a_shunyu_kei","b_shunyu_kei","nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo","zatsu_chu","a_zatsu","b_zatsu","a_koujo15","b_koujo15","a_hantei_shotoku","b_hantei_shotoku","umare","koteki_hajime_tsuki","koteki_owari_tsuki","mangaku_bun","koteki_nenkin","ideco_zandaka","kokuho_kijun","a_kokuho_bun","b_kokuho_bun","setai_kubun","hikazei_gendo","a_jumin_bun","b_jumin_bun"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
-export const HITOGOTO_KASHO = 73;
+export const HITOGOTO_KASHO = 74;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
-export const MADA_NA: readonly string[] = ["koteki_kaishi_age","handan_a_bun","keigen_a","handan_b_bun","keigen_b","handan_c_bun","keigen_c","an_a_bun","an_b_bun","sakaime_1","sakaime_2","sakaime_3","hantei_age","an_a_nensu","an_b_nensu","koteki_tsukisu","a_koteki","b_koteki","a_ideco","b_ideco","a_shunyu_kei","b_shunyu_kei","nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo","a_zatsu","b_zatsu","a_koujo15","b_koujo15","a_hantei_shotoku","b_hantei_shotoku","umare","koteki_hajime_tsuki","koteki_owari_tsuki","koteki_nenkin","mangaku_age","ideco_zandaka","kokuho_kijun","a_kokuho_bun","b_kokuho_bun","hikazei_gendo","a_jumin_bun","b_jumin_bun"];
+export const MADA_NA: readonly string[] = ["koteki_kaishi_age","handan_a_bun","keigen_a","handan_b_bun","keigen_b","handan_c_bun","keigen_c","an_a_bun","an_b_bun","sakaime_1","sakaime_2","sakaime_3","hantei_age","an_a_nensu","an_b_nensu","koteki_tsukisu","a_koteki","b_koteki","a_ideco","b_ideco","a_shunyu_kei","b_shunyu_kei","nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo","zatsu_chu","a_zatsu","b_zatsu","a_koujo15","b_koujo15","a_hantei_shotoku","b_hantei_shotoku","umare","koteki_hajime_tsuki","koteki_owari_tsuki","mangaku_bun","koteki_nenkin","ideco_zandaka","kokuho_kijun","a_kokuho_bun","b_kokuho_bun","setai_kubun","hikazei_gendo","a_jumin_bun","b_jumin_bun"];
 

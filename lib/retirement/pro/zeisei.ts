@@ -290,14 +290,41 @@ export class Jinteki {
     return -fdiv(-(moto * wari), 30_000) * 10_000;
   }
 
+  /**
+   * ★★★【2026-09-12・戦術Cowork 決め1066】**人的控除の内わけ**（所得税側）。
+   *
+   * ★★なぜ足したか …… ★決め1066は画面11 1125行の `{kojo_uchiwake}` を
+   *   「**0円でない項目だけを、決まった順で『名前 額』と並べる**」と決めています。
+   *   ★ところが `shotokuzei()` は**1つの和**しか返しておらず、
+   *   ★★**9項目のうち「配偶者控除・配偶者特別控除」「扶養控除」「障害者控除」「寡婦控除」
+   *      「ひとり親控除」の5つが、分けられませんでした**（★開発Coworkが数えました）。
+   *
+   * ★★★**`shotokuzei()` は、この内わけの和をそのまま返します**
+   *   ── ★2つの式を別に持たせません（★持たせると、必ず片方が古くなります）。
+   *
+   * ★★項目の名前は**決め1066の順**です。★額は1円も丸めません。
+   */
+  shotokuzeiUchiwake(honninGoukei: number): {
+    haigusha: number; fuyou: number; shogai: number; kafu: number; hitorioya: number;
+  } {
+    return {
+      // ★配偶者控除・配偶者特別控除（★段は `honninGoukei` で決まります）
+      haigusha: this.haigusha(honninGoukei, [380_000, 260_000, 130_000],
+        [480_000, 320_000, 160_000], haigushaTokubetsuShotokuzei),
+      // ★扶養控除のうち、特定扶養・老人扶養・同居老親（★一般の38万円は `Jinbutsu` 側に在ります）
+      fuyou: 630_000 * this.fuyou_tokutei + 480_000 * this.fuyou_rojin
+        + 580_000 * this.fuyou_dokyo_rojin,
+      shogai: 270_000 * this.shogai_ippan + 400_000 * this.shogai_tokubetsu
+        + 750_000 * this.shogai_dokyo_tokubetsu,
+      kafu: this.kafu ? 270_000 : 0,
+      hitorioya: this.hitorioya ? 350_000 : 0,
+    };
+  }
+
   shotokuzei(honninGoukei: number): number {
-    const v = 270_000 * this.shogai_ippan + 400_000 * this.shogai_tokubetsu
-      + 750_000 * this.shogai_dokyo_tokubetsu
-      + (this.kafu ? 270_000 : 0) + (this.hitorioya ? 350_000 : 0)
-      + 630_000 * this.fuyou_tokutei + 480_000 * this.fuyou_rojin
-      + 580_000 * this.fuyou_dokyo_rojin;
-    return v + this.haigusha(honninGoukei, [380_000, 260_000, 130_000],
-      [480_000, 320_000, 160_000], haigushaTokubetsuShotokuzei);
+    // ★★**内わけの和をそのまま返します**（★式を2か所に持たせません・決め1066）
+    const u = this.shotokuzeiUchiwake(honninGoukei);
+    return u.haigusha + u.fuyou + u.shogai + u.kafu + u.hitorioya;
   }
 
   jumin(honninGoukei: number): number {

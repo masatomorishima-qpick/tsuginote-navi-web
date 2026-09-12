@@ -253,10 +253,33 @@ export class Jinbutsu {
     return q;
   }
 
+  /**
+   * ★★★【2026-09-12・戦術Cowork 決め1066】**所得控除の内わけ**（所得税側・基礎控除と掛金を除く）。
+   *
+   * ★★**`kojoShotokuzei()` は、この内わけの和をそのまま返します**
+   *   ── ★式を2か所に持たせません（★持たせると、必ず片方が古くなります）。
+   * ★基礎控除（`Z.kisoShotoku`）と小規模企業共済等掛金控除（`kakekin`）は**ここに入りません**
+   *   ── ★どちらもこの本の外から来ます（`nenkanZeiUchiwake()` 1090行あたり）。
+   */
+  kojoShotokuzeiUchiwake(goukei: number): {
+    shakai: number; fuyou: number; haigusha: number;
+    hoken: number; shogai: number; kafu: number; hitorioya: number;
+  } {
+    const j = this.jinteki.shotokuzeiUchiwake(goukei);
+    return {
+      shakai: this.shakai_hoken,
+      // ★扶養控除 …… ★一般の38万円（`fuyou_nin`）と、特定・老人・同居老親（`jinteki`）の和
+      fuyou: 380_000 * this.fuyou_nin + j.fuyou,
+      haigusha: j.haigusha,
+      hoken: this.hokenKojoShotoku(),                 // ⑯【2026-09-06】★7欄
+      shogai: j.shogai, kafu: j.kafu, hitorioya: j.hitorioya,
+    };
+  }
+
   kojoShotokuzei(goukei = 0): number {
-    return this.shakai_hoken + 380_000 * this.fuyou_nin
-      + this.hokenKojoShotoku()                       // ⑯【2026-09-06】★7欄
-      + this.jinteki.shotokuzei(goukei);
+    // ★★**内わけの和をそのまま返します**（★式を2か所に持たせません・決め1066）
+    const u = this.kojoShotokuzeiUchiwake(goukei);
+    return u.shakai + u.fuyou + u.haigusha + u.hoken + u.shogai + u.kafu + u.hitorioya;
   }
   kojoJumin(goukei = 0): number {
     return this.shakai_hoken + 330_000 * this.fuyou_nin
@@ -1071,7 +1094,43 @@ export function shinkokuIchiran(p: Jinbutsu, r: EvalResult): ShinkokuGyou[] {
 export const SHINKOKU_FUGO: Record<string, number> =
   { '': 0, 'あ': 1, 'い': 2, 'う': 3, 'あう': 4, 'いう': 5 };
 
-export interface ZeiUchiwake { shotokuzei: number; jumin_sougou: number; jumin_taishoku: number; }
+/**
+ * ★★★【2026-09-12・戦術Cowork 決め1066】**所得控除の合計と、その内わけ**（所得税側・9項目）。
+ *
+ * ★★画面11 1125行「所得税の所得控除の合計／`{kojo_goukei}`」と、その小さい字
+ *   `{kojo_uchiwake}`（★0円でない項目だけを決まった順で並べる）のためのものです。
+ * ★★★**ここに置いた理由** …… ★合計の式は `nenkanZeiUchiwake()` の中に**すでに在ります**
+ *   （★1090行あたり `Z.kisoShotoku(goukei, n) + p.kojoShotokuzei(goukei) + kakekin`）。
+ *   ★画面の側で同じ式をもう1度書くと、**§実装側に式を持たせない** に触り、★片方が必ず古くなります。
+ * ★**順は決め1066のとおり**です。★名前（字）は画面の側が持ちます（★ここは数だけ）。
+ */
+export interface KojoUchiwake {
+  /** 基礎控除（`Z.kisoShotoku(goukei, nenbun)`） */
+  kiso: number;
+  /** 社会保険料控除 */
+  shakai: number;
+  /** 小規模企業共済等掛金控除（★その年の掛金） */
+  kakekin: number;
+  /** 生命保険料控除・地震保険料控除（⑯） */
+  hoken: number;
+  /** 配偶者控除・配偶者特別控除 */
+  haigusha: number;
+  /** 扶養控除（★一般38万円＋特定・老人・同居老親） */
+  fuyou: number;
+  /** 障害者控除 */
+  shogai: number;
+  /** 寡婦控除 */
+  kafu: number;
+  /** ひとり親控除 */
+  hitorioya: number;
+}
+
+export interface ZeiUchiwake {
+  shotokuzei: number; jumin_sougou: number; jumin_taishoku: number;
+  /** ★所得税の所得控除の合計（★下の `kojo_uchiwake` の和と必ず同じです） */
+  kojo_goukei: number;
+  kojo_uchiwake: KojoUchiwake;
+}
 
 /** その年の所得にかかる税の内訳（所得税／住民税総合＝翌年度／住民税退職＝その年） */
 export function nenkanZeiUchiwake(p: Jinbutsu, year: number, idecoNenkin: number,
@@ -1087,7 +1146,24 @@ export function nenkanZeiUchiwake(p: Jinbutsu, year: number, idecoNenkin: number
   const k = shotokuKumitate(p, year, idecoNenkin, taiShotoku);              // 所得税用
   const kj = shotokuKumitate(p, year, idecoNenkin, taiShotoku, 0);          // 住民税用
   const { nenbun: n, sougou, goukei } = k;
-  const ks = Z.kisoShotoku(goukei, n) + p.kojoShotokuzei(goukei) + kakekin;
+  /**
+   * ★★★【2026-09-12・決め1066】**内わけから合計を作ります**（★前は和だけを作っていました）。
+   *   ★`ks` の値は1円も変わりません ── ★下の `kojoGoukei` と**同じ和**です（★すぐ下で確かめます）。
+   */
+  const ku: KojoUchiwake = {
+    kiso: Z.kisoShotoku(goukei, n),
+    kakekin,
+    ...p.kojoShotokuzeiUchiwake(goukei),
+  };
+  const ks = ku.kiso + ku.shakai + ku.kakekin + ku.hoken
+    + ku.haigusha + ku.fuyou + ku.shogai + ku.kafu + ku.hitorioya;
+  /**
+   * ★★★**ここに「前の式と合うか」の門は置きません。**
+   *   ★`kojoShotokuzei()` も `Jinteki.shotokuzei()` も、いまは**この内わけの和を返します**ので、
+   *     ★★自分と自分を比べるだけの門になります（★★**こちらが1度、そう書きました**）。
+   *   ★★★代わりに、★**前の式を凍らせて写した当て**を器に置いて測りました
+   *     （`_kojo_uchiwake_ate.mjs`・250人 × 退職の年と年金の年 ── ★**差 0円**）。
+   */
   const kazeiSougou = Z.f1000(sougou - ks);
   // 所得税法87条2項：総所得から引ききれない所得控除を課税退職所得から差し引ける
   const amari = shinkoku ? Math.max(0, ks - sougou) : 0;
@@ -1104,6 +1180,8 @@ export function nenkanZeiUchiwake(p: Jinbutsu, year: number, idecoNenkin: number
     jumin_sougou: Z.juminSougou(sj, p.kojoJumin(sj) + kakekin, p.fuyouKei(),
                                 p.kyuchi, p.jinteki.sa(sj), sj),
     jumin_taishoku: Z.juminTaishoku(taiShotoku),
+    kojo_goukei: ks,
+    kojo_uchiwake: ku,
   };
 }
 

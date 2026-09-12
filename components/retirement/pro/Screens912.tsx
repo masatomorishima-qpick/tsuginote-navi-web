@@ -44,6 +44,7 @@
 import * as E from '@/lib/retirement/pro/engine';
 import type { IchiranGyou, IchiranMatome } from '@/lib/retirement/pro/ichiran';
 import { ritsuJi } from '@/lib/retirement/pro/gamen12Bun';
+import type * as E11 from '@/lib/retirement/pro/gamen11Bun';
 import { GAMEN9, MADA_NA as MADA9 } from './gamen9';
 import { GAMEN9shosai, MADA_NA as MADA9S } from './gamen9shosai';
 import { GAMEN10, MADA_NA as MADA10 } from './gamen10';
@@ -113,6 +114,13 @@ export type Moto912 = {
   gensenRitsu: number;
   /** `{nenkin_kaishi_age}` のもと …… その方が iDeCo等 を受け取り始める**年齢**（★`p.age(nenkinKaishiNen(...))`） */
   nenkinKaishiAge: number;
+  /**
+   * ★★★画面11の16種類（★戦術Cowork `senjutsu_20260912e.md` 6-4・**回2**）。
+   * ★★**どれも、ここでは作りません。**★エンジンが出したものを、そのまま受け取ります
+   *   （★分岐と式と字は `lib/retirement/pro/gamen11Bun.ts` に在ります）。
+   * ★呼ぶ側は `E11.gamen11Bun(p, plan, r, taishokuAge, nenkinGen)` の戻りを、そのまま渡してください。
+   */
+  bun11: E11.Bun11;
 };
 
 /** ★当てはまらない理由の字（★6通り・戦術Cowork `senjutsu_20260908d.md` 4節。**こちらでは書きません**） */
@@ -175,6 +183,34 @@ export function atai912(m: Moto912): Record<string, string | null> {
     ichiran_haba: en(m.ichiranMatome.haba),
     toori_kazu: `${m.toorisu.toLocaleString('en-US')}通り`,
     zenbu_haba: en(m.zenbuHaba),
+    /**
+     * ★★★画面11の16種類（★戦術Cowork `senjutsu_20260912e.md` 6-4・**回2**）。
+     *
+     * ★★**ここでは字にするだけです。**★分岐も式もありません（★`gamen11Bun.ts` に在ります）。
+     * ★★★**`null` は、そのまま渡します** …… ★「その方には存在しない」で、
+     *   `kumitate()` がかたまりごと落とします（★`nenkin_nashi_bun`・`nenkin_toshi_bun`・`zatsu_zero_bun`）。
+     *
+     * ★★★**この16を繋いでも、画面11の表は2つとも落ちたままです**（★回2の姿）──
+     *   ★退職金の表に `tai_gen`（回3）・年金の表に `setai_kubun`／`hikazei_gendo`（回4）が
+     *   `data-mada` で残っているためです。★開発Coworkが**実際に `kumitate()` を回して**測りました
+     *   （★16種類だけでも／24種類ぜんぶでも かたまり9・落ち3で**1つも変わりません**）。
+     */
+    an_bun: m.bun11.an_bun,
+    kojo_shiki: m.bun11.kojo_shiki,
+    tai_hantei_bun: m.bun11.tai_hantei_bun,
+    shotokuzei_tai: en(m.bun11.shotokuzei_tai),
+    jumin_taishoku: en(m.bun11.jumin_taishoku),
+    nenkin_nashi_bun: m.bun11.nenkin_nashi_bun,
+    nenkin_toshi_bun: m.bun11.nenkin_toshi_bun,
+    kyuyo: en(m.bun11.kyuyo),
+    kojo_uchiwake: m.bun11.kojo_uchiwake,
+    kojo_goukei: en(m.bun11.kojo_goukei),
+    jumin: en(m.bun11.jumin),
+    jumin_hantei_bun: m.bun11.jumin_hantei_bun,
+    kokuho_kiso: en(m.bun11.kokuho_kiso),
+    hoken_hantei_bun: m.bun11.hoken_hantei_bun,
+    hoken_kekka: m.bun11.hoken_kekka,
+    zatsu_zero_bun: m.bun11.zatsu_zero_bun,
   };
 
   /**

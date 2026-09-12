@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（177,710バイト ／ md5 4713aed7c1b3ed058eab15f611d2a362）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（177,785バイト ／ md5 11fdbdff4e7f2fb6ae11b0b152cfe03b）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -54,6 +54,7 @@ export const GAMEN11: readonly Block11[] = [
       na: ["jumin_taishoku"],
       kazari: [[null,"tbls"],[null]] },
   ] },
+  { kind: 'hon', bun: "{nenkin_nashi_bun}", na: ["nenkin_nashi_bun"] },
   { kind: 'midashi', lv: 3, bun: "あなたの年金の所得" },
   { kind: 'hon', bun: "{nenkin_toshi_bun}", na: ["nenkin_toshi_bun"] },
   { kind: 'hyo', gyou: [
@@ -105,11 +106,11 @@ export const GAMEN11: readonly Block11[] = [
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["an_bun","tai_gen","tai_age","kojo_shiki","kojo","shunyu","tai_hantei_bun","shotoku","shotokuzei_tai","jumin_taishoku","nenkin_toshi_bun","nenkin_gen","nenkin_shunyu","nenkin_kojo_kubun","nenkin_kojo","zatsu","kyuyo","kojo_uchiwake","kojo_goukei","shotokuzei","setai_kubun","hikazei_gendo","jumin_hantei_bun","jumin","kokuho_kiso","hoken_hantei_bun","hoken_kekka","zatsu_zero_bun","kyufu_kaisu","kyufu_kei","koza_tanka","koza_tsuki","koza_kei","tesuryo"];
+export const HITOGOTO_SHURUI: readonly string[] = ["an_bun","tai_gen","tai_age","kojo_shiki","kojo","shunyu","tai_hantei_bun","shotoku","shotokuzei_tai","jumin_taishoku","nenkin_nashi_bun","nenkin_toshi_bun","nenkin_gen","nenkin_shunyu","nenkin_kojo_kubun","nenkin_kojo","zatsu","kyuyo","kojo_uchiwake","kojo_goukei","shotokuzei","setai_kubun","hikazei_gendo","jumin_hantei_bun","jumin","kokuho_kiso","hoken_hantei_bun","hoken_kekka","zatsu_zero_bun","kyufu_kaisu","kyufu_kei","koza_tanka","koza_tsuki","koza_kei","tesuryo"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
-export const HITOGOTO_KASHO = 35;
+export const HITOGOTO_KASHO = 36;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
-export const MADA_NA: readonly string[] = ["an_bun","tai_gen","kojo_shiki","tai_hantei_bun","shotokuzei_tai","jumin_taishoku","nenkin_toshi_bun","kyuyo","kojo_uchiwake","kojo_goukei","setai_kubun","hikazei_gendo","jumin_hantei_bun","jumin","kokuho_kiso","hoken_hantei_bun","hoken_kekka","zatsu_zero_bun"];
+export const MADA_NA: readonly string[] = ["tai_gen","setai_kubun","hikazei_gendo"];
 

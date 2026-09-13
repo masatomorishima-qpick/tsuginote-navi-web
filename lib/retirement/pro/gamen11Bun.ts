@@ -1,11 +1,14 @@
 /**
  * lib/retirement/pro/gamen11Bun.ts ── 画面11（あなたの税金の計算過程について）の**字のもと**を作る
  *
- * ★★★戦術Cowork `senjutsu_20260912e.md` 6-4 の **回2の16種類**です。
+ * ★★★戦術Cowork `senjutsu_20260912e.md` 6-4 の **回2の16種類**と、
+ *   ★★`senjutsu_20260912g.md` 3節の **`ichiji_*` 9種類**（★2本目の表）── ★あわせて **25種類**です。
  *   ★決め1030（`an_bun`）・1033（保険料の2行）・1036(1)（`tai_hantei_bun`）・1042（`kyuyo`）
- *   ★1049⑥（`zatsu_zero_bun`）・1057＋1085 2-1（`nenkin_toshi_bun` の3つの字）
+ *   ★1049⑥＋1092＋1100（`zatsu_zero_bun`）・1085 2-1＋1093＋1099（`nenkin_toshi_bun` の4つの字）
  *   ★1065（`jumin`・`jumin_hantei_bun`）・1066（`kojo_uchiwake`・`kojo_goukei`）
  *   ★1077（`kojo_shiki`）・1078（`shotokuzei_tai`・`jumin_taishoku`）・1086（`nenkin_nashi_bun`）
+ *   ★★1101（`ichiji_*` 9種類 ── ★41人／250・16.4%に、最大 6,195,000円の退職所得と
+ *      1,448,041円の税が、計算過程の画面に1円も出ていませんでした）
  *
  * 【なぜこの本を作ったか】
  *   ★★16のうち8つは**分岐の字**で、2つは**組み立てた字**です。
@@ -17,10 +20,13 @@
  *   ★見せ方（`en()` で「円」を付けるなど）は `atai912()` がします。★ここは**数と字のもと**だけです。
  *   ★★**既定値を作っていません。**★「いまの年」も年齢も、呼ぶ側から渡します。
  *
- * 【★★★止め ── 戦術Coworkにお尋ねしている3つ】（★便に書きました）
- *   (1) `nenkin_toshi_bun` の**3つの字の順**と、字1の `{終了年齢}` の決め方
- *   (2) 保険料の判定の**給与所得者数**（★入力に欄が0か所・決め1059と同じ形）
- *   (3) `zatsu_zero_bun` の字（★給与所得が在る方にも「所得税はかかりません」と読めます）
+ * 【★★★止め ── 戦術Coworkにお尋ねしている2つ】（★便に書きました）
+ *   (1) 保険料の判定の**給与所得者数**（★入力に欄が0か所・決め1059と同じ形・回4の前に直します）
+ *   (2) ★★★**⑨企業年金・㉓役員退職慰労金が `build()` に渡っていません**
+ *       （★`kekka.ts` 94行が `[TAI_NAME]` の1本だけを渡しています。★`paidInput.ts` 344行の
+ *         `ichijikinOnly()` は**0か所から呼ばれていません**）。★測った差 ── ⑨500万円で
+ *       **税 676,778円 少なく・手取り 676,778円 多く**／㉓300万円で **税 297,024円 少なく**。
+ *       ★★渡すようになると、**退職所得の年が3つになりえます**（★下の `hoka.length > 1` で止まります）。
  */
 
 import * as Z from './zeisei';
@@ -69,12 +75,36 @@ export interface Bun11 {
   hoken_hantei_bun: string;
   /** ★決め1033 …… 「変わりません」／「上がる場合があります」 */
   hoken_kekka: string;
-  /** ★決め1049⑥ …… 雑所得が0円の方だけの1文。★ほかの方は `null`（かたまりごと落ちます） */
+  /**
+   * ★決め1049⑥＋決め1092＋★決め1100 …… **年金収入が0でない かつ 雑所得が0円**の方だけの1文
+   *   （★実測 **79人／250・31.6%**）。★ほかの方は `null`（かたまりごと落ちます）。
+   */
   zatsu_zero_bun: string | null;
+  // ── ★★★2本目の表（★基準HTML 1117〜1124行・決め1101・**`{nenkin_gen}` の一時金の年**） -----
+  /** ★見出しの支給源名（★「iDeCo等の一時金」の形）。★この年が無い方は `null`＝**節ごと落ちます** */
+  ichiji_gen: string | null;
+  /** ★見出しの年齢 */
+  ichiji_age: string | null;
+  /** ★退職所得控除の式（★1本目と同じ `kojoShikiJi()` で作ります） */
+  ichiji_kojo_shiki: string | null;
+  /** ★退職所得控除の額（★`KeikaRow.kojo_adj`） */
+  ichiji_kojo: number | null;
+  /** ★その年に受け取る退職手当等の額（★`KeikaRow.shunyu`） */
+  ichiji_shunyu: number | null;
+  /** ★「→ 控除に収まるので／控除を超えますので、あなたの退職所得」 */
+  ichiji_hantei_bun: string | null;
+  /** ★その年の退職所得（★`KeikaRow.shotoku`） */
+  ichiji_shotoku: number | null;
+  /** ★その退職所得にかかる所得税（★`KeikaRow.gensen_ari`） */
+  ichiji_shotokuzei: number | null;
+  /** ★その退職所得にかかる住民税（★その年に差し引かれます） */
+  ichiji_jumin: number | null;
   // ── ★この本が見た年（★当て・数えのために返します。★画面には出しません） ----------
   shirabeta: {
     /** 退職金の表の年 */
     tai_nen: number;
+    /** ★2本目の表の年（★その年が無い方は `null`） */
+    ichiji_nen: number | null;
     /** 年金の表の年（★その年が1つも無い方は `null`） */
     nenkin_nen: number | null;
     /** 年金の表の年の、公的年金の支払月数 */
@@ -166,15 +196,31 @@ export function kojoShikiJi(k: E.KeikaRow): string {
 /** ★① 決め1085 2-1 …… はじめの年の公的年金が12か月分でない方（★実測 98人・39.2%） */
 const TOSHI_TSUKISU = (kara: number, tsuki: number) =>
   `下の${kara}歳の年の公的年金は${tsuki}か月分だけですので、次の年から額が変わります。`;
-/** ★② 決め1057 …… 公的年金等控除の区分が変わる方（★実測 60人・24.0%） */
-const TOSHI_KUBUN = (kara: number, kawaru: number) =>
-  `下の表は${kara}歳の年のものです。${kawaru}歳から公的年金等控除の区分が変わり、雑所得も変わります。`;
 /**
- * ★③ 決め1093（★**新しい字**）…… 区分は変わらず、**雑所得だけ**が変わる方（★実測 84人・33.6%）。
- *   ★★決め1057の字②は変わる理由を「区分」に置いていたため、★この84人（33.6%）に当たりませんでした。
+ * ★② 決め1099（★**因果を外しました**）…… 公的年金等控除の区分が変わる方（★実測 60人・24.0%）。
+ *
+ * ★★★**前の字（決め1057）は「区分が変わり、★雑所得も変わります」でした。**
+ *   ★★その年に**雑所得が変わらない方が 14人／60（23.3%）**いらっしゃいました
+ *     （★12人は雑所得が両年とも0円・2人は0でないのに変わらない＝seed 178・211）。
+ *   ★なぜ …… ★雑所得は `max(0, 年金収入 − 公的年金等控除)` ですので、
+ *     ★★**両年とも控除に収まる方は、区分が変わっても0円のまま**です。
+ * ★★いまの字は「**区分が変わります**」だけ ── ★60人ぜんぶで真です（★区分が変わることで分けています）。
+ */
+const TOSHI_KUBUN = (kara: number, kawaru: number) =>
+  `下の表は${kara}歳の年のものです。${kawaru}歳から公的年金等控除の区分が変わります。`;
+/**
+ * ★③ 決め1099（★**因果を外しました**）…… 区分は変わらず、**雑所得だけ**が変わる方（★実測 84人・33.6%）。
+ *
+ * ★★★**前の字（決め1093）は「★あなたが受け取る年金の額が変わりますので、雑所得も変わります」でした。**
+ *   ★★その年に**年金の額が変わらない方が 28人／84（33.3%）**いらっしゃいました
+ *     ── ★**28人とも「年分」が変わっていました**（★令和10年分から基礎控除と公的年金等控除の
+ *        表が変わります・決め1031）。★うち19人は⑩の給与の収入も変わります。
+ * ★★いまの字は「**あなたの雑所得が変わります**」だけ ── ★84人ぜんぶで真です（★雑所得が変わることで分けています）。
+ *
+ * ★★★決め1098（★戦術Cowork）＝**「AなのでBも◯◯します」という形の字を書いたら、その回のうちにBを数える。**
  */
 const TOSHI_ZATSU = (kara: number, kawaru: number) =>
-  `下の表は${kara}歳の年のものです。${kawaru}歳から、あなたが受け取る年金の額が変わりますので、雑所得も変わります。`;
+  `下の表は${kara}歳の年のものです。${kawaru}歳から、あなたの雑所得が変わります。`;
 /**
  * ★④ 決め1093（★**字を変えました**）…… どの年も同じ方（★実測 7人・2.8%）。
  *   ★★**終了年齢を出しません** …… ★7人とも終わりが100歳で、`AGE_TO` の端が画面に出てしまいます。
@@ -248,6 +294,36 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
   }
   const taiU = E.nenkanZeiUchiwake(p, taiNen, r.detail[taiNen]?.ideco_nenkin ?? 0,
                                    k.shotoku, true, kakekinOf(r, taiNen));
+
+  /**
+   * ── ★★★2本目の表 …… **退職の年いがいに退職所得の年が在る方**（★決め1101・実測 78人／250・31.2%）
+   *
+   * ★★1本目（1111〜1116行）は「あなたの`{tai_gen}`（`{tai_age}`）」＝**退職の年 1本ぶん**です。
+   *   ★★★ですので、`keika` に退職の年いがいの年が在ると、★**その退職所得も税も、画面11のどこにも
+   *     出ていませんでした**（★41人／250・16.4%に、最大 6,195,000円の退職所得と 1,448,041円の税）。
+   *
+   * ★★**その年が無い方（172人・68.8%）には 9種類とも `null`** を渡します ＝ ★見出しごと落ちます
+   *   （★決め1101で、**見出しに印 `ichiji_gen` を入れていただきました** ── ★決め1094で分かったとおり、
+   *     ★見出しに名前が1つも無いと落ちません）。
+   *
+   * ★★★**2年以上在ったら止めます。**★表は2本しかありませんので、★**黙って1年だけ出しません。**
+   *   ★いまの本番は `kekka.ts` 94行が `E.build(p, [TAI_NAME], …)`（★退職の支給源1本）ですので、
+   *     ★退職所得の年は**最大2つ**です。★★ただし ⑨企業年金・㉓役員退職慰労金 を渡すようになると
+   *     **3つになりえます**（★この回の便の1節に、数で書きました）。
+   */
+  const hoka = r.keika.filter((x) => x.year !== taiNen);
+  if (hoka.length > 1) {
+    throw new Error(
+      `退職所得の年が、退職の年のほかに ${hoka.length}つあります`
+      + `（${hoka.map((x) => `${x.year}年`).join('・')}）。`
+      + '**画面11の表は2本までです。**3本目をどう出すかは決まっていませんので、こちらでは決めません。'
+      + '戦術Coworkに投げてください。',
+    );
+  }
+  const ik = hoka[0] ?? null;
+  const iU = ik === null ? null
+    : E.nenkanZeiUchiwake(p, ik.year, r.detail[ik.year]?.ideco_nenkin ?? 0,
+                          ik.shotoku, true, kakekinOf(r, ik.year));
 
   // ── 年金の表 …… **年金収入がはじめて0でなくなる年**（★決め1085の正本） -------
   const nen = E.nenkinByYear(p, plan);
@@ -344,9 +420,30 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
       ? '→ あなたの保険料の判定に使う所得が収まるので'
       : '→ あなたの保険料の判定に使う所得が超えるので',
     hoken_kekka: osamaru ? '変わりません' : '上がる場合があります',
-    zatsu_zero_bun: j.zatsu === 0 ? ZATSU_ZERO : null,
+    /**
+     * ★★★決め1100 …… **年金収入が0でない**ことを条件に入れました。
+     *   ★字は「公的年金等控除だけで**この年の年金の収入が引ききれます**ので」ですが、
+     *     ★★年金収入が0円の方（★1人・seed 12）は**引くもの自身がありません**（`nenkin_kojo` も `null`）。
+     *   ★その方には `nenkin_nashi_bun` が上で同じことを言いますので、2つの文が並んでいました。
+     * ★★出す相手 …… **79人／250（31.6%）**（★80人 − 1人）。
+     */
+    zatsu_zero_bun: j.zatsu === 0 && j.nenkinShunyu > 0 ? ZATSU_ZERO : null,
+    // ── ★★★2本目の表の9種類（★決め1101）
+    ichiji_gen: ik === null ? null : `${ik.gens.join('と')}の一時金`,
+    ichiji_age: ik === null ? null : `${p.age(ik.year)}歳`,
+    ichiji_kojo_shiki: ik === null ? null : kojoShikiJi(ik),
+    ichiji_kojo: ik === null ? null : ik.kojo_adj,
+    ichiji_shunyu: ik === null ? null : ik.shunyu,
+    ichiji_hantei_bun: ik === null ? null
+      : (ik.shotoku === 0
+        ? '→ 控除に収まるので、あなたの退職所得'
+        : '→ 控除を超えますので、あなたの退職所得'),
+    ichiji_shotoku: ik === null ? null : ik.shotoku,
+    ichiji_shotokuzei: ik === null ? null : ik.gensen_ari,
+    ichiji_jumin: iU === null ? null : iU.jumin_taishoku,
     shirabeta: {
-      tai_nen: taiNen, nenkin_nen: nenkinNen, nenkin_tsukisu: tsukisu,
+      tai_nen: taiNen, ichiji_nen: ik === null ? null : ik.year,
+      nenkin_nen: nenkinNen, nenkin_tsukisu: tsukisu,
       toshi_bun_kata: toshiKata,
       kawaru_age: kawaruAge,
       zatsu: j.zatsu, nenkin_shunyu: j.nenkinShunyu, keigen_shotoku: keigen,

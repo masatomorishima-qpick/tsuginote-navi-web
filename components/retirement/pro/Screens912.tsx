@@ -132,6 +132,13 @@ const RIYU_BUN: Record<E.ShinkokuRiyu, string> = {
   いう: 'あなたの公的年金等が400万円を超え、公的年金等以外の所得も20万円を超えます',
 };
 
+/**
+ * ★★`null` をそのまま通す `en()`。
+ *   ★★**`null` は「その方には存在しない」**で、`kumitate()` がかたまりごと落とします。
+ *   ★0円と `null` を取り違えないために、★**ここで 0 にしません**。
+ */
+const enKa = (n: number | null) => (n === null ? null : en(n));
+
 /** ★説明の後半（★年があるとき／無いとき。★戦術Cowork `senjutsu_20260908d.md` 4節） */
 const BUN_ARU = 'あなたが一時金を受け取る年ごとに、この決まりに当てはまるかどうかを見ました。';
 const BUN_NASHI = 'あなたは、退職金やiDeCo等を一時金で受け取る年がありません。ですので、この決まりの判定はしていません。';
@@ -211,6 +218,25 @@ export function atai912(m: Moto912): Record<string, string | null> {
     hoken_hantei_bun: m.bun11.hoken_hantei_bun,
     hoken_kekka: m.bun11.hoken_kekka,
     zatsu_zero_bun: m.bun11.zatsu_zero_bun,
+    /**
+     * ★★★2本目の表の9種類（★戦術Cowork `senjutsu_20260912g.md` 3節・決め1101）。
+     *
+     * ★★**`null` は、そのまま渡します** …… ★その年が無い方（★実測 172人／250・68.8%）は
+     *   9種類とも `null` で、★★**見出しと表がまとめて落ちます**
+     *   （★決め1101で**見出しに印 `ichiji_gen` を入れていただきました** ── ★見出しに名前が
+     *     1つも無いと、`naWoHirou()` が空を返して落ちません・決め1094）。
+     * ★★★**41人／250（16.4%）に、最大 6,195,000円の退職所得と 1,448,041円の税**が、
+     *   ★この表が入るまで、計算過程の画面に1円も出ていませんでした。
+     */
+    ichiji_gen: m.bun11.ichiji_gen,
+    ichiji_age: m.bun11.ichiji_age,
+    ichiji_kojo_shiki: m.bun11.ichiji_kojo_shiki,
+    ichiji_kojo: enKa(m.bun11.ichiji_kojo),
+    ichiji_shunyu: enKa(m.bun11.ichiji_shunyu),
+    ichiji_hantei_bun: m.bun11.ichiji_hantei_bun,
+    ichiji_shotoku: enKa(m.bun11.ichiji_shotoku),
+    ichiji_shotokuzei: enKa(m.bun11.ichiji_shotokuzei),
+    ichiji_jumin: enKa(m.bun11.ichiji_jumin),
   };
 
   /**

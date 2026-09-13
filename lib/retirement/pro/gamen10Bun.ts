@@ -110,8 +110,15 @@ export interface Bun10 {
     sa_migi: number | null;
     /** ★`sa_hajime_bun` が3つのうちどの字になったか */
     hajime_kata: 'moto' | 'onaji' | 'ima' | null;
-    /** ★`gyakuten_bun` が2つのうちどの字になったか */
-    gyakuten_kata: 'irekawaru' | 'irekawaranai' | null;
+    /**
+     * ★`gyakuten_bun` が**3つ**のうちどの字になったか（★決め1122）。
+     * ★★`sa_zero`（どの年齢でも差が0）は、★**決め1122が書いていない形**です ── ★字を作らず `null` を返します。
+     */
+    gyakuten_kata: 'tsuki' | 'irekawaru' | 'irekawaranai' | 'sa_zero' | null;
+    /** ★はじめの差が0の方の、**差が付きはじめる年齢**（★ほかの方は `null`） */
+    tsuki_age: number | null;
+    /** ★★はじめの差が0の方が、**差が付いたあと さらに正負が入れ替わる**年齢（★戦術Coworkのお尋ね） */
+    tsuki_gyakuten_age: number | null;
     /** ★`sa_saishu_bun` が3つのうちどの字になったか */
     saishu_kata: 'ima' | 'moto' | 'onaji' | null;
     /** ★図の左端が、退職の年齢と違うか */
@@ -167,7 +174,16 @@ const JI = {
     onaji: () => 'どちらも同じ額です',
     ima: (x: number) => `いま選んでいるほうが ${en(x)} 多く手元にあります`,
   },
+  /**
+   * ★★★【2026-09-13・決め1122】**3つになりました。**
+   *   ★前は2つで、★**はじめの差が0の方（108人／226・47.8%）ぜんぶ**が
+   *     「`{年齢}`歳で、多い少ないが**入れ替わります**」になっていました。
+   *   ★★**同じ額だったものは「入れ替わり」ません。**
+   *   ★★★「入れ替わる」は、★**正から負・負から正に変わる年だけ**を指します
+   *     ── ★**0 は「まだ差が付いていない」**であって、多い少ないではありません。
+   */
   gyakuten: {
+    tsuki: (a: number) => `${a}歳から、差が付きはじめます。`,
     irekawaru: (a: number) => `${a}歳で、多い少ないが入れ替わります。`,
     irekawaranai: () => 'そのあと、多い少ないが入れ替わることはありません。',
   },
@@ -295,6 +311,7 @@ export function gamen10Bun(
   let saMigi: number | null = null;
   let hajimeKata: Bun10['shirabeta']['hajime_kata'] = null;
   let gyakutenKata: Bun10['shirabeta']['gyakuten_kata'] = null;
+  let tsukiAge: number | null = null, tsukiGyakutenAge: number | null = null;
   let saishuKata: Bun10['shirabeta']['saishu_kata'] = null;
   if (kijunAri) {
     const ruA = ru(kijunLab as string);
@@ -303,15 +320,30 @@ export function gamen10Bun(
     saHajime = sa[ages[0]];
     saMigi = sa[migi];
     saZero = ages.every((a) => sa[a] === 0);
-    // ★向きが変わる年齢（★はじめの符号と違う符号が、はじめて出る年齢）
+    /**
+     * ★★★【決め1122】**「入れ替わる」は、正から負・負から正に変わる年だけ**です。
+     *   ★前は `fu(sa[a]) !== f0`（★**0も入れ替わりに数えていました**）。
+     *   ★★0 は「まだ差が付いていない」であって、多い少ないではありません。
+     */
     const fu = (v: number) => (v > 0 ? 1 : v < 0 ? -1 : 0);
     const f0 = fu(saHajime);
-    for (const a of ages) { if (fu(sa[a]) !== f0) { gyakutenAge = a; break; } }
+    if (f0 === 0) {
+      // ★はじめの差が0の方 …… **差が付きはじめる年**をさがします
+      tsukiAge = ages.find((a) => sa[a] !== 0) ?? null;
+      if (tsukiAge !== null) {
+        const f1 = fu(sa[tsukiAge]);
+        tsukiGyakutenAge = ages.find((a) => a > (tsukiAge as number) && fu(sa[a]) === -f1) ?? null;
+      }
+    } else {
+      gyakutenAge = ages.find((a) => fu(sa[a]) === -f0) ?? null;
+    }
     // ★差が動かなくなる年齢（★`v5/gamen10_chart.py` 326行の `kotei` と同じ数え方）
     koteiAge = ages.find((a) => ages.every((b) => b < a || sa[b] === sa[a])) ?? null;
     saKotei = koteiAge === null ? null : sa[koteiAge];
     hajimeKata = saHajime > 0 ? 'moto' : saHajime < 0 ? 'ima' : 'onaji';
-    gyakutenKata = gyakutenAge === null ? 'irekawaranai' : 'irekawaru';
+    gyakutenKata = f0 === 0
+      ? (tsukiAge === null ? 'sa_zero' : 'tsuki')
+      : (gyakutenAge === null ? 'irekawaranai' : 'irekawaru');
     saishuKata = saMigi < 0 ? 'ima' : saMigi > 0 ? 'moto' : 'onaji';
   }
 
@@ -379,7 +411,13 @@ export function gamen10Bun(
     sa_hajime_bun: hajimeKata === null ? null
       : hajimeKata === 'onaji' ? JI.hajime.onaji()
       : JI.hajime[hajimeKata](Math.abs(saHajime as number)),
-    gyakuten_bun: gyakutenKata === null ? null
+    /**
+     * ★★★決め1122の**3つの字**。
+     *   ★★`sa_zero`（どの年齢でも差が0）は決め1122が書いていませんので、★**字を作らず `null`**（かたまりごと落ちます）。
+     *     ★実測 **0人／226**ですが、入力しだいで起こりえますので、こちらでは決めません。
+     */
+    gyakuten_bun: gyakutenKata === null || gyakutenKata === 'sa_zero' ? null
+      : gyakutenKata === 'tsuki' ? JI.gyakuten.tsuki(tsukiAge as number)
       : gyakutenKata === 'irekawaranai' ? JI.gyakuten.irekawaranai()
       : JI.gyakuten.irekawaru(gyakutenAge as number),
     sa_saishu_bun: saishuKata === null ? null
@@ -412,6 +450,8 @@ export function gamen10Bun(
       sa_migi: saMigi,
       hajime_kata: hajimeKata,
       gyakuten_kata: gyakutenKata,
+      tsuki_age: tsukiAge,
+      tsuki_gyakuten_age: tsukiGyakutenAge,
       saishu_kata: saishuKata,
       hidari_chigau: taiAge !== null && hidari !== taiAge,
       hidari_moto: motoAge,

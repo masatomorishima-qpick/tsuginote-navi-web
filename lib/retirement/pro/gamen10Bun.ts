@@ -16,13 +16,18 @@
  *   ★決め1038 …… ②の比べ先は**その方の繰下げの上限**（`zeisei.kurisageJogenAge()`）／図の右端は**90歳**
  *   ★決め1047 …… ②は**比べる相手が在る方だけ**に出す／`oitsuku_bun` の字は**3つ**
  *   ★決め1070 …… `an_1_label`・`an_2_label` は **`Plan.label` そのまま**
+ *   ★決め1116 …… `sa_hajime_bun`・`gyakuten_bun`・`sa_saishu_bun` の字（★**その年に見た事実だけ**）
+ *   ★決め1117 …… `an_a`・`an_b` は**尻尾を外さない**（★2案の⑳は違いえます）
+ *   ★決め1118 …… `an_onaji_bun`（①の相手が無い方）／`sa_hajime_age`（★`an_a_age` から改名）／
+ *   　　　　　　　図の**左端**は「2つの案のどちらかで、はじめてお金が入る年齢」
  *
- * ★★★【字が決まっていない3つ ── 戦術Coworkにお尋ねしています】
- *   `sa_hajime_bun`・`gyakuten_bun`・`sa_saishu_bun` の3つは、**判断ログに決めが1つもありません**
- *   （★決め854「`_bun` は戦術が言葉を出すまで着手できない」）。
- *   ★★ですので、この本は **3つとも `null` を返します**（＝★その箱は`kumitate()` がかたまりごと落とします）。
- *   ★★★**字を、こちらで作りません。**★そのかわり、字を決めるのに要る**数**を `shirabeta` に入れて返します。
- *     ★（★決め1047 の `oitsuku_bun` も、開発が数を出してから戦術が字を決めた形です。★同じ順にします。）
+ * ★★★【前の回に、字が決まっていなかった3つ】
+ *   `sa_hajime_bun`・`gyakuten_bun`・`sa_saishu_bun` は、決めが1つも無いまま `data-mada` が外れました。
+ *   ★★こちらは**字を作らず `null` を返し**、★字を決めるのに要る**数**を出しました
+ *     （★決め854「`_bun` は戦術が言葉を出すまで着手できない」）。
+ *   ★★★**2026-09-13・決め1116 で、戦術Coworkが字を決めました。**★いまはその字を返しています。
+ *     ★見本の「そこから先は…**変わりません**」は **135人／226（59.7%）で当たらない**と数で出し、
+ *       ★戦術Coworkが**字から外されました**（★90歳の時点の事実だけを言う形に）。
  */
 
 import * as Z from './zeisei';
@@ -47,15 +52,24 @@ export interface Bun10 {
   an_a: string | null;
   /** ★`{an_b}` …… 選んだ案の名前 */
   an_b: string | null;
-  /** ★`{an_a_age}` …… ①の図の左端の年齢（★＝`ages[0]`） */
-  an_a_age: string | null;
-  /** ★★★字が決まっていません。★いまは必ず `null` を返します（上の覚え書き） */
+  /**
+   * ★`{sa_hajime_age}` …… ①の図の**左端の年齢**（★＝`ages[0]`）。
+   *   ★★①の**見出しにも**出ます（★決め1119(B)）ので、★`null` のとき**見出しごと落ちます**。
+   *   ★★★印の名前は `an_a_age` から `sa_hajime_age` に変わりました（★決め1118(6)）。
+   */
+  sa_hajime_age: string | null;
+  /**
+   * ★★★`{an_onaji_bun}` …… **①の相手（基準案）が無い方だけ**の1文（★決め1118(3)）。
+   *   ★①の見出しの**上**に在りますので、★相手が在る方は `null` ＝ かたまりごと落ちます。
+   */
+  an_onaji_bun: string | null;
+  /** ★決め1116 …… 左端の年齢の時点の差（★3つの字） */
   sa_hajime_bun: string | null;
-  /** ★★★字が決まっていません。★いまは必ず `null` を返します */
+  /** ★決め1116 …… 多い少ないが入れ替わるか（★1文まるごと・2つの字） */
   gyakuten_bun: string | null;
-  /** ★★★字が決まっていません。★いまは必ず `null` を返します */
+  /** ★決め1116 …… **90歳の時点**の差（★3つの字） */
   sa_saishu_bun: string | null;
-  /** ★`{sa_saishu}` …… ①の差が動かなくなったあとの額（★絶対値）。★②の箱に出ます */
+  /** ★`{sa_saishu}` …… **90歳の時点**の差（★絶対値）。★②の箱（1085行）に出ます */
   sa_saishu: number | null;
   // ── ② 公的年金を繰り下げると（★基準HTML 1037〜1085行） ------------------
   /** ★`{kurisage_age}` …… その方の繰下げの上限（★決め1038）。★相手が無い方は `null` */
@@ -92,6 +106,18 @@ export interface Bun10 {
     sa_kotei: number | null;
     /** ★①の差が、どの年齢でも0か */
     sa_zero: boolean;
+    /** ★90歳の時点の差（★符号つき）。★`sa_saishu_bun` と `sa_saishu` のもと */
+    sa_migi: number | null;
+    /** ★`sa_hajime_bun` が3つのうちどの字になったか */
+    hajime_kata: 'moto' | 'onaji' | 'ima' | null;
+    /** ★`gyakuten_bun` が2つのうちどの字になったか */
+    gyakuten_kata: 'irekawaru' | 'irekawaranai' | null;
+    /** ★`sa_saishu_bun` が3つのうちどの字になったか */
+    saishu_kata: 'ima' | 'moto' | 'onaji' | null;
+    /** ★図の左端が、退職の年齢と違うか */
+    hidari_chigau: boolean;
+    /** ★図の左端をさがした範囲の、いちばん若い年齢 */
+    hidari_moto: number;
     /** ②の相手が在るか */
     kurisage_ari: boolean;
     /** ★②の相手が無い理由（★決め1047の(あ)(い)(う)） */
@@ -104,27 +130,57 @@ export interface Bun10 {
 }
 
 /**
- * ★★★`Plan.label` から、先頭の「`{nenkin_gen}`を」と尻尾の「／公的年金を◯歳から」を外す。
+ * ★★★`Plan.label` から、**先頭の「`{nenkin_gen}`を」だけ**を外す（★決め1070(2)と同じ形）。
  *
- * ★★**尻尾の外し方は `ichiran.ts` の `motoLab()` と同じ形**です ── ★その案の⑳の数で外します
- *   （★探さずに、その数で外す。★当てずっぽうで切りません）。
- * ★★★**この形が正しいかは、戦術Coworkにお尋ねしています**（★便の5節）。
- *   ★見本の字は「60歳で一時金」「60歳から5年の年金」で、★この形では「60歳で一時金」「60歳から年金5年」です。
+ * ★★★【2026-09-13・決め1117(2)】**尻尾（「／公的年金を◯歳から」）は外しません。**
+ *   ★前は尻尾も外していました。★ところが `gamen8.ts` 92〜95行のとおり
+ *     **基準案の⑳は入力の⑳・選んだ案の⑳はその案のもの**で、★**2案の⑳は違いえます**。
+ *   ★★尻尾を外すと、★★★**⑳だけが違う2案が、同じ字になります**
+ *     （★実測 …… golden 250人で1人／226・こちらが描いた方はまさにこの形で「61歳で一時金」が2つ並びました）。
+ *   ★尻尾を残せば、⑳が違えば字も違います。
  */
 export function anJi(pl: E.Plan, idecoName: string): string {
-  let s = pl.label;
   const atama = `${idecoName}を`;
-  if (s.startsWith(atama)) s = s.slice(atama.length);
-  if (pl.nenkin_kaishi_age !== null) {
-    const shippo = `／公的年金を${pl.nenkin_kaishi_age}歳から`;
-    if (s.endsWith(shippo)) s = s.slice(0, -shippo.length);
-  }
-  return s;
+  return pl.label.startsWith(atama) ? pl.label.slice(atama.length) : pl.label;
 }
 
 /** ★案の⑳（★`null` の案は、その方の入力の⑳です） */
 const anAge = (pl: E.Plan, p: E.Jinbutsu): number =>
   pl.nenkin_kaishi_age ?? p.koteki_kaishi_age;
+
+/**
+ * ★★**案どうしを突き合わせる鍵**（★画面に出す字ではありません）。
+ *   ★`anJi()` からさらに尻尾（「／公的年金を◯歳から」）を外します ── ★`ichiran.ts` の `motoLab()` と同じ形で、
+ *     ★**その案の⑳の数で外します**（★探さずに、その数で。★当てずっぽうで切りません）。
+ *   ★これで「⑳だけが違う案」を見つけられます（★②の比べ先）。
+ */
+export function motoJi(pl: E.Plan, idecoName: string, p: E.Jinbutsu): string {
+  const s = anJi(pl, idecoName);
+  const shippo = `／公的年金を${anAge(pl, p)}歳から`;
+  return s.endsWith(shippo) ? s.slice(0, -shippo.length) : s;
+}
+
+/** ★★決め1116 …… 3つの `_bun` の字（★戦術Coworkが決めた字を、そのまま置いています） */
+const JI = {
+  hajime: {
+    moto: (x: number) => `くらべるもとのほうが ${en(x)} 多く手元にあります`,
+    onaji: () => 'どちらも同じ額です',
+    ima: (x: number) => `いま選んでいるほうが ${en(x)} 多く手元にあります`,
+  },
+  gyakuten: {
+    irekawaru: (a: number) => `${a}歳で、多い少ないが入れ替わります。`,
+    irekawaranai: () => 'そのあと、多い少ないが入れ替わることはありません。',
+  },
+  saishu: {
+    ima: (x: number) => `いま選んでいるほうが ${en(x)} 多くなります`,
+    moto: (x: number) => `くらべるもとのほうが ${en(x)} 多くなります`,
+    onaji: () => 'どちらも同じ額になります',
+  },
+} as const;
+
+/** ★★決め1118(3) …… ①の相手が無い方だけの1文 */
+const AN_ONAJI = 'あなたがいま選んでいる受け取り方は、くらべるもとと同じですので、'
+  + 'ここでお見せする差はありません。';
 
 /**
  * ★★★画面10の18種類を作ります。
@@ -135,7 +191,9 @@ const anAge = (pl: E.Plan, p: E.Jinbutsu): number =>
  * @param kijunLab **基準案の `Plan.label`**（★`gamen8.kijunAn()` の `lab`）。
  *   ★★**在らない方は `null` を渡してください**（★`kijunAn()` が `null` を返す方 ＝ E-23）。
  * @param idecoName 年金で受け取る支給源の名前（★入力から）
- * @param ages 図の年齢の範囲（★**既定値を作りません**。★呼ぶ側から渡してください）
+ * @param ageMigi 図の**右端**の年齢（★**既定値を作りません**。★呼ぶ側から `AGE_MIGI` を渡してください）。
+ *   ★★★**左端は、この本が出します**（★決め1118(6)）── ★「2つの案のどちらかで、はじめてお金が入る年齢」。
+ *     ★左端は案しだいで動きますので、呼ぶ側には出せません（★呼ぶ側は案を見ていません）。
  */
 export function gamen10Bun(
   p: E.Jinbutsu,
@@ -143,15 +201,10 @@ export function gamen10Bun(
   plan: E.Plan,
   kijunLab: string | null,
   idecoName: string,
-  ages: number[],
+  ageMigi: number,
 ): Bun10 {
-  if (!Array.isArray(ages) || ages.length < 2) {
-    throw new Error('画面10の年齢の範囲（ages）が渡っていません。呼び出し側から渡してください（既定値を作らない）。');
-  }
-  for (let i = 1; i < ages.length; i++) {
-    if (!Number.isInteger(ages[i]) || ages[i] !== ages[i - 1] + 1) {
-      throw new Error(`画面10の年齢の範囲（ages）が1歳きざみの整数ではありません（${ages.join(',')}）。`);
-    }
+  if (!Number.isInteger(ageMigi)) {
+    throw new Error('画面10の図の右端（ageMigi）が渡っていません。呼び出し側から渡してください（既定値を作らない・決め1038）。');
   }
   const ide = p.gens.find((g) => g.name === idecoName);
   if (!ide) throw new Error(`支給源「${idecoName}」がありません。画面10の加入期間が出せません。`);
@@ -159,10 +212,18 @@ export function gamen10Bun(
   // ── ② 相手が在るか（★決め1038・決め1047） ------------------------------
   const jogen = Z.kurisageJogenAge(p.seinen, p.umare);
   const imaAge = anAge(plan, p);
-  /** ★選んだ案と、⑳だけが違う案（★`Plan.label` の尻尾を外して突き合わせます） */
-  const moto = anJi(plan, idecoName);
+  /**
+   * ★選んだ案と、**⑳だけが違う案**（★突き合わせは `motoJi()`＝尻尾も外した字で）。
+   *
+   * ★★★【2026-09-13・気づいたこと】決め1117(2)で `anJi()` の尻尾を外すのをやめたとき、
+   *   ★ここも `anJi()` で突き合わせていたため、★★**②の相手が1人も見つからなくなりました**
+   *     （★描いて気づきました ── `kurisage_ari` が true から false に変わりました）。
+   *   ★★**画面に出す字**（`anJi()`・尻尾あり）と、**案どうしを突き合わせる鍵**（`motoJi()`・尻尾なし）は、
+   *     ★別のものです。★`ichiran.ts` の `motoLab()` と同じ形にしました。
+   */
+  const moto = motoJi(plan, idecoName, p);
   const aite = R.find(([pl]) =>
-    anAge(pl, p) === jogen && anAge(pl, p) !== imaAge && anJi(pl, idecoName) === moto) ?? null;
+    anAge(pl, p) === jogen && anAge(pl, p) !== imaAge && motoJi(pl, idecoName, p) === moto) ?? null;
   /** ★⑳の候補が1つだけの方（★決め1047の(あ)） */
   const kouho = new Set(R.map(([pl]) => anAge(pl, p)));
   const kurisageNashi: Bun10['shirabeta']['kurisage_nashi'] =
@@ -175,7 +236,47 @@ export function gamen10Bun(
   const erabu: string[] = [plan.label];
   if (kijunLab !== null && kijunLab !== plan.label) erabu.push(kijunLab);
   if (aite !== null) erabu.push(aite[0].label);
-  const d: Data10 = data10(p, R, erabu, ages);
+  const erabuPl = erabu.map((lab) => {
+    const x = R.find(([pl]) => pl.label === lab);
+    if (!x) throw new Error(`build() の戻りに「${lab}」がありません`);
+    return x;
+  });
+
+  /**
+   * ★★★【決め1118(6)】**図の左端は「2つの案のどちらかで、はじめてお金が入る年齢」**です。
+   *
+   *   ★前は「退職の年齢」でした。★ところが `{nenkin_gen}` を**退職の年より前に**受け取る案や、
+   *     ★公的年金を**繰り上げて**受け取る案では、★★**左端より前の差が見えません**。
+   *
+   *   ★★★**さがす範囲（下の `moto`）は、思い込みで置きません。**★お金が入りうる年は、
+   *     ★(1)その案が退職手当等を受け取る年（`plan.uketori_nen`）
+   *     ★(2)その案の公的年金がはじまる年齢（⑳）
+   *     ★(3)その案の `{nenkin_gen}` の年金がはじまる年（`nenkin_kaishi_nen`）
+   *     ★の3つしかありませんので、**その最小**から数えます（★`engine.ts` の `evaluate()` のとおり）。
+   *   ★★**退職の年は (1) に入っています** …… `engine.ts` 1652行が、一時金で受け取る支給源
+   *     ぜんぶに退職の年を入れますので、`uketori_nen` に必ず在ります（★額が0円の支給源も同じです）。
+   */
+  const kouhoAge: number[] = [];
+  for (const [pl] of erabuPl) {
+    kouhoAge.push(anAge(pl, p));
+    for (const y of Object.values(pl.uketori_nen)) kouhoAge.push(p.age(y));
+    if (pl.nenkin_kaishi_nen !== null) kouhoAge.push(p.age(pl.nenkin_kaishi_nen));
+  }
+  /** ★退職の年齢（★`{nenkin_gen}` いがいの支給源の受取年。★`engine.ts` 1652行のとおり、みな同じ年です） */
+  const taiNen = Object.entries(plan.uketori_nen).find(([n]) => n !== idecoName)?.[1] ?? null;
+  const taiAge = taiNen === null ? null : p.age(taiNen);
+  const motoAge = Math.min(...kouhoAge);
+  if (!(motoAge < ageMigi)) {
+    throw new Error(`画面10の図の左端（${motoAge}歳）が右端（${ageMigi}歳）より若くありません。`);
+  }
+  const kouhoAges = Array.from({ length: ageMigi - motoAge + 1 }, (_, i) => motoAge + i);
+  const d0: Data10 = data10(p, R, erabu, kouhoAges);
+  /** ★★その年に、どれかの案でお金が入ったか（★`data10()` の3つめ＝その年の額） */
+  const haitta = (a: number) => d0.sen.some((x) => (x[2][a] ?? 0) !== 0);
+  const hidari = kouhoAges.find(haitta) ?? motoAge;
+  const ages = kouhoAges.filter((a) => a >= hidari);
+
+  const d: Data10 = d0;
   const ru = (lab: string): Record<number, number> => {
     const x = d.sen.find((s) => s[0] === lab);
     if (!x) throw new Error(`図のもとに「${lab}」がありません`);
@@ -183,15 +284,24 @@ export function gamen10Bun(
   };
   const ruB = ru(plan.label);
 
-  // ── ① 差（★基準案の累計 − 選んだ案の累計） ------------------------------
+  /**
+   * ── ① 差 ＝ **くらべるもと（基準案）の累計 − いま選んでいる（選んだ案）の累計**
+   *   ★決め1117(3) …… 基準HTML 1000行が、この向きを字にしています。
+   */
   const kijunAri = kijunLab !== null && kijunLab !== plan.label;
+  const migi = ages[ages.length - 1];
   let saHajime: number | null = null, gyakutenAge: number | null = null;
   let koteiAge: number | null = null, saKotei: number | null = null, saZero = false;
+  let saMigi: number | null = null;
+  let hajimeKata: Bun10['shirabeta']['hajime_kata'] = null;
+  let gyakutenKata: Bun10['shirabeta']['gyakuten_kata'] = null;
+  let saishuKata: Bun10['shirabeta']['saishu_kata'] = null;
   if (kijunAri) {
     const ruA = ru(kijunLab as string);
     const sa: Record<number, number> = {};
     for (const a of ages) sa[a] = ruA[a] - ruB[a];
     saHajime = sa[ages[0]];
+    saMigi = sa[migi];
     saZero = ages.every((a) => sa[a] === 0);
     // ★向きが変わる年齢（★はじめの符号と違う符号が、はじめて出る年齢）
     const fu = (v: number) => (v > 0 ? 1 : v < 0 ? -1 : 0);
@@ -200,13 +310,15 @@ export function gamen10Bun(
     // ★差が動かなくなる年齢（★`v5/gamen10_chart.py` 326行の `kotei` と同じ数え方）
     koteiAge = ages.find((a) => ages.every((b) => b < a || sa[b] === sa[a])) ?? null;
     saKotei = koteiAge === null ? null : sa[koteiAge];
+    hajimeKata = saHajime > 0 ? 'moto' : saHajime < 0 ? 'ima' : 'onaji';
+    gyakutenKata = gyakutenAge === null ? 'irekawaranai' : 'irekawaru';
+    saishuKata = saMigi < 0 ? 'ima' : saMigi > 0 ? 'moto' : 'onaji';
   }
 
   // ── ② 追いつく年齢（★決め1047） ----------------------------------------
   let oitsukuAge: number | null = null;
   let oitsukuKata: Bun10['shirabeta']['oitsuku_kata'] = null;
   let sa90: number | null = null, ruMin: number | null = null, ruMax: number | null = null;
-  const migi = ages[ages.length - 1];
   ruMin = d.band[migi][0];
   ruMax = d.band[migi][1];
   if (aite !== null) {
@@ -256,15 +368,30 @@ export function gamen10Bun(
     koteki_nenkin: p.koteki_nenkin,
     an_a: kijunAri ? anJi(R.find(([pl]) => pl.label === kijunLab)![0], idecoName) : null,
     an_b: kijunAri ? anJi(plan, idecoName) : null,
-    an_a_age: kijunAri ? `${ages[0]}歳` : null,
+    sa_hajime_age: kijunAri ? `${ages[0]}歳` : null,
+    // ★★決め1118(3) …… 相手が在る方には出しません（★かたまりごと落ちます）
+    an_onaji_bun: kijunAri ? null : AN_ONAJI,
     /**
-     * ★★★**字が決まっていませんので、`null` を返します**（★この本の冒頭の覚え書き）。
-     *   ★★**こちらで字を作りません。**★数は `shirabeta` に入れてあります。
+     * ★★★決め1116 …… **3つとも「その年に見た事実」だけ**を書きます（★先のことを言いません）。
+     *   ★前の見本の「そこから先は…**変わりません**」は、★**135人／226（59.7%）で当たりません**でした
+     *     （★90歳まで差が動き続けます）。★戦術Coworkが字から外されました。
      */
-    sa_hajime_bun: null,
-    gyakuten_bun: null,
-    sa_saishu_bun: null,
-    sa_saishu: saKotei === null ? null : Math.abs(saKotei),
+    sa_hajime_bun: hajimeKata === null ? null
+      : hajimeKata === 'onaji' ? JI.hajime.onaji()
+      : JI.hajime[hajimeKata](Math.abs(saHajime as number)),
+    gyakuten_bun: gyakutenKata === null ? null
+      : gyakutenKata === 'irekawaranai' ? JI.gyakuten.irekawaranai()
+      : JI.gyakuten.irekawaru(gyakutenAge as number),
+    sa_saishu_bun: saishuKata === null ? null
+      : saishuKata === 'onaji' ? JI.saishu.onaji()
+      : JI.saishu[saishuKata](Math.abs(saMigi as number)),
+    /**
+     * ★`{sa_saishu}`（1085行「①の`{sa_saishu}`とこの額を足し算しないでください」）は、
+     *   ★★**`sa_saishu_bun` と同じ額**にしました（★どちらも**90歳の時点**の差）。
+     *   ★前は「差が動かなくなったあとの額」でしたが、★決め1116で `sa_saishu_bun` が
+     *     90歳の時点になりましたので、★**同じ画面に違う額を2つ出さない**ためにそろえます。
+     */
+    sa_saishu: saMigi === null ? null : Math.abs(saMigi),
     kurisage_age: aite === null ? null : `${jogen}歳`,
     an_1_label: aite === null ? null : plan.label,
     an_2_label: aite === null ? null : aite[0].label,
@@ -282,6 +409,12 @@ export function gamen10Bun(
       kotei_age: koteiAge,
       sa_kotei: saKotei,
       sa_zero: saZero,
+      sa_migi: saMigi,
+      hajime_kata: hajimeKata,
+      gyakuten_kata: gyakutenKata,
+      saishu_kata: saishuKata,
+      hidari_chigau: taiAge !== null && hidari !== taiAge,
+      hidari_moto: motoAge,
       kurisage_ari: aite !== null,
       kurisage_nashi: kurisageNashi,
       oitsuku_age: oitsukuAge,

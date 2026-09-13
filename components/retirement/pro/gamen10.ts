@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（179,612バイト ／ md5 aa6573c610c5e1c33785e18d50f9ca8c）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（180,120バイト ／ md5 3ce4353d96bde40eb6434020de403362）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -37,10 +37,11 @@ export const GAMEN10: readonly Block10[] = [
   { kind: 'midashi', lv: 2, bun: "退職金受け取りパターン比較" },
   { kind: 'hako', bun: "この画面の前提\nあなたは{tai_age}で{tai_gen} {shunyu}を受け取ります（勤続{nensu}）。{nenkin_gen} {ideco_zandaka}（加入{ideco_kanyu_nensu}）、公的年金 年 {koteki_nenkin}（{koteki_kaishi_age}から受け取る場合の額）。{tai_age}以降の給与はありません。", na: ["tai_age","tai_gen","shunyu","nensu","nenkin_gen","ideco_zandaka","ideco_kanyu_nensu","koteki_nenkin","koteki_kaishi_age"] },
   { kind: 'hon', bun: "あなたの年齢ごとに、手元にいくら入るかを比べます。\n性質の違う2つを、それぞれ分けてお見せします。", na: [] },
-  { kind: 'midashi', lv: 3, bun: "① 退職金とiDeCo等の受け取り方で、いつ・いくら入るか" },
-  { kind: 'hon', bun: "公的年金の受け取り方はどちらも{koteki_kaishi_age}からにそろえて、\n退職金とiDeCo等の受け取り方だけを比べます。\n\nグラフは、{an_a}を選択した場合、{an_b}にした場合との手取り累計の差を表しています。", na: ["koteki_kaishi_age","an_a","an_b"] },
-  { kind: 'hako', bun: "{an_a_age}の時点では、{sa_hajime_bun}。{gyakuten_bun}、そこから先は{sa_saishu_bun}。", na: ["an_a_age","sa_hajime_bun","gyakuten_bun","sa_saishu_bun"] },
-  { kind: 'midashi', lv: 3, bun: "② 公的年金を繰り下げると、どうなるか" },
+  { kind: 'hon', bun: "{an_onaji_bun}", na: ["an_onaji_bun"] },
+  { kind: 'midashi', lv: 3, bun: "① {sa_hajime_age}から先、退職金と{nenkin_gen}の受け取り方でどう変わるか" },
+  { kind: 'hon', bun: "くらべるもとは、{nenkin_gen}を一時金で受け取り、公的年金はあなたがお答えになった年齢から受け取る場合です。\n\nグラフは、くらべるもと（{an_a}）の累計から、いま選んでいる（{an_b}）の累計を引いた額です。", na: ["nenkin_gen","an_a","an_b"] },
+  { kind: 'hako', bun: "{sa_hajime_age}の時点では、{sa_hajime_bun}。{gyakuten_bun}90歳の時点では、{sa_saishu_bun}。", na: ["sa_hajime_age","sa_hajime_bun","gyakuten_bun","sa_saishu_bun"] },
+  { kind: 'midashi', lv: 3, bun: "② 公的年金を{kurisage_age}まで繰り下げると、どうなるか" },
   { kind: 'hon', bun: "受け取り方はどちらも{nenkin_gen}を{an_b}にそろえて、\n公的年金を{koteki_kaishi_age}から受け取る場合と、{kurisage_age}から受け取る場合を比べます。\n\nたては、その年齢までに手元に入ったお金の累計です。", na: ["nenkin_gen","an_b","koteki_kaishi_age","kurisage_age"] },
   { kind: 'hako', bun: "{an_1_label}{an_2_label}灰色の帯＝{toori_kazu}全部の幅（最小〜最大）", na: ["an_1_label","an_2_label","toori_kazu"] },
   { kind: 'hon', bun: "灰色の帯は、{toori_kazu}すべてを計算して出した幅です。\n上のふちがその年齢までの累計がいちばん多くなる受け取り方、\n下のふちがいちばん少なくなる受け取り方で、\nあなたが選べるどの受け取り方も、必ずこの帯の中に入ります。\n90歳までの累計でいえば{ruikei_min}〜{ruikei_max}です。", na: ["toori_kazu","ruikei_min","ruikei_max"] },
@@ -53,10 +54,10 @@ export const GAMEN10: readonly Block10[] = [
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["tai_age","tai_gen","shunyu","nensu","nenkin_gen","ideco_zandaka","ideco_kanyu_nensu","koteki_nenkin","koteki_kaishi_age","an_a","an_b","an_a_age","sa_hajime_bun","gyakuten_bun","sa_saishu_bun","kurisage_age","an_1_label","an_2_label","toori_kazu","ruikei_min","ruikei_max","kuuhaku_kaishi_age","kuuhaku_owari_age","oitsuku_bun","sa_90","sa_saishu","tedori"];
+export const HITOGOTO_SHURUI: readonly string[] = ["tai_age","tai_gen","shunyu","nensu","nenkin_gen","ideco_zandaka","ideco_kanyu_nensu","koteki_nenkin","koteki_kaishi_age","an_onaji_bun","sa_hajime_age","an_a","an_b","sa_hajime_bun","gyakuten_bun","sa_saishu_bun","kurisage_age","an_1_label","an_2_label","toori_kazu","ruikei_min","ruikei_max","kuuhaku_kaishi_age","kuuhaku_owari_age","oitsuku_bun","sa_90","sa_saishu","tedori"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
-export const HITOGOTO_KASHO = 35;
+export const HITOGOTO_KASHO = 39;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
 export const MADA_NA: readonly string[] = ["ideco_zandaka","koteki_kaishi_age"];

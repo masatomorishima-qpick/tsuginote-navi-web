@@ -1,12 +1,25 @@
 /** sakaime.ts ── 所得の「境目」の判定（engine/sakaime.py の移植）
  *  金額ではなく境目を出す。境目の金額は政令で全国共通のものが多いため。 */
 import type { Joukyou } from './engine';
+import { hikazeiGendo } from './zeisei';
 
 // 令和8年度。毎年改定されるので更新が必要
 export const KEIGEN_BASE = 430_000;   // 地方税法314条の2第2項1号の額
 export const KEIGEN_5WARI = 310_000;  // 令和7年度は305,000円
 export const KEIGEN_2WARI = 570_000;  // 令和7年度は560,000円
 export const NENKIN_15MAN = 150_000;  // 65歳以上の公的年金等所得からの控除
+/**
+ * ★★★【2026-09-13・決め1059／1069・森嶋さんの承認あり】**この表はもう使いません。**
+ *
+ *   ★この3つの額は「**単身**（扶養0人）」のときの非課税限度額で、★**扶養を見ていません**。
+ *   ★★同じ「住民税が非課税か」を、エンジンの中で**2通りに判定していました** ──
+ *     ★(あ)`engine.ts` 1693行 `Z.hikazeiGendo(p.kyuchi, p.fuyouKei())`（★級地と扶養の両方）
+ *     ★(い)ここ（★級地だけ）
+ *   ★★★**正本は `hikazeiGendo()` 1つ**にしました（★下の `sakaimeList()`）。
+ *   ★★この `export` は**残します** …… ★消すと、この表を読んでいた本が黙って別の数に変わったのか、
+ *     もともと読んでいなかったのかが分からなくなります。★★**読んでいる所は0か所**です
+ *     （★機械で数えました）。★次の回に消すかどうかを決めます。
+ */
 export const HIKAZEI: Record<number, number> = { 1: 450_000, 2: 415_000, 3: 380_000 };
 
 // 医療費の窓口負担（高齢者医療確保法施行令7条）
@@ -65,7 +78,15 @@ export interface Sakaime {
   hantei?: (v: V, hihokensha: number) => boolean;
 }
 
-export function sakaimeList(hihokensha = 1, kyuyoShotokusha = 1, kyuchi = 1): Sakaime[] {
+/**
+ * ★★★**既定値を作りません**（★決め1068・2026-09-13）。★4つとも呼び出し側から渡してください。
+ *
+ *   ★前は `hihokensha = 1, kyuyoShotokusha = 1, kyuchi = 1` でした。
+ *   ★★**同じ数でも、欄が増えた日に画面だけ古いままになります**（★§既定値を作らない）。
+ *   ★`fuyou` は**この回で足しました**（★`hikazei` の額に要ります）。
+ */
+export function sakaimeList(hihokensha: number, kyuyoShotokusha: number,
+                            kyuchi: number, fuyou: number): Sakaime[] {
   const base = KEIGEN_BASE + 100_000 * Math.max(0, kyuyoShotokusha - 1);
   return [
     { key: 'keigen7', name: '国民健康保険料などの7割軽減', shotoku: '軽減判定所得',
@@ -79,7 +100,12 @@ export function sakaimeList(hihokensha = 1, kyuyoShotokusha = 1, kyuchi = 1): Sa
       gaku: base + KEIGEN_2WARI * hihokensha, age_from: 0, age_to: 200, kyotsu: true,
       konkyo: '同上', koka: '軽減がなくなります' },
     { key: 'hikazei', name: '住民税の非課税', shotoku: '合計所得金額',
-      gaku: HIKAZEI[kyuchi], age_from: 0, age_to: 200, kyotsu: false,
+      /**
+       * ★★★【決め1059／1069】**`hikazeiGendo(kyuchi, fuyou)` から作ります。**
+       *   ★前は `HIKAZEI[kyuchi]`（★単身の額だけ）で、★★扶養がいらっしゃる方（実測 125人／250・50.0%）に
+       *     ★**「本当は収まるのに、超える」と出て**いました（★実測 38人／211・18.0%・★逆向きは0人）。
+       */
+      gaku: hikazeiGendo(kyuchi, fuyou), age_from: 0, age_to: 200, kyotsu: false,
       konkyo: '地方税法295条3項／同施行令47条の3（お住まいの級地で45万円・41.5万円・38万円）',
       koka: '住民税がかかり始めます。介護保険料の段階や医療費の負担にも連動します' },
     { key: 'kaigo1', name: '介護保険料の段階（第1段階から第2段階へ）', shotoku: '年金収入等',
@@ -113,7 +139,8 @@ function valOf(s: Sakaime, age: number, v: V): number {
 }
 
 /** 軽減判定所得から、受けられる軽減の割合（7・5・2・0） */
-export function keigenWariai(shotoku: number, hihokensha = 1, kyuyoShotokusha = 1): number {
+/** ★★**既定値を作りません**（★決め1068）。★2つとも呼び出し側から渡してください */
+export function keigenWariai(shotoku: number, hihokensha: number, kyuyoShotokusha: number): number {
   const base = KEIGEN_BASE + 100_000 * Math.max(0, kyuyoShotokusha - 1);
   if (shotoku <= base) return 7;
   if (shotoku <= base + KEIGEN_5WARI * hihokensha) return 5;
@@ -146,8 +173,16 @@ export type Koeta = Omit<Sakaime, 'hantei' | 'age_from' | 'age_to'> & {
 };
 
 /** iDeCo等を受け取ることで**新たに**超える境目だけを返す */
+/**
+ * ★★★**既定値を作りません**（★決め1059／1068・2026-09-13）。★6つとも呼び出し側から渡してください。
+ *
+ *   ★前は `hihokensha = 1, kyuyoShotokusha = 1, kyuchi = 1` で、★★`gamen8.ts` 214行が
+ *     `S.check(ari, nashi)` と呼んでいましたので、★**その方の級地も被保険者数も給与所得者数も届いていませんでした**。
+ *   ★`fuyou` は**この回で足しました**（★`hikazei` の額に要ります）。
+ */
 export function check(ari: Record<number, V>, nashi: Record<number, V>,
-                      hihokensha = 1, kyuyoShotokusha = 1, kyuchi = 1): Koeta[] {
+                      hihokensha: number, kyuyoShotokusha: number,
+                      kyuchi: number, fuyou: number): Koeta[] {
   const out: Koeta[] = [];
   const ages = Object.keys(ari).map(Number).sort((a, b) => a - b);
   // 軽減は7・5・2の3段階だが、伝えるべきは「何割から何割に下がるか」1つだけ
@@ -169,7 +204,7 @@ export function check(ari: Record<number, V>, nashi: Record<number, V>,
       break;
     }
   }
-  for (const s of sakaimeList(hihokensha, kyuyoShotokusha, kyuchi)) {
+  for (const s of sakaimeList(hihokensha, kyuyoShotokusha, kyuchi, fuyou)) {
     if (s.key.startsWith('keigen')) continue;
     for (const age of ages) {
       if (!(s.age_from <= age && age <= s.age_to)) continue;

@@ -211,7 +211,18 @@ export function zenToori(R: [E.Plan, E.EvalResult][], p: E.Jinbutsu, uketoriNen:
       ari[a] = E.shotokuJoukyou(q, y, nen[y] ?? 0);
       nashi[a] = E.shotokuJoukyou(q, y, 0);
     }
-    return S.check(ari, nashi);
+    /**
+     * ★★★【2026-09-13・決め1059／1069・森嶋さんの承認あり】**その方のものを渡します。**
+     *
+     *   ★前は `S.check(ari, nashi)` で、★`check()` の既定（1／1／1）が使われていました
+     *     ── ★★**その方の級地も被保険者数も給与所得者数も、1つも届いていませんでした**。
+     *   ★★`kyuchi` と `fuyou` は `q` から取ります（★`ari`・`nashi` を作ったのと**同じ人**です）。
+     *   ★★★`hihokensha`（被保険者数）と `kyuyoShotokusha`（給与所得者数）は、
+     *     ★**`paidInput.ts` に欄が0か所**ですので **1 を渡します**（★戦術Cowork `senjutsu_20260913e.md` 4-1）。
+     *     ★★**これは既定値ではありません** ── ★呼ぶ側が「1人」と決めて渡しています。
+     *     ★★★**欄ができた日は、ここを入力から渡してください**（★`check()` 側に既定を戻さないでください）。
+     */
+    return S.check(ari, nashi, 1, 1, q.kyuchi, q.fuyouKei());
   };
 
   // --- 全通りを、画面8が見る形に並べ直す ---

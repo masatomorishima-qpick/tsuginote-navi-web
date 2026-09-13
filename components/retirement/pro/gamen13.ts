@@ -8,7 +8,7 @@
  *
  * 画面13（この計算の根拠と、入れていないもの）。**条文の逐語がそのまま入ります。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（178,999バイト ／ md5 57099873bab8cd0478d18a7e003b6a6e）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（179,643バイト ／ md5 007d735a6d8aac6d71654350046b8a2b）
  */
 
 /** 表の1行 */

@@ -99,6 +99,14 @@ export interface Bun11 {
   ichiji_shotokuzei: number | null;
   /** ★その退職所得にかかる住民税（★その年に差し引かれます） */
   ichiji_jumin: number | null;
+  // ── ★★★区分の1文（★基準HTML 1117行・1126行・決め1107） --------------------
+  /**
+   * ★1本目の表の下の1文。★足し算が合う方（★実測 184人／250）と、
+   *   ★区分で説明できない方（★実測 1行・seed 235）には `null`（かたまりごと落ちます）。
+   */
+  kubun_bun: string | null;
+  /** ★2本目の表の下の1文（★同じ形。★実測 5人／78） */
+  ichiji_kubun_bun: string | null;
   // ── ★この本が見た年（★当て・数えのために返します。★画面には出しません） ----------
   shirabeta: {
     /** 退職金の表の年 */
@@ -123,6 +131,10 @@ export interface Bun11 {
     nenkin_shunyu: number;
     /** 軽減判定所得 */
     keigen_shotoku: number;
+    /** ★`退職所得 −（収入 − 控除）÷ 2`（★決め1107・0なら足し算が合っています） */
+    kubun_sa: number;
+    /** ★2本目の同じもの（★その年が無い方は `null`） */
+    ichiji_kubun_sa: number | null;
   };
 }
 
@@ -241,6 +253,63 @@ const TOSHI_ONAJI = (kara: number) =>
  *   ★ある所得が0円であることから、税が0円であることを導きません。
  */
 const ZATSU_ZERO = 'あなたの場合、公的年金等控除だけでこの年の年金の収入が引ききれますので、雑所得は0円になります。';
+
+/**
+ * ★★★`kubun_bun`・`ichiji_kubun_bun` の字（★戦術Cowork 決め1107・2026-09-13）。
+ *
+ * ★★【なぜ要るか】★画面は「収入」「控除」「退職所得」を**3行並べて**出しますので、
+ *   ★読む方は `（収入 − 控除）÷ 2 ＝ 退職所得` と読みます。
+ *   ★★**合わない方が 1本目 66人／250（26.4%）・2本目 5人／78（6.4%）**いらっしゃいました。
+ *
+ * ★★★【こちらで直した所 ── 便に書きました】
+ *   ★決め1107の字は「…より **`{hamidashi}`** 大きくなります」と書かれていましたが、
+ *   ★★**`KubunMeisai.hamidashi` は「2分の1にしない部分」ではありません** ──
+ *     ★区分ごとの `max(0, その区分の収入 − その区分の控除)` の**和**で、
+ *     ★★**一般の区分にも入ります**（★実測 203行／328行）。
+ *   ★★★`hamidashi` で出すと、★**足し算が合っている180行にも文が出ます**（★実測）。
+ *   ★★ですので **`退職所得 −（収入 − 控除）÷ 2`** で出します ── ★これは
+ *     ★戦術Coworkの**見本の数と合います**（★1本目 1,200,000円・2本目 100,000円）。
+ *   ★実測 …… ★**マイナスになる行 0行**（★向きを断定できます）・★**0でない行 71行**
+ *     （★1本目66・2本目5 ── ★戦術Coworkの数と1行も違いません）。
+ */
+const KUBUN_JI: Record<'tokutei' | 'tanki' | 'ippan', string> = {
+  tokutei: '特定役員退職手当等',
+  tanki: '短期退職手当等',
+  // ★一般は2分の1にしますので、この字には出ません（★下の `kubunNa()` が外します）
+  ippan: '一般の退職手当等',
+};
+
+/**
+ * ★★**2分の1にしない区分の名前**（★特定役員 ∪ 短期で300万円を超えた分）。
+ *   ★★★**どちらも無いときは `null`** を返します ── ★**実測 1行／71（seed 235・2027年）**。
+ *     ★その1行の差（575,000円）は「2分の1にしない」からではなく、
+ *     ★★**区分ごとに控除を割り振ると、余った控除が区分別では引かれない**ためです
+ *     （★区分ごとに `max(0, …)` で0で止めるため）。
+ *   ★★**その1行には値を渡しません**（★かたまりごと落ちます）── ★字が当たらないためです。
+ *     ★戦術Coworkにお尋ねしています。
+ */
+function kubunNa(k: E.KeikaRow): string | null {
+  const m = k.kubun_meisai;
+  const na: string[] = [];
+  if (m.kubun_ari.includes('tokutei')) na.push(KUBUN_JI.tokutei);
+  if (m.kubun_ari.includes('tanki') && m.koeta) na.push(KUBUN_JI.tanki);
+  return na.length ? na.join('と') : null;
+}
+
+/** ★★`退職所得 −（収入 − 控除）÷ 2`（★0のときは足し算が合っています） */
+function kubunSa(k: E.KeikaRow): number {
+  return k.shotoku - Math.floor(Math.max(0, k.shunyu - k.kojo_adj) / 2);
+}
+
+/** ★決め1107 の字（★1本目も2本目も同じ形） */
+function kubunBunJi(k: E.KeikaRow, na: string): string | null {
+  const kubun = kubunNa(k);
+  const sa = kubunSa(k);
+  if (sa <= 0 || kubun === null) return null;
+  return `あなたの${na}には、${kubun}にあたる部分があります。`
+    + `その部分は2分の1にしませんので、あなたの退職所得は`
+    + `（${en(k.shunyu)} − ${en(k.kojo_adj)}）÷ 2 より ${en(sa)} 大きくなります。`;
+}
 
 /** ★決め1086 の字（★年金として受け取る所得が1つも無い方） */
 const NENKIN_NASHI = (nenkinGen: string) =>
@@ -441,12 +510,17 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
     ichiji_shotoku: ik === null ? null : ik.shotoku,
     ichiji_shotokuzei: ik === null ? null : ik.gensen_ari,
     ichiji_jumin: iU === null ? null : iU.jumin_taishoku,
+    // ── ★★★区分の1文（★決め1107）
+    kubun_bun: kubunBunJi(k, k.gens.join('と')),
+    ichiji_kubun_bun: ik === null ? null
+      : kubunBunJi(ik, `${ik.gens.join('と')}の一時金`),
     shirabeta: {
       tai_nen: taiNen, ichiji_nen: ik === null ? null : ik.year,
       nenkin_nen: nenkinNen, nenkin_tsukisu: tsukisu,
       toshi_bun_kata: toshiKata,
       kawaru_age: kawaruAge,
       zatsu: j.zatsu, nenkin_shunyu: j.nenkinShunyu, keigen_shotoku: keigen,
+      kubun_sa: kubunSa(k), ichiji_kubun_sa: ik === null ? null : kubunSa(ik),
     },
   };
 }

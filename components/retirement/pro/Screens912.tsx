@@ -237,6 +237,13 @@ export function atai912(m: Moto912): Record<string, string | null> {
     ichiji_shotoku: enKa(m.bun11.ichiji_shotoku),
     ichiji_shotokuzei: enKa(m.bun11.ichiji_shotokuzei),
     ichiji_jumin: enKa(m.bun11.ichiji_jumin),
+    /**
+     * ★★★区分の1文（★戦術Cowork `senjutsu_20260913.md` 3節・決め1107）。
+     *   ★「収入」「控除」「退職所得」の3行が `（収入 − 控除）÷ 2 ＝ 退職所得` にならない方に出します
+     *     （★実測 1本目 66人／250・2本目 5人／78）。★合う方は `null`＝かたまりごと落ちます。
+     */
+    kubun_bun: m.bun11.kubun_bun,
+    ichiji_kubun_bun: m.bun11.ichiji_kubun_bun,
   };
 
   /**

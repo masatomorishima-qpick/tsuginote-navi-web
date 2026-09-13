@@ -18,6 +18,7 @@
  *   ★決め1070 …… `an_1_label`・`an_2_label` は **`Plan.label` そのまま**
  *   ★決め1116 …… `sa_hajime_bun`・`gyakuten_bun`・`sa_saishu_bun` の字（★**その年に見た事実だけ**）
  *   ★決め1117 …… `an_a`・`an_b` は**尻尾を外さない**（★2案の⑳は違いえます）
+ *   ★決め1122／1126／1127 …… `gyakuten_bun` の**5つの字**（★「入れ替わる」は正負が変わる年だけ）
  *   ★決め1118 …… `an_onaji_bun`（①の相手が無い方）／`sa_hajime_age`（★`an_a_age` から改名）／
  *   　　　　　　　図の**左端**は「2つの案のどちらかで、はじめてお金が入る年齢」
  *
@@ -110,11 +111,8 @@ export interface Bun10 {
     sa_migi: number | null;
     /** ★`sa_hajime_bun` が3つのうちどの字になったか */
     hajime_kata: 'moto' | 'onaji' | 'ima' | null;
-    /**
-     * ★`gyakuten_bun` が**3つ**のうちどの字になったか（★決め1122）。
-     * ★★`sa_zero`（どの年齢でも差が0）は、★**決め1122が書いていない形**です ── ★字を作らず `null` を返します。
-     */
-    gyakuten_kata: 'tsuki' | 'irekawaru' | 'irekawaranai' | 'sa_zero' | null;
+    /** ★`gyakuten_bun` が**5つ**のうちどの字になったか（★決め1122・決め1126・決め1127） */
+    gyakuten_kata: 'tsuki_irekawaru' | 'tsuki' | 'irekawaru' | 'irekawaranai' | 'sa_zero' | null;
     /** ★はじめの差が0の方の、**差が付きはじめる年齢**（★ほかの方は `null`） */
     tsuki_age: number | null;
     /** ★★はじめの差が0の方が、**差が付いたあと さらに正負が入れ替わる**年齢（★戦術Coworkのお尋ね） */
@@ -183,9 +181,25 @@ const JI = {
    *     ── ★**0 は「まだ差が付いていない」**であって、多い少ないではありません。
    */
   gyakuten: {
+    /**
+     * ★★★【2026-09-13・決め1126】**5つめの字**。★はじめの差が0の108人のうち、
+     *   ★★**103人（95.4%）が、差が付いたあと さらに正負が入れ替わって**いました。
+     *   ★前の字（`tsuki`）だと「`{年齢}`歳から差が付きはじめて、90歳ではこちらが多い」としか言わず、
+     *     ★★★**途中で多い少ないが入れ替わったことが、どこにも出ません**でした。
+     */
+    tsukiIrekawaru: (a: number, b: number) =>
+      `${a}歳から差が付きはじめ、${b}歳で多い少ないが入れ替わります。`,
     tsuki: (a: number) => `${a}歳から、差が付きはじめます。`,
     irekawaru: (a: number) => `${a}歳で、多い少ないが入れ替わります。`,
     irekawaranai: () => 'そのあと、多い少ないが入れ替わることはありません。',
+    /**
+     * ★★★【決め1127】**0人でも、起きたときに黙って消える形を残しません。**
+     *   ★前は `null` を返していました。★★すると1034行の箱が**かたまりごと落ち**、
+     *     ★`sa_hajime_bun`（「どちらも同じ額です」）も `sa_saishu_bun`（「どちらも同じ額になります」）も
+     *     ★★**いっしょに消え、「差が無い」ことすら画面に出なくなります**。
+     *   ★実測 **0人／226**ですが、入力しだいで起こりえます（★決め1086と同じ形）。
+     */
+    saZero: () => 'どの年齢でも、差は付きません。',
   },
   saishu: {
     ima: (x: number) => `いま選んでいるほうが ${en(x)} 多くなります`,
@@ -342,7 +356,8 @@ export function gamen10Bun(
     saKotei = koteiAge === null ? null : sa[koteiAge];
     hajimeKata = saHajime > 0 ? 'moto' : saHajime < 0 ? 'ima' : 'onaji';
     gyakutenKata = f0 === 0
-      ? (tsukiAge === null ? 'sa_zero' : 'tsuki')
+      ? (tsukiAge === null ? 'sa_zero'
+        : (tsukiGyakutenAge === null ? 'tsuki' : 'tsuki_irekawaru'))
       : (gyakutenAge === null ? 'irekawaranai' : 'irekawaru');
     saishuKata = saMigi < 0 ? 'ima' : saMigi > 0 ? 'moto' : 'onaji';
   }
@@ -411,12 +426,11 @@ export function gamen10Bun(
     sa_hajime_bun: hajimeKata === null ? null
       : hajimeKata === 'onaji' ? JI.hajime.onaji()
       : JI.hajime[hajimeKata](Math.abs(saHajime as number)),
-    /**
-     * ★★★決め1122の**3つの字**。
-     *   ★★`sa_zero`（どの年齢でも差が0）は決め1122が書いていませんので、★**字を作らず `null`**（かたまりごと落ちます）。
-     *     ★実測 **0人／226**ですが、入力しだいで起こりえますので、こちらでは決めません。
-     */
-    gyakuten_bun: gyakutenKata === null || gyakutenKata === 'sa_zero' ? null
+    /** ★★★決め1122・決め1126・決め1127 の**5つの字**（★`null` は①の相手が無い方だけ） */
+    gyakuten_bun: gyakutenKata === null ? null
+      : gyakutenKata === 'sa_zero' ? JI.gyakuten.saZero()
+      : gyakutenKata === 'tsuki_irekawaru'
+        ? JI.gyakuten.tsukiIrekawaru(tsukiAge as number, tsukiGyakutenAge as number)
       : gyakutenKata === 'tsuki' ? JI.gyakuten.tsuki(tsukiAge as number)
       : gyakutenKata === 'irekawaranai' ? JI.gyakuten.irekawaranai()
       : JI.gyakuten.irekawaru(gyakutenAge as number),

@@ -18,16 +18,23 @@
  *   ★★決め1135 …… 表の金額にも円を付ける（14か所）
  *   ★★決め1136 …… **表や箇条書きのセルの中の印を `null` にしない**（★かたまりごと落ちるため）
  *   ★★決め1137 …… `hantei_nenkin_kojo_kubun` は見本と同じ形で上の段も作る／公的年金0円の方の3つめの字
+ *   ★★決め1139 …… `koteki_tsukisu_bun` の**4つめの字**（★⑳の年が0か月）／`mangaku_bun`（★公的年金0円）
+ *   ★★決め1141 …… warn の囲みの出し方を3つに（★`jumin_koeru_bun` を足した）
+ *   ★★決め1143 …… **その方に当たる字が1つも無い画面を出さない**
  *
  * ──────────────────────────────────────────────────────────
- * ★★★【この本が `null` を返す所（★2か所・どちらも段落の中で、表と箇条書きではありません）】
+ * ★★★【この本が `null` を返す所】
  *
- *   `koteki_tsukisu_bun`・`mangaku_bun` …… ★**字が決まっていない方**にだけ `null`。
- *     ★(あ) 公的年金の額が0円の方の `mangaku_bun`（★「満額の0円が入るのは◯歳から」になってしまいます）
- *     ★(い) ⑳の年に公的年金の支払が**0か月**の方の `koteki_tsukisu_bun`
- *           （★見本の字は「◯月分から始まり…11月分まで」で、0か月の方には立ちません）
- *     ★(う) 月日をお答えで、⑳の年が**12か月**の方の `koteki_tsukisu_bun`（★実測 0人）
- *   ★★どれも **975行の段落（1かたまり）**が落ちるだけです。★表は落ちません。
+ *   1. `keigen_koeru_bun` …… ★★**B案で軽減も住民税も変わらない方**（★実測 76人／102・74.5%）。
+ *      ★★★決め1141(3)＝**「こうなります」と言って、何も起きないものを並べない。**
+ *      ★warn の囲みの `<b>` の中の印ですので、★**囲みごと落ちます**（★決め1101の形）。
+ *   2. `dasu` が `false` の方 …… ★`setai_kubun`・`hikazei_gendo` いがい ぜんぶ `null`。
+ *      ★★この2つは画面11（1137〜1138行）にも出ますので、★**必ず返します**（★決め1143(5-1)）。
+ *
+ * ★★★【`gyouNashi` で `<li>` を落とす所】（★`null` にしません・決め1136）
+ *   `keigen_kokuho_bun` …… ★軽減が変わらない方（★実測 77人／102）
+ *   `jumin_koeru_bun` ……… ★住民税が変わらない方（★実測 87人／102）
+ *   ★★**どちらも落ちる76人は、`keigen_koeru_bun` が `null` ですので囲みごと落ちます。**
  * ──────────────────────────────────────────────────────────
  */
 
@@ -110,19 +117,38 @@ export interface Bun9shosai {
    */
   dasu: boolean;
 
-  // ── その方のもの（★`dasu` が `false` でも返します。★画面11も使います） -------
+  /**
+   * ── ★★★**`dasu` が `false` でも必ず返す4つ**（★決め1143(5-1)）
+   *
+   *   ★★**画面9詳細の都合で `null` にすると、ほかの画面が落ちます。**
+   *   ★機械で数えた「画面9詳細の45種類のうち、ほかの画面にも出る名前」は **5種類** ──
+   *     `nenkin_gen`（★`atai912()` が別に持っています）／
+   *     `setai_kubun`・`hikazei_gendo`（★画面11 1137〜1138行）／
+   *     `ideco_zandaka`・`koteki_kaishi_age`（★画面10 993行）。
+   *   ★★★この4つは、★**出す相手でない方にも値を返します**。
+   */
   setai_kubun: string;
   hikazei_gendo: string;
+  ideco_zandaka: string;
+  koteki_kaishi_age: string;
 
   // ── 917行の3文（★決め1134・1文まるごと） -----------------------------------
   handan_a_bun: string | null;
   handan_b_bun: string | null;
   handan_c_bun: string | null;
-  // ── warn の囲み（★決め1134(3)） ---------------------------------------------
+  // ── warn の囲み（★決め1134(3)・決め1141） -----------------------------------
+  /** ★★何も変わらない方は `null`（★囲みごと落ちます・決め1141(3)） */
   keigen_koeru_bun: string | null;
+  /** ★軽減の行。★変わらない方は `gyou_nashi` に入り、`<li>` が落ちます（★`null` にしません） */
   keigen_kokuho_bun: string | null;
+  /** ★★決め1141(1) …… 住民税の行。★変わらない方は `gyou_nashi` に入ります */
+  jumin_koeru_bun: string | null;
+  /**
+   * ★★★**その方には、その行が無い**名前（★`gyouNashi912()` に渡します）。
+   *   ★★`null` ではありません ── ★**ふつうの分岐**で、`<li>` だけが落ちます（★決め1136・決め1094）。
+   */
+  gyou_nashi: readonly string[];
 
-  koteki_kaishi_age: string | null;
   // ── 図の凡例と、破線の箇条書きの額 -------------------------------------------
   an_a_bun: string | null;
   an_b_bun: string | null;
@@ -158,7 +184,6 @@ export interface Bun9shosai {
   // ── 表の下の文（975行） ------------------------------------------------------
   koteki_tsukisu_bun: string | null;
   mangaku_bun: string | null;
-  ideco_zandaka: string | null;
 
   // ── どの基準を超えるかの表（2本目） ------------------------------------------
   kokuho_kijun: string | null;
@@ -203,7 +228,7 @@ export interface Bun9shosai {
     /** 満額が入り始める年齢（★無ければ `null`） */
     mangaku_age: number | null;
     /** `koteki_tsukisu_bun` がどの字になったか */
-    tsukisu_bun_kata: 'mihon' | 'umare_nashi' | 'koteki_zero' | 'nashi';
+    tsukisu_bun_kata: 'mihon' | 'umare_nashi' | 'koteki_zero' | 'koteki_zero_tsuki' | 'nashi';
     /** 表の足し算（雑所得＋給与所得＋15万円 ＝ 判定所得）が合うか */
     hyo_au_a: boolean;
     hyo_au_b: boolean;
@@ -282,6 +307,10 @@ export function gamen9shosaiBun(
   if (kaishiNen === undefined) {
     throw new Error(`いま見せている案に、${idecoName} を受け取る年が在りません。`);
   }
+  /** ★`{ideco_zandaka}` のもと（★画面10にも出ますので、`dasu` に寄らず返します） */
+  const idecoGen = p.gens.find((g) => g.name === idecoName);
+  if (!idecoGen) throw new Error(`${idecoName} が、その方の支給源に在りません。`);
+
   const idecoKaishiAge = p.age(kaishiNen);
   const nensuA = kijunAge - idecoKaishiAge;
   const nensuB = nensuA + 1;
@@ -309,9 +338,11 @@ export function gamen9shosaiBun(
     return {
       dasu: false,
       setai_kubun: setaiKubun, hikazei_gendo: en(hikazeiGaku),
+      ideco_zandaka: en(idecoGen.shunyu), koteki_kaishi_age: `${kijunAge}歳`,
       handan_a_bun: null, handan_b_bun: null, handan_c_bun: null,
-      keigen_koeru_bun: null, keigen_kokuho_bun: null,
-      koteki_kaishi_age: null, an_a_bun: null, an_b_bun: null,
+      keigen_koeru_bun: null, keigen_kokuho_bun: null, jumin_koeru_bun: null,
+      gyou_nashi: [],
+      an_a_bun: null, an_b_bun: null,
       sakaime_1: null, sakaime_2: null, sakaime_3: null,
       hantei_age: null, an_a_nensu: null, an_b_nensu: null, koteki_tsukisu: null,
       a_koteki: null, b_koteki: null, a_ideco: null, b_ideco: null,
@@ -320,7 +351,7 @@ export function gamen9shosaiBun(
       a_zatsu: null, b_zatsu: null, a_kyuyo: null, b_kyuyo: null,
       a_koujo15: null, b_koujo15: null,
       a_hantei_shotoku: null, b_hantei_shotoku: null,
-      koteki_tsukisu_bun: null, mangaku_bun: null, ideco_zandaka: null,
+      koteki_tsukisu_bun: null, mangaku_bun: null,
       kokuho_kijun: null, a_kokuho_bun: null, b_kokuho_bun: null,
       a_jumin_bun: null, b_jumin_bun: null,
       shirabeta: shirabetaKara,
@@ -403,19 +434,31 @@ export function gamen9shosaiBun(
     return `${ageC}歳からは、どちらを選んでも同じです（${riyu}、${owari}）。`;
   })();
 
-  // ── warn の囲み（★決め1134(3)） ---------------------------------------------
+  // ── warn の囲み（★決め1134(3)・★★決め1141） --------------------------------
   /**
-   * ★★★**この囲みは「基準を超えると、こうなります」の形**です。
-   *   ★★何も変わらない方（★実測 **76人／102・74.5%**）には、★**向きを断定しない字**にしました。
-   *   ★★★**箇条書きの2行目（住民税）は固定の字**ですので、こちらでは直せません
-   *     ── ★**戦術Coworkにお尋ねしています**（★便）。
+   * ★★★決め1141 …… **3つに整理しました。**
+   *   (1) `jumin_koeru_bun` を足しました。★住民税が変わらない方（★87人）は `<li>` を落とします
+   *   (2) `keigen_kokuho_bun` も同じ。★軽減が変わらない方（★77人）は `<li>` を落とします
+   *   (3) ★★**どちらも変わらない方（★76人）は `keigen_koeru_bun` を `null`** ＝ 囲みごと落ちます
+   *   ★★★**「こうなります」と言って、何も起きないものを並べません。**
    */
   const koeruBun = (keigenSagaru || juminHajimaru)
     ? `${nensuB}年に延ばして基準を超えると`
-    : `${nensuB}年に延ばした場合は`;
+    : null;
+  /**
+   * ★★`<li>` の字は、★**落とす方にも値を返します**（★決め1136＝箇条書きのセルの中の印を `null` にしない）。
+   *   ★落とすのは `gyou_nashi` です ── ★**`kumitate()` が `<li>` だけを落とします**（★決め1094）。
+   */
   const kokuhoBun = keigenSagaru
     ? (wB === 0 ? `軽減が${wA}割からなくなります` : `軽減が${wA}割から${wB}割に下がります`)
     : `軽減は${mamaJi(wA)}変わりません`;
+  /** ★決め1141(1) …… 基準HTML 980行の固定の字を、そのまま印にしていただきました */
+  const juminBun = juminHajimaru
+    ? '住民税がかかり始めます。介護保険料の段階や医療費の負担にも連動します'
+    : '住民税は変わりません';
+  const gyouNashi: string[] = [];
+  if (!keigenSagaru) gyouNashi.push('keigen_kokuho_bun');
+  if (!juminHajimaru) gyouNashi.push('jumin_koeru_bun');
 
   // ── 975行の2つの文（★決め1058・決め1136(7)・決め1137(9)） -------------------
   const kotekiGaku = p.kotekiGaku();
@@ -434,15 +477,24 @@ export function gamen9shosaiBun(
         + '12か月分が入るものとして計算しています。';
     }
     /**
-     * ★★★**この2つの方の字は、まだ決まっていません**（★便でお尋ねしています）。
-     *   ★(い) ⑳の年の支払が **0か月**の方 …… 見本は「◯月分から始まり…11月分まで」で立ちません
-     *   ★(う) ⑳の年が **12か月**の方 …… 見本は「◯か月分だけだからです」で立ちません（★実測 0人）
+     * ★★★**⑳の年が 12か月 の方の字は、まだ決まっていません**（★便でお尋ねしています・実測 0人）。
+     *   ★見本は「◯か月分だけだからです」で、12か月の方には立ちません。
      */
-    if (tsukisu === 0 || tsukisu >= 12) { tsukisuKata = 'nashi'; return null; }
+    if (tsukisu >= 12) { tsukisuKata = 'nashi'; return null; }
     const t = p.tassuruTsuki(kijunAge);
     if (t === null) throw new Error('生まれた月日が在るのに、達する月が出ませんでした。');
     const m = Math.trunc(umare[0]), d = Math.trunc(umare[1]);
     const kaishiJi = tsukiJi(t + 1);
+    /**
+     * ★★★決め1139 …… **⑳の年に公的年金の支払が 0か月 の方**（★実測 1人／102・seed 226）。
+     *   ★★11月生まれ・12月1日生まれの方は**12月分**から、12月生まれの方は**翌年1月分**から始まり、
+     *     ★どちらも**その年には1か月分も届きません**（★偶数月に前月までの分をまとめて支払うため）。
+     */
+    if (tsukisu === 0) {
+      tsukisuKata = 'koteki_zero_tsuki';
+      return `あなたは${m}月${d}日生まれなので公的年金は${kaishiJi}分から始まりますが、`
+        + `その分が支払われるのは翌年ですので、${kijunAge}歳になる年には公的年金が入りません。`;
+    }
     /**
      * ★★**門** …… 「開始月から11月分まで」の月数が、`nenkinShiharaiTsukisu()` と合うこと。
      *   ★★★**前の回、ここが1か月ずれていました**（★`tsukiJi()` の覚え書き）。
@@ -465,20 +517,18 @@ export function gamen9shosaiBun(
 
   const mangakuBun = (() => {
     /**
-     * ★★★公的年金が0円の方の字は、まだ決まっていません（★便でお尋ねしています）
-     *   ── ★「満額の**0円**が入るのは◯歳からです。」になってしまいます。
+     * ★★★決め1139 …… **公的年金が0円の方**（★実測 1人／102・seed 12）。
+     *   ★「満額の**0円**が入るのは◯歳からです。」になってしまうためです。
+     *   ★★★**`null` にしません** …… ★975行の段落には `koteki_tsukisu_bun`（★決め1137(9)の字）も
+     *     在りますので、★`null` にすると**段落ごと落ちて、その字も消えます**（★決め1136の家族）。
      */
-    if (kotekiGaku === 0) return null;
+    if (kotekiGaku === 0) return '満額になる年はありません。';
     // ★決め1049⑤ の字（★はじめの年から満額が入る方）
     if (tsukisu >= 12) return 'はじめの年から満額が入ります。';
     if (mangakuAge === null) return null;
     // ★決め1136(7) …… （ ）の割り算を外しました
     return `満額の${en(kotekiGaku)}が入るのは${mangakuAge}歳からです。`;
   })();
-
-  // ── iDeCo等の残高 ------------------------------------------------------------
-  const idecoGen = p.gens.find((g) => g.name === idecoName);
-  if (!idecoGen) throw new Error(`${idecoName} が、その方の支給源に在りません。`);
 
   const ijou65 = p.nenrei1231(y0) >= 65;
   const kubunShita = ijou65 ? A.k.nenkinShunyu < KUBUN_65IJOU_1 : A.k.nenkinShunyu < KUBUN_65MIMAN_1;
@@ -496,12 +546,15 @@ export function gamen9shosaiBun(
     dasu: true,
     setai_kubun: setaiKubun,
     hikazei_gendo: en(hikazeiGaku),
+    ideco_zandaka: en(idecoGen.shunyu),
+    koteki_kaishi_age: `${kijunAge}歳`,
     handan_a_bun: handanA,
     handan_b_bun: handanB,
     handan_c_bun: handanC,
     keigen_koeru_bun: koeruBun,
     keigen_kokuho_bun: kokuhoBun,
-    koteki_kaishi_age: `${kijunAge}歳`,
+    jumin_koeru_bun: juminBun,
+    gyou_nashi: gyouNashi,
     an_a_bun: `${nensuA}年で受け取る`,
     an_b_bun: `${nensuB}年で受け取る`,
     sakaime_1: en(kijun7),
@@ -544,7 +597,6 @@ export function gamen9shosaiBun(
     b_hantei_shotoku: en(hantei(B, kijunAge)),
     koteki_tsukisu_bun: tsukisuBun,
     mangaku_bun: mangakuBun,
-    ideco_zandaka: en(idecoGen.shunyu),
     kokuho_kijun: en(kijun7),
     a_kokuho_bun: koeruJi(hantei(A, kijunAge), kijun7),
     b_kokuho_bun: koeruJi(hantei(B, kijunAge), kijun7),

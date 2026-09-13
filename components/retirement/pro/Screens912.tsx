@@ -334,6 +334,8 @@ export function atai912(m: Moto912): Record<string, string | null> {
      */
     keigen_koeru_bun: m.bun9s.keigen_koeru_bun,
     keigen_kokuho_bun: m.bun9s.keigen_kokuho_bun,
+    /** ★★決め1141(1) …… 住民税の行（★変わらない方は `gyouNashi912()` が `<li>` を落とします） */
+    jumin_koeru_bun: m.bun9s.jumin_koeru_bun,
     /** ★★決め1136(6) …… 表に足した給与所得の行 */
     a_kyuyo: m.bun9s.a_kyuyo,
     b_kyuyo: m.bun9s.b_kyuyo,
@@ -511,6 +513,15 @@ export function gyouNashi912(m: Moto912): string[] {
     const n = i + 1;
     if (!m.ichiran[i]) out.push(`an_label${n}`, `hoken_bun${n}`, `tedori${n}`, `sa${n}`);
   }
+  /**
+   * ★★★画面9詳細の warn の囲みの箇条書き（★決め1141(1)(2)）。
+   *   ★`keigen_kokuho_bun` …… 軽減が変わらない方（★実測 77人／102）
+   *   ★`jumin_koeru_bun` …… 住民税が変わらない方（★実測 87人／102）
+   * ★★**どちらもエンジンが決めています**（★`gamen9shosaiBun()` の `gyou_nashi`）。
+   *   ★ここでは受け取って渡すだけです（★§画面に出す数字と分岐は計算エンジン側）。
+   * ★★★どちらも落ちる76人は、`keigen_koeru_bun` が `null` ですので**囲みごと落ちます**（★決め1141(3)）。
+   */
+  out.push(...m.bun9s.gyou_nashi);
   return out;
 }
 
@@ -532,9 +543,65 @@ export function kumi912(m: Moto912): Record<string, Kumi> {
     for (const na of dero) if (!madaSet.has(na) && na in a) sono[na] = a[na];
     return kumitate(blocks, mada, sono, nashi);
   };
+  /**
+   * ★★★【2026-09-13・決め1143】**その方に当たる字が1つも無い画面を出しません。**
+   *
+   *   ★画面9詳細は、決め1046の「出す相手」でない方（★実測 148人／250・59.2%）には
+   *     ★★**かたまりが9個残りますが、その9個は「印が1つも無いか `{nenkin_gen}` だけ」**
+   *     ── ★その方に当たる字が1つもありません。
+   *   ★★ですので、★**かたまりを1つも作りません**（★決め1143(2)）。
+   *   ★★★**出すかどうかを決めているのはエンジン**です（★`gamen9shosaiBun()` の `dasu`）。
+   */
+  /**
+   * ★★★【2026-09-13・決め1143(5-1)】**画面9詳細の都合で `null` にした印が、
+   *   ほかの画面を落としていないか**を、★**ここで機械で数えます**。
+   *
+   *   ★★前の回、`setai_kubun`・`hikazei_gendo` を `null` にして**画面11の年金の表**を落としました。
+   *   ★★この回、`ideco_zandaka`・`koteki_kaishi_age` を `null` にして**画面10の前提の箱**を落としました
+   *     ── ★**2回とも、同じ形**です。★ですので**門にします。**
+   *   ★★★「画面9詳細にも、ほかの画面にも出る名前」を機械で拾い、
+   *     ★**出す相手でない方で、その名前が `null` なら止めます**。
+   */
+  if (!m.bun9s.dasu) {
+    const hoka = new Set<string>();
+    const marude = [GAMEN9, GAMEN10, GAMEN11, GAMEN12] as unknown as readonly BlockKyotsu[][];
+    for (const b of marude) {
+      for (const x of b) {
+        const hirou = (t: string) => {
+          for (const y of t.matchAll(/\{([a-zA-Z0-9_]+)\}/g)) hoka.add(y[1]);
+        };
+        if (x.kind === 'hyo') for (const g of x.gyou) hirou(g.cells.join(' '));
+        else if (x.kind === 'ret') for (const k of x.koumoku) hirou(k.bun);
+        else hirou(x.bun);
+      }
+    }
+    const kyoyu: string[] = [];
+    for (const x of GAMEN9shosai as readonly BlockKyotsu[]) {
+      const hirou = (t: string) => {
+        for (const y of t.matchAll(/\{([a-zA-Z0-9_]+)\}/g)) {
+          if (hoka.has(y[1]) && a[y[1]] === null) kyoyu.push(y[1]);
+        }
+      };
+      if (x.kind === 'hyo') for (const g of x.gyou) hirou(g.cells.join(' '));
+      else if (x.kind === 'ret') for (const k of x.koumoku) hirou(k.bun);
+      else hirou(x.bun);
+    }
+    if (kyoyu.length) {
+      throw new Error(
+        `画面9詳細を出さない方に、「${[...new Set(kyoyu)].join(' ')}」が \`null\` で渡されています。`
+        + '**この名前は、ほかの画面にも出ます。**`null` にすると、そちらのかたまりが落ちます。'
+        + '`gamen9shosaiBun()` が `dasu` に寄らず値を返すようにしてください（決め1143）。',
+      );
+    }
+  }
+  const kara: Kumi = {
+    dasu: [], ochita: 0, ochitaMada: 0, ochitaNashi: 0, ochitaNa: [], nashiNa: [],
+    gyouNashiKazu: 0, gyouNashiNa: [], karaOchi: 0, ireta: 0,
+  };
   return {
     画面9: hitotsu(GAMEN9 as readonly BlockKyotsu[], MADA9),
-    '画面9 詳細': hitotsu(GAMEN9shosai as readonly BlockKyotsu[], MADA9S),
+    '画面9 詳細': m.bun9s.dasu
+      ? hitotsu(GAMEN9shosai as readonly BlockKyotsu[], MADA9S) : kara,
     画面10: hitotsu(GAMEN10 as readonly BlockKyotsu[], MADA10),
     画面11: hitotsu(GAMEN11 as readonly BlockKyotsu[], MADA11),
     画面12: hitotsu(GAMEN12 as readonly BlockKyotsu[], MADA12),
@@ -542,7 +609,16 @@ export function kumi912(m: Moto912): Record<string, Kumi> {
 }
 
 export function Screen9({ m }: { m: Moto912 }) { return <ScreenBlocks kumi={kumi912(m)['画面9']} />; }
-export function Screen9Shosai({ m }: { m: Moto912 }) { return <ScreenBlocks kumi={kumi912(m)['画面9 詳細']} />; }
+/**
+ * ★★★決め1143 …… **出す相手でない方には、この画面を1文字も描きません。**
+ *   ★★★**入口（導線）は、基準HTMLにも `PaidApp.tsx` にも 0か所**です
+ *     （★こちらで機械で数えました ── ★`Screen9Shosai` を読み込む所が0か所）。
+ *     ★ですので、決め1143(3)（入口も出さない）で**この回に直す所はありません**。
+ */
+export function Screen9Shosai({ m }: { m: Moto912 }) {
+  if (!m.bun9s.dasu) return null;
+  return <ScreenBlocks kumi={kumi912(m)['画面9 詳細']} />;
+}
 export function Screen10({ m }: { m: Moto912 }) { return <ScreenBlocks kumi={kumi912(m)['画面10']} />; }
 export function Screen11({ m }: { m: Moto912 }) { return <ScreenBlocks kumi={kumi912(m)['画面11']} />; }
 export function Screen12({ m }: { m: Moto912 }) { return <ScreenBlocks kumi={kumi912(m)['画面12']} />; }

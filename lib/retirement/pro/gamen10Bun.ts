@@ -58,10 +58,9 @@ export interface Bun10 {
    *
    *   ★1037行は「どちらも`{nenkin_gen}`を`{an_b_mijikai}`にそろえて」で、
    *     ★★**②は公的年金の年齢を比べる節**ですので、★尻尾が入ると**同じ文の中に2つの年齢が並びます**。
-   *   ★★`motoJi()` で作ります ── ★**突き合わせの鍵と同じ関数です**が、
-   *     ★★★**これは画面に出す字**ですので、★決め1121（字と鍵を同じ関数にしない）に当たります。
-   *     ★★戦術Coworkが決め1135(2)で「`motoJi()` の形」と書かれていますので、そのとおりにしました。
-   *     ★**お尋ねしています**（★便）── ★鍵のほうを別の関数に分けるか、このままにするか。
+   *   ★★★**決め1142（2026-09-13）で、`motoJi()`（鍵）とは別の関数 `anBMijikaiJi()` に分けました。**
+   *     ★いまは同じ字を返しますが、★**役目が2つ**（画面に出す字／突き合わせの鍵）ですので、
+   *     ★★次に字を直したときに鍵が壊れないように、はじめから2つにしています。
    */
   an_b_mijikai: string | null;
   /**
@@ -163,6 +162,22 @@ export function anJi(pl: E.Plan, idecoName: string): string {
 /** ★案の⑳（★`null` の案は、その方の入力の⑳です） */
 const anAge = (pl: E.Plan, p: E.Jinbutsu): number =>
   pl.nenkin_kaishi_age ?? p.koteki_kaishi_age;
+
+/**
+ * ★★★【2026-09-13・決め1142】`{an_b_mijikai}` の字（★基準HTML 1037行）。
+ *
+ *   ★★**`motoJi()`（下）と、いまは同じ字を返します。**★それでも**関数を2つに分けます** ──
+ *     ★`motoJi()` は**②の比べ先をさがす鍵**で、★これは**画面に出す字**です。★役目が2つあります。
+ *   ★★★決め1142＝**決め1121は「いま字が同じかどうか」で判断しない。同じ字でも、役目が2つなら関数を2つにする。**
+ *     ★理由 …… ★**次に字を直したときに、鍵のほうが壊れます**（★前の回に、まさにそれが起きました）。
+ *   ★1000行の `{an_b}` は `anJi()`（★尻尾つき）です。★1037行は**②の節**で、
+ *     ★★尻尾（「／公的年金を◯歳から」）が入ると**同じ文の中に2つの年齢が並びます**。
+ */
+export function anBMijikaiJi(pl: E.Plan, idecoName: string, p: E.Jinbutsu): string {
+  const s = anJi(pl, idecoName);
+  const shippo = `／公的年金を${anAge(pl, p)}歳から`;
+  return s.endsWith(shippo) ? s.slice(0, -shippo.length) : s;
+}
 
 /**
  * ★★**案どうしを突き合わせる鍵**（★画面に出す字ではありません）。
@@ -427,7 +442,7 @@ export function gamen10Bun(
     an_a: kijunAri ? anJi(R.find(([pl]) => pl.label === kijunLab)![0], idecoName) : null,
     an_b: kijunAri ? anJi(plan, idecoName) : null,
     // ★★★決め1135(2)（2026-09-13）…… 1037行は尻尾を外した字
-    an_b_mijikai: kijunAri ? motoJi(plan, idecoName, p) : null,
+    an_b_mijikai: kijunAri ? anBMijikaiJi(plan, idecoName, p) : null,
     sa_hajime_age: kijunAri ? `${ages[0]}歳` : null,
     // ★★決め1118(3) …… 相手が在る方には出しません（★かたまりごと落ちます）
     an_onaji_bun: kijunAri ? null : AN_ONAJI,

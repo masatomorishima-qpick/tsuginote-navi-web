@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（179,424バイト ／ md5 4b8849993aafc16df1ba278020caa3b7）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（179,476バイト ／ md5 b0b85f5c7b9ffcc74551bb510f6ee69f）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -100,7 +100,7 @@ export const GAMEN9shosai: readonly Block9shosai[] = [
   { kind: 'hon', bun: "{keigen_koeru_bun}、こうなります。", na: ["keigen_koeru_bun"] },
   { kind: 'ret', koumoku: [
     { bun: "国民健康保険料などの軽減　{keigen_kokuho_bun}", na: ["keigen_kokuho_bun"] },
-    { bun: "住民税の非課税　住民税がかかり始めます。介護保険料の段階や医療費の負担にも連動します", na: [] },
+    { bun: "住民税の非課税　{jumin_koeru_bun}", na: ["jumin_koeru_bun"] },
   ] },
   { kind: 'hako', bun: "保険料がいくら上がるかは、お住まいの市区町村によって違います。上の表に出した基準の額（1,000,000円など）は国が定めているものですが、保険料の率は市区町村がそれぞれ決めているため、金額は出していません。\n\n介護保険料も所得で段階が上がりますが、あなたには境目をお出ししていません。住民税が課税される方の段階の境目は、国の告示と市区町村の条例で決まり、全国共通の金額がないためです。", na: [] },
   { kind: 'hako', bun: "あなたに給与などの収入があって、{nenkin_gen}がなくても基準を超えている場合は、この「保険料と医療費」の画面は出ません。受け取り方を変えても保険料が変わらないので、比べる意味がないためです。\n\nこの画面でいう「あなたの所得」は、公的年金と{nenkin_gen}の年金から公的年金等控除を引いた額に給与所得を足したもので、あなたの退職金は入りません（国民健康保険料の判定では、65歳以上の方はさらに15万円を引きます）。", na: ["nenkin_gen"] },
@@ -108,10 +108,10 @@ export const GAMEN9shosai: readonly Block9shosai[] = [
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["nenkin_gen","koteki_kaishi_age","handan_a_bun","handan_b_bun","handan_c_bun","an_a_bun","an_b_bun","sakaime_1","sakaime_2","sakaime_3","hantei_age","an_a_nensu","an_b_nensu","koteki_tsukisu","a_koteki","b_koteki","a_ideco","b_ideco","a_shunyu_kei","b_shunyu_kei","hantei_nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo","zatsu_chu","a_zatsu","b_zatsu","a_kyuyo","b_kyuyo","a_koujo15","b_koujo15","a_hantei_shotoku","b_hantei_shotoku","koteki_tsukisu_bun","mangaku_bun","ideco_zandaka","kokuho_kijun","a_kokuho_bun","b_kokuho_bun","setai_kubun","hikazei_gendo","a_jumin_bun","b_jumin_bun","keigen_koeru_bun","keigen_kokuho_bun"];
+export const HITOGOTO_SHURUI: readonly string[] = ["nenkin_gen","koteki_kaishi_age","handan_a_bun","handan_b_bun","handan_c_bun","an_a_bun","an_b_bun","sakaime_1","sakaime_2","sakaime_3","hantei_age","an_a_nensu","an_b_nensu","koteki_tsukisu","a_koteki","b_koteki","a_ideco","b_ideco","a_shunyu_kei","b_shunyu_kei","hantei_nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo","zatsu_chu","a_zatsu","b_zatsu","a_kyuyo","b_kyuyo","a_koujo15","b_koujo15","a_hantei_shotoku","b_hantei_shotoku","koteki_tsukisu_bun","mangaku_bun","ideco_zandaka","kokuho_kijun","a_kokuho_bun","b_kokuho_bun","setai_kubun","hikazei_gendo","a_jumin_bun","b_jumin_bun","keigen_koeru_bun","keigen_kokuho_bun","jumin_koeru_bun"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
-export const HITOGOTO_KASHO = 62;
+export const HITOGOTO_KASHO = 63;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
 export const MADA_NA: readonly string[] = [];

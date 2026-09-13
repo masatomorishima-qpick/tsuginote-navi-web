@@ -77,12 +77,25 @@ export function nagare(
   });
 }
 
-/** 図のもと。**帯は必ず全通りから作ります** */
+/**
+ * 図のもと。**帯は必ず全通りから作ります**
+ *
+ * ★★★【2026-09-13・回3・戦術Cowork 決め1038】**`ages` の既定値を消しました。**
+ *   ★前は `ages: number[] = Array.from({ length: 31 }, (_, i) => 60 + i)`（＝60〜90歳）でした。
+ *   ★★**既定値です**（★§既定値を作らない）── ★渡し忘れても止まらず、
+ *     **その方の退職の年齢が60歳でなくても60歳から数え始めます。**
+ *   ★★★図の右端（90歳）は決め1038の決めですが、★**それも呼び出し側から渡してください**
+ *     （★`gamen10Bun.ts` の `AGE_MIGI` が正本です）。
+ */
 export function data10(
   p: E.Jinbutsu, R: [E.Plan, { cash?: Record<number, number>; saishu_nen?: number | null; tesuryo?: number }][],
-  erabu: string[], ages: number[] = Array.from({ length: 31 }, (_, i) => 60 + i),
+  erabu: string[], ages: number[],
 ): Data10 {
   if (erabu.length > 3) throw new Error('一度に重ねられるのは3本までです');
+  if (!Array.isArray(ages) || ages.length < 2) {
+    throw new Error('data10() に ages が渡っていません。'
+      + '図の年齢の範囲は、呼び出し側から必ず渡してください（既定値を作らない・決め1038）。');
+  }
   const byl = new Map(R.map(([pl, r]) => [pl.label, [pl, r] as const]));
   // 公的年金は⑳だけで決まるので、**この呼び出しの中だけ**で使い回す
   const cache = new Map<string, Record<number, number>>();

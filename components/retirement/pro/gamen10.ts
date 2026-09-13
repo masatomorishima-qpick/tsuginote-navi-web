@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（179,643バイト ／ md5 007d735a6d8aac6d71654350046b8a2b）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（179,612バイト ／ md5 aa6573c610c5e1c33785e18d50f9ca8c）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -59,5 +59,5 @@ export const HITOGOTO_SHURUI: readonly string[] = ["tai_age","tai_gen","shunyu",
 export const HITOGOTO_KASHO = 35;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
-export const MADA_NA: readonly string[] = ["tai_gen","ideco_zandaka","ideco_kanyu_nensu","koteki_nenkin","koteki_kaishi_age","an_a","an_b","an_a_age","sa_hajime_bun","gyakuten_bun","sa_saishu_bun","kurisage_age","an_1_label","an_2_label","ruikei_min","ruikei_max","kuuhaku_kaishi_age","kuuhaku_owari_age","oitsuku_bun","sa_90","sa_saishu"];
+export const MADA_NA: readonly string[] = ["ideco_zandaka","koteki_kaishi_age"];
 

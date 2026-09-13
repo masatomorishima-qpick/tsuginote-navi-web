@@ -45,6 +45,7 @@ import * as E from '@/lib/retirement/pro/engine';
 import type { IchiranGyou, IchiranMatome } from '@/lib/retirement/pro/ichiran';
 import { ritsuJi } from '@/lib/retirement/pro/gamen12Bun';
 import type * as E11 from '@/lib/retirement/pro/gamen11Bun';
+import type * as E10 from '@/lib/retirement/pro/gamen10Bun';
 import { GAMEN9, MADA_NA as MADA9 } from './gamen9';
 import { GAMEN9shosai, MADA_NA as MADA9S } from './gamen9shosai';
 import { GAMEN10, MADA_NA as MADA10 } from './gamen10';
@@ -121,6 +122,13 @@ export type Moto912 = {
    * ★呼ぶ側は `E11.gamen11Bun(p, plan, r, taishokuAge, nenkinGen)` の戻りを、そのまま渡してください。
    */
   bun11: E11.Bun11;
+  /**
+   * ★★★画面10の18種類（★戦術Cowork `senjutsu_20260913b.md`・**回3**）。
+   * ★★**どれも、ここでは作りません。**★エンジンが出したものを、そのまま受け取ります
+   *   （★分岐と式と字は `lib/retirement/pro/gamen10Bun.ts` に在ります）。
+   * ★呼ぶ側は `E10.gamen10Bun(p, R, plan, kijunLab, idecoName, ages)` の戻りを、そのまま渡してください。
+   */
+  bun10: E10.Bun10;
 };
 
 /** ★当てはまらない理由の字（★6通り・戦術Cowork `senjutsu_20260908d.md` 4節。**こちらでは書きません**） */
@@ -244,6 +252,45 @@ export function atai912(m: Moto912): Record<string, string | null> {
      */
     kubun_bun: m.bun11.kubun_bun,
     ichiji_kubun_bun: m.bun11.ichiji_kubun_bun,
+    /**
+     * ★★★回3の2種類（★決め1113）。★画面10（993行）と画面11（1109・1112行）に出ます。
+     *   ★`tai_uchiwake_bun` は**1本だけの方に `null`** ＝ **その行だけ**が落ちます。
+     */
+    tai_gen: m.bun11.tai_gen,
+    tai_uchiwake_bun: m.bun11.tai_uchiwake_bun,
+    /**
+     * ★★★この3つは `data-mada` が1度も付いていませんでしたが、**渡す所が0か所**でした。
+     *   ★`{tai_gen}` の `data-mada` が外れて表が出るようになり、★`kumitate()` が止めて分かりました。
+     */
+    kojo: en(m.bun11.kojo),
+    shunyu: en(m.bun11.shunyu),
+    shotoku: en(m.bun11.shotoku),
+    /**
+     * ★★★回3の画面10・18種類（★戦術Cowork `senjutsu_20260913b.md`）。
+     *
+     * ★★**ここでは字にするだけです。**★分岐も式もありません（★`gamen10Bun.ts` に在ります）。
+     * ★★★**`sa_hajime_bun`・`gyakuten_bun`・`sa_saishu_bun` の3つは、字が決まっていません**
+     *   ── ★`gamen10Bun()` が `null` を返しますので、★**①の箱はかたまりごと落ちます**。
+     *   ★戦術Coworkにお尋ねしています（★便の5節。★数は `bun10.shirabeta` に在ります）。
+     */
+    ideco_kanyu_nensu: m.bun10.ideco_kanyu_nensu,
+    koteki_nenkin: en(m.bun10.koteki_nenkin),
+    an_a: m.bun10.an_a,
+    an_b: m.bun10.an_b,
+    an_a_age: m.bun10.an_a_age,
+    sa_hajime_bun: m.bun10.sa_hajime_bun,
+    gyakuten_bun: m.bun10.gyakuten_bun,
+    sa_saishu_bun: m.bun10.sa_saishu_bun,
+    sa_saishu: enKa(m.bun10.sa_saishu),
+    kurisage_age: m.bun10.kurisage_age,
+    an_1_label: m.bun10.an_1_label,
+    an_2_label: m.bun10.an_2_label,
+    ruikei_min: enKa(m.bun10.ruikei_min),
+    ruikei_max: enKa(m.bun10.ruikei_max),
+    kuuhaku_kaishi_age: m.bun10.kuuhaku_kaishi_age,
+    kuuhaku_owari_age: m.bun10.kuuhaku_owari_age,
+    oitsuku_bun: m.bun10.oitsuku_bun,
+    sa_90: enKa(m.bun10.sa_90),
   };
 
   /**

@@ -49,6 +49,32 @@ export interface Bun11 {
   /** ★決め1030 …… いま見せている案の札（`plan.label`） */
   an_bun: string;
   // ── 退職金の表（★基準HTML 1111〜1115行・**退職の年**） -------------------
+  /**
+   * ★★★決め1113 …… `{tai_gen}` ＝ **その年に受け取る退職手当等の名前**を `KeikaRow.gens` の順に「・」で。
+   *   ★画面10（993行）と画面11（1109行・1112行）の**3か所**に同じ字が出ます。
+   */
+  tai_gen: string;
+  /**
+   * ★★★決め1113 4-1 …… `{tai_uchiwake_bun}` ＝ **2本以上の方の内わけ**。
+   *   ★1本だけの方は `null`（★**その行だけ**が落ちます ── 表の中の行ですので）。
+   */
+  tai_uchiwake_bun: string | null;
+  /**
+   * ★★★【2026-09-13・回3で分かったこと】**`{kojo}`・`{shunyu}`・`{shotoku}` の3つも、ここで出します。**
+   *
+   *   ★この3つは、基準HTMLで **1度も `data-mada` が付いたことがありません**
+   *     （★エンジンには `KeikaRow.kojo_adj`・`shunyu`・`shotoku` として在るためです）。
+   *   ★★ところが **`atai912()` には、値を渡す所が0か所**でした。
+   *   ★★★**回2までは気づけませんでした** …… ★この3つが入っている表には `{tai_gen}` も入っていて、
+   *     ★`{tai_gen}` が `data-mada` でしたので、**表がかたまりごと落ちていた**からです。
+   *   ★★決め1114で `{tai_gen}` の `data-mada` が外れ、★**表が出るようになって、はじめて止まりました**
+   *     （★`kumitate()` が「かたまりに {kojo} が入っていません」で止めました ── ★門が鳴りました）。
+   */
+  kojo: number;
+  /** ★その年に受け取る退職手当等の額（★`KeikaRow.shunyu`。★2本以上の方は**合計**です） */
+  shunyu: number;
+  /** ★その年の退職所得（★`KeikaRow.shotoku`） */
+  shotoku: number;
   /** ★決め1077 …… 退職所得控除の式（★本則＋減額＋最低保障＋障害加算を、在るものだけ並べた字） */
   kojo_shiki: string;
   /** ★決め1036(1) …… 「→ 控除に収まるので、あなたの退職所得」／「→ 控除を超えますので、…」 */
@@ -304,14 +330,72 @@ function kubunSa(k: E.KeikaRow): number {
   return k.shotoku - Math.floor(Math.max(0, k.shunyu - k.kojo_adj) / 2);
 }
 
-/** ★決め1107 の字（★1本目も2本目も同じ形） */
+/**
+ * ★決め1107 の字（★1本目も2本目も同じ形）。
+ *
+ * ★★★【2026-09-13・決め1111・決め1114(A)】**式を字の中に書くのをやめました。**
+ *   ★前は「（`{収入}` − `{控除}`）÷ 2 より」と、**同じ表の上にある2つの数を、もう一度書いて**いました。
+ *   ★★戦術Coworkの直し …… 「**上の2つの数の差を2で割った額より**」。
+ *   ★★★理由（★戦術Coworkの便 1-1）…… ★見本の方は1本目の退職所得が0円でこの文が落ちますので、
+ *     ★**見本の中に式を書くと、表の数と食い違います**。
+ */
 function kubunBunJi(k: E.KeikaRow, na: string): string | null {
   const kubun = kubunNa(k);
   const sa = kubunSa(k);
   if (sa <= 0 || kubun === null) return null;
   return `あなたの${na}には、${kubun}にあたる部分があります。`
     + `その部分は2分の1にしませんので、あなたの退職所得は`
-    + `（${en(k.shunyu)} − ${en(k.kojo_adj)}）÷ 2 より ${en(sa)} 大きくなります。`;
+    + `上の2つの数の差を2で割った額より ${en(sa)} 大きくなります。`;
+}
+
+/**
+ * ★★★`{tai_gen}` ── **その年に受け取る退職手当等の名前**（★決め1113）。
+ *
+ * ★★**`KeikaRow.gens` の順に「・」でつなぎます**（★戦術Coworkの決めのとおり）。
+ * ★★★**戦術Coworkの例には `iDeCo等` が入っていません**（★1本「退職金」／2本「退職金・企業年金」／
+ *   3本「退職金・企業年金・役員退職慰労金」）。★ところが **`{nenkin_gen}` の一時金を退職の年に
+ *   受け取る方**では、`KeikaRow.gens` にその支給源も入ります（★実測は便に数で書きました）。
+ *   ★★こちらは**決めの字のとおり（`KeikaRow.gens` の順に「・」）**に作り、★数を便に出しています。
+ */
+export function taiGenJi(k: E.KeikaRow): string {
+  return k.gens.join('・');
+}
+
+/**
+ * ★★★`{tai_uchiwake_bun}` ── **2本以上の方の内わけ**（★決め1113 4-1）。
+ *
+ * ★字 …… 「内わけは、退職金 20,000,000円・企業年金 3,200,000円です。」
+ * ★★**1本だけの方には `null`** を返します（★`gyouNashi` ではなく `null` ＝ **行ごと落ちます**
+ *   ── ★この行は表の中ですので、`kumitate()` は**その行だけ**を落とします）。
+ * ★★★**額は `KubunMeisai` ではなく、その年に受け取る支給源そのものから取ります。**
+ *   ★`KeikaRow` は支給源ごとの額を持っていませんので、`plan` と `p.gens` から組み直します
+ *   （★`engine.ts` 736〜746行 `taishokuByYear()` と**同じ絞り方**です）。
+ */
+export function taiUchiwakeBun(p: E.Jinbutsu, plan: E.Plan, k: E.KeikaRow): string | null {
+  if (k.gens.length < 2) return null;
+  const xs: string[] = [];
+  let kei = 0;
+  for (const na of k.gens) {
+    const g = p.gens.find((x) => x.name === na);
+    if (!g) throw new Error(`支給源「${na}」が見つかりません（keika と gens が食い違っています）。`);
+    // ★`{nenkin_gen}` を併給で受け取る方は、一時金にする割合ぶんだけがその年に入ります
+    //   （★`engine.ts` 743行と**同じ式**です ── `Z.fdiv` で割ります。★`float` を使いません）
+    const shunyu = g.name === plan.nenkin_gen
+      ? Z.fdiv(g.shunyu * plan.ichiji_wariai, 100) : g.shunyu;
+    kei += shunyu;
+    xs.push(`${g.name} ${en(shunyu)}`);
+  }
+  /**
+   * ★★★**門** …… 内わけの和が、表に出る `{shunyu}`（＝`KeikaRow.shunyu`）と1円も違わないこと。
+   *   ★★違っていたら、画面に**足し算が合わない内わけ**が出ます。★黙って出しません。
+   */
+  if (kei !== k.shunyu) {
+    throw new Error(
+      `内わけの和（${en(kei)}）が、その年に受け取る額（${en(k.shunyu)}）と違います`
+      + `（${k.year}年・${k.gens.join('・')}）。画面に足し算が合わない内わけを出しません。`,
+    );
+  }
+  return `内わけは、${xs.join('・')}です。`;
 }
 
 /** ★決め1086 の字（★年金として受け取る所得が1つも無い方） */
@@ -472,6 +556,13 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
 
   return {
     an_bun: plan.label,
+    // ── ★★★回3の2種類（★決め1113） --------------------------------------
+    tai_gen: taiGenJi(k),
+    tai_uchiwake_bun: taiUchiwakeBun(p, plan, k),
+    // ★上の覚え書きの3つ（★`data-mada` は1度も付いていませんでしたが、渡す所が0か所でした）
+    kojo: k.kojo_adj,
+    shunyu: k.shunyu,
+    shotoku: k.shotoku,
     kojo_shiki: kojoShikiJi(k),
     tai_hantei_bun: k.shotoku === 0
       ? '→ 控除に収まるので、あなたの退職所得'
@@ -501,7 +592,8 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
      */
     zatsu_zero_bun: j.zatsu === 0 && j.nenkinShunyu > 0 ? ZATSU_ZERO : null,
     // ── ★★★2本目の表の9種類（★決め1101）
-    ichiji_gen: ik === null ? null : `${ik.gens.join('と')}の一時金`,
+    // ★`{tai_gen}` と同じ字の作り方にそろえました（★決め1113。★2本目の年は実測でいつも1本です）
+    ichiji_gen: ik === null ? null : `${taiGenJi(ik)}の一時金`,
     ichiji_age: ik === null ? null : `${p.age(ik.year)}歳`,
     ichiji_kojo_shiki: ik === null ? null : kojoShikiJi(ik),
     ichiji_kojo: ik === null ? null : ik.kojo_adj,
@@ -513,10 +605,16 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
     ichiji_shotoku: ik === null ? null : ik.shotoku,
     ichiji_shotokuzei: ik === null ? null : ik.gensen_ari,
     ichiji_jumin: iU === null ? null : iU.jumin_taishoku,
-    // ── ★★★区分の1文（★決め1107）
-    kubun_bun: kubunBunJi(k, k.gens.join('と')),
+    /**
+     * ── ★★★区分の1文（★決め1107・決め1114(A)）
+     *
+     * ★★★**`{tai_gen}` と同じ字を使います**（★決め1107の字が「あなたの`{tai_gen}`には、」ですので、
+     *   ★決め1113で `{tai_gen}` の字が決まったいま、**同じ画面で2通りに書きません**）。
+     *   ★前の回は `k.gens.join('と')` でしたので、「退職金とiDeCoと企業年金」でした。
+     */
+    kubun_bun: kubunBunJi(k, taiGenJi(k)),
     ichiji_kubun_bun: ik === null ? null
-      : kubunBunJi(ik, `${ik.gens.join('と')}の一時金`),
+      : kubunBunJi(ik, `${taiGenJi(ik)}の一時金`),
     shirabeta: {
       tai_nen: taiNen, ichiji_nen: ik === null ? null : ik.year,
       nenkin_nen: nenkinNen, nenkin_tsukisu: tsukisu,

@@ -51,8 +51,19 @@ export interface Bun10 {
   // ── ① 退職金とiDeCo等の受け取り方（★基準HTML 1000行・1034行） -----------
   /** ★`{an_a}` …… 基準案の名前。★比べる相手が無い方は `null`（かたまりごと落ちます） */
   an_a: string | null;
-  /** ★`{an_b}` …… 選んだ案の名前 */
+  /** ★`{an_b}` …… 選んだ案の名前（★1000行。★尻尾「／公的年金を◯歳から」を**残します**・決め1117(2)） */
   an_b: string | null;
+  /**
+   * ★★★`{an_b_mijikai}` …… **尻尾を外した**選んだ案の名前（★1037行・**決め1135(2)**）。
+   *
+   *   ★1037行は「どちらも`{nenkin_gen}`を`{an_b_mijikai}`にそろえて」で、
+   *     ★★**②は公的年金の年齢を比べる節**ですので、★尻尾が入ると**同じ文の中に2つの年齢が並びます**。
+   *   ★★`motoJi()` で作ります ── ★**突き合わせの鍵と同じ関数です**が、
+   *     ★★★**これは画面に出す字**ですので、★決め1121（字と鍵を同じ関数にしない）に当たります。
+   *     ★★戦術Coworkが決め1135(2)で「`motoJi()` の形」と書かれていますので、そのとおりにしました。
+   *     ★**お尋ねしています**（★便）── ★鍵のほうを別の関数に分けるか、このままにするか。
+   */
+  an_b_mijikai: string | null;
   /**
    * ★`{sa_hajime_age}` …… ①の図の**左端の年齢**（★＝`ages[0]`）。
    *   ★★①の**見出しにも**出ます（★決め1119(B)）ので、★`null` のとき**見出しごと落ちます**。
@@ -415,6 +426,8 @@ export function gamen10Bun(
     koteki_nenkin: p.koteki_nenkin,
     an_a: kijunAri ? anJi(R.find(([pl]) => pl.label === kijunLab)![0], idecoName) : null,
     an_b: kijunAri ? anJi(plan, idecoName) : null,
+    // ★★★決め1135(2)（2026-09-13）…… 1037行は尻尾を外した字
+    an_b_mijikai: kijunAri ? motoJi(plan, idecoName, p) : null,
     sa_hajime_age: kijunAri ? `${ages[0]}歳` : null,
     // ★★決め1118(3) …… 相手が在る方には出しません（★かたまりごと落ちます）
     an_onaji_bun: kijunAri ? null : AN_ONAJI,

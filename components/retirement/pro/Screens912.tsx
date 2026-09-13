@@ -131,10 +131,11 @@ export type Moto912 = {
    */
   bun10: E10.Bun10;
   /**
-   * ★★★画面9詳細の42種類（★戦術Cowork `senjutsu_20260913f.md` 4-3・**回4**）。
+   * ★★★画面9詳細の44種類（★戦術Cowork `senjutsu_20260913g.md`・**回4の続き**）。
    * ★★**どれも、ここでは作りません。**★エンジンが出したものを、そのまま受け取ります
    *   （★分岐と式と字は `lib/retirement/pro/gamen9shosaiBun.ts` に在ります）。
-   * ★呼ぶ側は `E9S.gamen9shosaiBun(p, R, plan, idecoName, 1, 1)` の戻りを、そのまま渡してください。
+   * ★呼ぶ側は `E9S.gamen9shosaiBun(p, R, plan, idecoName, 1, 1, kyuchiHabuita)` の戻りを、
+   *   そのまま渡してください（★`kyuchiHabuita` は `toJinbutsu()` が返します・決め1056）。
    */
   bun9s: E9S.Bun9shosai;
 };
@@ -300,6 +301,8 @@ export function atai912(m: Moto912): Record<string, string | null> {
     kuuhaku_owari_age: m.bun10.kuuhaku_owari_age,
     oitsuku_bun: m.bun10.oitsuku_bun,
     sa_90: enKa(m.bun10.sa_90),
+    /** ★★決め1135(2) …… 画面10 1037行は**尻尾を外した**字 */
+    an_b_mijikai: m.bun10.an_b_mijikai,
     /**
      * ★★★回4の、画面11の5種類 ＋ 画面10の `{nensu}`（★戦術Cowork `senjutsu_20260913f.md` 4-3）。
      *   ★★**`data-mada` は1度も付いていませんでしたが、渡す所が0か所**でした。
@@ -325,9 +328,15 @@ export function atai912(m: Moto912): Record<string, string | null> {
     handan_a_bun: m.bun9s.handan_a_bun,
     handan_b_bun: m.bun9s.handan_b_bun,
     handan_c_bun: m.bun9s.handan_c_bun,
-    keigen_a: m.bun9s.keigen_a,
-    keigen_b: m.bun9s.keigen_b,
-    keigen_c: m.bun9s.keigen_c,
+    /**
+     * ★★★決め1134（2026-09-13）── `keigen_a`・`keigen_b`・`keigen_c` は、
+     *   ★**基準HTMLから 0か所**になりました。★代わりに 917行の3文が1文まるごとの印です。
+     */
+    keigen_koeru_bun: m.bun9s.keigen_koeru_bun,
+    keigen_kokuho_bun: m.bun9s.keigen_kokuho_bun,
+    /** ★★決め1136(6) …… 表に足した給与所得の行 */
+    a_kyuyo: m.bun9s.a_kyuyo,
+    b_kyuyo: m.bun9s.b_kyuyo,
     an_a_bun: m.bun9s.an_a_bun,
     an_b_bun: m.bun9s.an_b_bun,
     sakaime_1: m.bun9s.sakaime_1,
@@ -359,6 +368,11 @@ export function atai912(m: Moto912): Record<string, string | null> {
     kokuho_kijun: m.bun9s.kokuho_kijun,
     a_kokuho_bun: m.bun9s.a_kokuho_bun,
     b_kokuho_bun: m.bun9s.b_kokuho_bun,
+    /**
+     * ★★★**この2つは、画面11（1137行）にも出ます。**
+     *   ★ですので `gamen9shosaiBun()` は、★**出す相手でない方にも必ず返します**
+     *     （★`null` にすると、画面11の年金の表がまるごと落ちます）。
+     */
     setai_kubun: m.bun9s.setai_kubun,
     hikazei_gendo: m.bun9s.hikazei_gendo,
     a_jumin_bun: m.bun9s.a_jumin_bun,

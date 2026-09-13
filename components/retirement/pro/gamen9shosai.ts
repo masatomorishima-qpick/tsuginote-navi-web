@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（180,223バイト ／ md5 f758d90608c5b713b82951a76db8e5ae）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（179,424バイト ／ md5 4b8849993aafc16df1ba278020caa3b7）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -37,16 +37,16 @@ export const GAMEN9shosai: readonly Block9shosai[] = [
   { kind: 'midashi', lv: 2, bun: "{nenkin_gen}を受け取る年数と、{koteki_kaishi_age}の年の保険料" },
   { kind: 'hako', bun: "ここまでは税金の話でした。このページは保険料と医療費の話です。手取りの金額には含めていません。", na: [] },
   { kind: 'hon', bun: "あなたの場合、こうなります", na: [] },
-  { kind: 'hon', bun: "{handan_a_bun}（国民健康保険料の軽減は{keigen_a}のまま）。\n{handan_b_bun}軽減が{keigen_a}から{keigen_b}に下がり、住民税がかかり始めます。\n{handan_c_bun}です（公的年金が満額入るので、どちらも軽減は{keigen_c}になります）。", na: ["handan_a_bun","keigen_a","handan_b_bun","keigen_b","handan_c_bun","keigen_c"] },
+  { kind: 'hon', bun: "{handan_a_bun}\n{handan_b_bun}\n{handan_c_bun}", na: ["handan_a_bun","handan_b_bun","handan_c_bun"] },
   { kind: 'midashi', lv: 3, bun: "保険料判定所得と保険料負担の比較" },
   { kind: 'hako', bun: "{an_a_bun}{an_b_bun}", na: ["an_a_bun","an_b_bun"] },
   { kind: 'hon', bun: "破線＝保険料・医療費の境目（濃い線が、あなたが実際に越える境目です）", na: [] },
   { kind: 'ret', koumoku: [
-    { bun: "軽減が{keigen_a}から{keigen_b}に下がる {sakaime_1}", na: ["keigen_a","keigen_b","sakaime_1"] },
-    { bun: "{keigen_b}から{keigen_c} {sakaime_2}", na: ["keigen_b","keigen_c","sakaime_2"] },
+    { bun: "軽減が7割から5割に下がる {sakaime_1}", na: ["sakaime_1"] },
+    { bun: "5割から2割 {sakaime_2}", na: ["sakaime_2"] },
     { bun: "軽減がなくなる {sakaime_3}", na: ["sakaime_3"] },
   ] },
-  { kind: 'hon', bun: "あなたの公的年金は{koteki_kaishi_age}から始まります。{nenkin_gen}を受け取る期間が{koteki_kaishi_age}にかかると、その年は公的年金とiDeCo等が同じ年の所得になり、あなたの所得が増えます。所得が国の定める基準を超えると、公的医療保険料・介護保険料・医療費の負担が上がることがあります。", na: ["koteki_kaishi_age","nenkin_gen"] },
+  { kind: 'hon', bun: "あなたの公的年金は{koteki_kaishi_age}から始まります。{nenkin_gen}を受け取る期間が{koteki_kaishi_age}にかかると、その年は公的年金と{nenkin_gen}が同じ年の所得になり、あなたの所得が増えます。所得が国の定める基準を超えると、公的医療保険料・介護保険料・医療費の負担が上がることがあります。", na: ["koteki_kaishi_age","nenkin_gen"] },
   { kind: 'midashi', lv: 3, bun: "保険料判定所得の計算方法" },
   { kind: 'hon', bun: "{hantei_age}のあなたの所得を、計算の順番のまま並べました。", na: ["hantei_age"] },
   { kind: 'hyo', gyou: [
@@ -68,6 +68,9 @@ export const GAMEN9shosai: readonly Block9shosai[] = [
     { cells: ["雑所得\n{zatsu_chu}","{a_zatsu}","{b_zatsu}"],
       na: ["zatsu_chu","a_zatsu","b_zatsu"],
       kazari: [[null,"tbls"],[null],[null]] },
+    { cells: ["あなたの給与所得","{a_kyuyo}","{b_kyuyo}"],
+      na: ["a_kyuyo","b_kyuyo"],
+      kazari: [[null],[null],[null]] },
     { cells: ["↓ ここから保険料の話です（税金の計算には出てきません）"],
       na: [],
       kazari: [[null]],
@@ -94,22 +97,22 @@ export const GAMEN9shosai: readonly Block9shosai[] = [
       na: ["setai_kubun","hikazei_gendo","a_jumin_bun","b_jumin_bun"],
       kazari: [[null,"tbls"],[null],[null]] },
   ] },
-  { kind: 'hon', bun: "{handan_b_bun}、こうなります。", na: ["handan_b_bun"] },
+  { kind: 'hon', bun: "{keigen_koeru_bun}、こうなります。", na: ["keigen_koeru_bun"] },
   { kind: 'ret', koumoku: [
-    { bun: "国民健康保険料などの軽減　軽減が{keigen_a}から{keigen_b}に下がります", na: ["keigen_a","keigen_b"] },
+    { bun: "国民健康保険料などの軽減　{keigen_kokuho_bun}", na: ["keigen_kokuho_bun"] },
     { bun: "住民税の非課税　住民税がかかり始めます。介護保険料の段階や医療費の負担にも連動します", na: [] },
   ] },
   { kind: 'hako', bun: "保険料がいくら上がるかは、お住まいの市区町村によって違います。上の表に出した基準の額（1,000,000円など）は国が定めているものですが、保険料の率は市区町村がそれぞれ決めているため、金額は出していません。\n\n介護保険料も所得で段階が上がりますが、あなたには境目をお出ししていません。住民税が課税される方の段階の境目は、国の告示と市区町村の条例で決まり、全国共通の金額がないためです。", na: [] },
-  { kind: 'hako', bun: "あなたに給与などの収入があって、iDeCo等がなくても基準を超えている場合は、この「保険料と医療費」の画面は出ません。受け取り方を変えても保険料が変わらないので、比べる意味がないためです。\n\nこの画面でいう「あなたの所得」は、公的年金とiDeCo等の年金から公的年金等控除を引いた額に給与所得を足したもので、あなたの退職金は入りません（国民健康保険料の判定では、65歳以上の方はさらに15万円を引きます）。", na: [] },
+  { kind: 'hako', bun: "あなたに給与などの収入があって、{nenkin_gen}がなくても基準を超えている場合は、この「保険料と医療費」の画面は出ません。受け取り方を変えても保険料が変わらないので、比べる意味がないためです。\n\nこの画面でいう「あなたの所得」は、公的年金と{nenkin_gen}の年金から公的年金等控除を引いた額に給与所得を足したもので、あなたの退職金は入りません（国民健康保険料の判定では、65歳以上の方はさらに15万円を引きます）。", na: ["nenkin_gen"] },
   { kind: 'kousin', bun: "この画面の根拠にした法令\n\n国民健康保険料の軽減：国民健康保険法施行令29条の7第6項。令和8年度は、単身の方で所得43万円まで7割、74万円まで5割、100万円まで2割の軽減。判定に使う所得には給与所得も入ります。65歳以上の方は公的年金等の所得からさらに15万円を引きます（同附則5条）\n\n介護保険料：介護保険法施行令38条1項1号ハ・2号イ。住民税が非課税の方の第1〜3段階の境目（826,500円・1,200,000円）だけが政令に金額で書かれています。第6段階以降の基準所得金額は厚生労働大臣の告示で、市区町村が条例で変えられます（同38条6〜8項・39条1項）\n\n医療費の窓口負担：高齢者医療確保法施行令7条2項〜5項。3割は課税所得145万円以上でも、収入が単身383万円・複数世帯520万円に満たない場合、基礎控除後の総所得金額等の合算が210万円以下の場合、住民税が非課税の場合は該当しません。「収入の額」の算定方法は厚生労働省令に委ねられており、当社は原文を確認できていないため、公的年金等の収入金額と給与収入の合計で判定しています" },
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["nenkin_gen","koteki_kaishi_age","handan_a_bun","keigen_a","handan_b_bun","keigen_b","handan_c_bun","keigen_c","an_a_bun","an_b_bun","sakaime_1","sakaime_2","sakaime_3","hantei_age","an_a_nensu","an_b_nensu","koteki_tsukisu","a_koteki","b_koteki","a_ideco","b_ideco","a_shunyu_kei","b_shunyu_kei","hantei_nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo","zatsu_chu","a_zatsu","b_zatsu","a_koujo15","b_koujo15","a_hantei_shotoku","b_hantei_shotoku","koteki_tsukisu_bun","mangaku_bun","ideco_zandaka","kokuho_kijun","a_kokuho_bun","b_kokuho_bun","setai_kubun","hikazei_gendo","a_jumin_bun","b_jumin_bun"];
+export const HITOGOTO_SHURUI: readonly string[] = ["nenkin_gen","koteki_kaishi_age","handan_a_bun","handan_b_bun","handan_c_bun","an_a_bun","an_b_bun","sakaime_1","sakaime_2","sakaime_3","hantei_age","an_a_nensu","an_b_nensu","koteki_tsukisu","a_koteki","b_koteki","a_ideco","b_ideco","a_shunyu_kei","b_shunyu_kei","hantei_nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo","zatsu_chu","a_zatsu","b_zatsu","a_kyuyo","b_kyuyo","a_koujo15","b_koujo15","a_hantei_shotoku","b_hantei_shotoku","koteki_tsukisu_bun","mangaku_bun","ideco_zandaka","kokuho_kijun","a_kokuho_bun","b_kokuho_bun","setai_kubun","hikazei_gendo","a_jumin_bun","b_jumin_bun","keigen_koeru_bun","keigen_kokuho_bun"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
-export const HITOGOTO_KASHO = 66;
+export const HITOGOTO_KASHO = 62;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
-export const MADA_NA: readonly string[] = ["koteki_kaishi_age","handan_a_bun","keigen_a","handan_b_bun","keigen_b","handan_c_bun","keigen_c","an_a_bun","an_b_bun","sakaime_1","sakaime_2","sakaime_3","hantei_age","an_a_nensu","an_b_nensu","koteki_tsukisu","a_koteki","b_koteki","a_ideco","b_ideco","a_shunyu_kei","b_shunyu_kei","hantei_nenkin_kojo_kubun","a_nenkin_kojo","b_nenkin_kojo","zatsu_chu","a_zatsu","b_zatsu","a_koujo15","b_koujo15","a_hantei_shotoku","b_hantei_shotoku","koteki_tsukisu_bun","mangaku_bun","ideco_zandaka","kokuho_kijun","a_kokuho_bun","b_kokuho_bun","setai_kubun","hikazei_gendo","a_jumin_bun","b_jumin_bun"];
+export const MADA_NA: readonly string[] = [];
 

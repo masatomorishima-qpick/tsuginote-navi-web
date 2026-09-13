@@ -189,6 +189,13 @@ export type Kumitate = {
   nenkinKaisu: number;
   /** 「わからない」を使った項目。**計算の根拠のページに、どう置いたかを書きます** */
   wakaranai: ('⑫' | '⑬')[];
+  /**
+   * ★★★【2026-09-13・決め1056】**⑰（お住まいの級地）を省いてお答えになったか。**
+   *   ★`kyuchiToEngine()` が `'habuku'` を **1** に潰しますので、★エンジンには届きません。
+   *   ★★`setai_kubun` の字（「1級地（お答えがないため）」）を作るために、★**ここから渡します**。
+   *   ★★★`Jinbutsu` にも `kyuchiToEngine()` にも、1文字も触っていません＝**手取りは1円も動きません**。
+   */
+  kyuchiHabuita: boolean;
 };
 
 /**
@@ -337,7 +344,20 @@ export function toJinbutsu(v: PaidInput): Kumitate {
     }),
   });
 
-  return { p, taishokuNen, nenkinKaisu: Math.trunc(v.nenkinKaisu), wakaranai };
+  /**
+   * ★★★【2026-09-13・決め1056】**⑰（お住まいの級地）を省いてお答えになったか。**
+   *
+   *   ★`kyuchiToEngine()` は `'habuku'` を **1** に潰しますので（★44〜45行）、
+   *     ★★**エンジンには「省いた」が届きません**。
+   *   ★★そのままだと、⑰を省いた方の画面に「**1級地**」とだけ出ます
+   *     ── ★お答えになっていないのに、答えたように見えます（★§後出しにしない）。
+   *   ★★★**`KYUCHI_HABUITA_TOKI`（=1）も `kyuchiToEngine()` も、1文字も変えていません**
+   *     ＝ ★**手取りは1円も動きません**（★決め1056）。
+   *   ★`Jinbutsu` に欄は足しません ── ★ここから**呼ぶ側へ渡すだけ**です
+   *     （★`setai_kubun` の字を作る `gamen9shosaiBun()` が受け取ります）。
+   */
+  const kyuchiHabuita = v.kyuchi === 'habuku';
+  return { p, taishokuNen, nenkinKaisu: Math.trunc(v.nenkinKaisu), wakaranai, kyuchiHabuita };
 }
 
 /** 一時金でだけ受け取る支給源の名前（`build()` の第2引数） */

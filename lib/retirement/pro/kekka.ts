@@ -18,7 +18,7 @@
 
 import 'server-only';
 import * as E from './engine';
-import { toJinbutsu, HEIKYU_WARIAI, type PaidInput } from './paidInput';
+import { toJinbutsu, ichijikinOnly, HEIKYU_WARIAI, type PaidInput } from './paidInput';
 import { gamen8, zenToori, type Gamen8, type Row } from './gamen8';
 import { gamen8Bun } from './gamen8Bun';
 import { ichiranMatome } from './ichiran';
@@ -91,7 +91,30 @@ export function keisan(v: PaidInput, genzaiNen: number, now: Date): Keisan {
   const nenkinAges = E.nenkinKouho(p, genzaiNen);
 
   let t0 = Date.now();
-  const R = E.build(p, [TAI_NAME], IDECO_NAME, kumitate.taishokuNen, {
+  /**
+   * ⑨㉓【決め1106・2026-09-13・森嶋さんの承認あり】★★★**ここが抜けていました。**
+   *
+   *   `paidInput.ts` 213〜232行は、支給源を最大4本つくります
+   *     ── ①退職金・③iDeCo等・**⑨企業年金**・**㉓役員退職慰労金**。
+   *   ★ところが、ここは `[TAI_NAME]`（＝「退職金」1本）だけを渡していました。
+   *   ★`engine.ts` 1652行は、**渡された名前にしか受取年を入れません**
+   *     （`for (const n of taishokuGenNames) baseUketori[n] = taishokuNen;`）。
+   *   ★`engine.ts` 741〜742行は、**受取年の無い支給源を飛ばします**ので、
+   *     ⑨と㉓は**退職所得に1円も入らず、税がかかりませんでした**。
+   *   ★★ところが `engine.ts` 1347行は `p.gens` を**ぜんぶ**足して `uketori` を作り、
+   *     1430行が `tedori = uketori − zei − tesuryo` としますので、
+   *     ★★★**税を引かないまま、満額が手取りに入っていました。**
+   *
+   *   ★実測（`golden_heavy_20260906`・250人・910案）……
+   *     ★⑨か㉓が在る方 **91人（36.4%）**。★その91人は**910案ぜんぶ**動きました。
+   *     ★税の和 4,304,275,438円 → 8,119,715,657円（★手取りは同じ額だけ減ります）。
+   *     ★1案あたりの税の差は **−123,498円 〜 +13,775,284円**（★向きは1つではありません）。
+   *     ★⑨も㉓も無い方 **159人**は、**1円も動きません**（★渡す名前が `['退職金']` のままです）。
+   *
+   *   ★`ichijikinOnly()`（`paidInput.ts` 344行）は、この日まで**0か所から呼ばれていませんでした**。
+   *   ★`p` は 90行の `const p = kumitate.p;` です（★戦術Coworkの便は `ichijikinOnly(kumitate.p)`。同じものです）。
+   */
+  const R = E.build(p, ichijikinOnly(p), IDECO_NAME, kumitate.taishokuNen, {
     heikyuWariai: [...HEIKYU_WARIAI],
     nenkinAges,
     genzaiNen,

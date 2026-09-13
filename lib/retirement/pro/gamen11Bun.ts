@@ -109,6 +109,36 @@ export interface Bun11 {
    *   （★実測 **79人／250・31.6%**）。★ほかの方は `null`（かたまりごと落ちます）。
    */
   zatsu_zero_bun: string | null;
+  /**
+   * ★★★【2026-09-13・回4 ── 出口の無かった6種類のうち5つ】（★戦術Cowork `senjutsu_20260913f.md` 4-3）
+   *
+   *   ★★**`data-mada` は1度も付いていませんでしたが、値を作る所が0か所**でした
+   *     （★`kojo`・`shunyu`・`shotoku` が回3で同じだったのと同じ形です）。
+   *   ★★★どれも**年金の表の年**（`shirabeta.nenkin_nen`）のものです。
+   */
+  /** ★1131行 …… あなたが1年に受け取る年金の額（★公的年金 ＋ `{nenkin_gen}`） */
+  nenkin_shunyu: number;
+  /** ★1132行 …… 公的年金等控除の区分（★「65歳未満」／「65歳以上」）。★年金収入0円の方は `null` */
+  nenkin_kojo_kubun: string | null;
+  /** ★1132行 …… 公的年金等控除の額（★引く数ですので、**符号を付けるのは画面側**）。★同じく `null` あり */
+  nenkin_kojo: number | null;
+  /** ★1133行 …… あなたの雑所得 */
+  zatsu: number;
+  /**
+   * ★1136行 …… 「→ 差し引いたあとの、所得税」。
+   *
+   *   ★★★**退職所得を入れません。**★この表は「あなたの年金の所得」の表で、
+   *     ★上の行が 雑所得・給与所得・所得控除の合計です。★退職所得は分離課税ですので、
+   *     ★★この行に入れると**上の行から出てこない数**になります。
+   *   ★式は `nenkanZeiUchiwake()` のものを使います（★退職所得に **0** を渡します ── ★既定値ではなく、
+   *     ★**この表は退職所得を入れない、とこちらが決めて渡しています**）。
+   */
+  shotokuzei: number;
+  /**
+   * ★★★【2026-09-13・回4】画面10（993行）の `{nensu}` …… **退職金の勤続年数**。
+   *   ★`{tai_gen}`・`{shunyu}` と**同じ行**（`KeikaRow`）から出します。
+   */
+  nensu: string;
   // ── ★★★2本目の表（★基準HTML 1117〜1124行・決め1101・**`{nenkin_gen}` の一時金の年**） -----
   /** ★見出しの支給源名（★「iDeCo等の一時金」の形）。★この年が無い方は `null`＝**節ごと落ちます** */
   ichiji_gen: string | null;
@@ -591,6 +621,18 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
      * ★★出す相手 …… **79人／250（31.6%）**（★80人 − 1人）。
      */
     zatsu_zero_bun: j.zatsu === 0 && j.nenkinShunyu > 0 ? ZATSU_ZERO : null,
+    /**
+     * ★★★【2026-09-13・回4】出口の無かった5種類 ＋ 画面10の `{nensu}`。
+     *   ★`shotokuzei` …… **退職所得を入れません**（★`Bun11` の覚え書き）。
+     *     ★★`taiShotoku` に 0 を渡した `nenkanZeiUchiwake()` の `shotokuzei` です。
+     */
+    nenkin_shunyu: j.nenkinShunyu,
+    nenkin_kojo_kubun: j.nenkin_kojo_kubun,
+    nenkin_kojo: j.nenkin_kojo,
+    zatsu: j.zatsu,
+    shotokuzei: E.nenkanZeiUchiwake(p, hyoNen, nen[hyoNen] ?? 0, 0,
+                                    true, kakekinOf(r, hyoNen)).shotokuzei,
+    nensu: `${k.nensu}年`,
     // ── ★★★2本目の表の9種類（★決め1101）
     // ★`{tai_gen}` と同じ字の作り方にそろえました（★決め1113。★2本目の年は実測でいつも1本です）
     ichiji_gen: ik === null ? null : `${taiGenJi(ik)}の一時金`,

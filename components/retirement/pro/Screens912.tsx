@@ -46,12 +46,13 @@ import type { IchiranGyou, IchiranMatome } from '@/lib/retirement/pro/ichiran';
 import { ritsuJi } from '@/lib/retirement/pro/gamen12Bun';
 import type * as E11 from '@/lib/retirement/pro/gamen11Bun';
 import type * as E10 from '@/lib/retirement/pro/gamen10Bun';
+import type * as E9S from '@/lib/retirement/pro/gamen9shosaiBun';
 import { GAMEN9, MADA_NA as MADA9 } from './gamen9';
 import { GAMEN9shosai, MADA_NA as MADA9S } from './gamen9shosai';
 import { GAMEN10, MADA_NA as MADA10 } from './gamen10';
 import { GAMEN11, MADA_NA as MADA11 } from './gamen11';
 import { GAMEN12, MADA_NA as MADA12 } from './gamen12';
-import { kumitate, en, type BlockKyotsu, type Kumi } from './gamenBun';
+import { kumitate, en, enFu, type BlockKyotsu, type Kumi } from './gamenBun';
 import ScreenBlocks from './ScreenBlocks';
 
 /**
@@ -129,6 +130,13 @@ export type Moto912 = {
    * ★呼ぶ側は `E10.gamen10Bun(p, R, plan, kijunLab, idecoName, ages)` の戻りを、そのまま渡してください。
    */
   bun10: E10.Bun10;
+  /**
+   * ★★★画面9詳細の42種類（★戦術Cowork `senjutsu_20260913f.md` 4-3・**回4**）。
+   * ★★**どれも、ここでは作りません。**★エンジンが出したものを、そのまま受け取ります
+   *   （★分岐と式と字は `lib/retirement/pro/gamen9shosaiBun.ts` に在ります）。
+   * ★呼ぶ側は `E9S.gamen9shosaiBun(p, R, plan, idecoName, 1, 1)` の戻りを、そのまま渡してください。
+   */
+  bun9s: E9S.Bun9shosai;
 };
 
 /** ★当てはまらない理由の字（★6通り・戦術Cowork `senjutsu_20260908d.md` 4節。**こちらでは書きません**） */
@@ -292,6 +300,69 @@ export function atai912(m: Moto912): Record<string, string | null> {
     kuuhaku_owari_age: m.bun10.kuuhaku_owari_age,
     oitsuku_bun: m.bun10.oitsuku_bun,
     sa_90: enKa(m.bun10.sa_90),
+    /**
+     * ★★★回4の、画面11の5種類 ＋ 画面10の `{nensu}`（★戦術Cowork `senjutsu_20260913f.md` 4-3）。
+     *   ★★**`data-mada` は1度も付いていませんでしたが、渡す所が0か所**でした。
+     *   ★`nenkin_kojo` は**引く数**ですので、★**符号はここで付けます**（★見本「−600,000円」）。
+     */
+    nenkin_shunyu: en(m.bun11.nenkin_shunyu),
+    nenkin_kojo_kubun: m.bun11.nenkin_kojo_kubun,
+    nenkin_kojo: m.bun11.nenkin_kojo === null ? null : enFu(-m.bun11.nenkin_kojo),
+    zatsu: en(m.bun11.zatsu),
+    shotokuzei: en(m.bun11.shotokuzei),
+    nensu: m.bun11.nensu,
+    /**
+     * ★★★回4の画面9詳細・42種類（★戦術Cowork `senjutsu_20260913f.md` 4-3）。
+     *
+     * ★★**ここでは渡すだけです。**★字も分岐も `gamen9shosaiBun.ts` に在ります
+     *   （★`{a_koteki}` などの円の有無も、あちらで決めています）。
+     * ★★★**`null` は、そのまま渡します** …… ★かたまりごと落ちます。
+     *   ★この回で `null` にしたのは、★**字が決まっていない6種類**
+     *   （`handan_a_bun`・`handan_b_bun`・`handan_c_bun`・`keigen_a`・`keigen_b`・`keigen_c`）と、
+     *   ★その方に当たらない字（`zatsu_chu`・`setai_kubun`・`koteki_tsukisu_bun`・`mangaku_bun`）です。
+     */
+    koteki_kaishi_age: m.bun9s.koteki_kaishi_age,
+    handan_a_bun: m.bun9s.handan_a_bun,
+    handan_b_bun: m.bun9s.handan_b_bun,
+    handan_c_bun: m.bun9s.handan_c_bun,
+    keigen_a: m.bun9s.keigen_a,
+    keigen_b: m.bun9s.keigen_b,
+    keigen_c: m.bun9s.keigen_c,
+    an_a_bun: m.bun9s.an_a_bun,
+    an_b_bun: m.bun9s.an_b_bun,
+    sakaime_1: m.bun9s.sakaime_1,
+    sakaime_2: m.bun9s.sakaime_2,
+    sakaime_3: m.bun9s.sakaime_3,
+    hantei_age: m.bun9s.hantei_age,
+    an_a_nensu: m.bun9s.an_a_nensu,
+    an_b_nensu: m.bun9s.an_b_nensu,
+    koteki_tsukisu: m.bun9s.koteki_tsukisu,
+    a_koteki: m.bun9s.a_koteki,
+    b_koteki: m.bun9s.b_koteki,
+    a_ideco: m.bun9s.a_ideco,
+    b_ideco: m.bun9s.b_ideco,
+    a_shunyu_kei: m.bun9s.a_shunyu_kei,
+    b_shunyu_kei: m.bun9s.b_shunyu_kei,
+    hantei_nenkin_kojo_kubun: m.bun9s.hantei_nenkin_kojo_kubun,
+    a_nenkin_kojo: m.bun9s.a_nenkin_kojo,
+    b_nenkin_kojo: m.bun9s.b_nenkin_kojo,
+    zatsu_chu: m.bun9s.zatsu_chu,
+    a_zatsu: m.bun9s.a_zatsu,
+    b_zatsu: m.bun9s.b_zatsu,
+    a_koujo15: m.bun9s.a_koujo15,
+    b_koujo15: m.bun9s.b_koujo15,
+    a_hantei_shotoku: m.bun9s.a_hantei_shotoku,
+    b_hantei_shotoku: m.bun9s.b_hantei_shotoku,
+    koteki_tsukisu_bun: m.bun9s.koteki_tsukisu_bun,
+    mangaku_bun: m.bun9s.mangaku_bun,
+    ideco_zandaka: m.bun9s.ideco_zandaka,
+    kokuho_kijun: m.bun9s.kokuho_kijun,
+    a_kokuho_bun: m.bun9s.a_kokuho_bun,
+    b_kokuho_bun: m.bun9s.b_kokuho_bun,
+    setai_kubun: m.bun9s.setai_kubun,
+    hikazei_gendo: m.bun9s.hikazei_gendo,
+    a_jumin_bun: m.bun9s.a_jumin_bun,
+    b_jumin_bun: m.bun9s.b_jumin_bun,
   };
 
   /**

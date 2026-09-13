@@ -7,7 +7,7 @@
 
 'use client';
 
-import { type Chart9 as Chart9Data, type Kijun, IRO, FONT, barPath } from '@/lib/retirement/pro/chart9';
+import { type Chart9 as Chart9Data, type Kijun, type AB, IRO, FONT, barPath } from '@/lib/retirement/pro/chart9';
 
 const HAI = '#5b6470';
 const ME_KOI = '#c9ced4';
@@ -55,9 +55,13 @@ export function KijunHanrei({ kijun }: { kijun: Kijun[] }) {
       <b className="font-bold text-slate-900">破線＝保険料・医療費の境目</b>
       （濃い線が、あなたが実際に越える境目です）
       <ul className="mt-1 list-disc pl-[18px]">
-        {kijun.map(([g, name, koi]) => (
+        {/**
+          * ★★★決め1048 の7つめ（2026-09-13・回4）── **金額の字は `chart9.ts` が作ります。**
+          *   ★前はここに `Math.trunc(g / 10_000)` と書いていました（★実装側に式を持たせていました）。
+          */}
+        {kijun.map(([, name, koi, ji]) => (
           <li key={name} style={{ color: koi ? '#8a4b12' : '#8a7a68', fontWeight: koi ? 700 : 400 }}>
-            {name} {Math.trunc(g / 10_000).toLocaleString('en-US')}万円
+            {name} {ji}
           </li>
         ))}
       </ul>
@@ -70,14 +74,18 @@ export function KijunHanrei({ kijun }: { kijun: Kijun[] }) {
  * 【§7-1】もとの `hanrei()` は **11.5px** でした（モックアップの縮尺）。
  * **本番は注記13px以上**なので、13pxにしています。
  */
-export function Hanrei9() {
+/**
+ * ★★★2026-09-13・回4 …… **5年・6年の決め打ちをやめました**（★`chart9.ts` の直し1・2と同じ）。
+ *   ★字は `{an_a_bun}`・`{an_b_bun}`（★`gamen9shosaiBun.ts` が作ります）を渡してください。
+ */
+export function Hanrei9({ bun }: { bun: Record<AB, string> }) {
   return (
     <div className="mb-1 flex gap-3.5 text-[13px] text-slate-900">
-      {([5, 6] as const).map((k) => (
+      {(['a', 'b'] as const).map((k) => (
         <span key={k} className="inline-flex items-center gap-1.5">
           <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-[2px]"
                 style={{ background: IRO[k] }} />
-          {k}年で受け取る
+          {bun[k]}
         </span>
       ))}
     </div>

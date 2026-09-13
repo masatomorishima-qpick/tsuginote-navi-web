@@ -10,45 +10,70 @@
  * 【§7の7】**図の中は目盛りと凡例だけ。**境目の名前と金額は`kijunHanrei()`が図の外に出します。
  *   E-22の直し（2026-08-17・オーナー承認）で、図の中の3行を外へ移しました。
  *   **文字は12px以上**（E-22で9px→12px）。
+ *
+ * ──────────────────────────────────────────────────────────
+ * ★★★【2026-09-13・回4 ── 8つ直しました】（★戦術Cowork `senjutsu_20260913f.md` 4-3）
+ *
+ *   1. `IRO` の鍵を **5・6 から `'a'・'b'`** にしました（★A案・B案は5年・6年とはかぎりません）
+ *   2. `[5, 6]` の決め打ちを **`['a', 'b']`** にしました
+ *   3. 案の名前の決め打ち（`iDeCo等を60歳から`）をやめ、★**案そのものを渡していただく**形にしました
+ *   4. ⑳の **65歳固定**（`／公的年金を65歳から`）をやめました（★3と同じ直しです）
+ *   5. `ages` の**既定値を消しました**（★§既定値を作らない）
+ *   6. `ymax` の**既定値を消しました**（★同上）
+ *   7. ★決め1048 の7つめ …… 破線の凡例の「◯万円」の**字まで、ここで作ります**
+ *        （★`Chart9.tsx` の `Math.trunc(g / 10_000)` は、実装側に式を持たせていました）
+ *   8. ★決め1048 の8つめ …… `keigenHanteiShotoku()` に**給与所得を渡します**
+ *        （★渡さないと、給与所得が在る方で**図の棒が低く出ます**）
+ * ──────────────────────────────────────────────────────────
  */
 
 import * as E from './engine';
 import * as S from './sakaime';
 
-/** 5年で受け取る／6年で受け取る */
-export const IRO: Record<5 | 6, string> = { 5: '#2a78d6', 6: '#eb6834' };
+/** A案（跨がない いちばん長い年数）／B案（その1年上）。★決め1046 */
+export type AB = 'a' | 'b';
+
+/** ★1・A案／B案（★前は `5 | 6` でした） */
+export const IRO: Record<AB, string> = { a: '#2a78d6', b: '#eb6834' };
 
 export type Row9 = { age: number; ideco: number; keigen: number; goukei: number };
-export type Data9 = Partial<Record<5 | 6, Row9[]>>;
-/** [金額, 名前, その方が実際に越えるか] */
-export type Kijun = [number, string, boolean];
+export type Data9 = Partial<Record<AB, Row9[]>>;
+/**
+ * 破線の境目。
+ *   `[金額, 名前, その方が実際に越えるか, ★金額の字]`
+ * ★★4つめは**決め1048の7つめ**で足しました（★「430,000円」の形。★画面側で割り算をしません）。
+ */
+export type Kijun = [number, string, boolean, string];
+
+/** ★7・金額の字（★`en()` と同じ形。★万円にしません・決め1043(1)） */
+export const kijunJi = (gaku: number): string => `${gaku.toLocaleString('en-US')}円`;
 
 /**
  * 図のもとになる数字。
- * `byl` は「ラベル → [Plan, 評価結果]」の辞書（`build()` の戻りから作ります）。
- * ⑳を軸にするとラベルの末尾に「／公的年金を◯歳から」が付くので、
- * **65歳から（＝繰上げも繰下げもしない）もの**を選びます。
+ *
+ * ★★★**案の名前で探しません**（★3・4の直し）。★A案・B案の `Plan` を、そのまま渡してください
+ *   （★`gamen9shosaiBun.ts` が決め1046の形で探したものです）。
+ *
+ * @param p    その方（★⑳の軸は、呼ぶ側で差し替え済みのもの）
+ * @param an   A案・B案の `Plan`
+ * @param ages 図に出す年齢（★5・**既定値はありません**）
  */
 export function data9(
   p: E.Jinbutsu,
-  byl: Record<string, [E.Plan, unknown]>,
-  ages: number[] = [60, 61, 62, 63, 64, 65, 66, 67],
+  an: Record<AB, E.Plan>,
+  ages: number[],
 ): Data9 {
   const out: Data9 = {};
-  for (const k of [5, 6] as const) {
-    const key = `iDeCo等を60歳から年金${k}年`;
-    const cand = Object.keys(byl).find(
-      (x) => x === key || x.startsWith(`${key}／公的年金を65歳から`));
-    if (!cand) continue;
-    const [pl] = byl[cand];
-    const nen = E.nenkinByYear(p, pl);
+  for (const k of ['a', 'b'] as const) {
+    const nen = E.nenkinByYear(p, an[k]);
     out[k] = ages.map((a) => {
       const y = p.year(a);
       const sj = E.shotokuJoukyou(p, y, nen[y] ?? 0);
       return {
         age: a,
         ideco: nen[y] ?? 0,
-        keigen: S.keigenHanteiShotoku(a, sj.nenkin_zatsu),
+        /** ★8・決め1048の8つめ …… **給与所得を渡します**（★`check()` 214行と同じ形） */
+        keigen: S.keigenHanteiShotoku(a, sj.nenkin_zatsu, sj.kyuyo ?? 0),
         goukei: sj.goukei,
       };
     });
@@ -75,7 +100,7 @@ export type Chart9 = {
   fuda: { x: number; y: number; text: string }[];
   /** 破線（境目）。**名前と金額は図の外**（`kijunHanrei()`） */
   hasen: { y: number; iro: string; futo: number }[];
-  /** 65歳の2本だけ、値のラベル */
+  /** ⑳の年の2本だけ、値のラベル */
   ne65: { x: number; y: number; text: string; iro: string }[];
   /** たて・よこの軸名 */
   jiku: { x: number; y: number; text: string; anchor: 'start' | 'end' }[];
@@ -94,9 +119,14 @@ export function barPath(x: number, y: number, w: number, h: number, r = 3): stri
     + `L${(x + w).toFixed(1)},${(y + h).toFixed(1)} Z`;
 }
 
-export function chart9(d: Data9, kijun: Kijun[], ymax = 2_000_000, p?: E.Jinbutsu): Chart9 {
-  const rows5 = d[5] ?? [];
-  const ages = rows5.map((r) => r.age);
+/**
+ * @param ymax たて軸の上限（★6・**既定値はありません**）
+ * @param kijunAge ⑳（★値のラベルを出す年齢。★前は 65 の決め打ちでした）
+ */
+export function chart9(d: Data9, kijun: Kijun[], ymax: number,
+                       kijunAge: number, p: E.Jinbutsu): Chart9 {
+  const rowsA = d.a ?? [];
+  const ages = rowsA.map((r) => r.age);
   const n = ages.length || 1;
   const gw = (X1 - X0) / n;
   const off = (gw - (BW * 2 + GAP)) / 2;
@@ -111,20 +141,18 @@ export function chart9(d: Data9, kijun: Kijun[], ymax = 2_000_000, p?: E.Jinbuts
   const fuda: Chart9['fuda'] = [];
   ages.forEach((a, i) => {
     const gx = X0 + i * gw;
-    ([5, 6] as const).forEach((k, j) => {
+    (['a', 'b'] as const).forEach((k, j) => {
       const v = d[k]?.[i]?.keigen ?? 0;
       bars.push({ x: gx + off + j * (BW + GAP), y: Y(v), w: BW, h: Y1 - Y(v), iro: IRO[k] });
     });
     ageLabels.push({ x: gx + gw / 2, y: Y1 + 18, text: String(a) });
-    // 65歳の棒が60〜64歳より低いのを見て「公的年金は66歳から始まるのか」と読まれた。
+    // ⑳の棒がその前の年より低いのを見て「公的年金は翌年から始まるのか」と読まれた。
     // 原因は**受け取り始める年は公的年金が満額入らない**こと。**変わった年だけ**短く書く。
-    if (p) {
-      const tsuki = p.nenkinShiharaiTsukisu(p.year(a));
-      const mae = p.nenkinShiharaiTsukisu(p.year(a - 1));
-      const t = (tsuki > 0 && tsuki < 12) ? `${tsuki}か月`
-        : (tsuki === 12 && mae < 12) ? '満額' : '';
-      if (t) fuda.push({ x: gx + gw / 2, y: Y1 + 34, text: t });
-    }
+    const tsuki = p.nenkinShiharaiTsukisu(p.year(a));
+    const mae = p.nenkinShiharaiTsukisu(p.year(a - 1));
+    const t = (tsuki > 0 && tsuki < 12) ? `${tsuki}か月`
+      : (tsuki === 12 && mae < 12) ? '満額' : '';
+    if (t) fuda.push({ x: gx + gw / 2, y: Y1 + 34, text: t });
   });
 
   // 破線。**名前と金額は図の外**（§7の7・E-22）
@@ -132,12 +160,12 @@ export function chart9(d: Data9, kijun: Kijun[], ymax = 2_000_000, p?: E.Jinbuts
     y: Y(g), iro: koi ? '#8a4b12' : '#c9b9a6', futo: koi ? 1.5 : 1,
   }));
 
-  // 65歳の2本だけ、値のラベル（ここが分かれ目なので）
-  const i65 = ages.indexOf(65);
+  // ⑳の年の2本だけ、値のラベル（ここが分かれ目なので）
+  const i65 = ages.indexOf(kijunAge);
   const ne65: Chart9['ne65'] = [];
   if (i65 >= 0) {
     const gx = X0 + i65 * gw;
-    ([5, 6] as const).forEach((k, j) => {
+    (['a', 'b'] as const).forEach((k, j) => {
       const v = d[k]?.[i65]?.keigen ?? 0;
       ne65.push({
         x: gx + off + j * (BW + GAP) + BW / 2, y: Y(v) - 5,

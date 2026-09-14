@@ -614,12 +614,110 @@ export function taishokuShotokuKubun(gs: [Gen, number][],
   const sShunyu = tanki.reduce((a, [, s]) => a + s, 0);
   const iShunyu = ippan.reduce((a, [, s]) => a + s, 0);
 
-  const tShotoku = Z.taishokuShotokuTokutei(tShunyu, tKojo);
-  const sZan = sShunyu - sKojo;
+  /**
+   * ★★★【2026-09-14・決め1174・決め1178・決め1179】**調整計算**
+   *
+   * ★★【直す前は何をしていたか】★区分ごとに `max(0, 収入 − その区分の控除)` を取っていました。
+   *   ★★**収入が控除に満たない区分の「余った控除」を、そのまま捨てていました。**
+   *   ★実測（`golden_heavy_20260906`・250人）…… ★**15人**が、この捨てぶんのために税を多く払う形でした
+   *     （★合計 31,038,660円・まん中 2,014,020円・最大 6,550,684円）。
+   *
+   * ★★【法令の姿】★正本は国税庁「令和7年版 源泉徴収のあらまし」第3 の（注）です
+   *   （★戦術Cowork `senjutsu_20260914e.md` 2節に4つとも逐語が写されています）。
+   *   ★★★**施行令71条の2の条文そのものは、原文を確認できていません。**
+   *     ★ですので、★**利用者にお見せする根拠には、条番号を書きません**（★決め1174）。
+   *
+   * ★★【移し方】★★★**移すのは、いつでも「マイナスの金額の全額」です。**
+   *   ★**2区分** …… 残る**1つに全額**を移します（★2分の1しません）
+   *   ★**3区分** …… 残る**2つに半分ずつ**を移し、引ききれない分をもう一方に回します
+   *
+   * ★★【短期の③について】★（注）は「短期…①」と「短期…（300万円＋短期退職所得控除額）③」の
+   *   **両方から差し引く**と書いています。★ここでは `sZan` そのものを先に動かしますので、
+   *   ★★**そのあと300万円の式に入れれば、③からも同じ額が引かれた形になります**（★同じ答えです）。
+   *
+   * ★★★【当てられていないこと】★**調整計算が働く数値の設例は、どの資料にも見つかりませんでした**
+   *   （★戦術Cowork 2-1(1)）。★ですので、★**1円まで合わせる当ては取れていません。**
+   *   ★★そこで、★**読みが1つに決まらない形が来たら、そこで止めます**（★下の3つの門）。
+   */
+  const aruT = tokutei.length > 0, aruS = tanki.length > 0, aruI = ippan.length > 0;
+  const kubunKazu = [aruT, aruS, aruI].filter(Boolean).length;
+  /** ★区分ごとの「収入 − その区分の控除」。★★**マイナスのままにします**（★ここで `max(0,)` を取りません） */
+  let tZan = tShunyu - tKojo;
+  let sZan = sShunyu - sKojo;
+  let iZan = iShunyu - iKojo;
+
+  if (kubunKazu === 2) {
+    /**
+     * ★★**2区分**（★(A)一般＋特定役員／(B)一般＋短期／(C)短期＋特定役員）。
+     *   ★★★**マイナスの全額を、残る1つに移します。**★2分の1しません。
+     *   ★どちらもマイナスの方は、収入の合計が控除の合計に届いていませんので、
+     *     ★**そろえて0にします**（★どちらへ移しても退職所得は0です）。
+     */
+    const futatsu = (a: number, b: number): [number, number] =>
+      a < 0 && b < 0 ? [0, 0] : a < 0 ? [0, b + a] : b < 0 ? [a + b, 0] : [a, b];
+    if (!aruI) [tZan, sZan] = futatsu(tZan, sZan);
+    else if (!aruS) [tZan, iZan] = futatsu(tZan, iZan);
+    else [sZan, iZan] = futatsu(sZan, iZan);
+  } else if (kubunKazu === 3) {
+    /**
+     * ★★**3区分**（★(D)・決め1174）。★マイナスの額を2分の1し、残る2つからそれぞれ差し引きます。
+     *   ★引ききれない分は、もう一方から差し引きます。
+     *
+     * ★★★**門1** …… ★マイナスが2つ以上ある形は、（注）が答えていません。★**止めます。**
+     * ★★★**門2** …… ★2分の1に1円未満の端数が出る形（★マイナスが奇数）は、
+     *   ★（注）が「どちらへ切り上げ、どちらへ切り捨てるか」を書き分けていますが、
+     *   ★★**一般がマイナスのときの向きを、こちらでは確かめられていません。**★**止めます。**
+     *   ★実測 …… ★**250人で1回も通りません**（★マイナスの区分がある3区分の方は1人・額は偶数）。
+     */
+    const mainasu = [tZan, sZan, iZan].filter((x) => x < 0);
+    if (mainasu.length >= 2) {
+      throw new Error('その年の3つの区分のうち、2つ以上で収入が控除に満たしていません。'
+        + '**この形は、国税庁の（注）が答えていません。**こちらでは決めません。戦術Coworkに投げてください。');
+    }
+    if (mainasu.length === 1) {
+      const A = -mainasu[0];
+      if (A % 2 !== 0) {
+        throw new Error(`調整計算で移す額（${A}円）が奇数ですので、2分の1に1円未満の端数が出ます。`
+          + '**どちらへ切り上げ、どちらへ切り捨てるかを、こちらでは確かめられていません。**'
+          + 'こちらでは決めません。戦術Coworkに投げてください。');
+      }
+      const han2 = fdiv(A, 2);
+      /** ★2つの受け手から `han2` ずつ引き、引ききれない分をもう一方に回します */
+      const wakeru = (x: number, y: number): [number, number] => {
+        const xAmari = Math.max(0, han2 - Math.max(0, x));
+        const yAmari = Math.max(0, han2 - Math.max(0, y));
+        return [x - han2 - yAmari, y - han2 - xAmari];
+      };
+      if (tZan < 0) { tZan = 0; [sZan, iZan] = wakeru(sZan, iZan); }
+      else if (sZan < 0) { sZan = 0; [tZan, iZan] = wakeru(tZan, iZan); }
+      else { iZan = 0; [tZan, sZan] = wakeru(tZan, sZan); }
+    }
+  }
+
+  /**
+   * ★★★**門3** …… ★**一般＋短期の2区分**で調整計算が働き、短期の残りが300万円を超える形。
+   *
+   * ★★【なぜこの形だけか】★戦術Cowork 2-1(2) が「確かめられなかった」とされたのは、
+   *   ★**⑴ロ（一般＋短期・短期の残りが300万円超）の（注）2** です。
+   *   ★★ほかの2つは、（注）が**300万円の式（③）を名ざしで書いています** ──
+   *     ★(B)3 …… 一般がマイナス → 短期の①**及び③**から差し引く
+   *     ★(C)1 …… 特定役員がマイナス → 短期の①**及び③**から差し引く
+   *   ★★★ですので、★**短期が受け取る側の形は、（注）が答えています。**★止めません。
+   *   ★★**短期がマイナスの側のときは、その残りは0になります**ので、この門には当たりません。
+   *   ★★★**それでも一般＋短期だけは止めます** ── ★そちらが「確かめられなかった」と
+   *     はっきり書かれた形だからです（★こちらで読み替えません）。
+   */
+  const ugoita = tZan !== tShunyu - tKojo || sZan !== sShunyu - sKojo || iZan !== iShunyu - iKojo;
+  if (ugoita && !aruT && aruS && aruI && sZan > Z.TANKI_KIJUN) {
+    throw new Error(`調整計算をしたあとの短期の残り（${sZan}円）が300万円を超えています。`
+      + '**この形の（注）は、確かめられていません。**こちらでは決めません。戦術Coworkに投げてください。');
+  }
+
+  const tShotoku = Math.max(0, tZan);
   let sBai = 0;
   if (sZan > 0) sBai = sZan <= Z.TANKI_KIJUN ? sZan
     : 2 * (fdiv(Z.TANKI_KIJUN, 2) + sZan - Z.TANKI_KIJUN);
-  const iBai = Math.max(0, iShunyu - iKojo);
+  const iBai = Math.max(0, iZan);
   const han = fdiv(sBai + iBai, 2);
   const shotoku = tShotoku + han;
   /**
@@ -635,21 +733,32 @@ export function taishokuShotokuKubun(gs: [Gen, number][],
    */
   const sShotoku = fdiv(sBai, 2);
   const iShotoku = han - sShotoku;
-  /** **式を変えていません。**前と1文字も同じ判定です（変数に取り出しただけ） */
-  const koeta = Math.max(0, sShunyu - sKojo) > Z.TANKI_KIJUN;
+  /**
+   * ★★★【2026-09-14・決め1178】**調整計算をしたあとの残りで見ます。**
+   *   ★前は `Math.max(0, sShunyu - sKojo)`（★調整前）でした。
+   *   ★★`sBai` は調整後の `sZan` で分岐していますので、★**そろえないと画面と式が食い違います。**
+   *   ★★調整が働いた方は門3で `sZan <= 300万` が保証されますので、★この判定は偽になります。
+   */
+  const koeta = Math.max(0, sZan) > Z.TANKI_KIJUN;
   const uchiwake: KubunUchiwake[] = [];
+  /**
+   * ★★★【2026-09-14・決め1178】**`hamidashi` も、調整計算をしたあとの残りにそろえます。**
+   *   ★前は `max(0, 収入 − その区分の控除)`（★調整前）でした。
+   *   ★★調整後は、★**その額がそのまま退職所得の式に入る額**です。★そろえないと、
+   *     ★`gamen11Bun.ts` の `kubunUchiwake()`（★内わけの門）が合わなくなります。
+   */
   if (tokutei.length) uchiwake.push({ kubun: 'tokutei', shunyu: tShunyu, kojo: tKojo,
-                                      hamidashi: Math.max(0, tShunyu - tKojo),
+                                      hamidashi: Math.max(0, tZan),
                                       shotoku: tShotoku });
   if (tanki.length) uchiwake.push({ kubun: 'tanki', shunyu: sShunyu, kojo: sKojo,
-                                    hamidashi: Math.max(0, sShunyu - sKojo),
+                                    hamidashi: Math.max(0, sZan),
                                     shotoku: sShotoku,
                                     ...(koeta ? { tanki_kijun: Z.TANKI_KIJUN,
                                                   tanki_kijun_bun: fdiv(Z.TANKI_KIJUN, 2),
                                                   tanki_koeta_bun: sZan - Z.TANKI_KIJUN }
                                               : {}) });
   if (ippan.length) uchiwake.push({ kubun: 'ippan', shunyu: iShunyu, kojo: iKojo,
-                                    hamidashi: Math.max(0, iShunyu - iKojo),
+                                    hamidashi: Math.max(0, iZan),
                                     shotoku: iShotoku });
   /**
    * **番人B**（2026-08-27・戦術Cowork `senjutsu_20260826j.md` §2「置いてください」）。

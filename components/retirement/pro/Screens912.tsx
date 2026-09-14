@@ -225,6 +225,8 @@ export function atai912(m: Moto912): Record<string, string | null> {
     shotokuzei_tai: en(m.bun11.shotokuzei_tai),
     jumin_taishoku: en(m.bun11.jumin_taishoku),
     nenkin_nashi_bun: m.bun11.nenkin_nashi_bun,
+    /** ★★★決め1181 …… 年金の節の見出し（★`null` の方は節ごと落ちます・門Cが見張ります） */
+    nenkin_setsu_midashi: m.bun11.nenkin_setsu_midashi,
     nenkin_toshi_bun: m.bun11.nenkin_toshi_bun,
     kyuyo: en(m.bun11.kyuyo),
     kojo_uchiwake: m.bun11.kojo_uchiwake,

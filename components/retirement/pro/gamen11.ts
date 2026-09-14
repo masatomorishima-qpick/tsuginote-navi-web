@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（179,846バイト ／ md5 fd0a2e3ab926ec70b6728dfbc91298e9）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（179,903バイト ／ md5 7041710699c346bb7e8e3a7c6407233b）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -78,7 +78,7 @@ export const GAMEN11: readonly Block11[] = [
   ] },
   { kind: 'hon', bun: "{ichiji_kubun_bun}", na: ["ichiji_kubun_bun"] },
   { kind: 'hon', bun: "{nenkin_nashi_bun}", na: ["nenkin_nashi_bun"] },
-  { kind: 'midashi', lv: 3, bun: "あなたの年金の所得" },
+  { kind: 'midashi', lv: 3, bun: "あなたの{nenkin_setsu_midashi}" },
   { kind: 'hon', bun: "{nenkin_toshi_bun}", na: ["nenkin_toshi_bun"] },
   { kind: 'hyo', gyou: [
     { cells: ["あなたが1年に受け取る年金の額\n公的年金と{nenkin_gen}の合計です","{nenkin_shunyu}"],
@@ -129,10 +129,10 @@ export const GAMEN11: readonly Block11[] = [
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["an_bun","tai_gen","tai_age","kojo_shiki","kojo","shunyu","tai_uchiwake_bun","tai_hantei_bun","shotoku","shotokuzei_tai","jumin_taishoku","kubun_bun","ichiji_gen","ichiji_age","ichiji_kojo_shiki","ichiji_kojo","ichiji_shunyu","ichiji_hantei_bun","ichiji_shotoku","ichiji_shotokuzei","ichiji_jumin","ichiji_kubun_bun","nenkin_nashi_bun","nenkin_toshi_bun","nenkin_gen","nenkin_shunyu","nenkin_kojo_kubun","nenkin_kojo","zatsu","kyuyo","kojo_uchiwake","kojo_goukei","shotokuzei","setai_kubun","hikazei_gendo","jumin_hantei_bun","jumin","kokuho_kiso","hoken_hantei_bun","hoken_kekka","zatsu_zero_bun","kyufu_kaisu","kyufu_kei","koza_tanka","koza_tsuki","koza_kei","tesuryo"];
+export const HITOGOTO_SHURUI: readonly string[] = ["an_bun","tai_gen","tai_age","kojo_shiki","kojo","shunyu","tai_uchiwake_bun","tai_hantei_bun","shotoku","shotokuzei_tai","jumin_taishoku","kubun_bun","ichiji_gen","ichiji_age","ichiji_kojo_shiki","ichiji_kojo","ichiji_shunyu","ichiji_hantei_bun","ichiji_shotoku","ichiji_shotokuzei","ichiji_jumin","ichiji_kubun_bun","nenkin_nashi_bun","nenkin_setsu_midashi","nenkin_toshi_bun","nenkin_gen","nenkin_shunyu","nenkin_kojo_kubun","nenkin_kojo","zatsu","kyuyo","kojo_uchiwake","kojo_goukei","shotokuzei","setai_kubun","hikazei_gendo","jumin_hantei_bun","jumin","kokuho_kiso","hoken_hantei_bun","hoken_kekka","zatsu_zero_bun","kyufu_kaisu","kyufu_kei","koza_tanka","koza_tsuki","koza_kei","tesuryo"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
-export const HITOGOTO_KASHO = 49;
+export const HITOGOTO_KASHO = 50;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
 export const MADA_NA: readonly string[] = [];

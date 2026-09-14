@@ -86,6 +86,18 @@ export interface Bun11 {
   // ── 年金の表（★基準HTML 1117〜1130行・**年金収入がはじめて0でなくなる年**・決め1085） ---
   /** ★決め1086 …… その年が1つも無い方だけの1文。★ほかの方は `null`（かたまりごと落ちます） */
   nenkin_nashi_bun: string | null;
+  /**
+   * ★★★決め1181 …… **年金の節の見出し**（★基準HTML 1124行・★2026-09-14に印が1つ増えました）。
+   *
+   * ★★【なぜ印にしたか】★年金の年が1つも無い方は、★**この節の中身が1つ残らず落ちます**
+   *   （★`nenkin_toshi_bun`・表・`zatsu_zero_bun` の3つとも `null`）。
+   *   ★★見出しに印が無いと、★**見出しだけが中身なしで残ります**（★実測 1人／250・`seed 12`）。
+   * ★★★これは**決め1086ですでに決めてあったもの**です ──
+   *   「節そのもの（見出し＋`nenkin_toshi_bun`＋表）を落とせるなら落とす」。
+   *   ★あのときは落とせるか分かっていませんでしたが、★**見出しに印を入れれば落ちます**（★決め1094）。
+   * ★★分かれ方は `nenkin_nashi_bun` と**同じ1つの条件**です（★その年が1つも無いか）。
+   */
+  nenkin_setsu_midashi: string | null;
   /** ★決め1057＋1085 2-1 …… 下の表がどの年のものかを言う1文（★3つの字） */
   nenkin_toshi_bun: string | null;
   /** ★決め1042 …… その年の給与所得 */
@@ -377,14 +389,24 @@ function kubunSa(k: E.KeikaRow): number {
  * *   ★★`engine.ts` は**読むだけ**です（★止め）。★`kubun_meisai` が返すものだけを使います。
  */
 function kubunUchiwake(k: E.KeikaRow): { hanbun: number; amari: number } {
-  let hanbun = 0, hami = 0, nokori = 0, kojoKei = 0;
+  let hanbun = 0, hami = 0, kojoKei = 0;
   for (const u of k.kubun_meisai.uchiwake) {
     hanbun += u.shotoku - Z.fdiv(u.hamidashi, 2);
     hami += u.hamidashi;
-    nokori += Math.max(0, u.kojo - u.shunyu);
     kojoKei += u.kojo;
   }
-  const hikenakatta = (k.kojo_adj - kojoKei) + nokori;
+  /**
+   * ★★★【2026-09-14・決め1178】**「引けなかった控除」の数え方が変わりました。**
+   *
+   * ★前は 2つ足していました ──
+   *   (あ) `Σ max(0, その区分の控除 − その区分の収入)`（★その区分で引き切れなかったぶん）
+   *   (い) `kojo_adj − Σ その区分の控除`（★どの区分の式にも乗らなかったぶん）
+   *
+   * ★★★**(あ) は、調整計算が引き取りました**（★`engine.ts`）── ★もう捨てていません。
+   *   ★ですので **(い) だけ**が残ります。★実測 …… ★**250人で1人だけ**（`seed 183`・400,000円）。
+   *   ★★その1人を直さないのは戦術Coworkの決めです（★決め1179(3)）。
+   */
+  const hikenakatta = k.kojo_adj - kojoKei;
   return { hanbun, amari: Z.fdiv(Math.min(hikenakatta, hami), 2) };
 }
 
@@ -675,6 +697,8 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
     shotokuzei_tai: k.gensen_ari,
     jumin_taishoku: taiU.jumin_taishoku,
     nenkin_nashi_bun: nenkinNen === null ? NENKIN_NASHI(nenkinGen) : null,
+    /** ★★決め1181 …… `nenkin_nashi_bun` と**裏返し**です（★同じ1つの条件で分けます） */
+    nenkin_setsu_midashi: nenkinNen === null ? null : '年金の所得',
     nenkin_toshi_bun: toshiBun,
     kyuyo: j.kyuyo,
     kojo_uchiwake: uchiwakeJi,

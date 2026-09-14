@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（179,661バイト ／ md5 0c89a84fd20e3fd27e634602f37a56a7）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（179,846バイト ／ md5 fd0a2e3ab926ec70b6728dfbc91298e9）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -36,7 +36,7 @@ export type Block10 =
 export const GAMEN10: readonly Block10[] = [
   { kind: 'midashi', lv: 2, bun: "退職金受け取りパターン比較" },
   { kind: 'hako', bun: "この画面の前提\nあなたは{tai_age}で{tai_gen} {shunyu}を受け取ります（勤続{nensu}）。{nenkin_gen} {ideco_zandaka}（加入{ideco_kanyu_nensu}）、公的年金 年 {koteki_nenkin}（{koteki_kaishi_age}から受け取る場合の額）。{tai_age}以降の給与はありません。", na: ["tai_age","tai_gen","shunyu","nensu","nenkin_gen","ideco_zandaka","ideco_kanyu_nensu","koteki_nenkin","koteki_kaishi_age"] },
-  { kind: 'hon', bun: "あなたの年齢ごとに、手元にいくら入るかを比べます。\n性質の違う2つを、それぞれ分けてお見せします。", na: [] },
+  { kind: 'hon', bun: "{kurabe_bun}", na: ["kurabe_bun"] },
   { kind: 'hon', bun: "{an_onaji_bun}", na: ["an_onaji_bun"] },
   { kind: 'midashi', lv: 3, bun: "① {sa_hajime_age}から先、退職金と{nenkin_gen}の受け取り方でどう変わるか" },
   { kind: 'hon', bun: "くらべるもとは、{nenkin_gen}を一時金で受け取り、公的年金はあなたがお答えになった年齢から受け取る場合です。\n\nグラフは、くらべるもと（{an_a}）の累計から、いま選んでいる（{an_b}）の累計を引いた額です。", na: ["nenkin_gen","an_a","an_b"] },
@@ -47,8 +47,8 @@ export const GAMEN10: readonly Block10[] = [
   { kind: 'hon', bun: "灰色の帯は、{toori_kazu}すべてを計算して出した幅です。\n上のふちがその年齢までの累計がいちばん多くなる受け取り方、\n下のふちがいちばん少なくなる受け取り方で、\nあなたが選べるどの受け取り方も、必ずこの帯の中に入ります。\n90歳までの累計でいえば{ruikei_min}〜{ruikei_max}です。", na: ["toori_kazu","ruikei_min","ruikei_max"] },
   { kind: 'hako', bun: "{kuuhaku_kaishi_age}から{kuuhaku_owari_age}までは、公的年金が1円も入りません。\n{oitsuku_bun}。\nそれより長く生きれば多く、短ければ少なくなります。\n当社は何歳まで生きるかを置きませんので、どちらが有利かは申し上げません。\n追いつく年齢だけをお伝えします。\n\n90歳まで受け取った場合の差は{sa_90}です。", na: ["kuuhaku_kaishi_age","kuuhaku_owari_age","oitsuku_bun","sa_90"] },
   { kind: 'hon', bun: "この{sa_90}と、①の{sa_saishu}を足し算しないでください。①は{nenkin_gen}の受け取り方のちがい、②は公的年金を繰り下げるかどうかのちがいで、比べているものが違うためです。", na: ["sa_90","sa_saishu","nenkin_gen"] },
-  { kind: 'midashi', lv: 3, bun: "この金額に入っているもの" },
-  { kind: 'hako', bun: "あなたの退職金・iDeCo等・公的年金の、税金と手数料を引いたあとの額です。\n給与など、受け取り方で変わらない収入は入れていません。\n\n何歳まで生きるかは置いていません。たては「その年齢まで受け取った場合」の数字です。\n\n手数料は、いちばん最後に受け取る年にまとめて引いています。", na: [] },
+  { kind: 'midashi', lv: 3, bun: "{gurafu_ji}の数字に入っているもの" },
+  { kind: 'hako', bun: "{gurafu_ji}の数字は、あなたの退職金・iDeCo等・公的年金の、税金と手数料を引いたあとの額です。\n給与など、受け取り方で変わらない収入は入れていません。\n\n何歳まで生きるかは置いていません。たては「その年齢まで受け取った場合」の数字です。\n\n手数料は、いちばん最後に受け取る年にまとめて引いています。", na: ["gurafu_ji"] },
   { kind: 'hon', bun: "②（公的年金を{kurisage_age}まで繰り下げる場合）の累計には、公的年金も入っています。計算結果としてお出しする手取り（{tedori}）は退職金とiDeCo等だけの金額なので、②の数字とは一致しません。②には、その年齢までに受け取る公的年金の額から、公的年金で増える税を引いたものが足してあります。{tedori}には入っていません。公的年金を受け取り始める年齢が違う受け取り方を並べるには、公的年金を入れないと比べようがないためです。", na: ["kurisage_age","tedori"] },
   { kind: 'midashi', lv: 3, bun: "年ごとに、手元にいくら入るか" },
   { kind: 'hon', bun: "年齢ごとの金額は、ダウンロードするファイルに入れてお渡しします。\n1歳きざみで、その年に手元に入る額と、その年に増える税金が並びます。\n\n{tai_age}前後にまとまった支出のご予定がある場合は、そちらでご確認ください。", na: ["tai_age"] },
@@ -56,10 +56,10 @@ export const GAMEN10: readonly Block10[] = [
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["tai_age","tai_gen","shunyu","nensu","nenkin_gen","ideco_zandaka","ideco_kanyu_nensu","koteki_nenkin","koteki_kaishi_age","an_onaji_bun","sa_hajime_age","an_a","an_b","sa_hajime_bun","gyakuten_bun","sa_saishu_bun","kurisage_age","an_b_mijikai","an_1_label","an_2_label","toori_kazu","ruikei_min","ruikei_max","kuuhaku_kaishi_age","kuuhaku_owari_age","oitsuku_bun","sa_90","sa_saishu","tedori"];
+export const HITOGOTO_SHURUI: readonly string[] = ["tai_age","tai_gen","shunyu","nensu","nenkin_gen","ideco_zandaka","ideco_kanyu_nensu","koteki_nenkin","koteki_kaishi_age","kurabe_bun","an_onaji_bun","sa_hajime_age","an_a","an_b","sa_hajime_bun","gyakuten_bun","sa_saishu_bun","kurisage_age","an_b_mijikai","an_1_label","an_2_label","toori_kazu","ruikei_min","ruikei_max","kuuhaku_kaishi_age","kuuhaku_owari_age","oitsuku_bun","sa_90","sa_saishu","gurafu_ji","tedori"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
-export const HITOGOTO_KASHO = 42;
+export const HITOGOTO_KASHO = 45;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
 export const MADA_NA: readonly string[] = [];

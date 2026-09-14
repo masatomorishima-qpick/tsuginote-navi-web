@@ -288,6 +288,9 @@ export function atai912(m: Moto912): Record<string, string | null> {
     an_b: m.bun10.an_b,
     sa_hajime_age: m.bun10.sa_hajime_age,
     an_onaji_bun: m.bun10.an_onaji_bun,
+    /** ★★決め1172 …… 995行の1文と、「◯の数字に入っているもの」の節の見出し・囲み */
+    kurabe_bun: m.bun10.kurabe_bun,
+    gurafu_ji: m.bun10.gurafu_ji,
     sa_hajime_bun: m.bun10.sa_hajime_bun,
     gyakuten_bun: m.bun10.gyakuten_bun,
     sa_saishu_bun: m.bun10.sa_saishu_bun,
@@ -547,44 +550,58 @@ export type Setsu = {
   /**
    * ★★**代表の名前** …… ★この**どれか1つでも `null`** なら、その節は落ちるはずです。
    *   ★①の節＝`sa_hajime_age`（★24人）／②の節＝`kurisage_age`（★168人）／
-   *   ★①と②の両方＝`sa_90`・`sa_saishu`（★175人＝24＋168−17）。
+   *   ★①と②の両方＝`sa_90`・`sa_saishu`（★175人＝24＋168−17）／
+   *   ★グラフの数字の節＝`gurafu_ji`（★17人）。
    */
   daihyo: readonly string[];
-  /** その節に入るかたまり（★そのかたまりに出てくる `{名前}` を並べ、重なりを外して並べ替えたもの） */
-  katamari: readonly (readonly string[])[];
   /**
-   * ★★★その節に入る**図**の名前（★いまは3つとも空です）。
+   * その節に入るかたまり（★**かたまりの種類**と、★そのかたまりに出てくる `{名前}` の組）。
+   *   ★★種類も見るのは、★**同じ名前の組のかたまりが2つある**ことがあるためです
+   *     （★`gurafu_ji` の見出しと囲みは、どちらも名前が `gurafu_ji` 1つだけです）。
+   *   ★★★どちらも**機械が作ったもの**です（★基準HTMLの文言を、この本に写していません）。
+   */
+  katamari: readonly { kind: BlockKyotsu['kind']; na: readonly string[] }[];
+  /**
+   * ★★★その節に入る**図**の名前（★いまは4つとも空です）。
    *   ★★図は `kumitate()` が見ませんので、★**繋ぐ回に、描いた図の名前を門Cに渡します**（★決め1166）。
    *   ★★★**同じことを2か所に書かないため**、図を出すかどうかの決まりは**ここに1つだけ**置きます。
    */
   zu: readonly string[];
 };
 
-/** ★節の一覧（★画面10・★戦術Cowork `senjutsu_20260914b.md` 4-1） */
+/** ★節の一覧（★画面10・★戦術Cowork `senjutsu_20260914b.md` 4-1・`senjutsu_20260914c.md` 5-2） */
 export const SETSU: readonly Setsu[] = [
   {
     gamen: '画面10', na: '①の節', daihyo: ['sa_hajime_age'], zu: [],
     katamari: [
-      ['nenkin_gen', 'sa_hajime_age'],                                        // 見出し①（999行）
-      ['an_a', 'an_b', 'nenkin_gen'],                                         // 本文①（1000行）
-      ['gyakuten_bun', 'sa_hajime_age', 'sa_hajime_bun', 'sa_saishu_bun'],    // 囲み①（1035行）
+      { kind: 'midashi', na: ['nenkin_gen', 'sa_hajime_age'] },                    // 見出し①（999行）
+      { kind: 'hon', na: ['an_a', 'an_b', 'nenkin_gen'] },                         // 本文①（1000行）
+      { kind: 'hako', na: ['gyakuten_bun', 'sa_hajime_age', 'sa_hajime_bun', 'sa_saishu_bun'] }, // 囲み①
     ],
   },
   {
     gamen: '画面10', na: '②の節', daihyo: ['kurisage_age'], zu: [],
     katamari: [
-      ['kurisage_age'],                                                       // 見出し②（1037行）
-      ['an_b_mijikai', 'koteki_kaishi_age', 'kurisage_age', 'nenkin_gen'],    // 本文②（1038行）
-      ['an_1_label', 'an_2_label', 'toori_kazu'],                             // hanrei（1074行）
-      ['ruikei_max', 'ruikei_min', 'toori_kazu'],                             // chu（1075行）
-      ['kuuhaku_kaishi_age', 'kuuhaku_owari_age', 'oitsuku_bun', 'sa_90'],    // 囲み②（1080行）
-      ['kurisage_age', 'tedori'],                                             // ②の累計の chu（1093行）
+      { kind: 'midashi', na: ['kurisage_age'] },                                   // 見出し②（1037行）
+      { kind: 'hon', na: ['an_b_mijikai', 'koteki_kaishi_age', 'kurisage_age', 'nenkin_gen'] }, // 本文②
+      { kind: 'hako', na: ['an_1_label', 'an_2_label', 'toori_kazu'] },            // hanrei（1074行）
+      { kind: 'hon', na: ['ruikei_max', 'ruikei_min', 'toori_kazu'] },             // chu（1075行）
+      { kind: 'hako', na: ['kuuhaku_kaishi_age', 'kuuhaku_owari_age', 'oitsuku_bun', 'sa_90'] }, // 囲み②
+      { kind: 'hon', na: ['kurisage_age', 'tedori'] },                             // ②の累計の chu（1093行）
     ],
   },
   {
     gamen: '画面10', na: '①と②の両方の節', daihyo: ['sa_90', 'sa_saishu'], zu: [],
     katamari: [
-      ['nenkin_gen', 'sa_90', 'sa_saishu'],                                   // 足し算しないでくださいの chu（1086行）
+      { kind: 'hon', na: ['nenkin_gen', 'sa_90', 'sa_saishu'] },                   // 足し算しないでくださいの chu
+    ],
+  },
+  {
+    /** ★★★【2026-09-14・決め1172】**グラフの数字の節**（★見出しにも印を入れました） */
+    gamen: '画面10', na: 'グラフの数字の節', daihyo: ['gurafu_ji'], zu: [],
+    katamari: [
+      { kind: 'midashi', na: ['gurafu_ji'] },                                      // 見出し（1088行）
+      { kind: 'hako', na: ['gurafu_ji'] },                                         // 囲み（1089行）
     ],
   },
 ];
@@ -613,26 +630,31 @@ function monC(
   zuDeta: readonly string[],
 ): void {
   const deta = new Set(kumi.dasuIndex);
-  const kumiJi = blocks.map((b) => naNoKumi(b).join(','));
+  const kagi = blocks.map((b) => `${b.kind}|${naNoKumi(b).join(',')}`);
   for (const se of SETSU) {
     if (se.gamen !== gamen) continue;
     /** ★代表の名前が1つでも `null` なら、この節は落ちるはずです */
     const ochiru = se.daihyo.some((x) => atai[x] === null);
-    if (!ochiru) continue;
+    /** ★落ちるはずなのに残っていたもの */
     const nokotta: string[] = [];
+    /** ★★残るはずなのに落ちていたもの（★決め1169・**こちらが7人で見つけました**） */
+    const ochisugi: string[] = [];
     for (const k of se.katamari) {
-      const kj = [...k].sort().join(',');
-      const ban = kumiJi.map((x, i) => (x === kj ? i : -1)).filter((i) => i >= 0);
+      const kj = `${k.kind}|${[...k.na].sort().join(',')}`;
+      const ban = kagi.map((x, i) => (x === kj ? i : -1)).filter((i) => i >= 0);
       if (ban.length !== 1) {
         throw new Error(
-          `門C …… ${gamen}「${se.na}」のかたまり（${kj || '（印なし）'}）が、`
+          `門C …… ${gamen}「${se.na}」のかたまり（${kj}）が、`
           + `**${ban.length}個**見つかりました（★1個のはずです）。`
           + '**基準HTMLが動いています。**節の一覧を直してください（決め1164）。',
         );
       }
-      if (deta.has(ban[0])) nokotta.push(kj || '（印なし）');
+      const deta1 = deta.has(ban[0]);
+      if (ochiru && deta1) nokotta.push(kj);
+      if (!ochiru && !deta1) ochisugi.push(kj);
     }
-    const zuNokotta = se.zu.filter((z) => zuDeta.includes(z));
+    const zuNokotta = ochiru ? se.zu.filter((z) => zuDeta.includes(z)) : [];
+    const zuOchisugi = ochiru ? [] : se.zu.filter((z) => !zuDeta.includes(z));
     if (nokotta.length || zuNokotta.length) {
       throw new Error(
         `門C …… ${gamen}「${se.na}」は落ちるはずなのに、`
@@ -641,6 +663,24 @@ function monC(
         + `  残ったかたまり： ${nokotta.join(' ／ ') || '（なし）'}\n`
         + `  残った図： ${zuNokotta.join(' ') || '（なし）'}\n`
         + '  **節の見出しだけ・説明だけが残ります。**そこで止めます（決め1164）。',
+      );
+    }
+    if (ochisugi.length || zuOchisugi.length) {
+      /**
+       * ★★★【2026-09-14・決め1169】**両向きで見ます。**
+       *   ★「落ちるはずなのに残っている」だけでなく、★★**「残るはずなのに落ちている」も止めます**。
+       *   ★★どちらも**その方の画面から、出すはずの説明が消える**という同じ害です。
+       *   ★★★決め1156・決め1157・決め1168の3つとも**落ちすぎの側**で、
+       *     ★**3つとも人の目でしか見つかっていません**（★機械は1つも見つけていません）。
+       */
+      throw new Error(
+        `門C …… ${gamen}「${se.na}」は残るはずなのに、`
+        + `かたまりが${ochisugi.length}個・図が${zuOchisugi.length}個 落ちています。\n`
+        + `  代表の名前は、どれも \`null\` ではありません： ${se.daihyo.join(' ')}\n`
+        + `  落ちたかたまり： ${ochisugi.join(' ／ ') || '（なし）'}\n`
+        + `  落ちた図： ${zuOchisugi.join(' ') || '（なし）'}\n`
+        + '  **その節に、当たるはずの説明が足りません。**'
+        + 'そのかたまりの印の `null` の条件が、代表の条件と違っています（決め1168・決め1169）。',
       );
     }
   }

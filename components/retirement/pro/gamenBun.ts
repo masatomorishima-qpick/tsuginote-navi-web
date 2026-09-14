@@ -65,7 +65,15 @@ export type BlockKyotsu =
 export type Kumi = {
   /** 出せたかたまり。**`{名前}` はエンジンの値に置き換わっています** */
   dasu: BlockKyotsu[];
-  /** **出せなかったかたまりの数**（下の2つの合計） */
+  /**
+   * **出せなかったかたまりの数**。
+   *
+   * ★★★【2026-09-13・決め1146】**`ochitaMada` ＋ `ochitaNashiNazo`** です。
+   *   ★`ochitaNashiKime`（★戦術Coworkが落とすと決めたもの）は**入りません**。
+   *   ★★決め940と同じ理由です ── ★**数えると、その方の帯が永久に消えません。**
+   *   ★★★**ただし「まるごと数えない」ではありません**（★決め1146）── ★**名簿で分けます。**
+   *     ★種類で決めると、同じ種類に入っている「まだ決めていないもの」も、いっしょに消えます。
+   */
   ochita: number;
   /** そのうち **`data-mada`（エンジンに出口が無い）** で落ちた数。**こちらの宿題ではありません**（戦術Cowork） */
   ochitaMada: number;
@@ -77,9 +85,31 @@ export type Kumi = {
    *   `null`　　　 … 出口はあるが、**その方には存在しない**
    *     例：確定拠出年金が無い方の「口座管理手数料 66円×48か月」の行。
    *         66円も48か月も**存在しません**。0と書くと「0か月かかった」に読めます。
-   *   **その方に何と出すかは、決まっていません。**仕様の穴として戦術Coworkに投げます。
+   *
+   * ★★★【2026-09-13・決め1146】**この数には、2つのものが混ざっています。**
+   *   ★下の `ochitaNashiKime` ＋ `ochitaNashiNazo` ＝ この数です（★合わせて返します）。
    */
   ochitaNashi: number;
+  /**
+   * ★★★**戦術Coworkが「この方には出さない」と決めて落としたかたまり**の数（★決め1146）。
+   *
+   *   ★落ちた理由の名前が**ぜんぶ `ochiteYoi`（名簿）に在る**ものだけを、ここに数えます。
+   *   ★★**`ochita` には入れません**（★本番の止めにも、利用者に見える帯にも使いません）。
+   *   ★★★**それでも返します** …… ★止まったときに**全体が見える**ように
+   *     （★`ScreenBlocks.tsx` の止めの文に、この数と名前も書きます・決め1146(4)）。
+   *     ★**黙って減らさない**ためです。
+   */
+  ochitaNashiKime: number;
+  /**
+   * ★★★**まだ何を出すか決まっていない `null`** で落ちたかたまりの数（★決め1146）。
+   *
+   *   ★落ちた理由の名前に、**名簿に無いものが1つでも在る**ものを、ここに数えます。
+   *   ★★★**`ochita` に入れます** ── ★これは**仕様の穴**で、★戦術Coworkに投げるものです。
+   *   ★★まるごと数えないと、★**その方の画面から字が1つ減ったことに、誰も気づきません**（★決め1146）。
+   */
+  ochitaNashiNazo: number;
+  /** ★`ochitaNashiKime` の理由になった名前（★決め1146(4)・止めの文に書きます） */
+  kimeNa: string[];
   /** 出せなかった理由になった名前（`data-mada` のもの） */
   ochitaNa: string[];
   /** 出せなかった理由になった名前（エンジンが `null` を返したもの） */
@@ -122,6 +152,15 @@ function naWoHirou(b: BlockKyotsu): string[] {
 /**
  * かたまりに値を入れる。
  *
+ * @param ochiteYoi
+ *   ★★★**落としてよい名前の名簿**（★決め1146・2026-09-13・森嶋さんの承認）。
+ *
+ *   ★★`null` で落ちたかたまりには、**2つのもの**が混ざっていました ──
+ *     (ア) 戦術Coworkが「この方には出さない」と**決めて**落としたもの（★決め1101・決め1141(3) ほか）
+ *     (イ) ★**まだ何を出すか決めていない `null`** ＝ 仕様の穴
+ *   ★★★**(ア)だけを `ochita` から外します。**★(イ)は、いままでどおり止めます
+ *     ── ★まるごと外すと、★**(イ)が黙って消え、その方の画面から字が1つ減ったことに誰も気づきません**。
+ *
  * @param blocks 基準HTMLから抜き出したかたまり（`GAMEN9` など）
  * @param mada   `data-mada` の名前（`MADA_NA`）。**ここに載っている印は1つも出しません**
  * @param atai   エンジンから取った値。**すべて文字列**（見せ方は呼ぶ側が決めます）
@@ -146,8 +185,19 @@ export function kumitate(
   mada: readonly string[],
   atai: Readonly<Record<string, string | null>>,
   gyouNashi: readonly string[] = [],
+  ochiteYoi: Readonly<Record<string, number>> = {},
 ): Kumi {
   const madaSet = new Set(mada);
+  /**
+   * ★★★【2026-09-13・決め1146／★2026-09-14・決め1155 で形が変わりました】**落としてよい名前の名簿**。
+   *
+   * *   ★★★**名前だけではなく、「その名前で落とすかたまりの数」もいっしょに書きます**（★決め1155）。
+   *     ★例 …… `{ kurisage_age: 2 }` ＝「`kurisage_age` で**2つ**落とす」。
+   * *   ★★この名簿に在る名前だけで落ちたかたまりは、`ochitaNashiKime` に数え、★`ochita` に入れません。
+   * *   ★★★**名簿に入れてよいのは、判断ログに決めが在る名前だけ**です（★決め1147(2)）。
+   * *   ★★★**開発Coworkが勝手に増やしません**（★決め1147(3)）── ★増やす要りが出たら、そこで止めて投げます。
+   */
+  const yoiSet = new Set(Object.keys(ochiteYoi));
 
   for (const na of Object.keys(atai)) {
     if (madaSet.has(na)) {
@@ -158,13 +208,46 @@ export function kumitate(
     }
   }
 
+  /**
+   * ★★★【2026-09-13・決め1148 門B ／ ★2026-09-14・決め1155 で中身が変わりました】
+   *   **名簿に書いた「落とすかたまりの数」と、実際に出てくる数が合っていること。**
+   *
+   * *   ★★前は「2つ以上なら止める」でした。★★★**それは決めの読み違いでした** ──
+   *     ★`kurisage_age`・`sa_hajime_age`（決め1118(5)）と `ichiji_gen`（決め1101）は、
+   *     ★★**見出しにも印を入れて、見出しごと落とすのが決め**でした。
+   * *   ★ですので**数そのものを名簿に書き**、★★**書いた数と実際の数が違ったら止めます**。
+   * *   ★★これで、基準HTMLを直してかたまりの数が動いたときに、★**機械が鳴ります**。
+   * *   ★名簿が空のあいだは、1度も鳴りません。
+   */
+  if (yoiSet.size) {
+    const kazoe = new Map<string, number>();
+    for (const x of yoiSet) kazoe.set(x, 0);
+    for (const b of blocks) {
+      for (const x of new Set(naWoHirou(b))) {
+        if (yoiSet.has(x)) kazoe.set(x, (kazoe.get(x) ?? 0) + 1);
+      }
+    }
+    const chigau = [...kazoe].filter(([x, n]) => n !== ochiteYoi[x]);
+    if (chigau.length) {
+      throw new Error(
+        `名簿に書いた「落とすかたまりの数」と、この画面の実際の数が違います： `
+        + `${chigau.map(([x, n]) => `${x}（名簿 ${ochiteYoi[x]}／実際 ${n}）`).join('・')}。`
+        + '**基準HTMLか名簿のどちらかが動いています。**'
+        + 'こちらでは決めません。戦術Coworkに投げてください（決め1155 門B）。',
+      );
+    }
+  }
+
   const gyouNashiSet = new Set(gyouNashi);
   const dasu: BlockKyotsu[] = [];
   const ochitaNa = new Set<string>();
   const nashiNa = new Set<string>();
   const gyouNashiNa = new Set<string>();
+  const kimeNa = new Set<string>();
   let ochitaMada = 0;
   let ochitaNashi = 0;
+  let ochitaNashiKime = 0;
+  let ochitaNashiNazo = 0;
   let gyouNashiKazu = 0;
   let karaOchi = 0;
   let ireta = 0;
@@ -230,6 +313,18 @@ export function kumitate(
     const nashi = na.filter((x) => atai[x] === null);
     if (nashi.length) {
       ochitaNashi++;
+      /**
+       * ★★★決め1146(2) …… **落ちた理由の名前が、ぜんぶ名簿に在るか**で分けます。
+       *   ★1つでも名簿に無い名前が在れば `ochitaNashiNazo`（★まだ決まっていない `null`）。
+       *   ★★**「1つでも」**にしています ── ★かたまりは**まるごと**落ちますので、
+       *     ★決めた名前と決めていない名前が混ざったら、★**決めていないほうが勝ちます**（★黙って消さない）。
+       */
+      if (nashi.every((x) => yoiSet.has(x))) {
+        ochitaNashiKime++;
+        for (const x of nashi) kimeNa.add(x);
+      } else {
+        ochitaNashiNazo++;
+      }
       for (const x of nashi) nashiNa.add(x);
       continue;
     }
@@ -265,8 +360,11 @@ export function kumitate(
     }
   }
 
-  return { dasu, ochita: ochitaMada + ochitaNashi, ochitaMada, ochitaNashi,
-           ochitaNa: [...ochitaNa], nashiNa: [...nashiNa],
+  return { dasu,
+           // ★★★決め1146(3) …… `ochitaNashiKime` は入れません
+           ochita: ochitaMada + ochitaNashiNazo,
+           ochitaMada, ochitaNashi, ochitaNashiKime, ochitaNashiNazo,
+           ochitaNa: [...ochitaNa], nashiNa: [...nashiNa], kimeNa: [...kimeNa],
            gyouNashiKazu, gyouNashiNa: [...gyouNashiNa], karaOchi, ireta };
 }
 

@@ -102,8 +102,16 @@ export default function ScreenBlocks({ kumi }: { kumi: Kumi }) {
     throw new Error(
       `**本番化してはいけないものが、本番のビルドに出ています。**\n`
       + `  出せなかったかたまり ${kumi.ochita}個`
-      + `（エンジンに出口が無い ${kumi.ochitaMada}個／その方に存在しない ${kumi.ochitaNashi}個）\n`
+      // ★★★決め1146(3) …… `ochita` は `ochitaMada + ochitaNashiNazo` です。
+      //   ★ここを `ochitaNashi`（決めたぶんも入る数）のままにすると、★★**足しても合いません**。
+      + `（エンジンに出口が無い ${kumi.ochitaMada}個`
+      + `／その方に存在しない・まだ決めていない ${kumi.ochitaNashiNazo}個）\n`
       + `  出口が無い名前： ${kumi.ochitaNa.join(' ') || '（なし）'}\n`
+      // ★★★【2026-09-13・決め1146(4)】**決めで落としたところも、数と名前を書きます。**
+      //   ★`ochita` には入れていませんが（決め1146(3)）、★黙って消えたのではないことを
+      //   ★止めの文の中で分かるようにしておきます（★名簿を読み違えたときに気づけます）。
+      + `  決めで落としたかたまり ${kumi.ochitaNashiKime}個`
+      + `（名簿の名前： ${kumi.kimeNa.join(' ') || '（なし）'}）\n`
       + '  判断ログ83②「`data-mada` が0になるまで本番化しない」。\n'
       + '  短い画面を黙って出さないために、ここで止めます。',
     );
@@ -114,6 +122,20 @@ export default function ScreenBlocks({ kumi }: { kumi: Kumi }) {
       {kaihatsuChu() && kumi.ochita > 0 && (
         <div className="note" data-kaihatsu-obi>
           {OBI_BUN}{kumi.ochita}か所あります。準備ができ次第、お見せします。
+        </div>
+      )}
+      {/*
+        * ★★★【2026-09-13・決め1146(5)】**決めで落としたところは、別の帯で出します。**
+        *
+        * *   ★★上の帯（`data-kaihatsu-obi`）とは**別の帯**です。混ぜません。
+        * *   ★理由 …… 上の帯は「まだお見せできない」＝これから出すもの。
+        *     こちらは★**その方には存在しないので出さないと決めたもの**で、
+        *     ★準備ができても出ません。同じ帯にすると、直す所が分からなくなります。
+        * *   ★★開発中（`kaihatsuChu()`）だけです。本番では出ません。
+        */}
+      {kaihatsuChu() && kumi.ochitaNashiKime > 0 && (
+        <div className="note" data-kaihatsu-obi-kime>
+          決めで落としたところが{kumi.ochitaNashiKime}か所あります。
         </div>
       )}
     </>

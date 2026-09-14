@@ -525,11 +525,48 @@ export function gyouNashi912(m: Moto912): string[] {
   return out;
 }
 
+/**
+ * ★★★【2026-09-13・決め1146】**落としてよい名前の名簿（いまは空です）**
+ *
+ * *   ★ここに名前を入れると、その名前が `null` で落ちたかたまりは
+ *     `ochitaNashiKime`（決めで落とした）に数えられ、★`ochita` には入りません。
+ * *   ★★**空のままにしてください。**名前を増やす要りが出たときは、
+ *     ★そこで止めて戦術Coworkに投げます（★決め1146・名簿を作るのは戦術Cowork）。
+ * *   ★★★**1行は「名前 ＋ その名前で落とすかたまりの数」です**（★2026-09-14・決め1155）。
+ *     ★例 …… `画面10: { kurisage_age: 2 }` ＝「`kurisage_age` で**2つ**落とす」。
+ *     ★★門B（`kumitate()`）が、★**書いた数と実際の数が違ったら止めます**。
+ * *   ★★★**数は戦術Coworkが書きます**（★決め1155）── ★こちらで数えて埋めません。
+ *     ★`kurisage_age`・`sa_hajime_age`（★決め1118(5)）と `ichiji_gen`（★決め1101）は、
+ *     ★★**見出しにも印を入れて、見出しごと落とすのが決め**でした（★2か所とも落とします）。
+ * *   ★★★**画面ごとに分けて書きます**（★決め1147(1)）── ★同じ名前でも、画面が違えば別に書きます。
+ *     ★理由 …… ★`ichiji_gen` は画面11で2か所・`kurisage_age` は画面10で2か所というように、
+ *     ★**同じ名前でも画面によって出てくる数が違います**。まとめて書くと、それが見えません。
+ * *   ★1行ごとに決め番号を書きます（★決め1147(2)）。
+ */
+export const OCHITE_YOI: Readonly<Record<string, Readonly<Record<string, number>>>> = {
+  画面9: {},
+  '画面9 詳細': {},
+  画面10: {},
+  画面11: {},
+  画面12: {},
+};
+
 /** 5画面ぶんを組み立てる。**出せなかった数も返します** */
 export function kumi912(m: Moto912): Record<string, Kumi> {
   const a = atai912(m);
   const nashi = gyouNashi912(m);
-  const hitotsu = (blocks: readonly BlockKyotsu[], mada: readonly string[]) => {
+  /**
+   * @param gamen ★名簿は**画面ごと**ですので、画面の名前を受け取ります（★決め1147(1)）。
+   *   ★★**既定値を作りません** ── ★名簿に無い画面の名前を渡したら、そこで止めます。
+   */
+  const hitotsu = (gamen: string, blocks: readonly BlockKyotsu[], mada: readonly string[]) => {
+    const yoi = OCHITE_YOI[gamen];
+    if (yoi === undefined) {
+      throw new Error(
+        `名簿（\`OCHITE_YOI\`）に「${gamen}」がありません。`
+        + `**画面を足したときは、名簿にもその画面を足してください**（空の配列で結構です・決め1147(1)）。`,
+      );
+    }
     // **その画面に出てこない名前は渡しません。**渡すと「使っていない値」が見えなくなります
     const dero = new Set<string>();
     const hirou = (s: string) => { for (const x of s.matchAll(/\{([a-zA-Z0-9_]+)\}/g)) dero.add(x[1]); };
@@ -541,7 +578,7 @@ export function kumi912(m: Moto912): Record<string, Kumi> {
     const madaSet = new Set(mada);
     const sono: Record<string, string | null> = {};
     for (const na of dero) if (!madaSet.has(na) && na in a) sono[na] = a[na];
-    return kumitate(blocks, mada, sono, nashi);
+    return kumitate(blocks, mada, sono, nashi, yoi);
   };
   /**
    * ★★★【2026-09-13・決め1143】**その方に当たる字が1つも無い画面を出しません。**
@@ -595,16 +632,18 @@ export function kumi912(m: Moto912): Record<string, Kumi> {
     }
   }
   const kara: Kumi = {
-    dasu: [], ochita: 0, ochitaMada: 0, ochitaNashi: 0, ochitaNa: [], nashiNa: [],
+    dasu: [], ochita: 0, ochitaMada: 0, ochitaNashi: 0,
+    ochitaNashiKime: 0, ochitaNashiNazo: 0,
+    ochitaNa: [], nashiNa: [], kimeNa: [],
     gyouNashiKazu: 0, gyouNashiNa: [], karaOchi: 0, ireta: 0,
   };
   return {
-    画面9: hitotsu(GAMEN9 as readonly BlockKyotsu[], MADA9),
+    画面9: hitotsu('画面9', GAMEN9 as readonly BlockKyotsu[], MADA9),
     '画面9 詳細': m.bun9s.dasu
-      ? hitotsu(GAMEN9shosai as readonly BlockKyotsu[], MADA9S) : kara,
-    画面10: hitotsu(GAMEN10 as readonly BlockKyotsu[], MADA10),
-    画面11: hitotsu(GAMEN11 as readonly BlockKyotsu[], MADA11),
-    画面12: hitotsu(GAMEN12 as readonly BlockKyotsu[], MADA12),
+      ? hitotsu('画面9 詳細', GAMEN9shosai as readonly BlockKyotsu[], MADA9S) : kara,
+    画面10: hitotsu('画面10', GAMEN10 as readonly BlockKyotsu[], MADA10),
+    画面11: hitotsu('画面11', GAMEN11 as readonly BlockKyotsu[], MADA11),
+    画面12: hitotsu('画面12', GAMEN12 as readonly BlockKyotsu[], MADA12),
   };
 }
 

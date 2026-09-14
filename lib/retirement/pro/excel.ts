@@ -93,19 +93,41 @@ export function ichijikinNoAn(k: Keisan, idecoName: string): Row | null {
 }
 
 /** 28項目の raw を「ラベル｜値」の行に（★値は raw の字のまま。複数の欄は鍵ごとに1行） */
+/** ★★決め1204 …… お答えいただいていない欄の字（★空欄にしません） */
+const KOTAE_NASHI = 'お答えいただいていません';
+
+/**
+ * ★★【2026-09-14・決め1204】**円で出る値に、桁区切りを入れます**（★「1230000円」→「1,230,000円」）。
+ *   ★★シート4は**文字列のまま**にします（★「1850万円」「33年」「61歳」と単位が混ざるためです・戦術Cowork 2節の2）。
+ *   ★★★**円の欄だけ**です。★ほかの単位（万円・年・歳・月・日）には入れません。
+ *   ★数でない字（★「わからない」など）は、そのまま返します。
+ */
+function kugiru(v: string, tani: string): string {
+  if (tani !== '円') return v;
+  if (!/^-?\d+$/.test(v)) return v;
+  return Number(v).toLocaleString('en-US');
+}
+
 function nyuryokuNoGyou(kou: readonly Kou[], raw: Record<string, string>): [string, string][] {
   const out: [string, string][] = [];
   for (const f of PAID_FIELDS) {
     const k = kou.find((x) => x.no === f.no);
     const kagis = Object.keys(raw).filter((x) => x === f.no || x.startsWith(`${f.no}/`)).sort();
-    if (!k || kagis.length === 0) { out.push([f.label, '']); continue; }
+    /**
+     * ★★★【2026-09-14・決め1204】**お答えいただいていない欄は、そう書きます。**
+     *   ★前は**空欄**でしたので、★★「0円」なのか「お答えいただいていない」のかが**見ても分かりません**でした。
+     *   ★★★実測 …… ★この欄が空のとき、★**エンジンは 0 として計算しています**
+     *     （`paidRules.ts` 467・468・480行 `?? 0`）。★⑧の「何歳まで」だけは、
+     *     ★★⑧が0のときは**退職する年齢そのもの**になります（★同 469行・★⑧が0でないときだけ、お答えを読みます）。
+     */
+    if (!k || kagis.length === 0) { out.push([f.label, KOTAE_NASHI]); continue; }
     for (const kagi of kagis) {
       const r = ranWoHiku(kou, kagi);
       const v = raw[kagi];
       const ji = r?.sentaku ? (r.sentaku.find((s) => s.kagi === v)?.ji ?? v)
         : r?.shurui === 'hai' ? (v === 'hai' ? 'はい' : 'いいえ')
         : v === 'wakaranai' ? 'わからない'
-        : r?.tani ? `${v}${r.tani}` : v;
+        : r?.tani ? `${kugiru(v, r.tani)}${r.tani}` : v;
       out.push([kagi === f.no ? f.label : `${f.label}（${kagi.slice(f.no.length + 1)}）`, ji]);
     }
   }
@@ -121,7 +143,15 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
   stream.on('data', (c: Buffer) => chunks.push(c));
   const owatta = new Promise<void>((resolve, reject) => { stream.on('end', resolve); stream.on('error', reject); });
 
-  const wb = new ExcelJS.stream.xlsx.WorkbookWriter({ stream, useStyles: false, useSharedStrings: false });
+  /**
+   * ★★★【2026-09-14・決め1204】**`useStyles` を `true` にしました。**
+   *   ★`false` のままだと、★**`numFmt`（桁区切り）が本に書かれません**（★実測：22422160 と出ていました）。
+   */
+  const wb = new ExcelJS.stream.xlsx.WorkbookWriter({ stream, useStyles: true, useSharedStrings: false });
+  /** ★★お金の欄の書式（★決め1204・`#,##0`）。★値は**数値のまま**にします（★利用者がご自分で足せるように） */
+  const KUGIRI = '#,##0';
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const okane = (row: any, ...retsu: number[]) => { for (const c of retsu) row.getCell(c).numFmt = KUGIRI; return row; };
   const { g8, D, R, p } = k;
   const b = k.kekka.bun8;
 
@@ -133,17 +163,26 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
   s1.addRow([b.judge.hon.replace(/\n/g, '')]).commit();
   if (b.judge.hosoku) s1.addRow([b.judge.hosoku]).commit();
   s1.addRow([]).commit();
-  s1.addRow(['あなたの受け取り方', '税金', '手取り', '保険料が上がる年齢', '見方']).commit();
+  /**
+   * ★★★【2026-09-14・決め1204】**列名を、画面の字から写しました。**
+   *   ★基準HTML **850行**＝「この受け取り方で増える税金」／**851行**＝「あなたの手取り」。
+   *   ★★単位は**列名に「（円）」**を付けます（★値は数値のまま）。
+   */
+  s1.addRow(['あなたの受け取り方', 'この受け取り方で増える税金（円）', 'あなたの手取り（円）',
+    '保険料が上がる年齢', '見方']).commit();
   for (const h of g8.houkou) {
     const row = D.find((x) => x.lab === h.lab);
-    s1.addRow([h.lab, h.zei, h.tedori, row ? hokenNoJi(row) : '', h.mikata.join('／')]).commit();
+    okane(s1.addRow([h.lab, h.zei, h.tedori, row ? hokenNoJi(row) : '', h.mikata.join('／')]), 2, 3).commit();
   }
   s1.commit();
 
   // ---- 2 受け取り方の一覧（全通り）
   const s2 = wb.addWorksheet('受け取り方の一覧');
-  s2.addRow(['番号', '受け取り方', '税金', '手取り', '最初の年に入る額', '受け取り終わる年齢', '保険料が上がる年齢']).commit();
-  D.forEach((x, i) => { s2.addRow([i + 1, x.lab, x.zei, x.tedori, x.age0, x.owari, hokenNoJi(x)]).commit(); });
+  s2.addRow(['番号', '受け取り方', 'この受け取り方で増える税金（円）', 'あなたの手取り（円）',
+    '最初の年に入る額（円）', '受け取り終わる年齢', '保険料が上がる年齢']).commit();
+  D.forEach((x, i) => {
+    okane(s2.addRow([i + 1, x.lab, x.zei, x.tedori, x.age0, x.owari, hokenNoJi(x)]), 3, 4, 5).commit();
+  });
   s2.commit();
 
   // ---- 3 年ごとの内訳（★この便では2本）
@@ -159,7 +198,8 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
   s3.addRow([JI_S3_SOEJI]).commit();
   // ★注記は、拠出が終わってから受け取り始めるまでの年がある案が1つでもあるときだけ（senjutsu_20260903c.md 1番の字）
   if (anRows.some((a) => a.first < a.uketoriFirst)) s3.addRow([JI_S3_KOZA]).commit();
-  s3.addRow(['番号', '年', '年齢', 'その年に手元に入る額', 'その年に増える税金', 'その年の手数料']).commit();
+  s3.addRow(['番号', '年', '年齢', 'その年に手元に入る額（円）', 'その年に増える税金（円）',
+    'その年の手数料（円）']).commit();
   anRows.forEach((a, n) => {
     if (n > 0) s3.addRow([]).commit();          // ★案と案の間に空の行を1つ（どこまでが1つの案か分かるように）
     const r = R[a.i][1];
@@ -169,11 +209,11 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
       const zei = r.harau?.[y] ?? 0;
       const tesu = r.tesuryo_by_year?.[y] ?? 0;
       gKei += gaku; zKei += zei; tKei += tesu;
-      s3.addRow([a.i + 1, y, p.age(y), gaku, zei, tesu]).commit();
+      okane(s3.addRow([a.i + 1, y, p.age(y), gaku, zei, tesu]), 4, 5, 6).commit();
     }
     // ★合計と手取りの2行（案ごと）。★「年」の列に語を置きます（その行が「年」の行ではないため）
-    s3.addRow([a.i + 1, '合計', '', gKei, zKei, tKei]).commit();
-    s3.addRow([a.i + 1, '手取り', '', gKei - zKei - tKei, '', '']).commit();
+    okane(s3.addRow([a.i + 1, '合計', '', gKei, zKei, tKei]), 4, 5, 6).commit();
+    okane(s3.addRow([a.i + 1, '手取り', '', gKei - zKei - tKei, '', '']), 4).commit();
   });
   s3.commit();
 

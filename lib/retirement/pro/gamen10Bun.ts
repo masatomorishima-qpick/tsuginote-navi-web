@@ -89,9 +89,12 @@ export interface Bun10 {
   an_1_label: string | null;
   /** ★`{an_2_label}` …… 同じ受け取り方で⑳を上限にした案の `Plan.label` そのまま */
   an_2_label: string | null;
-  /** ★`{ruikei_min}` …… 90歳までの累計の、全通りの最小（★帯の下のふち） */
+  /**
+   * ★`{ruikei_min}` …… 90歳までの累計の、全通りの最小（★帯の下のふち）。
+   *   ★★【2026-09-14・決め1162】**②が無い方（★②のグラフが無い方）には `null`** です。
+   */
   ruikei_min: number | null;
-  /** ★`{ruikei_max}` …… 同じく最大（★帯の上のふち） */
+  /** ★`{ruikei_max}` …… 同じく最大（★帯の上のふち）。★②が無い方には `null`（★決め1162） */
   ruikei_max: number | null;
   /** ★`{kuuhaku_kaishi_age}` …… 繰り下げると公的年金が入らなくなる、はじめの年齢 */
   kuuhaku_kaishi_age: string | null;
@@ -392,9 +395,21 @@ export function gamen10Bun(
   let oitsukuAge: number | null = null;
   let oitsukuKata: Bun10['shirabeta']['oitsuku_kata'] = null;
   let sa90: number | null = null, ruMin: number | null = null, ruMax: number | null = null;
-  ruMin = d.band[migi][0];
-  ruMax = d.band[migi][1];
+  /**
+   * ★★★【2026-09-14・決め1162】**`ruikei_min`・`ruikei_max` は、②が無い方には `null` です。**
+   *
+   * *   ★この2つは**②のグラフの灰色の帯の最小と最大**です。
+   *     ★★②のグラフが無い方（★`aite === null`）には、★**そもそも存在しません**。
+   * *   ★★前は、②が無い方にも帯の数だけを返していましたので、
+   *     ★1075行の `chu`（「灰色の帯は、◯通りすべてを…90歳までの累計でいえば◯〜◯です。」）が
+   *     ★★★**②が落ちる168人にも残っていました**（★開発Coworkが250人で数え、描いて字で見ました）。
+   * *   ★★★**`toori_kazu` は `null` にしません**（★決め1162）── ★あれは**画面ぜんたいの通り数**で、
+   *     ★②が無い方にも存在します。★かたまりを落とすためだけに、関係の薄い名前を `null` にしません。
+   *   ★それでも `chu` は、この2つで**かたまりごと落ちます**。
+   */
   if (aite !== null) {
+    ruMin = d.band[migi][0];
+    ruMax = d.band[migi][1];
     const ru2 = ru(aite[0].label);
     sa90 = Math.abs(ru2[migi] - ruB[migi]);
     /**

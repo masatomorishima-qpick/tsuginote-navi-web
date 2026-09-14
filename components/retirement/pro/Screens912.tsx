@@ -526,6 +526,127 @@ export function gyouNashi912(m: Moto912): string[] {
 }
 
 /**
+ * ★★★【2026-09-14・決め1164 門C】**節の一覧（★戦術Coworkが決めました）**
+ *
+ * *   ★「節」＝**同じ話をしているかたまりのまとまり**です（★画面10の①の節・②の節）。
+ * *   ★★**代表の名前が `null` の方には、その節のかたまりが1つ残らず落ちること**を、
+ *     ★機械が250人で数えます（★門C）。★1つでも残ったら**止めます**。
+ * *   ★★★**そうしないと、節の見出しだけ・説明だけが残ります** ── ★この3回で3つ見つけました
+ *     （★`chu`（1075行）が168人に残った／囲み②が7人で落ちた／「この金額に入っているもの」が168人に残った）。
+ *     ★★**3つとも人の目が見つけたもので、機械は1つも見つけていません**（★決め1164）。
+ *
+ * ★★かたまりの見分けは、★**そのかたまりに出てくる `{名前}` の組**でします。
+ *   ★★★**字で見分けません**（★基準HTMLの文言を、この本に写さないためです）。
+ *   ★組が見つからない・2つ以上見つかったときは、★**そこで止めます**（★基準HTMLが動いた、ということです）。
+ */
+export type Setsu = {
+  /** どの画面か */
+  gamen: string;
+  /** 節の名前（★止めの文に出します） */
+  na: string;
+  /**
+   * ★★**代表の名前** …… ★この**どれか1つでも `null`** なら、その節は落ちるはずです。
+   *   ★①の節＝`sa_hajime_age`（★24人）／②の節＝`kurisage_age`（★168人）／
+   *   ★①と②の両方＝`sa_90`・`sa_saishu`（★175人＝24＋168−17）。
+   */
+  daihyo: readonly string[];
+  /** その節に入るかたまり（★そのかたまりに出てくる `{名前}` を並べ、重なりを外して並べ替えたもの） */
+  katamari: readonly (readonly string[])[];
+  /**
+   * ★★★その節に入る**図**の名前（★いまは3つとも空です）。
+   *   ★★図は `kumitate()` が見ませんので、★**繋ぐ回に、描いた図の名前を門Cに渡します**（★決め1166）。
+   *   ★★★**同じことを2か所に書かないため**、図を出すかどうかの決まりは**ここに1つだけ**置きます。
+   */
+  zu: readonly string[];
+};
+
+/** ★節の一覧（★画面10・★戦術Cowork `senjutsu_20260914b.md` 4-1） */
+export const SETSU: readonly Setsu[] = [
+  {
+    gamen: '画面10', na: '①の節', daihyo: ['sa_hajime_age'], zu: [],
+    katamari: [
+      ['nenkin_gen', 'sa_hajime_age'],                                        // 見出し①（999行）
+      ['an_a', 'an_b', 'nenkin_gen'],                                         // 本文①（1000行）
+      ['gyakuten_bun', 'sa_hajime_age', 'sa_hajime_bun', 'sa_saishu_bun'],    // 囲み①（1035行）
+    ],
+  },
+  {
+    gamen: '画面10', na: '②の節', daihyo: ['kurisage_age'], zu: [],
+    katamari: [
+      ['kurisage_age'],                                                       // 見出し②（1037行）
+      ['an_b_mijikai', 'koteki_kaishi_age', 'kurisage_age', 'nenkin_gen'],    // 本文②（1038行）
+      ['an_1_label', 'an_2_label', 'toori_kazu'],                             // hanrei（1074行）
+      ['ruikei_max', 'ruikei_min', 'toori_kazu'],                             // chu（1075行）
+      ['kuuhaku_kaishi_age', 'kuuhaku_owari_age', 'oitsuku_bun', 'sa_90'],    // 囲み②（1080行）
+      ['kurisage_age', 'tedori'],                                             // ②の累計の chu（1093行）
+    ],
+  },
+  {
+    gamen: '画面10', na: '①と②の両方の節', daihyo: ['sa_90', 'sa_saishu'], zu: [],
+    katamari: [
+      ['nenkin_gen', 'sa_90', 'sa_saishu'],                                   // 足し算しないでくださいの chu（1086行）
+    ],
+  },
+];
+
+/** かたまりに出てくる `{名前}`（★重なりを外し、並べ替えたもの） */
+function naNoKumi(b: BlockKyotsu): string[] {
+  const out: string[] = [];
+  const hirou = (x: string) => { for (const m of x.matchAll(/\{([a-zA-Z0-9_]+)\}/g)) out.push(m[1]); };
+  if (b.kind === 'hyo') for (const g of b.gyou) hirou(g.cells.join(' '));
+  else if (b.kind === 'ret') for (const k of b.koumoku) hirou(k.bun);
+  else hirou(b.bun);
+  return [...new Set(out)].sort();
+}
+
+/**
+ * ★★★【2026-09-14・決め1164】**門C** ── 節ごとに、1つ残らず落ちたかを見ます。
+ *
+ * @param zuDeta ★**その方に実際に描いた図の名前**（★いまは1つも描いていませんので、いつも空です）。
+ *   ★★繋ぐ回に、`Screen10` が描いた図の名前を渡します（★決め1166）。
+ */
+function monC(
+  gamen: string,
+  blocks: readonly BlockKyotsu[],
+  atai: Readonly<Record<string, string | null>>,
+  kumi: Kumi,
+  zuDeta: readonly string[],
+): void {
+  const deta = new Set(kumi.dasuIndex);
+  const kumiJi = blocks.map((b) => naNoKumi(b).join(','));
+  for (const se of SETSU) {
+    if (se.gamen !== gamen) continue;
+    /** ★代表の名前が1つでも `null` なら、この節は落ちるはずです */
+    const ochiru = se.daihyo.some((x) => atai[x] === null);
+    if (!ochiru) continue;
+    const nokotta: string[] = [];
+    for (const k of se.katamari) {
+      const kj = [...k].sort().join(',');
+      const ban = kumiJi.map((x, i) => (x === kj ? i : -1)).filter((i) => i >= 0);
+      if (ban.length !== 1) {
+        throw new Error(
+          `門C …… ${gamen}「${se.na}」のかたまり（${kj || '（印なし）'}）が、`
+          + `**${ban.length}個**見つかりました（★1個のはずです）。`
+          + '**基準HTMLが動いています。**節の一覧を直してください（決め1164）。',
+        );
+      }
+      if (deta.has(ban[0])) nokotta.push(kj || '（印なし）');
+    }
+    const zuNokotta = se.zu.filter((z) => zuDeta.includes(z));
+    if (nokotta.length || zuNokotta.length) {
+      throw new Error(
+        `門C …… ${gamen}「${se.na}」は落ちるはずなのに、`
+        + `かたまりが${nokotta.length}個・図が${zuNokotta.length}個 残っています。\n`
+        + `  代表の名前（\`null\` のもの）： ${se.daihyo.filter((x) => atai[x] === null).join(' ')}\n`
+        + `  残ったかたまり： ${nokotta.join(' ／ ') || '（なし）'}\n`
+        + `  残った図： ${zuNokotta.join(' ') || '（なし）'}\n`
+        + '  **節の見出しだけ・説明だけが残ります。**そこで止めます（決め1164）。',
+      );
+    }
+  }
+}
+
+/**
  * ★★★【2026-09-13・決め1146】**落としてよい名前の名簿（いまは空です）**
  *
  * *   ★ここに名前を入れると、その名前が `null` で落ちたかたまりは
@@ -552,7 +673,7 @@ export const OCHITE_YOI: Readonly<Record<string, Readonly<Record<string, number>
 };
 
 /** 5画面ぶんを組み立てる。**出せなかった数も返します** */
-export function kumi912(m: Moto912): Record<string, Kumi> {
+export function kumi912(m: Moto912, zuDeta: readonly string[] = []): Record<string, Kumi> {
   const a = atai912(m);
   const nashi = gyouNashi912(m);
   /**
@@ -635,9 +756,9 @@ export function kumi912(m: Moto912): Record<string, Kumi> {
     dasu: [], ochita: 0, ochitaMada: 0, ochitaNashi: 0,
     ochitaNashiKime: 0, ochitaNashiNazo: 0,
     ochitaNa: [], nashiNa: [], kimeNa: [],
-    gyouNashiKazu: 0, gyouNashiNa: [], karaOchi: 0, ireta: 0,
+    gyouNashiKazu: 0, gyouNashiNa: [], karaOchi: 0, ireta: 0, dasuIndex: [],
   };
-  return {
+  const out: Record<string, Kumi> = {
     画面9: hitotsu('画面9', GAMEN9 as readonly BlockKyotsu[], MADA9),
     '画面9 詳細': m.bun9s.dasu
       ? hitotsu('画面9 詳細', GAMEN9shosai as readonly BlockKyotsu[], MADA9S) : kara,
@@ -645,6 +766,24 @@ export function kumi912(m: Moto912): Record<string, Kumi> {
     画面11: hitotsu('画面11', GAMEN11 as readonly BlockKyotsu[], MADA11),
     画面12: hitotsu('画面12', GAMEN12 as readonly BlockKyotsu[], MADA12),
   };
+  /**
+   * ★★★【2026-09-14・決め1164】**門C** …… 節ごとに、1つ残らず落ちたかを見ます。
+   *   ★★`zuDeta`（描いた図の名前）は、★**いまは1つも描いていませんので空**です
+   *     （★`Chart10.tsx` を読み込んでいる本は0本・実測）。★繋ぐ回に `Screen10` が渡します。
+   */
+  const BLOCKS: Record<string, readonly BlockKyotsu[]> = {
+    画面9: GAMEN9 as readonly BlockKyotsu[],
+    '画面9 詳細': GAMEN9shosai as readonly BlockKyotsu[],
+    画面10: GAMEN10 as readonly BlockKyotsu[],
+    画面11: GAMEN11 as readonly BlockKyotsu[],
+    画面12: GAMEN12 as readonly BlockKyotsu[],
+  };
+  for (const gamen of Object.keys(out)) {
+    // ★出さない画面（★`kara`）は、かたまりが1つも無いので見ません
+    if (gamen === '画面9 詳細' && !m.bun9s.dasu) continue;
+    monC(gamen, BLOCKS[gamen], a, out[gamen], zuDeta);
+  }
+  return out;
 }
 
 export function Screen9({ m }: { m: Moto912 }) { return <ScreenBlocks kumi={kumi912(m)['画面9']} />; }

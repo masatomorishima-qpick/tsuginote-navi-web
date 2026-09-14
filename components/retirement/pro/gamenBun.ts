@@ -136,6 +136,15 @@ export type Kumi = {
   karaOchi: number;
   /** 入れた印の数（か所） */
   ireta: number;
+  /**
+   * ★★★【2026-09-14・決め1164 門C】**`dasu` の1つ1つが、`blocks` の何番目だったか。**
+   *
+   * *   ★`dasu` は値を入れたあとのものですので、★**もとのどのかたまりかが、あとから分かりません**
+   *     （★`midashi` は `na` を持ちません）。
+   * *   ★★門C（節ごとに、1つ残らず落ちたかを見る門）は、この番号で突き合わせます。
+   * *   ★★★**字で見分けません**（★基準HTMLの文言を写さないためです）。
+   */
+  dasuIndex: number[];
 };
 
 /** かたまりに出てくる `{名前}` を、順番のまま全部拾う（重なりも数えます） */
@@ -240,6 +249,8 @@ export function kumitate(
 
   const gyouNashiSet = new Set(gyouNashi);
   const dasu: BlockKyotsu[] = [];
+  /** ★`dasu` に入れたかたまりが、`blocks` の何番目だったか（★決め1164 門C） */
+  const dasuIndex: number[] = [];
   const ochitaNa = new Set<string>();
   const nashiNa = new Set<string>();
   const gyouNashiNa = new Set<string>();
@@ -256,7 +267,8 @@ export function kumitate(
   const gyouOchiru = (s2: string) =>
     [...s2.matchAll(/\{([a-zA-Z0-9_]+)\}/g)].map((m) => m[1]).filter((x) => gyouNashiSet.has(x));
 
-  for (let b of blocks) {
+  for (let bi = 0; bi < blocks.length; bi++) {
+    let b = blocks[bi];
     // **先に、その方には無い行／項目を落とします**（かたまりごとではありません）
     if (b.kind === 'hyo') {
       const nokosu = b.gyou.filter((g) => {
@@ -349,18 +361,23 @@ export function kumitate(
     if (b.kind === 'hyo') {
       // ★`kazari`・`gyoKazari` は、**そのまま**運びます（★値を入れるのは `cells` だけです）
       dasu.push({ kind: 'hyo', gyou: b.gyou.map((g) => ({ cells: g.cells.map(ire), na: g.na, kazari: g.kazari, gyoKazari: g.gyoKazari })) });
+      dasuIndex.push(bi);
     } else if (b.kind === 'ret') {
       dasu.push({ kind: 'ret', koumoku: b.koumoku.map((k) => ({ bun: ire(k.bun), na: k.na })) });
+      dasuIndex.push(bi);
     } else if (b.kind === 'midashi') {
       dasu.push({ kind: 'midashi', lv: b.lv, bun: ire(b.bun) });
+      dasuIndex.push(bi);
     } else if (b.kind === 'kousin') {
       dasu.push({ kind: 'kousin', bun: ire(b.bun) });
+      dasuIndex.push(bi);
     } else {
       dasu.push({ kind: b.kind, bun: ire(b.bun), na: b.na });
+      dasuIndex.push(bi);
     }
   }
 
-  return { dasu,
+  return { dasu, dasuIndex,
            // ★★★決め1146(3) …… `ochitaNashiKime` は入れません
            ochita: ochitaMada + ochitaNashiNazo,
            ochitaMada, ochitaNashi, ochitaNashiKime, ochitaNashiNazo,

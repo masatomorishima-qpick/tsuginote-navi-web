@@ -623,6 +623,67 @@ export const SETSU: readonly Setsu[] = [
       { kind: 'hako', na: ['gurafu_ji'] },                                         // 囲み（1089行）
     ],
   },
+  /**
+   * ★★★【2026-09-14・決め1181・決め1186】**画面11の節 4つ**（★戦術Cowork 5節・3-1）。
+   *
+   * ★★★**どの節にも、`kubun_bun`／`ichiji_kubun_bun`／`zatsu_zero_bun` の段落は入れていません。**
+   *   ★理由（★228人で数えました）── ★★入れると門Cが「落ちすぎ」で鳴ります ──
+   *     ★退職の年の節に `kubun_bun` …… **184人**
+   *     ★一時金の節に `ichiji_kubun_bun` …… **58人**
+   *     ★年金の節に `zatsu_zero_bun` …… **170人**
+   *   ★★3つとも「2分の1にしない区分がある方」「公的年金等控除だけで引ききれる方」に出る
+   *     **ふつうの分岐**で、★節が在るか無いかとは**別のこと**です。
+   *   ★★見出しと表（と `nenkin_toshi_bun`）だけにすると、★**4つとも 残った0人／落ちすぎ0人**です。
+   *
+   * ★かたまりの名前の組は、★**抜き出した `gamen11.ts` から機械で取りました**（★手で写していません）。
+   */
+  {
+    /** ★退職の年の節 …… ★実測 `tai_gen` が `null` の方は **0人**（★戦術Cowork 3-1 のお尋ね） */
+    gamen: '画面11', na: '退職の年の節', daihyo: ['tai_gen'], zu: [],
+    katamari: [
+      { kind: 'midashi', na: ['tai_age', 'tai_gen'] },
+      { kind: 'hyo', na: ['jumin_taishoku', 'kojo', 'kojo_shiki', 'shotoku', 'shotokuzei_tai',
+        'shunyu', 'tai_gen', 'tai_hantei_bun', 'tai_uchiwake_bun'] },
+    ],
+  },
+  {
+    /** ★一時金の節 …… ★実測 `ichiji_gen` が `null` の方は **166人／228** */
+    gamen: '画面11', na: '一時金の節', daihyo: ['ichiji_gen'], zu: [],
+    katamari: [
+      { kind: 'midashi', na: ['ichiji_age', 'ichiji_gen'] },
+      { kind: 'hyo', na: ['ichiji_gen', 'ichiji_hantei_bun', 'ichiji_jumin', 'ichiji_kojo',
+        'ichiji_kojo_shiki', 'ichiji_shotoku', 'ichiji_shotokuzei', 'ichiji_shunyu'] },
+    ],
+  },
+  {
+    /**
+     * ★★**手数料の節** …… ★**代表なし**（★`daihyo` が空）＝「落ちない節」です。
+     *   ★★`daihyo` が空だと `ochiru` は必ず偽になりますので、★**1つでも落ちたら止まります**。
+     *
+     * ★★★**見出し「あなたの手数料」は、この一覧に入れていません。**
+     *   ★理由 …… ★この見出しには**印が1つもありません**ので、かたまりの見分け（`種類|名前の組`）が
+     *     ★★**`midashi|`（空）になり、画面11に2つあります**（★0番と13番）。
+     *   ★★★**2つ見つかると門Cはそこで止まります**ので、入れると誰も画面を見られません。
+     *   ★★印が1つも無い見出しは**誰にも落ちません**ので、★見張る値打ちがあるのは**表のほう**です。
+     *   ★★★**見出しも見張りたい場合は、そちらで見出しに印を入れてください**（★決め1181と同じ形）。
+     */
+    gamen: '画面11', na: '手数料の節', daihyo: [], zu: [],
+    katamari: [
+      { kind: 'hyo', na: ['koza_kei', 'koza_tanka', 'koza_tsuki', 'kyufu_kaisu', 'kyufu_kei', 'tesuryo'] },
+    ],
+  },
+  {
+    /** ★年金の節（★決め1181）…… ★実測 `nenkin_setsu_midashi` が `null` の方は **1人**（`seed 12`） */
+    gamen: '画面11', na: '年金の節', daihyo: ['nenkin_setsu_midashi'], zu: [],
+    katamari: [
+      { kind: 'midashi', na: ['nenkin_setsu_midashi'] },
+      { kind: 'hon', na: ['nenkin_toshi_bun'] },
+      { kind: 'hyo', na: ['hikazei_gendo', 'hoken_hantei_bun', 'hoken_kekka', 'jumin',
+        'jumin_hantei_bun', 'kojo_goukei', 'kojo_uchiwake', 'kokuho_kiso', 'kyuyo',
+        'nenkin_gen', 'nenkin_kojo', 'nenkin_kojo_kubun', 'nenkin_shunyu',
+        'setai_kubun', 'shotokuzei', 'zatsu'] },
+    ],
+  },
 ];
 
 /** かたまりに出てくる `{名前}`（★重なりを外し、並べ替えたもの） */

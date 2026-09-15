@@ -431,6 +431,19 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
    */
   const setai = setaiNoJi(p, k.kyuchiHabuita, HIHOKENSHA, KYUYO_SHOTOKUSHA);
   s4.addRow(['計算の全ステップ']).commit();
+  /**
+   * ★★★【2026-09-15・決め1233】**画面のことを言う2つの字を、ファイルには出しません**（★基準HTML 895行の覚え書き）。
+   *
+   * (1) ★`{an_bun}` の1文（「いま表示しているのは…**一覧で別の受け取り方を選ぶと**…切り替わります。」）
+   *     ── ★★**ファイルの中に「一覧で選ぶ」動きがありません。**★すぐ上の行に、その案の番号と名前が出ています。
+   *     ★★見分け方は**名前**です（★`na` に `an_bun` を持つかたまり）。★字で見分けません（★字は直る日に古びます）。
+   * (2) ★「**この画面の**根拠にした資料」（`kousin`）── ★案ごとに出さず、★**節の終わりに1回だけ**、
+   *     ★見出しを「**根拠にした資料**」（★`gamen8Bun()` の `konkyoShiryo`・基準HTML 896行）に替えて出します。
+   *     ★★資料の本文は**そのまま**です。★★★案ごとに字が違ったら止めます（★黙って1つだけ出しません）。
+   *
+   * ★★★画面11そのものの字は、**1文字も変えていません**（★v1.1・`tome.md` G）。★ファイルに入れるときだけです。
+   */
+  let shiryo: string | null = null;
   for (const a of anRows) {
     const r = R[a.i][1];
     const t = r.tesuryo_uchiwake;
@@ -446,10 +459,29 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
     s4.addRow([]).commit();
     s4.addRow([`番号 ${a.i + 1}`, a.x.lab]).commit();
     for (const blk of kumi.dasu) {
+      // ★決め1233(1) …… 「一覧で選ぶと切り替わる」の1文は、ファイルに出しません
+      if ((blk.kind === 'hako' || blk.kind === 'hon') && blk.na.includes('an_bun')) continue;
+      if (blk.kind === 'kousin') {
+        // ★決め1233(2) …… 資料は節の終わりに1回だけ。★案ごとに字が違ったら止めます
+        if (shiryo !== null && shiryo !== blk.bun) {
+          throw new Error('「根拠にした資料」の字が、案によって違います。1回にまとめられませんので止めます。');
+        }
+        shiryo = blk.bun;
+        continue;
+      }
       if (blk.kind === 'hyo') for (const g of blk.gyou) s4.addRow([...g.cells]).commit();
       else if (blk.kind === 'ret') for (const kk of blk.koumoku) s4.addRow(['', kk.bun]).commit();
       else s4.addRow([blk.bun]).commit();
     }
+  }
+  if (shiryo !== null) {
+    const ATAMA = 'この画面の根拠にした資料\n';
+    if (!shiryo.startsWith(ATAMA)) {
+      // ★見出しの字が変わった日に、黙って古い形で出さないための止めです
+      throw new Error('「この画面の根拠にした資料」で始まっていません。基準HTMLの画面11の見出しが変わっています。');
+    }
+    s4.addRow([]).commit();
+    s4.addRow([`${b.konkyoShiryo}\n${shiryo.slice(ATAMA.length)}`]).commit();
   }
 
   s4.addRow([]).commit();

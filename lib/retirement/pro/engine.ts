@@ -1454,6 +1454,51 @@ export interface EvalResult {
 /** この受け取り方をしたときに、公的年金だけの世界と比べて何円多く引かれるか
  *  baseCache : (p, year) にしか依存しない「公的年金だけの世界」の税をキャッシュする。
  *              build() の中で同じ q・同じ年が何千回も出るため。**計算結果は変わらない。** */
+/**
+ * ★★★**その案を測るときの「人」を返します**（★`build()` が `evaluate()` に渡すのと同じもの）。
+ *
+ * ★★【なぜ要るか・2026-09-15・開発Cowork】
+ *   ★`build()` は、★**案の⑳（公的年金を受け取り始める年齢）でその方を作り直してから**測ります
+ *     （★下の 1820行 …… `const q = nAge === p.koteki_kaishi_age ? p : p.withKotekiKaishiAge(nAge);`）。
+ *   ★★★**この作り直しを忘れて `evaluate(p, plan, …)` と書くと、★入力の⑳のままで測ります。**
+ *     ★★実測 …… ★こちらは `_shinkoku_sa.tsx`（★便14l の131人・99人）で**忘れました**。
+ *   ★★同じ4行が、いま**5か所**に写されています ──
+ *     `engine.ts` 1820行／`gamen8.ts` 205〜206行／`gamen9shosaiBun.ts` 281〜282行／
+ *     `gamen11Bun.ts` 570〜571行／`chart10.ts` 43行。
+ *   ★★★**写しが5つあれば、6つめを書く人は必ず忘れます。**★ここを正本にします。
+ *
+ * ★★`plan.nenkin_kaishi_age` が `null` のとき（★⑳を軸にしない案）は、★その方をそのまま返します。
+ */
+export function planNoHito(p: Jinbutsu, plan: Plan): Jinbutsu {
+  const nAge = plan.nenkin_kaishi_age;
+  if (nAge === null || nAge === undefined || nAge === p.koteki_kaishi_age) return p;
+  return p.withKotekiKaishiAge(nAge);
+}
+
+/**
+ * ★★★**確定申告で戻る額**（★戦術Cowork 決め1214・`senjutsu_20260915.md` 1節）。
+ *
+ * ★★式は**無料版と同じ**です（★`free.ts` 235行 `modoru: gs.zei - sh.zei`）。
+ *   ★`shinkoku = false` …… ★**所得税法87条2項を使わない**（★総所得から引ききれない所得控除を、
+ *     課税退職所得から差し引かない）＝ ★源泉徴収だけで終わらせた場合の税。
+ *   ★`shinkoku = true` …… ★確定申告をして精算した場合の税。
+ *   ★★その差が、★**確定申告をすると戻ってくる額**です。
+ *
+ * ★★★**向きは1方向です** …… ★`amari` は課税退職所得を下げるだけで、総合課税には触りません。
+ *   ★ですので **0 以上**にしかなりません（★実測でも250人・マイナス0人）。
+ *   ★★それでも `Math.max(0, …)` で丸めません ── ★**マイナスが出たら、それは直すべき知らせです**。
+ *
+ * @param p          その方（★入力のまま。★⑳の差し替えは、この本がします）
+ * @param plan       その案
+ * @param zeiShinkoku ★その案の**確定申告をした場合の税**（★`build()` が返した `EvalResult.zei`）。
+ *                   ★★**呼び出し側から渡します** ── ★ここでもう一度測ると、
+ *                     ★`build()` の答えとずれていても気づけません。
+ */
+export function modoruGaku(p: Jinbutsu, plan: Plan, zeiShinkoku: number): number {
+  const q = planNoHito(p, plan);
+  return evaluate(q, plan, false).zei - zeiShinkoku;
+}
+
 export function evaluate(p: Jinbutsu, plan: Plan, shinkoku = true,
                          kakekinByYear: Record<number, number> | null = null,
                          baseCache: Map<number, ZeiUchiwake> | null = null,

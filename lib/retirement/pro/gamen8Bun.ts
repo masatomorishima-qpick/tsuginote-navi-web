@@ -23,6 +23,14 @@ import type { Gamen8, Houkou } from './gamen8';
  */
 export const JI_SOEJI_ZEI = 'あなたの給与と公的年金はそのままにして、退職金とiDeCo等をこの受け取り方にしたときに、増える税金です。給与や公的年金にかかる税は、この額に入っていません';
 
+/**
+ * ★★★**「確定申告で戻る額」の見出しと添え字**（★戦術Cowork 決め1214・`senjutsu_20260915.md` 1-6）。
+ *   ★★字は**基準HTML 1252行から写しました**（★`tsuginote_gamen_base.html` 183,384バイト／`9a309ee9…`）。
+ *   ★★★**こちらで書き直さないこと。**★言い方は無料版（`Screen2.tsx` 100行）にそろえてあります。
+ */
+export const JI_MODORU = '確定申告で戻る額';
+export const JI_SOEJI_MODORU = '上の「この受け取り方で増える税金」と「あなたの手取り」は、あなたが確定申告をしたときの額です。確定申告をなさらないと、あなたの手取りはこの額だけ少なくなります。戻るのは翌年です';
+
 /** 金額。**表とカードは円**（§7-8） */
 export const y = (n: number): string => `${n.toLocaleString('en-US')}円`;
 
@@ -100,11 +108,18 @@ export function gamen8Bun(
     how: howOf(h.lab),
     hyo: [
       ['この受け取り方で増える税金', y(h.zei), JI_SOEJI_ZEI],
+      /**
+       * ★★★【2026-09-15・決め1214】**「あなたの手取り」のすぐ上**に置きます
+       *   （★基準HTML 1252〜1253行・★無料版 `Screen2.tsx` と同じ並びです）。
+       * ★★頭の「＋」は、★**戻ってくる向き**を字で言うためです（★基準HTMLの見本も「＋65,854円」）。
+       *   ★0円の方には「＋0円」とは書かず、★**「0円」**と出します（★実測 …… 250人のうち**105人**）。
+       */
+      [JI_MODORU, h.modoru > 0 ? `＋${y(h.modoru)}` : y(h.modoru), JI_SOEJI_MODORU],
       ['あなたの手取り', y(h.tedori)],
       ['最初の年に入る額', y(h.age0)],
       ['受け取り終わる年齢', `${h.owari}歳`],
       ['保険料・医療費', h.sakaime.length ? '上がる場合あり' : '変わりません'],
-    ] as [string, string][],
+    ] as [string, string, string?][],
   }));
 
   // ---- 差（2枚目のカードの後）----

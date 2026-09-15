@@ -148,6 +148,19 @@ export type Houkou = {
              shotoku: string; shotoku_gaku: number; gaku: number }[];
   /** 手取りがいちばん多い案との差。**先頭の方向は必ず0円** */
   sa: number;
+  /**
+   * ★★★**確定申告で戻る額**（★戦術Cowork 決め1214・`senjutsu_20260915.md` 1節）。
+   *
+   * ★★上の `zei` と `tedori` は、★**確定申告をしたときの額**です
+   *   （★`engine.ts` の `build()` が `evaluate(q, plan, **true**, …)` を呼びます。
+   *    ★★**行番号を書きません** ── ★本が伸びた日に、黙って別の行を指すからです）。
+   * ★★★確定申告をなさらないと、★**その方の手取りは、この額だけ少なくなります**。
+   * ★式は `engine.ts` の `modoruGaku()` が持ちます（★無料版 `free.ts` 235行の `modoru` と同じ）。
+   *   ★★**この本にも `Screen8.tsx` にも、式を持たせていません**（★§2の3）。
+   * ★0円のことがあります（★実測 …… 250人のうち**105人**。★いちばん上のカードの案で数えました）。★**0円でも行は出します**
+   *   ── ★「戻る額はありません」も、その方にとっては答えです（★後出しにしない）。
+   */
+  modoru: number;
 };
 
 export type Gamen8 = {
@@ -334,6 +347,14 @@ export function gamen8(p: E.Jinbutsu, genzaiNen: number,
         shotoku: s.shotoku, shotoku_gaku: s.shotoku_gaku, gaku: s.gaku,
       })),
       sa: saidai - g.x.tedori,
+      /**
+       * ★★★【2026-09-15・決め1214】**確定申告で戻る額。**
+       *   ★`E.modoruGaku()` が、★**案の⑳でその方を作り直してから**測ります
+       *     （★`engine.ts` `planNoHito()`。★ここで作り直しを書きません ── 写しが増えます）。
+       *   ★`g.x.zei` は `build()` が返した「確定申告をした場合の税」です（★測り直しません）。
+       *   ★★出るのは**カードの数だけ**（★1〜3回）ですので、★全通りは測りません。
+       */
+      modoru: E.modoruGaku(p, g.x.pl, g.x.zei),
     })),
     kado_su: houkou.length,
     mikata_zenbu: [...MIKATA],

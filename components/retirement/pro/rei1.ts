@@ -10,7 +10,7 @@
  * **実装側で計算し直しません**（指示書 §5-1-2 のお願い1）。
  * **割合の文（「◯%の方は◯円変わります」）は足しません**（同3。出どころに答えられません）。
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（180,674バイト ／ md5 f0699e820b8c28b6a8b79ad1a484ae11）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（183,384バイト ／ md5 9a309ee9369e242a302fc3765bf7941c）
  */
 
 export type Rei1 = {

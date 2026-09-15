@@ -41,6 +41,7 @@
 import * as E from './engine';
 import * as S from './sakaime';
 import * as Z from './zeisei';
+import { setaiNoJi } from './gamen11Atai';
 
 /** 円の表記（★`gamen10Bun.ts`・`gamen11Bun.ts` と同じ形） */
 const en = (n: number) => `${n.toLocaleString('en-US')}円`;
@@ -288,17 +289,22 @@ export function gamen9shosaiBun(
    *   （★`zeisei.ts` の `hikazeiGendo()` が、級地と扶養の人数の2つだけで額を決めているため）。
    * ★★★⑰を省いてお答えの方には「（お答えがないため）」を添えます（★決め1056）。
    */
-  const fuyou = p.fuyouKei();
-  const setaiKubun = `${fuyou === 0 ? '単身' : `扶養${fuyou}人`}・${p.kyuchi}級地`
-    + (kyuchiHabuita ? '（お答えがないため）' : '');
-  /** ★住民税の非課税限度額（★`sakaimeList()` の `hikazei` から読みます。★額を写しません） */
+  /**
+   * ★★★【2026-09-15・決め1231】**この2つの正本を `gamen11Atai.ts` に移しました。**
+   *   ★理由 …… ★この2つは**画面9詳細と画面11の両方**に出ます（★基準HTML 1137〜1138行）。
+   *     ★★Excel シート4に「計算の全ステップ」（＝画面11）を入れることになり、
+   *     ★★★`excel.ts` は**画面9詳細を作りません**ので、★この2つだけを取り出せる本が要りました。
+   *   ★★**ここで組み立て直しません**（★写しは、いつか片方だけ古びます・決め1219）。
+   */
+  const { setaiKubun, hikazeiGendo, hikazeiGaku, fuyou } =
+    setaiNoJi(p, kyuchiHabuita, hihokensha, kyuyoShotokusha);
+  /** ★軽減の基準（★`sakaimeList()` から読みます。★額を写しません） */
   const listHito = S.sakaimeList(hihokensha, kyuyoShotokusha, p.kyuchi, fuyou);
   const gakuOf = (key: string) => {
     const s = listHito.find((x) => x.key === key);
     if (!s) throw new Error(`\`sakaimeList()\` に ${key} が在りません。`);
     return s.gaku;
   };
-  const hikazeiGaku = gakuOf('hikazei');
   const kijun7 = gakuOf('keigen7'), kijun5 = gakuOf('keigen5'), kijun2 = gakuOf('keigen2');
 
   /** iDeCo等を受け取り始める年（★年金の案なら `nenkin_kaishi_nen`・一時金なら `uketori_nen`） */
@@ -337,7 +343,7 @@ export function gamen9shosaiBun(
   if (planA === null || planB === null) {
     return {
       dasu: false,
-      setai_kubun: setaiKubun, hikazei_gendo: en(hikazeiGaku),
+      setai_kubun: setaiKubun, hikazei_gendo: hikazeiGendo,
       ideco_zandaka: en(idecoGen.shunyu), koteki_kaishi_age: `${kijunAge}歳`,
       handan_a_bun: null, handan_b_bun: null, handan_c_bun: null,
       keigen_koeru_bun: null, keigen_kokuho_bun: null, jumin_koeru_bun: null,
@@ -562,7 +568,7 @@ export function gamen9shosaiBun(
   return {
     dasu: true,
     setai_kubun: setaiKubun,
-    hikazei_gendo: en(hikazeiGaku),
+    hikazei_gendo: hikazeiGendo,
     ideco_zandaka: en(idecoGen.shunyu),
     koteki_kaishi_age: `${kijunAge}歳`,
     handan_a_bun: handanA,

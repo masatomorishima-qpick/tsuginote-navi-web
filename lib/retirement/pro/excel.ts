@@ -10,7 +10,9 @@
  *                        番号・年・年齢・その年に手元に入る額（**額面**）・その年に納める税金・その年の手数料（1歳きざみの通し）
  *                        ★★案ごとに `合計` と `手取り` の2行（`入る額 − 税 − 手数料 ＝ 手取り`。★シート1の手取りと同じ数）。
  *                          ★案と案の間に空の行を1つ。★年の範囲は `nenNoHani()`（A-2a2）
- *   4 計算の内容と根拠　ご入力の28項目（ラベルは `PAID_FIELDS` の字・値は raw）＋ 根拠にした条文（`gamen13.ts`）。★「計算の全ステップ」は 9〜12 の便
+ *   4 計算の内容と根拠　ご入力の28項目（ラベルは `PAID_FIELDS` の字・値は raw）
+ *                        ＋ ★★★**計算の全ステップ**（★画面11のかたまり・シート3と同じ案ぶん・決め1231）
+ *                        ＋ 根拠にした条文（`gamen13.ts`）
  *
  * ★★ここに式はありません。数は全部 `D`・`R`・`Gamen8` から写すだけです
  *   （★1つだけ `engine.ts` の `modoruGaku()` を**呼び**ます ── ★シート2の「確定申告で戻る額」・決め1225。
@@ -36,6 +38,10 @@ import { PAID_FIELDS } from '@/components/retirement/pro/paidFields';
 import { GAMEN13 } from '@/components/retirement/pro/gamen13';
 import { hitogotoBun } from '@/components/retirement/pro/gamen13Bun';
 import { paidKou, ranWoHiku, type Kou } from './paidRules';
+import { gamen11Bun } from './gamen11Bun';
+import { atai11, gyouNashi11, setaiNoJi } from './gamen11Atai';
+import { GAMEN11, MADA_NA as MADA11 } from '@/components/retirement/pro/gamen11';
+import { kumitate } from '@/components/retirement/pro/gamenBun';
 
 /**
  * ★シート3の上に置く1行（戦術の字・senjutsu_20260903c.md 1番）。
@@ -54,6 +60,18 @@ export const JI_S2_SHINKOKU =
  */
 export const JI_S3_SOEJI =
   'あなたの給与と公的年金はそのままにして、退職金とiDeCo等をこの受け取り方にしたときに、その年に増える税金です。給与や公的年金にかかる税は、この額に入っていません';
+
+/**
+ * ★★★【2026-09-15・決め1231】**シート4の「計算の全ステップ」が渡す2つ**。
+ *
+ * ★★★**これは既定値ではありません。**★`paidInput.ts` に欄が**0か所**ですので、
+ *   ★**こちらが「1人」と決めて渡しています**（★`gamen8.ts` 248行・`_hakaru.tsx` 374行と**同じ数**です）。
+ * ★★★**欄ができた日は、ここを入力から渡してください**（★呼ばれる側に既定を置かないでください）。
+ */
+const HIHOKENSHA = 1;
+const KYUYO_SHOTOKUSHA = 1;
+/** ★iDeCo等の名前（★`kekka.ts` の `IDECO_NAME` と同じ字。★シート3の `ichijikinNoAn()` にも渡しています） */
+const IDECO_NAME = 'iDeCo等';
 
 /**
  * ★シート3が出す年の範囲（senjutsu_20260903c.md 5番・d.md 1番）。
@@ -289,6 +307,12 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
   s1.addRow([b.judge.hon.replace(/\n/g, '')]).commit();
   if (b.judge.hosoku) s1.addRow([b.judge.hosoku]).commit();
   s1.addRow([]).commit();
+  /**
+   * ★★★【2026-09-15・決め1230】**列名の上に1行**（★戦術Cowork 3節）。
+   *   ★字は `gamen8Bun()` の `modoruYokunen` が持ちます（★基準HTML 894行から1字1句写したもの）。
+   *   ★★シート2にも同じ所に入れます（★どちらにも「確定申告で戻る額」の列が在るためです）。
+   */
+  s1.addRow([b.modoruYokunen]).commit();
   s1.addRow([...RETSU_S1]).commit();
   for (const h of g8.houkou) {
     const row = D.find((x) => x.lab === h.lab);
@@ -320,6 +344,8 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
    *   ★★シート2には列を足していません ── ★**測って便に書きました**（★重さの数は便の3節）。
    */
   s2.addRow([JI_S2_SHINKOKU]).commit();
+  // ★★決め1230 …… ★「増える税金と手取りは…」の**次の行**（★戦術Cowork 3節）
+  s2.addRow([b.modoruYokunen]).commit();
   s2.addRow([...RETSU_S2]).commit();
   /**
    * ★★★【2026-09-15・決め1225】**全通りに「確定申告で戻る額」を出します。**
@@ -351,7 +377,7 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
   // ---- 3 年ごとの内訳（★この便では2本）
   const s3 = wb.addWorksheet('年ごとの内訳');
   const ketsuron = D.find((x) => x.lab === g8.houkou[0]?.lab) ?? null;
-  const ichiji = ichijikinNoAn(k, 'iDeCo等');
+  const ichiji = ichijikinNoAn(k, IDECO_NAME);
   const an = [ketsuron, ichiji].filter((x): x is Row => x !== null);
   const seen = new Set<Row>();
   const anRows = an.filter((x) => { if (seen.has(x)) return false; seen.add(x); return true; })
@@ -383,6 +409,49 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
   const s4 = wb.addWorksheet('計算の内容と根拠');
   s4.addRow(['ご入力の内容']).commit();
   for (const [l, val] of nyuryokuNoGyou(paidKou(k.kekka.genzaiNen), raw)) s4.addRow([l, val]).commit();
+  s4.addRow([]).commit();
+
+  /**
+   * ★★★【2026-09-15・決め1231】**計算の全ステップ**（★戦術Cowork `senjutsu_20260915e.md` 1節）。
+   *
+   * ★★【なぜ入れるか】…… ★基準HTMLの「ファイルの中身」の4行目は、★**4画面ともこう約束しています** ──
+   *   「4　計算の内容と根拠 ｜ あなたがご入力になった内容、**計算の全ステップ**、根拠にした条文」。
+   *   ★★★**ところが、この本には1行も入っていませんでした**（★戦術Coworkが本を開いて見つけられました）。
+   *
+   * ★★【何を出すか】…… ★**画面11のかたまり**（`GAMEN11`）に、`gamen11Bun()` の値を入れたもの。
+   *   ★★字は**基準HTMLのまま**です（★`gamen11.ts` は `gamen_chushutsu.mjs` が機械で抜き出したもの）。
+   *   ★★★**ここに式はありません** …… ★当てはめは `gamen11Atai.ts` の `atai11()` が持ちます（★正本）。
+   *
+   * ★★【どの案を出すか】…… ★★**シート3と同じ案**（★`anRows`）です（★戦術Coworkの決め）。
+   *   ★利用者が、同じ案の「年ごとの内訳」と「計算の全ステップ」を並べて読めます。
+   *   ★案の番号（★シート2の「番号」）を見出しに添えます。
+   *
+   * ★★`setai_kubun`・`hikazei_gendo` は**画面9詳細と同じ字**です。
+   *   ★★★**画面9詳細は作りません**（★1案あたりが重くなります）── ★`setaiNoJi()` が正本です。
+   */
+  const setai = setaiNoJi(p, k.kyuchiHabuita, HIHOKENSHA, KYUYO_SHOTOKUSHA);
+  s4.addRow(['計算の全ステップ']).commit();
+  for (const a of anRows) {
+    const r = R[a.i][1];
+    const t = r.tesuryo_uchiwake;
+    if (!t) throw new Error('`evaluate()` が `tesuryo_uchiwake` を返していません。');
+    const b11 = gamen11Bun(p, a.x.pl, r, g8.kijun.taishoku_age, IDECO_NAME);
+    const kumi = kumitate(GAMEN11, MADA11,
+      atai11({
+        bun11: b11, tesuryo: t, nenkinGen: IDECO_NAME,
+        taishokuAge: g8.kijun.taishoku_age,
+        setaiKubun: setai.setaiKubun, hikazeiGendo: setai.hikazeiGendo,
+      }),
+      gyouNashi11(t));
+    s4.addRow([]).commit();
+    s4.addRow([`番号 ${a.i + 1}`, a.x.lab]).commit();
+    for (const blk of kumi.dasu) {
+      if (blk.kind === 'hyo') for (const g of blk.gyou) s4.addRow([...g.cells]).commit();
+      else if (blk.kind === 'ret') for (const kk of blk.koumoku) s4.addRow(['', kk.bun]).commit();
+      else s4.addRow([blk.bun]).commit();
+    }
+  }
+
   s4.addRow([]).commit();
   s4.addRow(['根拠にした条文']).commit();
   for (const blk of GAMEN13) {

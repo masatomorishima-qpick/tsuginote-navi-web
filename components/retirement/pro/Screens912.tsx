@@ -45,6 +45,7 @@ import * as E from '@/lib/retirement/pro/engine';
 import type { IchiranGyou, IchiranMatome } from '@/lib/retirement/pro/ichiran';
 import { ritsuJi } from '@/lib/retirement/pro/gamen12Bun';
 import type * as E11 from '@/lib/retirement/pro/gamen11Bun';
+import { atai11, gyouNashi11 } from '@/lib/retirement/pro/gamen11Atai';
 import type * as E10 from '@/lib/retirement/pro/gamen10Bun';
 import type * as E9S from '@/lib/retirement/pro/gamen9shosaiBun';
 import { GAMEN9, MADA_NA as MADA9 } from './gamen9';
@@ -170,6 +171,17 @@ export function atai912(m: Moto912): Record<string, string | null> {
   const t = m.r.tesuryo_uchiwake;
   if (!t) throw new Error('`evaluate()` が `tesuryo_uchiwake` を返していません。');
   const out: Record<string, string | null> = {
+    /**
+     * ★★★【2026-09-15・決め1231】**画面11の48種類は `gamen11Atai.ts` が正本です。**
+     *   ★★**ここに写しを置きません。**★`excel.ts`（`server-only`）も同じ本を呼びます
+     *     ── ★この本は `'use client'` ですので、サーバーからは呼べません（★決め1219）。
+     *   ★`setai_kubun`・`hikazei_gendo` は画面9詳細と同じ字です（★`bun9s` から渡します）。
+     *   ★★手数料の行を落とすのは `gyouNashi11()`（★下の `gyouNashi912()` が呼びます）。
+     */
+    ...atai11({
+      bun11: m.bun11, tesuryo: t, nenkinGen: m.nenkinGen, taishokuAge: m.taishokuAge,
+      setaiKubun: m.bun9s.setai_kubun, hikazeiGendo: m.bun9s.hikazei_gendo,
+    }),
     // 画面10・画面9（表の中は `data-mada` があるので、実際には出ません）
     tedori: en(m.r.tedori),
     /**
@@ -178,21 +190,13 @@ export function atai912(m: Moto912): Record<string, string | null> {
      * **行を出すかどうかは `kyufu_gyou` / `koza_gyou` が決めます**（下の `gyouNashi912()`）。
      * ここでは値だけを作ります。**`null` のときも、いちおう文字にはしません。**
      */
-    kyufu_kaisu: `${t.kyufu_kaisu}回`,
-    kyufu_kei: en(t.kyufu_kei),
-    koza_tanka: t.koza_tanka === null ? null : en(t.koza_tanka),
-    koza_tsuki: t.koza_tsuki === null ? null : `${t.koza_tsuki}か月`,
-    koza_kei: t.koza_kei === null ? null : en(t.koza_kei),
-    tesuryo: en(t.kei),
     // 画面12
-    nenkin_gen: m.nenkinGen,
     /**
      * ★★★画面12の4つ（★戦術Cowork `senjutsu_20260909l.md`）。
      * ★★**ここでは字にするだけです。**★分岐も式もありません（★`gamen12Bun.ts` に在ります）。
      * ★（★`nenkin_kikan` は消しました ── ★基準HTML 1141行が `{uketori_katachi}` に変わり、
      *    ★★`nenkin_kikan` の印は**基準HTMLに0か所**になりました・決め1023）
      */
-    tai_age: `${m.taishokuAge}歳`,
     uketori_katachi: m.uketoriKatachi,
     gensen_ritsu: ritsuJi(m.gensenRitsu),
     nenkin_kaishi_age: `${m.nenkinKaishiAge}歳`,
@@ -219,24 +223,7 @@ export function atai912(m: Moto912): Record<string, string | null> {
      *   `data-mada` で残っているためです。★開発Coworkが**実際に `kumitate()` を回して**測りました
      *   （★16種類だけでも／24種類ぜんぶでも かたまり9・落ち3で**1つも変わりません**）。
      */
-    an_bun: m.bun11.an_bun,
-    kojo_shiki: m.bun11.kojo_shiki,
-    tai_hantei_bun: m.bun11.tai_hantei_bun,
-    shotokuzei_tai: en(m.bun11.shotokuzei_tai),
-    jumin_taishoku: en(m.bun11.jumin_taishoku),
-    nenkin_nashi_bun: m.bun11.nenkin_nashi_bun,
     /** ★★★決め1181 …… 年金の節の見出し（★`null` の方は節ごと落ちます・門Cが見張ります） */
-    nenkin_setsu_midashi: m.bun11.nenkin_setsu_midashi,
-    nenkin_toshi_bun: m.bun11.nenkin_toshi_bun,
-    kyuyo: en(m.bun11.kyuyo),
-    kojo_uchiwake: m.bun11.kojo_uchiwake,
-    kojo_goukei: en(m.bun11.kojo_goukei),
-    jumin: en(m.bun11.jumin),
-    jumin_hantei_bun: m.bun11.jumin_hantei_bun,
-    kokuho_kiso: en(m.bun11.kokuho_kiso),
-    hoken_hantei_bun: m.bun11.hoken_hantei_bun,
-    hoken_kekka: m.bun11.hoken_kekka,
-    zatsu_zero_bun: m.bun11.zatsu_zero_bun,
     /**
      * ★★★2本目の表の9種類（★戦術Cowork `senjutsu_20260912g.md` 3節・決め1101）。
      *
@@ -247,35 +234,19 @@ export function atai912(m: Moto912): Record<string, string | null> {
      * ★★★**41人／250（16.4%）に、最大 6,195,000円の退職所得と 1,448,041円の税**が、
      *   ★この表が入るまで、計算過程の画面に1円も出ていませんでした。
      */
-    ichiji_gen: m.bun11.ichiji_gen,
-    ichiji_age: m.bun11.ichiji_age,
-    ichiji_kojo_shiki: m.bun11.ichiji_kojo_shiki,
-    ichiji_kojo: enKa(m.bun11.ichiji_kojo),
-    ichiji_shunyu: enKa(m.bun11.ichiji_shunyu),
-    ichiji_hantei_bun: m.bun11.ichiji_hantei_bun,
-    ichiji_shotoku: enKa(m.bun11.ichiji_shotoku),
-    ichiji_shotokuzei: enKa(m.bun11.ichiji_shotokuzei),
-    ichiji_jumin: enKa(m.bun11.ichiji_jumin),
     /**
      * ★★★区分の1文（★戦術Cowork `senjutsu_20260913.md` 3節・決め1107）。
      *   ★「収入」「控除」「退職所得」の3行が `（収入 − 控除）÷ 2 ＝ 退職所得` にならない方に出します
      *     （★実測 1本目 66人／250・2本目 5人／78）。★合う方は `null`＝かたまりごと落ちます。
      */
-    kubun_bun: m.bun11.kubun_bun,
-    ichiji_kubun_bun: m.bun11.ichiji_kubun_bun,
     /**
      * ★★★回3の2種類（★決め1113）。★画面10（993行）と画面11（1109・1112行）に出ます。
      *   ★`tai_uchiwake_bun` は**1本だけの方に `null`** ＝ **その行だけ**が落ちます。
      */
-    tai_gen: m.bun11.tai_gen,
-    tai_uchiwake_bun: m.bun11.tai_uchiwake_bun,
     /**
      * ★★★この3つは `data-mada` が1度も付いていませんでしたが、**渡す所が0か所**でした。
      *   ★`{tai_gen}` の `data-mada` が外れて表が出るようになり、★`kumitate()` が止めて分かりました。
      */
-    kojo: en(m.bun11.kojo),
-    shunyu: en(m.bun11.shunyu),
-    shotoku: en(m.bun11.shotoku),
     /**
      * ★★★回3の画面10・18種類（★戦術Cowork `senjutsu_20260913b.md`）。
      *
@@ -313,11 +284,6 @@ export function atai912(m: Moto912): Record<string, string | null> {
      *   ★★**`data-mada` は1度も付いていませんでしたが、渡す所が0か所**でした。
      *   ★`nenkin_kojo` は**引く数**ですので、★**符号はここで付けます**（★見本「−600,000円」）。
      */
-    nenkin_shunyu: en(m.bun11.nenkin_shunyu),
-    nenkin_kojo_kubun: m.bun11.nenkin_kojo_kubun,
-    nenkin_kojo: m.bun11.nenkin_kojo === null ? null : enFu(-m.bun11.nenkin_kojo),
-    zatsu: en(m.bun11.zatsu),
-    shotokuzei: en(m.bun11.shotokuzei),
     nensu: m.bun11.nensu,
     /**
      * ★★★回4の画面9詳細・42種類（★戦術Cowork `senjutsu_20260913f.md` 4-3）。
@@ -380,8 +346,6 @@ export function atai912(m: Moto912): Record<string, string | null> {
      *   ★ですので `gamen9shosaiBun()` は、★**出す相手でない方にも必ず返します**
      *     （★`null` にすると、画面11の年金の表がまるごと落ちます）。
      */
-    setai_kubun: m.bun9s.setai_kubun,
-    hikazei_gendo: m.bun9s.hikazei_gendo,
     a_jumin_bun: m.bun9s.a_jumin_bun,
     b_jumin_bun: m.bun9s.b_jumin_bun,
   };
@@ -482,8 +446,8 @@ export function gyouNashi912(m: Moto912): string[] {
   const t = m.r.tesuryo_uchiwake;
   if (!t) throw new Error('`evaluate()` が `tesuryo_uchiwake` を返していません。');
   const out: string[] = [];
-  if (!t.kyufu_gyou) out.push('kyufu_tanka', 'kyufu_kaisu', 'kyufu_kei');
-  if (!t.koza_gyou) out.push('koza_tanka', 'koza_tsuki', 'koza_kei');
+  /** ★★決め1231 …… 手数料の行の正本は `gamen11Atai.ts` の `gyouNashi11()` です（★写しを置きません） */
+  out.push(...gyouNashi11(t));
   /**
    * ★★★確定申告（★戦術Cowork `senjutsu_20260908d.md` 4節の表）
    *

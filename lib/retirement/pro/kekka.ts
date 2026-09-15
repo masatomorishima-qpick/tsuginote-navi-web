@@ -34,6 +34,12 @@ export type Keisan = {
   D: Row[];
   g8: Gamen8;
   kekka: Kekka;
+  /**
+   * ★★★【2026-09-15・決め1231】⑰（お住まいの級地）を**省いてお答えになったか**（★決め1056）。
+   *   ★`toJinbutsu()` がすでに返しているものを、そのまま運びます（★ここで判じ直しません）。
+   *   ★★Excel シート4の「計算の全ステップ」が、★`setaiNoJi()` に渡します。
+   */
+  kyuchiHabuita: boolean;
   /** かかった時間（ms・build／zenToori／gamen8） */
   ms: { build: number; zenToori: number; gamen8: number };
 };
@@ -194,6 +200,8 @@ export function keisan(v: PaidInput, genzaiNen: number, now: Date): Keisan {
     //   ★★行は (ウ) でまとめたあとのものです（★決め999・決め1000・決め1001）
     ichiran: ichiranMatome(D, ICHIRAN_KENSU, NYURYOKU_AGE),
   };
-  return { p, taishokuNen: kumitate.taishokuNen, R, D, g8, kekka, ms: { build: msBuild, zenToori: msZen, gamen8: msG8 } };
+  return { p, taishokuNen: kumitate.taishokuNen, R, D, g8, kekka,
+           kyuchiHabuita: kumitate.kyuchiHabuita,
+           ms: { build: msBuild, zenToori: msZen, gamen8: msG8 } };
 }
 

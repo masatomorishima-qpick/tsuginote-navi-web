@@ -215,8 +215,18 @@ export function zenToori(R: [E.Plan, E.EvalResult][], p: E.Jinbutsu, uketoriNen:
    * **その案の⑳で所得を組み立てます。入力された⑳ではありません。**
    */
   const hoken = (pl: E.Plan) => {
-    const q = (pl.nenkin_kaishi_age === null || pl.nenkin_kaishi_age === p.koteki_kaishi_age)
-      ? p : p.withKotekiKaishiAge(pl.nenkin_kaishi_age);
+    /**
+     * ★★★【2026-09-15・決め1219】**`E.planNoHito()` に寄せました。**
+     *   ★前は、ここで4行を組み立て直していました（★`build()` と同じ形の写し）。
+     *   ★★★**写しは、いつか片方だけ古びます。**★正本は `engine.ts` の `planNoHito()` です。
+     *   ★★戦術Coworkが5か所を開いて数えてくださり、★**寄せられるのは3か所**でした
+     *     （★ここ／`gamen9shosaiBun.ts`／`gamen11Bun.ts`）。
+     *     ★のこる2か所（`engine.ts` の `build()`・`chart10.ts`）は、
+     *     ★★**案ではなく「年齢の数」を見ています**ので当たりません。
+     *   ★★★**この回に寄せたのは、ここ1か所だけ**です
+     *     （★`gamen9shosaiBun.ts`・`gamen11Bun.ts` は画面9詳細・画面11＝**v1.1**・`tome.md` G）。
+     */
+    const q = E.planNoHito(p, pl);
     const nen = E.nenkinByYear(q, pl);
     const ari: Record<number, E.Joukyou> = {}, nashi: Record<number, E.Joukyou> = {};
     for (let a = AGE_FROM; a <= AGE_TO; a++) {

@@ -56,14 +56,28 @@ function Gyo({ t }: { t: string }) {
   );
 }
 
-/** 「詳細を見る」の5行。**基準HTMLの並びのまま** */
-const MICHI: [Saki, string, string][] = [
-  ['ichiran', 'あなたの受け取り方の一覧', '並べ替えと絞り込みで探す'],
-  ['hikaku', '受け取り方の比較', '図で見る、手取りと時期の差'],
-  ['keisan', 'あなたの税金の計算過程', '1円まで追える全ステップ'],
-  ['tetsuzuki', 'あなたの手続き', 'いつ何をすればよいか'],
-  ['konkyo', 'この計算の根拠', '使った法令と、入れていないもの'],
+/**
+ * 「詳細を見る」の行。**字と並びは基準HTMLのまま**（★消していません）。
+ *
+ * ★★★【2026-09-15・決め1236】**v1 では `dasu: true` の行だけを出します。**
+ *   ★★理由 …… ★`PaidApp.tsx` が受けるのは `konkyo` **1つだけ**です。
+ *     ★ほかの4行は、★★**押しても何も起きません**。
+ *   ★★★**押しても何も起きない道を、画面に出さない**（★戦術Cowork 決め1236）。
+ *     ★「あとで作ります」は、★利用者には見えません。
+ *   ★★v1.1 で画面9〜12を繋ぐ日に、★**その行の `dasu` を `true` にしてください**
+ *     （★字を書き直さずに済むように、★消さずに残しています）。
+ *
+ * ★★★**下の `MICHI_ZENBU` は、`kensa/gamen8_michi_mon.tsx` が読みます**
+ *   （★出している行の先が、ぜんぶ `PaidApp.tsx` の `onSusumu` で受けられているか）。
+ */
+export const MICHI_ZENBU: { saki: Saki; na: string; sub: string; dasu: boolean }[] = [
+  { saki: 'ichiran', na: 'あなたの受け取り方の一覧', sub: '並べ替えと絞り込みで探す', dasu: false },
+  { saki: 'hikaku', na: '受け取り方の比較', sub: '図で見る、手取りと時期の差', dasu: false },
+  { saki: 'keisan', na: 'あなたの税金の計算過程', sub: '1円まで追える全ステップ', dasu: false },
+  { saki: 'tetsuzuki', na: 'あなたの手続き', sub: 'いつ何をすればよいか', dasu: false },
+  { saki: 'konkyo', na: 'この計算の根拠', sub: '使った法令と、入れていないもの', dasu: true },
 ];
+const MICHI = MICHI_ZENBU.filter((x) => x.dasu);
 
 export default function Screen8({ b, pattern, onSusumu, onDownload, downloadMatteiru = false, downloadBun }: Props) {
   // §8-3。`pattern` は `gamen8()` の `kado_su` をそのまま渡してください（画面で数えない）
@@ -222,13 +236,18 @@ export default function Screen8({ b, pattern, onSusumu, onDownload, downloadMatt
         </tbody>
       </table>
       <p className="mt-2 text-[13px] leading-relaxed text-[#5b6470]">
-        Excel（.xlsx）です。表計算ソフトをお持ちでない場合のために、同じ内容のPDFも一緒にお渡しします。
+        {/* ★★★決め1248（2026-09-15）。★前は「表計算ソフトをお持ちでない場合のために、同じ内容のPDFも一緒に
+            お渡しします。」でした。★★決め1201で「PDFは作りません」と決まり、決め1216で基準HTMLの4か所も
+            直っていましたが、★★★**この1行だけが古いまま残っていました**（★基準HTMLの「PDF」は0か所）。
+            ★19,800円をお支払いになった方に、**作らないものをお渡しすると書いていました**。
+            ★いまは基準HTML 891行から1字1句写しています。 */}
+        Excel（.xlsx）です。表計算ソフトをお持ちでない方も、この画面は、お送りするメールのリンクから、ご購入から1年のあいだ何度でもお開きになれます。
       </p>
 
       {/* ---- 詳細を見る ---- */}
       <h2 className="mt-8 text-[19px] font-bold text-slate-900">詳細を見る</h2>
       <div className="mt-3">
-        {MICHI.map(([saki, na, sub]) => (
+        {MICHI.map(({ saki, na, sub }) => (
           <button
             key={saki}
             type="button"

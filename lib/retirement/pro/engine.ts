@@ -1504,10 +1504,25 @@ export function planNoHito(p: Jinbutsu, plan: Plan): Jinbutsu {
  * @param zeiShinkoku ★その案の**確定申告をした場合の税**（★`build()` が返した `EvalResult.zei`）。
  *                   ★★**呼び出し側から渡します** ── ★ここでもう一度測ると、
  *                     ★`build()` の答えとずれていても気づけません。
+ *
+ * ★★★【2026-09-15・決め1225】**キャッシュを2つ受け取れるようにしました**
+ *   （★Excelのシート2で、★**全通り**に対して呼ぶことになったためです）。
+ *   ★画面8は1〜3回しか呼びませんので、★渡さないまま（`null`）で結構です（★実測2枚で1ms）。
+ *
+ * @param baseCache ★「公的年金だけの世界」の税のキャッシュ。★**年（`y`）だけを鍵にしています**ので、
+ *   ★★★**その方（＝⑳）ごとに、別の `Map` を渡してください。**
+ *     ★★1つを使い回すと、★**別の⑳の答えが静かに返ります**（★`build()` も⑳ごとに作っています）。
+ *   ★★あわせて、★**`shinkoku` の違うものと混ぜないでください**（★下の `evaluate()` は
+ *     `shinkoku` を見て `nenkanZeiUchiwake()` を呼び、その戻りをこの `Map` に入れます）。
+ *     ★この本は `shinkoku = false` でしか呼びませんので、★`build()` のキャッシュを渡さないでください。
+ * @param taiCache ★退職所得のキャッシュ。★**⑳に依存しません**（★鍵に `p` が入っていません）ので、
+ *   ★1つを全部で使い回せます。
  */
-export function modoruGaku(p: Jinbutsu, plan: Plan, zeiShinkoku: number): number {
+export function modoruGaku(p: Jinbutsu, plan: Plan, zeiShinkoku: number,
+                           baseCache: Map<number, ZeiUchiwake> | null = null,
+                           taiCache: Map<string, [Record<number, number>, KeikaRow[]]> | null = null): number {
   const q = planNoHito(p, plan);
-  return evaluate(q, plan, false).zei - zeiShinkoku;
+  return evaluate(q, plan, false, null, baseCache, taiCache).zei - zeiShinkoku;
 }
 
 export function evaluate(p: Jinbutsu, plan: Plan, shinkoku = true,

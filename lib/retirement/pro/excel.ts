@@ -12,7 +12,9 @@
  *                          ★案と案の間に空の行を1つ。★年の範囲は `nenNoHani()`（A-2a2）
  *   4 計算の内容と根拠　ご入力の28項目（ラベルは `PAID_FIELDS` の字・値は raw）＋ 根拠にした条文（`gamen13.ts`）。★「計算の全ステップ」は 9〜12 の便
  *
- * ★★ここに式はありません。数は全部 `D`・`R`・`Gamen8` から写すだけです。
+ * ★★ここに式はありません。数は全部 `D`・`R`・`Gamen8` から写すだけです
+ *   （★1つだけ `engine.ts` の `modoruGaku()` を**呼び**ます ── ★シート2の「確定申告で戻る額」・決め1225。
+ *    ★★式は `engine.ts` が持ちます）。
  * ★保険料の字は画面9の2つ（`保険料は変わりません`／`◯歳から保険料が上がる場合があります`）。金額は出しません。
  * ★シート2に「番号」の列を先頭に足しています（★シート3の「番号」が指す先。仕様の列に無い1列・便に書きます）。
  * ★道具は exceljs（MIT・4.4.0）。★書式なし・共有文字列なし（stream）。この本だけが読み込みます（`server-only`）。
@@ -24,7 +26,12 @@ import ExcelJS from 'exceljs';
 import type { Keisan } from './kekka';
 import type { PaidInput } from './paidInput';
 import type { Row } from './gamen8';
-import type * as E from './engine';
+/**
+ * ★★★【2026-09-15・決め1225】**`import type` をやめました。**
+ *   ★シート2の「確定申告で戻る額」で `E.modoruGaku()` を**呼ぶ**ようになったためです。
+ *   ★★**式はこの本に持ちません**（★§2の3）── ★呼ぶだけです。
+ */
+import * as E from './engine';
 import { PAID_FIELDS } from '@/components/retirement/pro/paidFields';
 import { GAMEN13 } from '@/components/retirement/pro/gamen13';
 import { hitogotoBun } from '@/components/retirement/pro/gamen13Bun';
@@ -182,8 +189,14 @@ export const DASHITE_INAI: Record<string, string> = {
  */
 const RETSU_S1 = ['あなたの受け取り方', 'この受け取り方で増える税金（円）', '確定申告で戻る額（円）',
   'あなたの手取り（円）', '保険料・医療費', '見方'] as const;
-const RETSU_S2 = ['番号', 'あなたの受け取り方', 'この受け取り方で増える税金（円）', 'あなたの手取り（円）',
-  '最初の年に入る額（円）', '受け取り終わる年齢', '保険料・医療費'] as const;
+/**
+ * ★★★【2026-09-15・決め1225】**「確定申告で戻る額（円）」を1つ足しました**（★戦術Cowork お願い1）。
+ *   ★字は**基準HTMLの行名から写しました**（★画面9のカードの行名「確定申告で戻る額」・決め1208）。
+ *   ★★**シート1の列名と1字1句そろえています**（★上の `RETSU_S1` の3つめ）。
+ *   ★並びも**シート1と同じ**にしました（★「増える税金」の次・「手取り」の前）。
+ */
+const RETSU_S2 = ['番号', 'あなたの受け取り方', 'この受け取り方で増える税金（円）', '確定申告で戻る額（円）',
+  'あなたの手取り（円）', '最初の年に入る額（円）', '受け取り終わる年齢', '保険料・医療費'] as const;
 const RETSU_S3 = ['番号', '年', '年齢', 'その年に手元に入る額（円）', 'その年に増える税金（円）',
   'その年の手数料（円）'] as const;
 
@@ -284,15 +297,19 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
       2, 3, 4).commit();
   }
   /**
-   * ★★★【2026-09-15・決め1223】**表のあとに、2行**（★戦術Cowork お願い4「Excelと画面に入れてください」）。
-   *   ★字は `gamen8Bun()` の `nokoranai` が持ちます（★基準HTML 892行から1字1句写したもの）。
-   *   ★★**1行に1つの文**（★決め1207）。
-   *   ★★★**置き場所はこちらで決めました** …… ★シート1の表のすぐ下。
-   *     ★理由 …… ★この2行は「このファイル」のことを言っていますので、★**ファイルの1枚目**に置きました。
-   *     ★違う所がよろしければ、便にお書きください（★動かすのは1か所です）。
+   * ★★★【2026-09-15・決め1227】**表のあとに、2行**（★置き場所はシート1の表の下のまま・戦術Cowork 3-3）。
+   *
+   * ★★★【前の回からの直し】…… ★前は `b.nokoranai`（★画面8と**同じ字**）を入れていました。
+   *   ★★**これは戦術Coworkの誤った指示で、こちらがそのまま入れたものです**（★お尋ね3でお尋ねしていました）。
+   *   ★★★なぜ誤りか …… ★`nokoranai` の2文めは「**先にこのファイルをダウンロードしてください**」です。
+   *     ★★**このファイルを開いておられる方は、もうダウンロードなさっています。**★当たりません。
+   *   ★いまは `b.nokoranaiFile`（★基準HTML 893行）＝「**このファイルは、計算し直しても、お手元に残ります**」。
+   *
+   * ★★決め1227 …… **同じことを、画面とファイルに同じ字で出さない。**
+   * ★★**1行に1つの文**（★決め1207）。
    */
   s1.addRow([]).commit();
-  for (const x of b.nokoranai) s1.addRow([x]).commit();
+  for (const x of b.nokoranaiFile) s1.addRow([x]).commit();
   s1.commit();
 
   // ---- 2 受け取り方の一覧（全通り）
@@ -304,8 +321,30 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
    */
   s2.addRow([JI_S2_SHINKOKU]).commit();
   s2.addRow([...RETSU_S2]).commit();
+  /**
+   * ★★★【2026-09-15・決め1225】**全通りに「確定申告で戻る額」を出します。**
+   *
+   * ★★★**式はここに在りません。**★`engine.ts` の `modoruGaku()` が持ちます（★§2の3）。
+   * ★ここがするのは、★**キャッシュの入れ物を⑳ごとに分けて渡すこと**だけです。
+   *
+   * ★★【なぜ⑳ごとか】…… ★`baseCache` は**年だけを鍵**にしていますので、
+   *   ★★★**1つにまとめると、別の⑳の答えが静かに返ります**（★`engine.ts` の覚え書き）。
+   *   ★`taiCache` は⑳に依存しませんので、★1つで足ります。
+   * ★★【なぜ `x.zei` を渡すか】…… ★`x.zei` は `build()` が返した**確定申告をした場合の税**そのものです
+   *   （★`gamen8.ts` `zenToori()` が `r.zei` を写しています）。★ここで測り直しません。
+   * ★★★【`D` と `R` の並び】…… ★`zenToori()` は `for (const [pl, r] of R)` で**1つずつ**積みますので、
+   *   ★`D[i]` と `R[i]` は同じ案です。★★**探しに行きません**（★41,216通りで `indexOf` を呼ぶと、
+   *   ★★★総当たりになります ── ★これは器の写しでこちらがしていた誤りです。★便に書きました）。
+   */
+  const taiCache = new Map<string, [Record<number, number>, E.KeikaRow[]]>();
+  const baseCaches = new Map<number, Map<number, E.ZeiUchiwake>>();
   D.forEach((x, i) => {
-    okane(s2.addRow([i + 1, x.lab, x.zei, x.tedori, x.age0, x.owari, hokenNoJi(x)]), 3, 4, 5).commit();
+    const nAge = x.nenkin_age ?? p.koteki_kaishi_age;
+    let bc = baseCaches.get(nAge);
+    if (!bc) { bc = new Map(); baseCaches.set(nAge, bc); }
+    const modoru = E.modoruGaku(p, x.pl, x.zei, bc, taiCache);
+    okane(s2.addRow([i + 1, x.lab, x.zei, modoru, x.tedori, x.age0, x.owari, hokenNoJi(x)]),
+      3, 4, 5, 6).commit();
   });
   s2.commit();
 

@@ -35,7 +35,22 @@ import { kekkaKa, type Kekka } from '@/lib/retirement/pro/kekkaKata';
 const BUN = {
   matteiru: '計算しています。そのままお待ちください。この画面を閉じないでください。',
   shippai: '計算できませんでした。しばらくたってから、もう一度「計算結果を見る」を押してください。それでも計算できないときは、info@blueadventures.jp までご連絡ください。',
-  excelMatteiru: 'ファイルを作っています。そのままお待ちください。',
+  /**
+   * ★★★【2026-09-15・決め1222】**戦術Coworkが `tome.md` B の「`PaidApp.tsx` を触らない」を、
+   *   ★この1つの字だけ、明示に解かれました**（★`senjutsu_20260915c.md` 4-1）。
+   *
+   * ★★【なぜ直すか】…… ★前は「ファイルを作っています。そのままお待ちください。」だけで、
+   *   ★★**何通り計算しているかも、時間がかかることも、出ていませんでした**。
+   *   ★★★実測 …… ★41,216通りの方は、ボタンを押してから**18秒以上**かかります。
+   * ★★字は**基準HTML 891行から1字1句写しました**（★`tsuginote_gamen_base.html` 187,926／`67b25af7…`）。
+   * ★★★**秒数（「◯秒ほどかかります」）は、まだ書きません**（★Vercel で測っていません・決め1222）。
+   *
+   * ★★★**通り数は、こちらで組み立てていません。**★`gamen8Bun()` が作った字
+   *   （`Bun8.toorisuJi`）を、そのまま受け取ります（★§2の3・実装側に式を持たせない）。
+   */
+  excelMatteiru: (toorisuJi: string) =>
+    `あなたの${toorisuJi}をすべて計算して、ファイルにまとめています。`
+    + '少し時間がかかります。この画面を閉じないでください。',
   kigen: (k: string) => `ご利用いただける期間は、${k}までです。`,
   // 【2026-09-03・A-2a3（senjutsu_20260903g.md 2番）】森嶋さんの決めで「入力を変更する」に。
   //   ★「ご入力の内容を直す」（A-2a）→「入力した内容を変える」（A-2a2）→「入力を変更する」（A-2a3）。
@@ -203,7 +218,9 @@ export default function PaidApp({ genzaiNen, kigen, inputs, kekka: kekkaMoto }: 
           }}
           onDownload={onDownload}
           downloadMatteiru={excelMatteiru}
-          downloadBun={BUN.excelMatteiru}
+          // ★★★決め1222 …… 字が通り数を受け取る形になりましたので、この1行も動いています
+          //   （tome.md B の解きは BUN.excelMatteiru の1つでしたので、便に書きました）
+          downloadBun={BUN.excelMatteiru(kekka.bun8.toorisuJi)}
         />
       </div>
 

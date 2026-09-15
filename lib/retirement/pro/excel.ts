@@ -283,6 +283,16 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
     okane(s1.addRow([h.lab, h.zei, h.modoru, h.tedori, row ? hokenNoJi(row) : '', h.mikata.join('／')]),
       2, 3, 4).commit();
   }
+  /**
+   * ★★★【2026-09-15・決め1223】**表のあとに、2行**（★戦術Cowork お願い4「Excelと画面に入れてください」）。
+   *   ★字は `gamen8Bun()` の `nokoranai` が持ちます（★基準HTML 892行から1字1句写したもの）。
+   *   ★★**1行に1つの文**（★決め1207）。
+   *   ★★★**置き場所はこちらで決めました** …… ★シート1の表のすぐ下。
+   *     ★理由 …… ★この2行は「このファイル」のことを言っていますので、★**ファイルの1枚目**に置きました。
+   *     ★違う所がよろしければ、便にお書きください（★動かすのは1か所です）。
+   */
+  s1.addRow([]).commit();
+  for (const x of b.nokoranai) s1.addRow([x]).commit();
   s1.commit();
 
   // ---- 2 受け取り方の一覧（全通り）

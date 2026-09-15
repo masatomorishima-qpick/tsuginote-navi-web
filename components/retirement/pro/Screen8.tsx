@@ -197,6 +197,14 @@ export default function Screen8({ b, pattern, onSusumu, onDownload, downloadMatt
       {downloadMatteiru && downloadBun ? (
         <p className="mt-2 text-base leading-relaxed text-slate-800">{downloadBun}</p>
       ) : null}
+      {/* ★★★【2026-09-15・決め1223】**ボタンのすぐ下**（★基準HTML 892行と同じ並び）。
+          ★字は `gamen8Bun()` が持ちます（★ここに式も字も置きません・§2の3）。
+          ★★**待っている間だけでなく、いつも出します** ── ★押す前に読めなければ意味がありません。 */}
+      <div className="mt-2">
+        {b.nokoranai.map((x, i) => (
+          <p key={i} className="text-[13px] leading-relaxed text-[#5b6470]">{x}</p>
+        ))}
+      </div>
       <table className="mt-4 w-full text-base">
         <thead>
           <tr className="border-b border-slate-300 text-left">

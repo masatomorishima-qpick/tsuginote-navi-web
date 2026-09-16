@@ -53,8 +53,12 @@ export function hantei(taishokukin: number, kinzokuNensu: number, zandaka: numbe
                kw: Partial<Hantei> = {}): Hantei =>
     ({ branch, riyu, sa, keikoku, ...kw });
 
+  // ★★★2026-09-16・決め1264（★戦術Cowork `senjutsu_20260915l.md` 1-3）
+  //   ★前 …… 「あなたにiDeCo・企業型DC・**小規模企業共済**がないため、…」
+  //   ★★★**小規模企業共済だけをお持ちの方は、「お持ちでも」ここへ来ます**（★③が0円になるため）。
+  //     ★★「小規模企業共済が**ない**ため」と書くと、★★★**在れば通ると読めます。★通りません。**
   if (zandaka <= 0 || kanyuNensu <= 0)
-    return out('対象外', 'あなたにiDeCo・企業型DC・小規模企業共済がないため、比べる受け取り方がありません');
+    return out('対象外', 'あなたにiDeCo・企業型DCがないため、比べる受け取り方がありません');
   if (taishokukin <= 0)
     return out('対象外', 'あなたに退職金がないため、比べる受け取り方がありません');
 

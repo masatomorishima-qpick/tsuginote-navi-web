@@ -106,9 +106,29 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
 
   return (
     <div>
+      {/*
+        ★★★2026-09-16・決め1263（★戦術Cowork `senjutsu_20260915l.md` 1-1・戦略Coworkのお決め）
+          ★前 …… 「退職金とiDeCoの受け取り方で、あなたの手取りは**これだけ変わります**」
+          ★理由(1) …… ★「これだけ変わります」は**変わることを断定**しています。
+            ★★実測 …… ★差は 0円〜812,617円で、★**5条件中1条件が0円**でした。
+          ★理由(2) …… ★「退職金とiDeCo」は**企業型DCの方を呼びません**。
+          ★★基準HTML 552行から1字1句写しています。
+      */}
       <h1 className="text-[26px] font-bold leading-tight text-slate-900 sm:text-[30px]">
-        退職金とiDeCoの受け取り方で、あなたの手取りはこれだけ変わります
+        退職金・iDeCo・企業型DCの受け取り方で、あなたの手取りはいくら変わるか
       </h1>
+
+      {/*
+        ★★★2026-09-16・決め1263（★戦術Cowork `senjutsu_20260915l.md` 1-2）── ★**副題**です。
+          ★★**見出しのすぐ下**に置きます。★基準HTML **554行**から1字1句写しています。
+          ★★★便k の副題（「退職金・iDeCo・企業型DC・公的年金を、いつ・どの形で受け取るか。／
+            全通り計算して、手取りを比べます。」）は、★**入れません**（★戦術Cowork `senjutsu_20260916.md` 1-1）。
+            ★理由 …… ★見出しと副題で「退職金・iDeCo・企業型DC」が2回出ます。
+          ★★基準HTMLは `<p class="hon"><b>…</b></p>`（★**本文・太字**）です。
+      */}
+      <p className="mt-4 text-base font-bold leading-relaxed text-slate-900">
+        公的年金を受け取り始める年齢も変えて、全通りを計算します。
+      </p>
 
       <p className="mt-4 text-base leading-relaxed text-slate-800">
         退職所得控除の<b className="font-bold">2026年（令和8年）改正</b>に対応しています。

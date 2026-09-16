@@ -246,7 +246,15 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
       <div data-block-start="notfor" className="mt-6 rounded-xl border border-[#c2841e] bg-[#fdf6e7] p-4">
         <b className="text-base font-bold leading-relaxed text-slate-900">次の場合は、有料版ではお役に立てません。</b>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-base leading-relaxed text-slate-900">
-          <li>iDeCo・企業型DC・小規模企業共済のいずれもお持ちでない場合。比べる受け取り方がないためです</li>
+          {/*
+            ★★★2026-09-16・決め1264（★戦術Cowork `senjutsu_20260915l.md` 1-3）
+              ★前 …… 「iDeCo・企業型DC・**小規模企業共済**のいずれもお持ちでない場合。…」
+              ★★★**なぜ誤りか** …… ★**小規模企業共済だけをお持ちの方は、「お持ちでも」対象外です**
+                （★③が0円になるため）。★★「お持ちでない場合は対象外」と書くと、
+                ★★★**「お持ちなら通る」と読めます。★通りません。**
+              ★★基準HTML 757行は、戦術Coworkが直されました。
+          */}
+          <li>iDeCo・企業型DCのいずれもお持ちでない場合。比べる受け取り方がないためです</li>
           <li>受け取り方をご自身で選べない場合。お勤め先やご利用の金融機関によっては一時金しか選べないことがあります</li>
         </ul>
       </div>

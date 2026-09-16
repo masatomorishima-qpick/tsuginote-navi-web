@@ -66,7 +66,7 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
   return (
     <section id="pro-pricing" ref={ref} className="mt-12 border-t border-slate-200 pt-8">
       <h2 className="text-[22px] font-bold text-slate-900">
-          [有料版]退職金とiDeCoの受け取り方シミュレーションについて
+          [有料版]老後のお金の受け取りシミュレーションについて
       </h2>
 
       {/* 1. 写真（測りません。先頭なので必ず見えます） */}

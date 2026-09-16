@@ -131,7 +131,7 @@ export default async function KekkaPage() {
                   href={PRO_PATH}
                   className="font-medium text-emerald-700 hover:text-emerald-800"
                 >
-                  退職金とiDeCoの受け取り方シミュレーションのページへ
+                  老後のお金の受け取りシミュレーションのページへ
                 </Link>
               </p>
               <p className={P}>ご不明な点は、info@blueadventures.jp までご連絡ください。</p>

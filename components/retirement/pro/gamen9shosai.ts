@@ -4,7 +4,7 @@
  * **このファイルは手で書きません。**`kensa/gamen_chushutsu.mjs` が
  * 基準HTMLから機械で作ります。直したいときは**基準HTMLを直して作り直してください。**
  *
- *   node kensa/gamen_chushutsu.mjs <基準HTML> 9 詳細 > components/retirement/pro/gamen9shosai.ts
+ *   node kensa/gamen_chushutsu.mjs <基準HTML> "9 詳細" --na=9shosai > components/retirement/pro/gamen9shosai.ts
  *
  * 画面9 詳細。**基準HTMLの文がそのまま入ります。こちらが書き直してはいけません（§2の8）。**
  *
@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（200,009バイト ／ md5 4d133c6845710676b60cf494fb60f74e）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（201,914バイト ／ md5 95e2e0fbf80f2c0cbf282f507c522448）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */

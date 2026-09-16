@@ -20,7 +20,7 @@ const PAGE_PATH = '/retirement/pro/tokushoho';
 
 export const metadata: Metadata = {
   title: '特定商取引法に基づく表記 | つぎの手ナビ',
-  description: '退職金とiDeCoの受け取り方シミュレーション（有料版）の特定商取引法に基づく表記です。',
+  description: '老後のお金の受け取りシミュレーション（有料版）の特定商取引法に基づく表記です。',
   alternates: { canonical: `${SITE_URL}${PAGE_PATH}` },
 };
 
@@ -34,7 +34,7 @@ const DOUSA_KANKYOU =
 
 /** 第5版b §1 の表（16行）。項目名も中身も、そのままの順番です */
 const KOUMOKU: ReadonlyArray<readonly [string, string]> = [
-  ['サービス名', '退職金とiDeCoの受け取り方シミュレーション（有料版）'],
+  ['サービス名', '老後のお金の受け取りシミュレーション（有料版）'],
   ['販売事業者', 'BlueAdventures'],
   ['運営統括責任者', '森嶋 聖人'],
   ['所在地', '神奈川県横浜市西区浅間町1丁目4番3号ウィザードビル402'],
@@ -83,7 +83,7 @@ export default function TokushohoPage() {
 
             <p className="mt-8 text-sm leading-7 sm:text-base">
               <Link href="/retirement/pro" className="font-medium text-emerald-700 hover:text-emerald-800">
-                退職金とiDeCoの受け取り方シミュレーションのページへ
+                老後のお金の受け取りシミュレーションのページへ
               </Link>
             </p>
           </div>

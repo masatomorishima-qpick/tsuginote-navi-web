@@ -55,7 +55,7 @@ export function kounyuMail(hikisu: KounyuMailNoHikisu): KounyuMailNoBun {
 
   const subject = '【つぎの手ナビ】ご購入ありがとうございます（結果を開くリンク）';
 
-  const text = `このたびは、退職金とiDeCoの受け取り方シミュレーション（有料版）をお求めいただき、
+  const text = `このたびは、老後のお金の受け取りシミュレーション（有料版）をお求めいただき、
 ありがとうございます。
 
 下のリンクを開くと、あなたの計算結果をご覧いただけます。
@@ -99,7 +99,7 @@ https://www.tsuginotenavi.jp
 <body style="margin:0;padding:0;background:#ffffff;">
 <div style="max-width:600px;margin:0 auto;padding:24px 20px;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;">
 
-  <p style="${p}">このたびは、退職金とiDeCoの受け取り方シミュレーション（有料版）をお求めいただき、<br>ありがとうございます。</p>
+  <p style="${p}">このたびは、老後のお金の受け取りシミュレーション（有料版）をお求めいただき、<br>ありがとうございます。</p>
 
   <p style="${p}">下のリンクを開くと、あなたの計算結果をご覧いただけます。</p>
 

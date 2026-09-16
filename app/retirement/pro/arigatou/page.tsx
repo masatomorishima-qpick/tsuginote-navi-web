@@ -51,7 +51,7 @@ export default function ArigatouPage() {
           </p>
           <p className="mt-8">
             <Link href={PRO_PATH} className="font-medium text-emerald-700 hover:text-emerald-800">
-              退職金とiDeCoの受け取り方シミュレーションのページへ
+              老後のお金の受け取りシミュレーションのページへ
             </Link>
           </p>
           <div className="h-16" aria-hidden="true" />

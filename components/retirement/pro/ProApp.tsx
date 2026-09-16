@@ -27,7 +27,7 @@ import Screen2 from './Screen2';
 import Screen3 from './Screen3';
 import Screen4 from './Screen4';
 import Screen56 from './Screen56';
-import { manToYen, type FreeInput } from './types';
+import { FIELDS, manToYen, type FreeInput } from './types';
 import { freeResult, type FreeResult } from '@/lib/retirement/pro/free';
 import { track, getProSessionId, getGaIds, captureGclid } from '@/lib/retirement/pro/track';
 import { taishokuBandFromYen, idecoBandFromYen, diffBandFromYen } from '@/lib/retirement/pro/band';
@@ -82,6 +82,13 @@ export default function ProApp({ genzaiNen, enteredAtResult = false }: Props) {
   /** 「戻る」で入力画面に戻ったときに戻す値。**移るときに1回だけ写します** */
   const [savedRaw, setSavedRaw] = useState<Record<string, string>>({});
   const lpSentRef = useRef(false);
+  /**
+   * ★★★2026-09-15・決め1258（★戦術Cowork `senjutsu_20260915j.md` 3-3 の1）
+   *   ★★**決済の口を呼んでいる間、2度目の押しを受けません。**
+   *   ★理由 …… ★2度押すと Stripe の Session が2つできます。★★お支払いが2回になる道を作りません。
+   *   ★★state ではなく ref です（★押した瞬間に効かせるため。★state は描き直しを待ちます）。
+   */
+  const kauChuRef = useRef(false);
 
   // ---- 入口 ----------------------------------------------------------------
   useEffect(() => {
@@ -112,7 +119,7 @@ export default function ProApp({ genzaiNen, enteredAtResult = false }: Props) {
         else if (q.get('utm_source')) entrySource = q.get('utm_source') ?? '';
       } catch { /* no-op */ }
       track('pro_lp_view', entrySource ? { entry_source: entrySource } : {});
-      sendPageView(PATH_INPUT, '退職金とiDeCoの受け取り方シミュレーション');
+      sendPageView(PATH_INPUT, '老後のお金の受け取りシミュレーション');
     }
   }, [enteredAtResult]);
 
@@ -158,8 +165,59 @@ export default function ProApp({ genzaiNen, enteredAtResult = false }: Props) {
       taishoku_band: taishokuBandFromYen(manToYen(v.taishokukinMan)),
       ideco_band: idecoBandFromYen(manToYen(v.idecoMan)),
     });
-    sendPageView(PATH_RESULT, '退職金とiDeCoの受け取り方シミュレーション 計算結果');
+    sendPageView(PATH_RESULT, '老後のお金の受け取りシミュレーション 計算結果');
   }, [genzaiNen]);
+
+  // ---- 買う道（★2026-09-15・決め1258・戦術Cowork `senjutsu_20260915j.md` 3-3 の1）----------
+  /**
+   * ★★★**画面5-6の「有料版購入」→ Stripe Checkout（別画面）。**
+   *   ★★`/retirement/pro/buy` を**通しません**（★基準HTML 502行／`tokushoho/page.tsx`「購入方法」）。
+   *
+   * ★★【送るもの】…… ★**`FIELDS` の5つだけ**です。
+   *   ★★★**口は、5つ以外の鍵が1つでも混ざっていると 400 で落とします**（`lib/retirement/pro/pass.ts` 92〜94行）。
+   *   ★ですので、ここで名前を並べ直さず、★**`FIELDS` から組み立てます**（★足した日に、ここが黙って古びないため）。
+   *   ★★★**`gclid` と GA4 の id は送りません。**★上の覚え書き（2026-08-19）は「決済のbodyに載せます」と
+   *     書いていますが、★★**いまの口はそれを 400 で落とします**。★★覚え書きのほうが古いです
+   *     （★この食い違いは戦術Coworkへ書きました）。
+   *
+   * ★★【口が開いていないとき（404）】…… ★`/retirement/pro/buy` へお送りします。
+   *   ★★★理由 …… ★栓 `PRO_RETIREMENT_CHECKOUT_ENABLED` が `'1'` でない入れ物では、この口は 404 です。
+   *     ★★そのとき**何も起きないボタン**にすると、★★★**決め1236（押しても何も起きない道を、画面に出さない）に反します**。
+   *     ★`buy` の頁は、★**同じ栓で中身を分けます**（★`app/retirement/pro/buy/page.tsx`）。
+   *   ★★★**利用者に出す新しい字を、こちらで作っていません**（★決め1213・1245）。
+   *
+   * ★★【そのほかの落ち（400・500・繋がらない）】…… ★同じく `buy` へお送りします。
+   *   ★★**黙って止まりません。**★★ただし「決済が始められませんでした」という字は、
+   *     ★★★**基準HTMLに1か所もありません**ので、★**こちらでは作りません**（★戦術Coworkへ投げました）。
+   */
+  const onKau = useCallback(async () => {
+    if (kauChuRef.current) return;
+    // ★入力がまだ無いときは、何もしません（★画面5-6は入力のあとにしか出ませんので、通りません）
+    if (!input) return;
+    kauChuRef.current = true;
+    const buy = '/retirement/pro/buy';
+    try {
+      // ★5つを `FIELDS` から組み立てます（★名前を2か所に持ちません）
+      const okuru: Record<string, number> = {};
+      for (const f of FIELDS) okuru[f.key] = input[f.key];
+
+      const res = await fetch('/api/retirement/pro/billing/checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(okuru),
+      });
+      if (res.ok) {
+        const mono = (await res.json()) as { url?: unknown };
+        // ★`url` は Stripe の頁です。★形だけ確かめます（★中身は当社では作っていません）
+        if (typeof mono.url === 'string' && mono.url.startsWith('https://')) {
+          window.location.href = mono.url;
+          return;                      // ★★ここでは `kauChuRef` を戻しません（★移る途中で2度目を受けないため）
+        }
+      }
+    } catch { /* ★下の `buy` へ落とします */ }
+    kauChuRef.current = false;
+    window.location.href = buy;
+  }, [input]);
 
   if (step === 'input' || !result || !input) {
     return (
@@ -184,10 +242,7 @@ export default function ProApp({ genzaiNen, enteredAtResult = false }: Props) {
       <Screen4 r={result} />
       <Screen56
         r={result}
-        onBuy={() => {
-          // 購入前のページへ（§6の12）。決済まわりは【3】で作ります
-          window.location.href = '/retirement/pro/buy';
-        }}
+        onBuy={onKau}
       />
     </>
   );

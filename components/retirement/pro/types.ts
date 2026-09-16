@@ -41,7 +41,13 @@ export const FIELDS: ReadonlyArray<{
   { no: 2, key: 'kinzokuNensu', label: '② あなたの勤続年数',
     unit: '年', min: 1, max: 60, placeholder: '38' },
   { no: 3, key: 'idecoMan', label: '③ あなたのiDeCo等の残高',
-    note: 'iDeCo・企業型DC・小規模企業共済', unit: '万円', min: 0, max: 20_000, placeholder: '500' },
+    // ★★★2026-09-15・決め1260（★戦術Cowork `senjutsu_20260915k.md` 2-4・3-1）。★前は
+    //   「iDeCo・企業型DC・**小規模企業共済**」でした。★★**小規模企業共済を外しました。**
+    //   ★理由（★戦術Coworkが `zeisei.ts` 42〜44行・`engine.ts` 952〜955行を開いて数えた向き）……
+    //     ★③に入れると `dc=true` になり、★**共済金を受け取る年に19年の窓が当たります**（★正しくは4年か9年）。
+    //     ★窓が広がる → 前に受け取ったものが多く「重複」に数えられる → **控除が減り、税が増えます**（★不利側）。
+    //   ★★基準HTMLの2か所は戦術Coworkが直しました（★`paidFields.ts` は抜き出しですので、もう直っています）。
+    note: 'iDeCo・企業型DC', unit: '万円', min: 0, max: 20_000, placeholder: '500' },
   { no: 4, key: 'kanyuNensu', label: '④ あなたが③に加入していた期間',
     unit: '年', min: 1, max: 60, placeholder: '20' },
   { no: 5, key: 'taishokuAge', label: '⑤ あなたが退職金を受け取る予定の年齢',

@@ -8,7 +8,7 @@
  * **直したいときは、基準HTMLを直して、これを作り直してください。**
  * ここを直接いじると、次に作り直したときに消えます。
  *
- * 抜き出しもと: tsuginote_gamen_base.html（200,009バイト ／ md5 4d133c6845710676b60cf494fb60f74e）
+ * 抜き出しもと: tsuginote_gamen_base.html（201,914バイト ／ md5 95e2e0fbf80f2c0cbf282f507c522448）
  * 項目数: 34
  */
 
@@ -37,7 +37,7 @@ export const PAID_FIELDS: readonly PaidField[] = [
     info: "",
     mihon: "38年", group: "はじめにご入力いただいた内容" },
   { no: "③", label: "③ あなたのiDeCo等の残高",
-    small: "iDeCo・企業型DC・小規模企業共済",
+    small: "iDeCo・企業型DC",
     info: "",
     mihon: "500万円", group: "はじめにご入力いただいた内容" },
   { no: "④", label: "④ あなたが③に加入していた期間",
@@ -172,7 +172,7 @@ export const PAID_GROUPS: readonly string[] = ["はじめにご入力いただ�
 /** 画面の枠の文言。**これも基準HTMLから抜き出しています** */
 export const PAID_CHROME = {
   /** 見出し。**「[有料版]」は基準HTMLの表記のまま**（全角の［］ではありません） */
-  h2: "[有料版]退職金とiDeCoの受け取り方シミュレーション入力",
+  h2: "[有料版]老後のお金の受け取りシミュレーション入力",
   /** 引き継いだ5項目の上に出す説明 */
   hikitsugiHon: "この5項目はここで直せます。直すと、下の入力と計算結果にそのまま反映されます。",
   /** 「詳細を入力する」の見出し。**既定では閉じています**（基準HTMLは資料用に開いています） */

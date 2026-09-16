@@ -49,11 +49,11 @@ export default function TermsPage() {
             <li>(i) 匿名アンケートによる相談先候補の案内機能（以下、「<strong>候補案内機能</strong>」といいます。）</li>
             <li>(ii) ログインしてご利用いただくデジタル資産の整理・共有機能（<code>/digital/*</code>。以下、「<strong>デジタル資産機能</strong>」といいます。）</li>
             <li>(iii) 資産づくり診断（/shisan）</li>
-            <li>(iv) 退職金とiDeCoの受け取り方シミュレーション（/retirement/pro。有料版を含みます。）</li>
+            <li>(iv) 老後のお金の受け取りシミュレーション（/retirement/pro。有料版を含みます。）</li>
           </ul>
           <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
             第1条〜第13条は各機能に共通する内容です。
-            デジタル資産機能に固有の事項は第14条に、退職金とiDeCoの受け取り方シミュレーション（有料版）に固有の事項は第15条に定めます。
+            デジタル資産機能に固有の事項は第14条に、老後のお金の受け取りシミュレーション（有料版）に固有の事項は第15条に定めます。
             各特則と第1条〜第13条で異なる内容が定められている場合、その機能については特則が優先します。
           </p>
 
@@ -359,10 +359,10 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-xl font-semibold text-slate-900">
-                15. 退職金とiDeCoの受け取り方シミュレーション（有料版）に関する特則
+                15. 老後のお金の受け取りシミュレーション（有料版）に関する特則
               </h2>
               <p className="mt-3">
-                本条は、当サイトが提供する「退職金とiDeCoの受け取り方シミュレーション（有料版）」
+                本条は、当サイトが提供する「老後のお金の受け取りシミュレーション（有料版）」
                 （以下、「本ツール」といいます。）に限り適用される特則です。
               </p>
               <h3 className="mt-6 text-base font-semibold text-slate-900">

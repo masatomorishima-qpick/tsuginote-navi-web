@@ -65,7 +65,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.9,
     },
-    // 受け取り方シミュレーション（無料版・2026-08-31 新設）。
+    // 受け取りシミュレーション（無料版・2026-08-31 新設。★2026-09-15 にサービス名が変わりました・決め1261）。
     // /retirement/pro/result と /retirement/pro/buy は載せない（どちらも noindex）。
     {
       url: `${baseUrl}/retirement/pro`,

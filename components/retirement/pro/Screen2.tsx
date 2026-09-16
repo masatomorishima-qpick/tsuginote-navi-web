@@ -57,8 +57,26 @@ export default function Screen2({ r, onBuy }: { r: FreeResult; onBuy: () => void
   return (
     <div ref={rootRef}>
       <h1 className="text-[26px] font-bold leading-tight text-slate-900 sm:text-[30px]">
-        退職金とiDeCoの受け取り方シミュレーション 計算結果
+        老後のお金の受け取りシミュレーション 計算結果
       </h1>
+
+      {/*
+        ★★★2026-09-15・決め1261（★戦術Cowork `senjutsu_20260915k.md` 2-3）
+          ★★**購入前に出す3行**です。★字は基準HTML **600〜602行**から**1字1句**写しています。
+          ★1〜2行目 …… ★戦略Cowork 4-3 の断り書き（★後出しにしない）。
+          ★3行目 …… ★③に何を入れるかの前提（★③のラベルから「小規模企業共済」を外したことと対です）。
+          ★★基準HTMLでは、見出しの**すぐ下**・「あなたの手取り計算」の**上**に在ります。★同じ並びにしています。
+          ★★★**こちらで字を1文字も変えていません。**★変えたいときは、消す前に戦術Coworkへ投げてください。
+      */}
+      <p className="mt-4 text-[13px] leading-relaxed text-[#5b6470]">
+        どの受け取り方でも手取りが同じ額になる方もいます。
+      </p>
+      <p className="mt-2 text-[13px] leading-relaxed text-[#5b6470]">
+        無料版は、受け取る年だけを計算します。退職した翌年以降の税と社会保険料は、有料版で計算します。
+      </p>
+      <p className="mt-2 text-[13px] leading-relaxed text-[#5b6470]">
+        あなたのiDeCo等の中身 …… iDeCo・企業型DC（小規模企業共済は含めていません）
+      </p>
 
       {/* 入力の整合の警告（勤め始めが早すぎる など）。あるときだけ出す */}
       {r.hantei.keikoku.length > 0 ? (

@@ -1,5 +1,5 @@
 /**
- * app/retirement/pro/page.tsx — 退職金とiDeCoの受け取り方シミュレーション（無料の入口）
+ * app/retirement/pro/page.tsx — 老後のお金の受け取りシミュレーション（無料の入口）
  *
  * §1  titleタグ・OGPは指示書の指定どおり。
  * §3-2 Q11・Q12：**`/retirement/pro` は検索に出す**（`/retirement/pro/result` は出さない）。
@@ -15,7 +15,7 @@ import ProApp from '@/components/retirement/pro/ProApp';
 import { tokyoYear } from '@/lib/retirement/pro/now';
 
 const PAGE_PATH = '/retirement/pro';
-const PAGE_TITLE = '退職金とiDeCoの受け取り方シミュレーション【2026年改正対応】';
+const PAGE_TITLE = '老後のお金の受け取りシミュレーション【2026年改正対応】';
 const PAGE_DESCRIPTION =
   '退職金とiDeCo等の受け取り方で、あなたの手取りがいくら変わるかを計算します。退職所得控除の2026年（令和8年）改正に対応。特定の金融機関・金融商品の推奨は行いません。';
 
@@ -52,7 +52,7 @@ const jsonLd = {
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'ホーム', item: SITE_URL },
         { '@type': 'ListItem', position: 2, name: '退職金・年金', item: `${SITE_URL}/retirement` },
-        { '@type': 'ListItem', position: 3, name: '受け取り方シミュレーション', item: `${SITE_URL}${PAGE_PATH}` },
+        { '@type': 'ListItem', position: 3, name: '受け取りシミュレーション', item: `${SITE_URL}${PAGE_PATH}` },
       ],
     },
   ],
@@ -70,7 +70,7 @@ export default function ProPage() {
         <Breadcrumb
           crumbs={[
             { name: '退職金・年金', path: '/retirement' },
-            { name: '受け取り方シミュレーション', path: PAGE_PATH },
+            { name: '受け取りシミュレーション', path: PAGE_PATH },
           ]}
         />
         <ProApp genzaiNen={tokyoYear(new Date())} />

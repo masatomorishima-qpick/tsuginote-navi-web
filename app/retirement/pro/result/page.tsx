@@ -18,7 +18,7 @@ import { tokyoYear } from '@/lib/retirement/pro/now';
 const PAGE_PATH = '/retirement/pro';
 
 export const metadata: Metadata = {
-  title: '退職金とiDeCoの受け取り方シミュレーション 計算結果｜つぎの手ナビ',
+  title: '老後のお金の受け取りシミュレーション 計算結果｜つぎの手ナビ',
   robots: { index: false, follow: false },
   alternates: { canonical: `${SITE_URL}${PAGE_PATH}` },
 };
@@ -33,7 +33,7 @@ export default function ProResultPage() {
         <Breadcrumb
           crumbs={[
             { name: '退職金・年金', path: '/retirement' },
-            { name: '受け取り方シミュレーション', path: PAGE_PATH },
+            { name: '受け取りシミュレーション', path: PAGE_PATH },
           ]}
         />
         <ProApp genzaiNen={tokyoYear(new Date())} enteredAtResult />

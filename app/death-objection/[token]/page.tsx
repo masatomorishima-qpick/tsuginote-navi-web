@@ -175,10 +175,10 @@ export default async function DeathObjectionPage({ params }: Props) {
         <p className="text-center text-sm leading-relaxed text-slate-600">
           お困りの場合は{' '}
           <a
-            href="mailto:info@blueadventures.jp"
+            href="mailto:support@tsuginotenavi.jp"
             className="font-medium text-emerald-700 hover:underline"
           >
-            info@blueadventures.jp
+            support@tsuginotenavi.jp
           </a>
           {' '}までご連絡ください。
         </p>
@@ -239,10 +239,10 @@ function SimpleStateCard({
             <p className="mt-4 text-sm text-slate-500">
               お困りの場合は{' '}
               <a
-                href="mailto:info@blueadventures.jp"
+                href="mailto:support@tsuginotenavi.jp"
                 className="text-emerald-700 hover:underline"
               >
-                info@blueadventures.jp
+                support@tsuginotenavi.jp
               </a>
               {' '}までご連絡ください。
             </p>

@@ -34,7 +34,7 @@ import { kekkaKa, type Kekka } from '@/lib/retirement/pro/kekkaKata';
 /** ★戦術の字（senjutsu_20260902ad.md 1-2・1-4・3番・y.md 1番）。1文字も変えないでください */
 const BUN = {
   matteiru: '計算しています。そのままお待ちください。この画面を閉じないでください。',
-  shippai: '計算できませんでした。しばらくたってから、もう一度「計算結果を見る」を押してください。それでも計算できないときは、info@blueadventures.jp までご連絡ください。',
+  shippai: '計算できませんでした。しばらくたってから、もう一度「計算結果を見る」を押してください。それでも計算できないときは、support@tsuginotenavi.jp までご連絡ください。',
   /**
    * ★★★【2026-09-15・決め1222】**戦術Coworkが `tome.md` B の「`PaidApp.tsx` を触らない」を、
    *   ★この1つの字だけ、明示に解かれました**（★`senjutsu_20260915c.md` 4-1）。

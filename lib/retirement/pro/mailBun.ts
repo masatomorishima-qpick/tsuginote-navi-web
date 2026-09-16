@@ -73,7 +73,7 @@ ${link}
 
 ──────────
 
-ご不明な点は、info@blueadventures.jp までご連絡ください。
+ご不明な点は、support@tsuginotenavi.jp までご連絡ください。
 
 つぎの手ナビ
 BlueAdventures
@@ -120,7 +120,7 @@ https://www.tsuginotenavi.jp
 
   <hr style="${hr}">
 
-  <p style="${p}">ご不明な点は、<a href="mailto:info@blueadventures.jp" style="${a}">info@blueadventures.jp</a> までご連絡ください。</p>
+  <p style="${p}">ご不明な点は、<a href="mailto:support@tsuginotenavi.jp" style="${a}">support@tsuginotenavi.jp</a> までご連絡ください。</p>
 
   <p style="${p}">つぎの手ナビ<br>BlueAdventures<br><a href="https://www.tsuginotenavi.jp" style="${a}">https://www.tsuginotenavi.jp</a></p>
 

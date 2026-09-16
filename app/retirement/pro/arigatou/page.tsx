@@ -45,7 +45,7 @@ export default function ArigatouPage() {
           <p className={P}>
             メールが届かないときは、迷惑メールのフォルダをご確認ください。
             <br />
-            それでも見つからないときは、info@blueadventures.jp までご連絡ください。
+            それでも見つからないときは、support@tsuginotenavi.jp までご連絡ください。
             <br />
             ご購入のときにご入力いただいたメールアドレスをお知らせいただければ、お調べします。
           </p>

@@ -250,7 +250,7 @@ export async function createDeathNotice(
     return {
       ok: false,
       error: 'same_owner_lifetime_exceeded',
-      detail: `同じ方への死亡通知は生涯 ${SAME_OWNER_MAX_LIFETIME_NOTICES} 回までです。状況が変わった場合は info@blueadventures.jp までご連絡ください。`,
+      detail: `同じ方への死亡通知は生涯 ${SAME_OWNER_MAX_LIFETIME_NOTICES} 回までです。状況が変わった場合は support@tsuginotenavi.jp までご連絡ください。`,
     };
   }
 
@@ -289,7 +289,7 @@ export async function createDeathNotice(
     return {
       ok: false,
       error: 'notifier_rate_limited',
-      detail: `死亡通知の申請は 30 日に ${NOTIFIER_MAX_NOTICES_PER_30_DAYS} 件までです。お困りの場合は info@blueadventures.jp までご連絡ください。`,
+      detail: `死亡通知の申請は 30 日に ${NOTIFIER_MAX_NOTICES_PER_30_DAYS} 件までです。お困りの場合は support@tsuginotenavi.jp までご連絡ください。`,
     };
   }
 
@@ -484,7 +484,7 @@ export async function cancelByNotifier(
       ok: false,
       error: 'invalid_status',
       detail:
-        '既に運営にて確認が始まっているため、ご自身での取り消しはできません。お困りの場合は info@blueadventures.jp までご連絡ください。',
+        '既に運営にて確認が始まっているため、ご自身での取り消しはできません。お困りの場合は support@tsuginotenavi.jp までご連絡ください。',
     };
   }
 
@@ -494,7 +494,7 @@ export async function cancelByNotifier(
     return {
       ok: false,
       error: 'cancel_window_expired',
-      detail: `申請から ${Math.floor(NOTIFIER_SELF_CANCEL_WINDOW_SECONDS / 3600)} 時間が経過したため、ご自身での取り消しはできません。お困りの場合は info@blueadventures.jp までご連絡ください。`,
+      detail: `申請から ${Math.floor(NOTIFIER_SELF_CANCEL_WINDOW_SECONDS / 3600)} 時間が経過したため、ご自身での取り消しはできません。お困りの場合は support@tsuginotenavi.jp までご連絡ください。`,
     };
   }
 

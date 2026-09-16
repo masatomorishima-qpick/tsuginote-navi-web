@@ -292,7 +292,7 @@ ${p.helpUrl}
 
 ──
 つぎの手ナビ デジタル資産
-お問い合わせ：info@blueadventures.jp
+お問い合わせ：support@tsuginotenavi.jp
 `;
 }
 
@@ -335,7 +335,7 @@ function ownerImmediateNoticeHtml(p: {
       </p>
     </div>
     <div style="margin-top:24px;text-align:center;font-size:11px;color:#94a3b8;">
-      つぎの手ナビ デジタル資産<br>info@blueadventures.jp
+      つぎの手ナビ デジタル資産<br>support@tsuginotenavi.jp
     </div>
   </div>
 </body></html>`;
@@ -360,7 +360,7 @@ ${p.helpUrl}
 
 ──
 つぎの手ナビ デジタル資産
-info@blueadventures.jp
+support@tsuginotenavi.jp
 `;
 }
 
@@ -396,7 +396,7 @@ function recipientAwarenessHtml(p: {
       </p>
     </div>
     <div style="margin-top:24px;text-align:center;font-size:11px;color:#94a3b8;">
-      つぎの手ナビ デジタル資産<br>info@blueadventures.jp
+      つぎの手ナビ デジタル資産<br>support@tsuginotenavi.jp
     </div>
   </div>
 </body></html>`;

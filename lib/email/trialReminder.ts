@@ -66,7 +66,7 @@ export async function sendTrialWarningEmail(
 ──
 つぎの手ナビ デジタル資産
 https://tsuginotenavi.jp
-お問い合わせ：info@blueadventures.jp
+お問い合わせ：support@tsuginotenavi.jp
 `;
 
   const html = `<!DOCTYPE html>
@@ -105,7 +105,7 @@ https://tsuginotenavi.jp
     <div style="margin-top:24px;text-align:center;font-size:11px;color:#94a3b8;line-height:1.6;">
       <strong>つぎの手ナビ デジタル資産</strong><br>
       <a href="https://tsuginotenavi.jp" style="color:#94a3b8;text-decoration:underline;">https://tsuginotenavi.jp</a><br>
-      お問い合わせ：info@blueadventures.jp
+      お問い合わせ：support@tsuginotenavi.jp
     </div>
   </div>
 </body>
@@ -159,7 +159,7 @@ export async function sendTrialFinalReminderEmail(
 ──
 つぎの手ナビ デジタル資産
 https://tsuginotenavi.jp
-お問い合わせ：info@blueadventures.jp
+お問い合わせ：support@tsuginotenavi.jp
 `;
 
   const html = `<!DOCTYPE html>
@@ -212,7 +212,7 @@ https://tsuginotenavi.jp
     <div style="margin-top:24px;text-align:center;font-size:11px;color:#94a3b8;line-height:1.6;">
       <strong>つぎの手ナビ デジタル資産</strong><br>
       <a href="https://tsuginotenavi.jp" style="color:#94a3b8;text-decoration:underline;">https://tsuginotenavi.jp</a><br>
-      お問い合わせ：info@blueadventures.jp
+      お問い合わせ：support@tsuginotenavi.jp
     </div>
   </div>
 </body>
@@ -259,7 +259,7 @@ export async function sendTrialEndedEmail(
 ──
 つぎの手ナビ デジタル資産
 https://tsuginotenavi.jp
-お問い合わせ：info@blueadventures.jp
+お問い合わせ：support@tsuginotenavi.jp
 `;
 
   const html = `<!DOCTYPE html>
@@ -315,7 +315,7 @@ https://tsuginotenavi.jp
     <div style="margin-top:24px;text-align:center;font-size:11px;color:#94a3b8;line-height:1.6;">
       <strong>つぎの手ナビ デジタル資産</strong><br>
       <a href="https://tsuginotenavi.jp" style="color:#94a3b8;text-decoration:underline;">https://tsuginotenavi.jp</a><br>
-      お問い合わせ：info@blueadventures.jp
+      お問い合わせ：support@tsuginotenavi.jp
     </div>
   </div>
 </body>

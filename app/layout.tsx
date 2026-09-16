@@ -41,7 +41,12 @@ const siteJsonLd = {
       // 2026-07-29：image を削除。組織情報としては logo があれば足り、image は冗長。
       // 記事ページでは Article の image と並んで出力されるため、
       // 「記事の代表画像が logo.png になっている」と誤読される原因になっていた。
-      email: "info@blueadventures.jp",
+      // ★★★2026-09-16・決め1303（★戦術Cowork `senjutsu_20260916j.md` 4節・森嶋さんのお決め）
+      //   ★前 …… `info@blueadventures.jp`。★★**サイト全体で 54か所（★21本・50行）を置き換えました。**
+      //   ★この Organization は「つぎの手ナビ」を指しています（★事業者は BlueAdventures）ので、
+      //     ★**`support@tsuginotenavi.jp` で筋が通ります**。
+      //   ★★`info@blueadventures.jp` は**止めていません**（★両方が届く形・決め1298）。
+      email: "support@tsuginotenavi.jp",
       description:
         "住宅ローン・資産づくり・お金の管理について、あなたが入力した数字にもとづく試算と、中立的な情報を提供するサイト。特定の金融商品・金融機関の推奨は行いません。運営：BlueAdventures。",
       sameAs: ["https://blueadventures.jp/"],

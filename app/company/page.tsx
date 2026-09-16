@@ -72,7 +72,7 @@ export default function CompanyPage() {
 
               <div className="grid gap-2 px-5 py-4 sm:grid-cols-[180px_1fr] sm:px-6">
                 <dt className="font-semibold text-slate-900">メールアドレス</dt>
-                <dd className="text-slate-700">info@blueadventures.jp</dd>
+                <dd className="text-slate-700">support@tsuginotenavi.jp</dd>
               </div>
 
               <div className="grid gap-2 px-5 py-4 sm:grid-cols-[180px_1fr] sm:px-6">

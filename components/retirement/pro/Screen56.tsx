@@ -331,7 +331,7 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
             <b className="font-bold">お客様のご都合による返金は、お受けしていません。</b>ご購入後すぐに計算結果をご覧いただけるためです。
           </p>
           <p className="mt-2 text-base leading-relaxed text-slate-900">
-            当社に原因のある不具合があったときは、お支払いいただいた額の全額を返金します。計算に誤りがあった、画面が表示されない、お支払いいただいたのにご利用いただけない、などです。info@blueadventures.jp までご連絡ください。
+            当社に原因のある不具合があったときは、お支払いいただいた額の全額を返金します。計算に誤りがあった、画面が表示されない、お支払いいただいたのにご利用いただけない、などです。support@tsuginotenavi.jp までご連絡ください。
           </p>
           <p className="mt-2 text-base leading-relaxed text-slate-900">
             推奨する動作環境の外でのご利用と、保守のための一時的な停止は、上記の不具合に含みません。

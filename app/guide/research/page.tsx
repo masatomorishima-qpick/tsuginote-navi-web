@@ -237,7 +237,7 @@ export default function ResearchPage() {
               </Link>
               ）へのリンクを添えていただけると、読者が一次情報を確認できます。
             </p>
-            <p>取材・データに関するお問い合わせは info@blueadventures.jp までお願いします。</p>
+            <p>取材・データに関するお問い合わせは support@tsuginotenavi.jp までお願いします。</p>
           </div>
         </section>
       </div>

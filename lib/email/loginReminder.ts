@@ -61,7 +61,7 @@ ${input.dashboardUrl}
 
 ──
 つぎの手ナビ デジタル資産
-お問い合わせ：info@blueadventures.jp
+お問い合わせ：support@tsuginotenavi.jp
 `;
 
   const html = `<!DOCTYPE html>
@@ -100,7 +100,7 @@ ${input.dashboardUrl}
       </p>
     </div>
     <div style="margin-top:24px;text-align:center;font-size:11px;color:#94a3b8;">
-      つぎの手ナビ デジタル資産<br>info@blueadventures.jp
+      つぎの手ナビ デジタル資産<br>support@tsuginotenavi.jp
     </div>
   </div>
 </body></html>`;

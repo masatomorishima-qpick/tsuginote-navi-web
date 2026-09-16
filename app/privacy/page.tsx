@@ -216,7 +216,7 @@ export default function PrivacyPage() {
                 12. お問い合わせ窓口
               </h2>
               <p className="mt-3">
-                情報の取扱いに関するお問い合わせは、info@blueadventures.jp までご連絡ください。
+                情報の取扱いに関するお問い合わせは、support@tsuginotenavi.jp までご連絡ください。
               </p>
             </section>
 
@@ -518,7 +518,7 @@ export default function PrivacyPage() {
                 15-6. 開示・訂正・削除等の請求
               </h3>
               <p className="mt-3">
-                お問い合わせ窓口（info@blueadventures.jp）へご連絡ください。
+                お問い合わせ窓口（support@tsuginotenavi.jp）へご連絡ください。
                 会員登録の仕組みがないため、ご本人であることの確認として、ご購入時のメールアドレス宛にご連絡します。
                 ご本人であることが確認できたのち、速やかに対応します。
               </p>

@@ -62,7 +62,7 @@ export async function sendOwnerLinkAcceptedEmail(
 ──
 つぎの手ナビ デジタル資産
 https://tsuginotenavi.jp
-お問い合わせ：info@blueadventures.jp
+お問い合わせ：support@tsuginotenavi.jp
 `;
 
   const html = `<!DOCTYPE html>
@@ -117,7 +117,7 @@ https://tsuginotenavi.jp
         <a href="https://tsuginotenavi.jp" style="color:#9ca3af;text-decoration:none;">tsuginotenavi.jp</a>
       </p>
       <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.6;">
-        お問い合わせ：<a href="mailto:info@blueadventures.jp" style="color:#9ca3af;text-decoration:underline;">info@blueadventures.jp</a>
+        お問い合わせ：<a href="mailto:support@tsuginotenavi.jp" style="color:#9ca3af;text-decoration:underline;">support@tsuginotenavi.jp</a>
       </p>
     </div>
 

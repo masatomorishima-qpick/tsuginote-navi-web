@@ -32,7 +32,7 @@ type Props = {
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ACCEPTED_TYPES = '.jpg,.jpeg,.png,.heic,.heif,.pdf';
 
-const SUPPORT_EMAIL = 'info@blueadventures.jp';
+const SUPPORT_EMAIL = 'support@tsuginotenavi.jp';
 
 /**
  * サーバーからのエラーコード（英語）をユーザー向けの説明文に変換する。

@@ -163,7 +163,7 @@ export async function POST(
 
 ──
 つぎの手ナビ デジタル資産
-info@blueadventures.jp
+support@tsuginotenavi.jp
 `,
           html: `<p>${escapeHtml(objectionMessage).replace(/\n/g, '<br>')}</p>
 <p>ご報告いただいた死亡通知は取り下げとなりました。お気持ちは丁寧に受け取っており、

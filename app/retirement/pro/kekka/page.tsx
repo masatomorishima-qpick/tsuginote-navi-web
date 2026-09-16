@@ -95,7 +95,7 @@ export default async function KekkaPage() {
                 このページは、ご購入のときにお送りしたメールのリンクから開いていただけます。
               </p>
               <p className={P}>
-                メールが見つからないときは、info@blueadventures.jp までご連絡ください。
+                メールが見つからないときは、support@tsuginotenavi.jp までご連絡ください。
                 <br />
                 ご購入のときにご入力いただいたメールアドレスをお知らせいただければ、お調べします。
               </p>
@@ -112,7 +112,7 @@ export default async function KekkaPage() {
                 リンクを写して貼り付けた場合は、途中で切れていることがあります。
               </p>
               <p className={P}>
-                それでも開けないときは、info@blueadventures.jp までご連絡ください。
+                それでも開けないときは、support@tsuginotenavi.jp までご連絡ください。
               </p>
             </>
           )}
@@ -134,7 +134,7 @@ export default async function KekkaPage() {
                   老後のお金の受け取りシミュレーションのページへ
                 </Link>
               </p>
-              <p className={P}>ご不明な点は、info@blueadventures.jp までご連絡ください。</p>
+              <p className={P}>ご不明な点は、support@tsuginotenavi.jp までご連絡ください。</p>
             </>
           )}
 

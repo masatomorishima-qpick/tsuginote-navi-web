@@ -107,27 +107,28 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
   return (
     <div>
       {/*
-        ★★★2026-09-16・決め1263（★戦術Cowork `senjutsu_20260915l.md` 1-1・戦略Coworkのお決め）
-          ★前 …… 「退職金とiDeCoの受け取り方で、あなたの手取りは**これだけ変わります**」
-          ★理由(1) …… ★「これだけ変わります」は**変わることを断定**しています。
-            ★★実測 …… ★差は 0円〜812,617円で、★**5条件中1条件が0円**でした。
-          ★理由(2) …… ★「退職金とiDeCo」は**企業型DCの方を呼びません**。
-          ★★基準HTML 552行から1字1句写しています。
+        ★★★2026-09-16・決め1296（★戦術Cowork `senjutsu_20260916h.md` 2-1・森嶋さんのお決め）
+          ★★**見出し（h1）を、ツール名にしました。**★★★**見出しと副題を入れ替えたものです。**
+          ★前 …… 「退職金・iDeCo・企業型DCの受け取り方で、あなたの手取りはいくら変わるか」
+            ★★その字は、下の**副題**に移りました（★消していません）。
+          ★さらに前（決め1263まで） …… 「退職金とiDeCoの受け取り方で、あなたの手取りは**これだけ変わります**」
+          ★★基準HTML **552行**から1字1句写しています。
       */}
       <h1 className="text-[26px] font-bold leading-tight text-slate-900 sm:text-[30px]">
-        退職金・iDeCo・企業型DCの受け取り方で、あなたの手取りはいくら変わるか
+        老後のお金の受け取りシミュレーション【2026年改正対応】
       </h1>
 
       {/*
-        ★★★2026-09-16・決め1263（★戦術Cowork `senjutsu_20260915l.md` 1-2）── ★**副題**です。
+        ★★★2026-09-16・決め1296（★戦術Cowork `senjutsu_20260916h.md` 2-1）── ★**副題**です。
           ★★**見出しのすぐ下**に置きます。★基準HTML **554行**から1字1句写しています。
-          ★★★便k の副題（「退職金・iDeCo・企業型DC・公的年金を、いつ・どの形で受け取るか。／
-            全通り計算して、手取りを比べます。」）は、★**入れません**（★戦術Cowork `senjutsu_20260916.md` 1-1）。
-            ★理由 …… ★見出しと副題で「退職金・iDeCo・企業型DC」が2回出ます。
+          ★★★**前の副題「公的年金を受け取り始める年齢も変えて、全通りを計算します。」は入れません。**
+            ★理由 …… ★★**無料版は「受け取る年だけ」を計算します。**★購入前の副題で
+            「全通りを計算します」と申し上げるのは言い過ぎでした（★戦術Coworkの自認）。
+            ★中身は、下の本文の**有料版の2行**に入っています。
           ★★基準HTMLは `<p class="hon"><b>…</b></p>`（★**本文・太字**）です。
       */}
       <p className="mt-4 text-base font-bold leading-relaxed text-slate-900">
-        公的年金を受け取り始める年齢も変えて、全通りを計算します。
+        退職金・iDeCo・企業型DCの受け取り方で、あなたの手取りはいくら変わるか
       </p>
 
       <p className="mt-4 text-base leading-relaxed text-slate-800">
@@ -135,72 +136,25 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
         <br />
         <b className="font-bold">無料版では、あなたの手取りがいくら変わるかをお出しします。</b>
         <br />
+        {/*
+          ★★★2026-09-16・決め1296（★戦術Cowork `senjutsu_20260916h.md` 2-2）── ★**2行に分けました。**
+            ★前 …… 「有料版では、あなたの公的年金・保険料・医療費の負担まで見て、
+              最大41,216通りの手取りシミュレーションを抽出します。」
+            ★★理由 …… ★★★**41,216通りを生んでいるのは iDeCo等の受け取り方と公的年金の年齢なのに、
+              その字が1つも入っていませんでした**（★基準HTML 664行「この5つを組み合わせると 41,216通り」と食い違い）。
+            ★「抽出します」→「比べます」…… ★基準HTML 674行「比べるのは、有料版です」に揃えました。
+          ★★基準HTML **555行**から1字1句写しています（★`<br>` の分け方も）。
+        */}
         <b className="font-bold">
-          有料版では、あなたの公的年金・保険料・医療費の負担まで見て、最大41,216通りの手取りシミュレーションを抽出します。
+          有料版では、あなたのiDeCo・企業型DCを、いつ・どの形で受け取るかまで計算します。
+        </b>
+        <br />
+        <b className="font-bold">
+          公的年金を受け取り始める年齢と組み合わせて、保険料・医療費の負担まで見て、最大41,216通りの手取りを比べます。
         </b>
         <br />
         まず、あなたの数字を5つ入力してください。
       </p>
-
-      {/*
-        【判断ログ ★81・2026-08-20】画面1に「当社が計算した例」を3つ置きます。
-
-        【なぜ置くか】いまの画面1には**金額が1つも出ていませんでした。**数字は「41,216通り」
-          だけで、これは見本の方の通り数です。「これだけ変わります」と書いておきながら、
-          **いくら変わるのかがどこにも書いていませんでした**（オーナー指摘）。
-
-        【ここで守っていること】
-          ・**金額は `rei1.ts` から出します。**それは `kensa/gamen1_chushutsu.mjs` が
-            基準HTMLから機械で作ったものです。**実装側で計算し直しません**（§5-1-2 のお願い1）。
-          ・**「◯%の方は◯円変わります」という割合の文を足しません**（同3）。
-            格子の組み方だけで「差0円」の割合が 12%→15.0%→25.7% と動きます。
-            どれも実測ですが、**どれも来訪者の分布ではありません。**出どころに答えられません。
-          ・**「差が出ない方もいます」を、例と同じブロックに、本文と同じ大きさで出します**（★81）。
-            小さく書くと後出しになります（§2の5）。**16px です。**
-          ・**人物は輪郭だけの絵**です。写真は「お客様の声」と読まれるおそれがあります。
-            **「実在の方ではありません」**を見出しに書いています。
-          ・見出し（h1）は変えていません（★81）。
-      */}
-      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-        <p className="text-base leading-relaxed text-slate-800">{REI_MIDASHI}</p>
-
-        <ul className="mt-3 space-y-3">
-          {REI.map((r) => (
-            <li key={r.sa} className="flex items-start gap-3 rounded-xl bg-slate-50 p-3 sm:p-4">
-              {/* 輪郭だけの絵。**写真は使いません**（★81） */}
-              <svg
-                viewBox="0 0 40 40"
-                aria-hidden="true"
-                className="mt-0.5 h-10 w-10 shrink-0 fill-[#9aa5b1]"
-              >
-                <circle cx="20" cy="13" r="7.6" />
-                <path d="M5.8 36c0-7.8 6.4-14.2 14.2-14.2S34.2 28.2 34.2 36z" />
-              </svg>
-              <div className="min-w-0">
-                <p className="text-[15px] leading-relaxed text-slate-700">
-                  {r.jouken.map((line) => (
-                    <span key={line} className="block">{line}</span>
-                  ))}
-                </p>
-                <p className="mt-1.5 text-[20px] font-bold tabular-nums text-[#127a63]">{r.sa}</p>
-                <p className="mt-0.5 text-[15px] tabular-nums text-slate-700">{r.maeAto}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-
-        {/* **本文と同じ 16px。**同じブロックの中に置きます（★81） */}
-        <p className="mt-4 text-base leading-relaxed text-slate-800">
-          {REI_ZERO.split('\n').map((line, k) => (
-            <span key={line} className="block">
-              {k === 0 ? <b className="font-bold">差が出ない方もいます。</b> : null}
-              {k === 0 ? line.replace('差が出ない方もいます。', '') : line}
-            </span>
-          ))}
-        </p>
-
-        <p className="mt-3 text-[13px] leading-relaxed text-[#5b6470]">{REI_SHUTTEN}</p>
-      </section>
 
       <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
         {FIELDS.map((f) => (
@@ -257,11 +211,93 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
         無料で計算する
       </button>
 
+      {/*
+        ★★★2026-09-16・決め1297（★戦術Cowork `senjutsu_20260916i.md` 1節・森嶋さんのお決め）
+          ★前 …… 「入力された内容は保存されません。」
+          ★★★**消しませんでした。★字を替えました。**
+          ★★この1行は「リセットされます」という便利さの字ではありません ── ★★★**2026-08-18 に、
+            `taishokukin`・`ideco` を GA4 へ送るのをやめて「帯」にさせた約束の字**です
+            （★`lib/retirement/pro/track.ts` 140〜141行・`lib/retirement/pro/band.ts` 5行）。
+          ★★替えた理由 …… ★「保存されません」は受け身で、**誰が持たないか**が書いてありません／
+            ★**主語に「あなたの」を入れる**（★移管指示書5）／★**「金額」と書くと、何を持たないかが分かります**。
+          ★★★**「Googleにも残りません」とは書きません** …… ★**帯（範囲）は送っています**
+            （★`pro_result_view` の `taishoku_band`・`ideco_band`）。★書けない字は書きません。
+          ★★基準HTML **566行**から1字1句写しています。
+      */}
       <p className="mt-3 text-[13px] leading-relaxed text-[#5b6470]">
-        入力された内容は保存されません。
+        あなたが入力した金額を、当社は保存しません。
         <br />
         金融商品の販売はありません。
       </p>
+
+      {/*
+        ★★★2026-09-16・決め1296（★戦術Cowork `senjutsu_20260916h.md` 2-4・森嶋さんのお決め）
+          ★★**この「当社が計算した例」を、入力欄より後ろに下げました**（★前は入力欄の前に在りました）。
+          ★★★理由 …… ★本文の終わりが「**まず、あなたの数字を5つ入力してください。**」ですので、
+            ★**その次に入力欄が在るのが筋**です（★前は、例のカード3枚が間に挟まっていました）。
+          ★★基準HTML **557〜566行が入力欄・ボタン・注記、568行から例**です（★同じ順に並べています）。
+          ★★★**画面1の形が変わった日 ＝ 2026-09-16**（★GA4 の数を並べるときの切れ目です）。
+
+        【判断ログ ★81・2026-08-20】画面1に「当社が計算した例」を3つ置きます。
+
+        【なぜ置くか】いまの画面1には**金額が1つも出ていませんでした。**数字は「41,216通り」
+          だけで、これは見本の方の通り数です。「これだけ変わります」と書いておきながら、
+          **いくら変わるのかがどこにも書いていませんでした**（オーナー指摘）。
+
+        【ここで守っていること】
+          ・**金額は `rei1.ts` から出します。**それは `kensa/gamen1_chushutsu.mjs` が
+            基準HTMLから機械で作ったものです。**実装側で計算し直しません**（§5-1-2 のお願い1）。
+          ・**「◯%の方は◯円変わります」という割合の文を足しません**（同3）。
+            格子の組み方だけで「差0円」の割合が 12%→15.0%→25.7% と動きます。
+            どれも実測ですが、**どれも来訪者の分布ではありません。**出どころに答えられません。
+          ・**「差が出ない方もいます」を、例と同じブロックに、本文と同じ大きさで出します**（★81）。
+            小さく書くと後出しになります（§2の5）。**16px です。**
+          ・**人物は輪郭だけの絵**です。写真は「お客様の声」と読まれるおそれがあります。
+            **「実在の方ではありません」**を見出しに書いています。
+          ・★81 の回は、見出し（h1）を変えていません。
+            ★★**その後、決め1263（2026-09-16）と決め1296（同日）で2度変わりました。**
+            ★いまの h1 は「老後のお金の受け取りシミュレーション【2026年改正対応】」です。
+      */}
+      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        <p className="text-base leading-relaxed text-slate-800">{REI_MIDASHI}</p>
+
+        <ul className="mt-3 space-y-3">
+          {REI.map((r) => (
+            <li key={r.sa} className="flex items-start gap-3 rounded-xl bg-slate-50 p-3 sm:p-4">
+              {/* 輪郭だけの絵。**写真は使いません**（★81） */}
+              <svg
+                viewBox="0 0 40 40"
+                aria-hidden="true"
+                className="mt-0.5 h-10 w-10 shrink-0 fill-[#9aa5b1]"
+              >
+                <circle cx="20" cy="13" r="7.6" />
+                <path d="M5.8 36c0-7.8 6.4-14.2 14.2-14.2S34.2 28.2 34.2 36z" />
+              </svg>
+              <div className="min-w-0">
+                <p className="text-[15px] leading-relaxed text-slate-700">
+                  {r.jouken.map((line) => (
+                    <span key={line} className="block">{line}</span>
+                  ))}
+                </p>
+                <p className="mt-1.5 text-[20px] font-bold tabular-nums text-[#127a63]">{r.sa}</p>
+                <p className="mt-0.5 text-[15px] tabular-nums text-slate-700">{r.maeAto}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        {/* **本文と同じ 16px。**同じブロックの中に置きます（★81） */}
+        <p className="mt-4 text-base leading-relaxed text-slate-800">
+          {REI_ZERO.split('\n').map((line, k) => (
+            <span key={line} className="block">
+              {k === 0 ? <b className="font-bold">差が出ない方もいます。</b> : null}
+              {k === 0 ? line.replace('差が出ない方もいます。', '') : line}
+            </span>
+          ))}
+        </p>
+
+        <p className="mt-3 text-[13px] leading-relaxed text-[#5b6470]">{REI_SHUTTEN}</p>
+      </section>
 
       {/*
         §5-1：スマホの数字キーボードがせり上がっても⑤が隠れないよう、下に大きく余白を取る。

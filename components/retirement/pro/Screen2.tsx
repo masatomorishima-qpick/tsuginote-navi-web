@@ -329,7 +329,13 @@ export default function Screen2({ r, onBuy }: { r: FreeResult; onBuy: () => void
           ? <>上記の手取り最大{signedYen(r.sa)}は、<b className="font-bold">退職金とiDeCo等だけを見た数字</b>です。</>
           : <>上記の手取り{r.tedori.toLocaleString('en-US')}円は、あなたの<b className="font-bold">退職金とiDeCo等だけを見た数字</b>です。</>}
         有料版では、あなたの<b className="font-bold">公的年金・保険料・医療費の負担まで見て</b>、最大
-        <span className="tabular-nums">{r.toorisu.toLocaleString('en-US')}</span>通りの手取りシミュレーションを抽出します。
+        {/*
+          ★★★2026-09-16・決め1296（★戦術Cowork `senjutsu_20260916h.md` 2-3）
+            ★前 …… 「…通りの手取り**シミュレーションを抽出します**。」
+            ★★いま …… 「…通りの**手取りを比べます**。」★基準HTML **650行**から1字1句。
+            ★理由 …… ★**674行が「比べるのは、有料版です」と書いていますので、そちらに揃えました。**
+        */}
+        <span className="tabular-nums">{r.toorisu.toLocaleString('en-US')}</span>通りの手取りを比べます。
       </p>
 
       {/* §7-4：橙は購入ボタンだけ。ここは案内なので緑の枠線ボタン */}

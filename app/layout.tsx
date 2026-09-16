@@ -92,14 +92,33 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // ★計測（GA4・Microsoft Clarity）は、本番の入れ物のときだけ読み込みます。
-  // ★Vercel の画面の設定には頼りません。設定はあとから誰でも変えられますが、
-  //   この条件はコードの中にあるので、門で数えられます。
+  // ★計測（GA4・Microsoft Clarity）は、Preview と development では読み込みません。
   // ★VERCEL_ENV は Vercel が入れる値で、本番は 'production'、Preview は 'preview' です
   //   （Vercel「System environment variables」── build と runtime の両方で使えます）。
   // ★この本はサーバ側の本なので、NEXT_PUBLIC_ が付かない環境変数も読めます
   //   （Next.js 16.2.7 の説明書 01-app/02-guides/environment-variables.md）。
-  const honbanNoKeisokuWoYomu = process.env.VERCEL_ENV === "production";
+  //
+  // ★★★【2026-09-16・決め1287 ── 戦術Cowork `senjutsu_20260916e.md` 2節】
+  //   ★★**倒れる向きを、逆にしました。**
+  //   ★前 …… `VERCEL_ENV === "production"` のときだけ読む。
+  //     ★★★**`VERCEL_ENV` が無いと、計測が止まりました。**
+  //     ★★`app/layout.tsx` はサイト全体の本ですので、★**`/shisan`（テストA）の計測も、同じ日に止まります。**
+  //     ★★★止めには「`/shisan` とテストAの計測に影響を与えない」と在ります ── ★**この形は、それに反します。**
+  //   ★いま …… **`preview` と `development` のときだけ読まない**。
+  //     ・`production` … 読む（★いままでと同じ）
+  //     ・`preview`    … 読まない（★狙いどおり）
+  //     ・`development`… 読まない
+  //     ・★★**無い**  … ★★★**読む**（★`main` のいまの姿と同じ。★★しかも下の「調べの印」が `(なし)` と出ます）
+  //   ★★★**気づいたときには止まっている → 気づくが、止まらない。**
+  //
+  //   ★★「無いときに読むと、Preview でも計測を汚すのでは」…… ★★**汚します。★ですがそれは `main` のいまの姿です。**
+  //     ★System Environment Variables は品物ごとの入／切ですので、★切なら Preview も本番も同じく無くなります。
+  //     ★★つまり「切のときは、いまと同じ姿に戻るだけ」で、★**新しく悪くなる道がありません。**
+  const keisokuWoYomu =
+    process.env.VERCEL_ENV !== "preview" && process.env.VERCEL_ENV !== "development";
+  // ★★「調べの印」を出すかどうかは、**別の値**です（★下の覚え書き）。
+  //   ★★★計測の条件と同じ値にすると、★**`VERCEL_ENV` が無いときに印が出なくなります** ── ★それでは気づけません。
+  const honban = process.env.VERCEL_ENV === "production";
 
   return (
     <html lang="ja" className={cn("font-sans", geist.variable)}>
@@ -118,20 +137,22 @@ export default function RootLayout({
           ★この印は `VERCEL_ENV !== "production"` のときだけ出ます。ですので ──
             ・Preview で `preview` と出れば …… ①（正しい）
             ・Preview で `(なし)` と出れば …… ②（★Vercel の設定が要ります）
-            ・★★本番でこの印が出ていたら …… ②（★本番の計測が止まっています）
+            ・★★本番でこの印が出ていたら …… ②（★Vercel が `VERCEL_ENV` を出していません）
           ★★★本番が正しいときは、この印は出ません。★本番の姿は1バイトも変わりません。
+          ★★★【2026-09-16・決め1287】★**②のときも、計測は止まりません**（★上の `keisokuWoYomu`）。
+            ★★止まるのは「Preview でも計測が動いてしまう」ことだけです。★★**それでも、直す所は Vercel の設定です。**
           ★利用者には見えません（`<meta>` です）。★値は production／preview／development だけで、
             鍵でも住所でもありません。
           ★★消す日 …… ★**本番に出したあと、本番の頁で GA4 と Clarity のタグが
             読み込まれていることを確かめた日**に消します（★「本番化の日」ではありません ──
             ★★本番化のその日が、この印がいちばん要る日です）。
         */}
-        {honbanNoKeisokuWoYomu ? null : (
+        {honban ? null : (
           <meta name="keisoku-shirabe" content={process.env.VERCEL_ENV || "(なし)"} />
         )}
-        {honbanNoKeisokuWoYomu ? <ClarityScript /> : null}
+        {keisokuWoYomu ? <ClarityScript /> : null}
       </body>
-      {honbanNoKeisokuWoYomu ? (
+      {keisokuWoYomu ? (
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       ) : null}
     </html>

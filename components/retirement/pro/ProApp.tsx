@@ -32,6 +32,8 @@ import Screen56 from './Screen56';
 import { FIELDS, manToYen, type FreeInput } from './types';
 import { freeResult, type FreeResult } from '@/lib/retirement/pro/free';
 import { track, getProSessionId, getGaIds, captureGclid } from '@/lib/retirement/pro/track';
+// 決め1320（2026-09-17）：`?op=1` の印を立てる。読むだけで使う本なので、この1本は触りません。
+import { captureOpParam } from '@/lib/shisan/op';
 import { taishokuBandFromYen, idecoBandFromYen, diffBandFromYen } from '@/lib/retirement/pro/band';
 
 const PATH_INPUT = '/retirement/pro';
@@ -121,6 +123,35 @@ export default function ProApp({ genzaiNen, enteredAtResult = false }: Props) {
       //     まだ数えていません**（★戦術Cowork）。
       //   ★★いま、この2つは **`track()`（GA4の計測）だけ**で使っています。
       captureGclid();
+
+      /**
+       * 【2026-09-17・決め1320（戦術Cowork まとめ・3版 6節）】
+       *   `captureOpParam()` を足しました。`?op=1` で、この端末に運営者の印を立てます。
+       *
+       * 【何が欠けていたか】ほかの3本は、前から呼んでいました ──
+       *   `app/shisan/AssetConciergeMvp.tsx` 269行／`components/loan/LoanCalculator.tsx` 174行／
+       *   `components/retirement/TaishokukinCalculator.tsx` 91行。
+       *   この本（`ProApp.tsx`）だけが 0か所でした。
+       *   一方、`lib/retirement/pro/track.ts` は `isOperatorClient()` を読んでいます
+       *   （30行で import・336行の `isDebug()` で呼び出し）。
+       *   読む所は在るのに、立てる所が在りませんでした。
+       *   ですので `/retirement/pro?op=1` で開いても、鍵は立ちませんでした。
+       *
+       * 【過去の数について】2026-08-31〜09-16 の28人の中の森嶋さんの分には、印が付いていません。
+       *   過去の数から機械で外す道は在りません（戦術Cowork まとめ・3版 6-2）。
+       *
+       * 【止め（3つとも、戦術Coworkの明示）】
+       *   (1) `lib/shisan/op.ts` は 1バイトも触りません（読むだけで使う・`track.ts` 22行）。
+       *       `/shisan` とテストAの計測に影響を与えません。
+       *   (2) 送らない形にしません。`isOperatorClient()` が true でも、これまでどおり送って
+       *       `debug: true` を付けます（`track.ts` 335〜341行の `isDebug()`）。送って印を付けておけば後から分けられます。
+       *       送らないと、送っていないことも分かりません。
+       *   (3) `?op=0` での解除も、そのままです（`op.ts` 32行 `window.localStorage.removeItem(KEY)`）。
+       *
+       * 【置く所】`captureGclid()` のすぐ後。どちらも「URLから拾って控える」同じ仕事だからです。
+       */
+      captureOpParam();
+
       const gaId0 = process.env.NEXT_PUBLIC_GA_ID;
       if (gaId0) getGaIds(gaId0);
 

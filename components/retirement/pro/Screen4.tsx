@@ -140,8 +140,25 @@ export default function Screen4({ r }: { r: FreeResult }) {
         </tbody>
       </table>
 
+      {/*
+        【2026-09-17・決め1319(2)（戦術Cowork まとめ・3版 5-1／戦略Coworkのお決め）】
+          下の段落（228字・太字5か所）を `<details>` に畳みました。
+
+        【中の字は1字も変えていません。】畳んだだけです。
+          summary の字 …… 「この例で、控除が足りているかを見る」（基準HTML 697行から1字1句）。
+
+        【§2の7 に当たらないこと】実装指示書 v4 87行「計算の根拠と出典を折りたたまない」は、
+          この段落には当たりません。ここは「その方の数で書いた、例の説明」で、根拠と出典ではないためです。
+          根拠と出典は、この本の下（「この画面の根拠にした資料」）に在り、そちらは畳みません。
+          この線引きは、戦術Coworkと合っています（便n 2節 → まとめ・3版 5-1）。
+
+        【骨】`<details className="…">` ＋ `<summary className="cursor-pointer …">`。
+          画面5-6（`Screen56.tsx` 204〜205行）と同じ形です。
+      */}
       {g.osamaru ? (
-        <p className="mt-3 text-base leading-relaxed text-slate-800">
+        <details className="mt-3 rounded-xl border border-slate-200 p-4">
+        <summary className="cursor-pointer text-base font-bold text-slate-900">この例で、控除が足りているかを見る</summary>
+        <p className="mt-2 text-base leading-relaxed text-slate-800">
           {/* §7-8 の規則3：この1文の2つの額をまとめて決める */}
           あなたの退職金{osa[0]}は、退職所得控除{osa[1]}に収まっています。
           <b className="font-bold">
@@ -166,6 +183,7 @@ export default function Screen4({ r }: { r: FreeResult }) {
             </b>
           )}
         </p>
+        </details>
       ) : null}
 
       {A && g.modoruNen !== null ? (

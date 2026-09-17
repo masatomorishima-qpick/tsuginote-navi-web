@@ -75,6 +75,16 @@ type ReservedPrefix = `_${string}` | `firebase_${string}` | `ga_${string}`
 /** §8-2 無料版（#1〜#17） */
 export type FreeEvent =
   | 'pro_lp_view'
+  /**
+   * ★★★【2026-09-17・戦術Cowork「まとめ便」お願い5】★**画面1の読み進み**です。
+   *   ★★**名前は `pro_lp_scroll`**（★お決めはこちらに任されました）。
+   *   ★理由 …… ★画面2は `pro_result_scroll`、画面5-6は `pro_pricing_scroll` で、
+   *     ★★**どちらも「その画面の呼び名＋`_scroll`」**です。★画面1の呼び名は `pro_lp_view` の `lp` なので、
+   *     ★そろえて `pro_lp_scroll` にしました（★新しい呼び名を作っていません）。
+   *   ★★**§8-2 は #1〜#17 の17本でしたが、これで18本になります**
+   *     （★§8-2 の表そのものは戦術Coworkの持ち場です。★こちらは実装だけ足しました）。
+   */
+  | 'pro_lp_scroll'
   | 'pro_input_start'
   | 'pro_input_field'
   | 'pro_calc_click'
@@ -125,8 +135,13 @@ export type ProEvent = FreeEvent | PaidEvent;
 export type Branch = '対象外' | '空ければ解決' | '金額が小さい' | '空けられない';
 
 /** 画面5-6のブロック（§8-5。`photo` は測らない） */
+/**
+ * ★★【2026-09-17・決め1313】★`'ai'` を外しました（★`Screen56.tsx` から
+ *   「AIに聞けば無料でできるのでは」のかたまりを外したため・★決め1312）。
+ *   ★★**名前をここに残すと、`blocks.ts` の一覧に戻せてしまいます。**★両方から外します。
+ */
 export type PricingBlock =
-  | '4views' | 'different' | 'ai' | 'included'
+  | '4views' | 'different' | 'included'
   | 'cannot' | 'notincluded' | 'notfor' | 'inputs' | 'prepare' | 'price';
 
 /** イベントごとに載せてよいパラメータ。**ここにない鍵は渡せない。** */
@@ -134,6 +149,9 @@ type Params = {
   // 【2026-08-18】`source` → `entry_source`。予約名ではないので動きますが、
   //   GA4には「セッションの参照元」という別のものがあり、レポートで並ぶと紛らわしくなります
   pro_lp_view: { entry_source?: string };
+  // ★★★【2026-09-17・戦術Cowork「まとめ便」お願い5】★画面1の読み進み。
+  //   ★★**中身は `pro_result_scroll`・`pro_pricing_scroll` と同じ形**（★25/50/75/100・同じ深さは一度だけ）。
+  pro_lp_scroll: { depth: 25 | 50 | 75 | 100 };
   pro_input_start: Record<never, never>;
   pro_input_field: { field_no: 1 | 2 | 3 | 4 | 5 };
   pro_calc_click: Record<never, never>;

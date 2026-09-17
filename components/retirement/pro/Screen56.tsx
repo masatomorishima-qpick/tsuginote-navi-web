@@ -140,70 +140,17 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
         />
       </div>
 
-      {/* 4. AIについて。**ここの金額は固定の例**（§5-3） */}
-      <H3 block="ai">「AIに聞けば無料でできるのでは」というご質問について</H3>
-      <table className="mt-3 w-full border-collapse">
-        <thead>
-          <tr><th colSpan={2} className="border-b border-slate-300 py-2 text-left text-base font-bold text-slate-900">生成AI3つの質問結果</th></tr>
-          <tr>
-            <th className="w-24 border-b border-slate-200 py-2 text-left text-base font-bold text-slate-900">聞いた相手</th>
-            <th className="border-b border-slate-200 py-2 text-left text-base font-bold text-slate-900">返ってきた答え</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="border-b border-slate-200">
-            <td className="py-3 pr-3 align-top text-base text-slate-900">1件目</td>
-            <td className="py-3 align-top text-base leading-relaxed text-slate-900">
-              <b className="font-bold">当社と同じ結論</b>（iDeCo等を60歳から5年の年金）。ただし所得税の基礎控除を
-              <b className="font-bold">95万円</b>としていました（あなたが受け取る令和8年分は
-              <b className="font-bold tabular-nums">1,040,000円</b>です）
-            </td>
-          </tr>
-          <tr className="border-b border-slate-200">
-            <td className="py-3 pr-3 align-top text-base text-slate-900">2件目</td>
-            <td className="py-3 align-top text-base leading-relaxed text-slate-900">
-              「退職金の<b className="font-bold">5年後</b>にiDeCo等を一時金で受け取れば<b className="font-bold">税金は0円</b>」。
-              <b className="font-bold">事実と違います</b>
-            </td>
-          </tr>
-          <tr>
-            <td className="py-3 pr-3 align-top text-base text-slate-900">3件目</td>
-            <td className="py-3 align-top text-base leading-relaxed text-slate-900">
-              「両方を60歳で一時金」。住民税を課税退職所得の<b className="font-bold">3%</b>（正しくは10%）、
-              公的年金等控除を<b className="font-bold">120万円</b>（正しくは110万円）としていました
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p className="mt-3 text-base leading-relaxed text-slate-800">
-        <b className="font-bold">結論、全てのツールで異なる結果になりました。2件目がいちばん危ない答えです。</b>
-        退職金を先に受け取った場合、控除が戻るのは<b className="font-bold">20年後</b>です（5年ではありません）。
-        当社が計算すると、この受け取り方の税金は<b className="font-bold tabular-nums">343,751円</b>、
-        手取りは<b className="font-bold tabular-nums">24,651,057円</b>。
-        <b className="font-bold">同じ年にまとめて受け取るより69,285円少なくなります。</b>
-        つまり、この助言に従うと、何もしないより悪くなります。
-      </p>
-      <p className="mt-2 text-[13px] leading-relaxed text-[#5b6470]">
-        ※この3つの金額は、<b className="font-bold text-slate-900">勤続38年・退職金2,000万円・iDeCo等500万円・公的年金220万円の方の例</b>です。公的年金の額によって変わるため、無料版ではお一人ずつの金額は出していません。有料版では、あなたの公的年金の見込額を入れて計算します。
-      </p>
-      <p className="mt-3 text-base leading-relaxed text-slate-800">
-        <b className="font-bold">そして3件とも、5年の年金にすると60歳の時点で手元に入る額が3,720,342円少なくなることを、金額では書きませんでした。</b>
-      </p>
-      <div className="mt-3 rounded-xl border border-[#c2841e] bg-[#fdf6e7] p-4">
-        <b className="text-base font-bold leading-relaxed text-slate-900">
-          AIは、合っているときと間違っているときで、まったく同じ自信で答えます。
-        </b>
-        <span className="mt-1 block text-base leading-relaxed text-slate-900">
-          当社は、アウトプットの信頼性を担保するために、条件分岐のパターンとそれに見合う計算式を作ったうえでアウトプットしています。
-          <b className="font-bold">根拠にした条文も、計算の全ステップもお見せします。</b>
-        </span>
-      </div>
-      <p className="mt-2 text-[13px] leading-relaxed text-[#5b6470]">
-        ※聞いた質問は3件とも同じ文です。AIは日々更新されるため、いま同じことを聞いても同じ答えになるとは限りません。
-        <b className="font-bold text-slate-900">この結果は2026年8月時点のものです。</b>
-      </p>
-
+      {/*
+        ★★★2026-09-17・決め1312（★戦術Cowork `senjutsu_20260917c.md` 2-2・戦略Coworkのお決め）
+          ★★**「AIに聞けば無料でできるのでは」というご質問について**（★見出しと、その下の6つのかたまり）を、
+            ★**この画面から外しました**（★**803字 ／ 太字18か所**）。
+          ★理由 …… ★★**買う直前の画面を短くするためです**（★買う前に読む字 7,596 → **6,995字**）。
+          ★★★**消していません。**★控えは置き場の `bin/senjutsu/ai_hikaku_20260917.html`（2,648バイト）。
+            ★★**記事のどこへ移すかは、戦略Coworkがお決めになります。**★**この回では、どこにも足していません。**
+          ★★あわせて `lib/retirement/pro/blocks.ts` の一覧から `ai` を外しました（★決め1313）──
+            ★**画面に無いのに一覧に在ると、`pro_pricing_block_view` の `ai` がただ 0件になり、
+              ★★「ai で全員落ちた」と読まれる道が在ります。**
+      */}
       {/* 5. そのほかに含まれるもの */}
       <details data-block-start="included" className="mt-6 rounded-xl border border-slate-200 p-4">
         <summary className="cursor-pointer text-base font-bold text-slate-900">そのほかに含まれるもの</summary>
@@ -361,7 +308,20 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
                 （★無料＝当社は保存しない ／ 有料＝当社に保存される）。
               ★★基準HTML **786行**から1字1句。
           */}
-          <li>あなたが入力した内容は当社に保存され、直したいところだけ変えられます。</li>
+          {/*
+            ★★★2026-09-17・決め1308・1312（★戦術Cowork `senjutsu_20260917c.md` 2-1）
+              ★★**9本に置き替えました**（★前は4本）。★基準HTML **775〜786行**から1字1句。
+              ★足した5本 …… ★①計算し直すと前の結果は残りません（★決め1308 ── ★買う前の5画面に **0か所**でした）
+                ／★②当社に原因のある不具合 ／★③お客様のご都合による返金（★どちらも「返金」の語が買う前に **0か所**でした）
+                ／★④⑤**保存期間と削除**（★「保存期間」「削除」も買う前に **0か所**。★字はプライバシーポリシー 15-4・15-6 から）
+              ★★**太字（`<b>`）の付く所も、基準HTMLのとおりです。**
+          */}
+          <li><b className="font-bold">あなたが入力した内容は当社に保存され、直したいところだけ変えられます。</b></li>
+          <li><b className="font-bold">計算し直すと、前の結果は残りません。</b>残しておきたいときは、先にファイルをダウンロードしてください。</li>
+          <li><b className="font-bold">当社に原因のある不具合があったときは、お支払いいただいた額の全額を返金します。</b>support@tsuginotenavi.jp までご連絡ください。</li>
+          <li><b className="font-bold">お客様のご都合による返金は、お受けしていません。</b>ご購入後すぐに計算結果をご覧いただけるためです。</li>
+          <li><b className="font-bold">あなたが入力した内容とメールアドレスは、ご利用いただける期間（購入から1年）が過ぎたあと、60日以内に削除します。</b></li>
+          <li><b className="font-bold">それより前に削除してほしいときは、support@tsuginotenavi.jp までご連絡ください。</b>ご購入時のメールアドレス宛に、ご本人の確認のご連絡をします。</li>
           <li>ご購入時のメールアドレスに、結果を開き直すリンクをお送りします。</li>
           <li>都度のお支払いです。自動更新はありません。</li>
           <li>決済はStripeを利用します。あなたのメールアドレスは米国のStripe, Inc.およびResendに送られます。</li>

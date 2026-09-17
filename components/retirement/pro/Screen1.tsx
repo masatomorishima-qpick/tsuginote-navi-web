@@ -16,9 +16,10 @@
 
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FIELDS, type FieldNo, type FreeInput } from './types';
 import { track } from '@/lib/retirement/pro/track';
+import { observeScrollDepth } from '@/lib/retirement/pro/blocks';
 import { REI, REI_MIDASHI, REI_ZERO, REI_SHUTTEN } from './rei1';
 
 type Props = {
@@ -50,6 +51,22 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const startedRef = useRef(false);
   const fieldSentRef = useRef<Set<FieldNo>>(new Set());
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * ★★★【2026-09-17・戦術Cowork「まとめ便」お願い5】★**画面1の読み進みを測ります。**
+   *   ★★**画面2（`Screen2.tsx` 51行）・画面5-6（`Screen56.tsx` 55行）と同じ形**です
+   *     ── ★同じ `observeScrollDepth`（`lib/retirement/pro/blocks.ts` 83行）を呼びます。
+   *   ★★★**名前は `pro_lp_scroll`**（★25/50/75/100・同じ深さは一度だけ）。
+   *   ★★**測る高さは、このかたまり全部**です ── ★いちばん下の
+   *     「キーボードよけの余白」（★`h-[45vh] min-h-[18rem]`）も入ります。
+   *     ★★★**つまり100%は「余白の底まで来た」であって、「⑤を入れ終えた」ではありません。**
+   *     ★読むときは、この1行を思い出してください。
+   */
+  useEffect(() => {
+    if (!rootRef.current) return;
+    return observeScrollDepth('pro_lp_scroll', rootRef.current);
+  }, []);
 
   const setValue = (key: string, next: string) => {
     if (!startedRef.current) {
@@ -105,7 +122,7 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
   };
 
   return (
-    <div>
+    <div ref={rootRef}>
       {/*
         ★★★2026-09-16・決め1296（★戦術Cowork `senjutsu_20260916h.md` 2-1・森嶋さんのお決め）
           ★★**見出し（h1）を、ツール名にしました。**★★★**見出しと副題を入れ替えたものです。**

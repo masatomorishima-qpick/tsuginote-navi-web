@@ -19,8 +19,18 @@
 import { trackOnce, type PricingBlock } from './track';
 
 /** §8-5 の一覧。**`photo` は測らない。** */
+/**
+ * ★★★【2026-09-17・決め1313（★戦術Cowork `senjutsu_20260917d.md` 2-2）】
+ *   ★**`'ai'` を外しました。**★`Screen56.tsx` から「AIに聞けば無料でできるのでは」の
+ *     かたまりを外したためです（★決め1312）。
+ *   ★★**なぜ外すか** …… ★下の門は「**一覧に無い印が画面に在る**」ときだけ鳴ります。
+ *     ★★★**逆（★一覧に在るのに画面に無い）は、黙って通ります。**
+ *     ★そのままだと `pro_pricing_block_view` の `ai` がただ 0件になり、
+ *     ★★**「ai で全員落ちた」と読まれる道が在ります。**
+ *   ★★`PricingBlock`（`track.ts`）からも同じ日に外しています。
+ */
 export const MEASURED_BLOCKS: readonly PricingBlock[] = [
-  '4views', 'different', 'ai', 'included',
+  '4views', 'different', 'included',
   'cannot', 'notincluded', 'notfor', 'inputs', 'prepare', 'price',
 ] as const;
 
@@ -70,8 +80,14 @@ export function observePricingBlocks(root: ParentNode = document): () => void {
 }
 
 /** 25/50/75/100% の到達（§8-2 #6・#11）。同じ深さは一度だけ送る。 */
+/**
+ * ★★★【2026-09-17・戦術Cowork「まとめ便」お願い5】★**`pro_lp_scroll` を足しました**（★画面1）。
+ *   ★★**この関数の中身は1字も変えていません。**★受け取れる名前を1つ増やしただけです
+ *     （★`Screen1.tsx` から呼べるようにするため）。
+ *   ★★**名前は `track.ts` の `FreeEvent` にも同じ日に足しています**（★片方だけだと tsc が止まります）。
+ */
 export function observeScrollDepth(
-  name: 'pro_result_scroll' | 'pro_pricing_scroll',
+  name: 'pro_lp_scroll' | 'pro_result_scroll' | 'pro_pricing_scroll',
   el: HTMLElement,
 ): () => void {
   if (typeof window === 'undefined') return () => {};

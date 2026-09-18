@@ -43,6 +43,15 @@ function Row({ label, note, value, strong, strongLabel }: {
   );
 }
 
+/** 単語の途中で改行しない（基準HTML `.ph .body .kz`・決め1343） */
+const KZ = '[word-break:keep-all] [overflow-wrap:anywhere] [line-break:strict]';
+
+/**
+ * 「有料版が公的年金まで見る理由」の例の数（決め1343）。**あなたの数ではありません。固定の例です。**
+ * 基準HTML（219,643 ／ 988e520d）の `span.kz-n` から1字1句。`kensa/kz_rei_ate.py` が engine で当てます。
+ */
+const KZ_REI_SA = '＋274,290円';
+
 export default function Screen2({ r, onBuy }: { r: FreeResult; onBuy: () => void }) {
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -324,19 +333,52 @@ export default function Screen2({ r, onBuy }: { r: FreeResult; onBuy: () => void
         確定申告で精算されます。変わるのは、いったん引かれる額と、戻ってくるまでの時間だけです。
       </p>
 
-      <p className="mt-6 text-base leading-relaxed text-slate-800">
-        {r.bunkiSa === 'aru'
-          ? <>上記の手取り最大{signedYen(r.sa)}は、<b className="font-bold">退職金とiDeCo等だけを見た数字</b>です。</>
-          : <>上記の手取り{r.tedori.toLocaleString('en-US')}円は、あなたの<b className="font-bold">退職金とiDeCo等だけを見た数字</b>です。</>}
-        有料版では、あなたの<b className="font-bold">公的年金・保険料・医療費の負担まで見て</b>、最大
-        {/*
-          ★★★2026-09-16・決め1296（★戦術Cowork `senjutsu_20260916h.md` 2-3）
-            ★前 …… 「…通りの手取り**シミュレーションを抽出します**。」
-            ★★いま …… 「…通りの**手取りを比べます**。」★基準HTML **650行**から1字1句。
-            ★理由 …… ★**674行が「比べるのは、有料版です」と書いていますので、そちらに揃えました。**
-        */}
-        <span className="tabular-nums">{r.toorisu.toLocaleString('en-US')}</span>通りの手取りを比べます。
-      </p>
+      {/*
+        【2026-09-18・決め1343（戦術Cowork `kaihatsu_ate_20260918d.md` 3-2・森嶋さんの承認済み）】
+          前の1行（「上記の手取り最大＋◯◯円は、退職金とiDeCo等だけを見た数字です。有料版では、…最大◯◯通りの手取りを比べます。」）を、
+          このかたまりに置き替えました。基準HTML（219,643 ／ 988e520d）711〜735行 `div.kz-sec`。
+
+          止め1 …… このかたまりの「＋274,290円」は、あなたの数ではありません。固定の例です。
+            `r`（freeResult）の数につないではいけません。無料版は公的年金をうかがっていないため、ご本人では計算できない数です。
+            この数は `kensa/kz_rei_ate.py` が engine を回して、基準HTMLとこの本の両方と一致することを確かめています。
+            前の1行が読んでいた `r.sa`・`r.toorisu`・`r.bunkiSa` は、ここでは1つも読みません。
+          止め2 …… 単語の途中で改行しない。`<wbr>` の位置は、字と同じく基準HTMLから1字1句写しています。
+            `.kz` と同じ3つ（word-break:keep-all ／ overflow-wrap:anywhere ／ line-break:strict）を付けています。
+          止め3 …… 絵に、量を表す形（棒・矢印の高さ）を足さない。絵は基準HTMLのSVGを1字1句写したものです。
+          字の大きさは「2. 絶対に守ること」5番（本文16px以上・注記13px以上）に合わせています（基準HTMLの 12px・11.5px・13.5px・14px を上げました）。
+      */}
+      <div className="mt-[30px] mb-1.5 border-t border-slate-200 pt-[22px] text-center">
+        <h2 className={`${KZ} mb-3 text-[22px] font-bold leading-[1.4] tracking-[-0.02em] text-slate-900`}>
+          有料版が<br />公的年金まで<wbr />見る理由
+        </h2>
+        <p className={`${KZ} mb-2.5 text-[13px] leading-[1.75] text-[#5b6470]`}>
+          例：<wbr />65歳・<wbr />退職金2,000万円<wbr />（勤続38年）・<wbr />iDeCo等500万円<wbr />（加入20年）・<wbr />公的年金 年220万円<wbr />（65歳から<wbr />受け取り）
+        </p>
+        <svg className="mt-1 mb-2 block h-auto w-full" viewBox="0 0 320 132" role="img" aria-label="公的年金の受け取り時期を、あとへずらす絵">
+          <line x1="14" y1="104" x2="306" y2="104" stroke="#c7ccd3" strokeWidth="2" strokeLinecap="round"/>
+          <g fill="#c7ccd3"><circle cx="30" cy="104" r="3.5"/><circle cx="82" cy="104" r="3.5"/><circle cx="134" cy="104" r="3.5"/><circle cx="186" cy="104" r="3.5"/><circle cx="238" cy="104" r="3.5"/><circle cx="290" cy="104" r="3.5"/></g>
+          <rect x="14" y="70" width="140" height="26" rx="8" fill="#eaf0f8" stroke="#2c4a7c" strokeWidth="1.5"/>
+          <text x="84" y="88" textAnchor="middle" fontSize="13" fontWeight="700" fill="#2c4a7c">iDeCo等</text>
+          <rect x="14" y="20" width="96" height="30" rx="9" fill="none" stroke="#9aa3ad" strokeWidth="1.5" strokeDasharray="4 4"/>
+          <text x="62" y="40" textAnchor="middle" fontSize="13" fontWeight="700" fill="#9aa3ad">公的年金</text>
+          <rect x="196" y="20" width="110" height="30" rx="9" fill="#0f5f4e"/>
+          <text x="251" y="40" textAnchor="middle" fontSize="13" fontWeight="700" fill="#fff">公的年金</text>
+          <path d="M114 35 C 140 6, 166 6, 188 30" fill="none" stroke="#0f5f4e" strokeWidth="2.4" strokeLinecap="round"/>
+          <path d="M180 30 L 190 33 L 189 22" fill="none" stroke="#0f5f4e" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
+          <text x="160" y="126" textAnchor="middle" fontSize="11" fill="#5b6470">受け取る時期</text>
+        </svg>
+        <div className="mb-1.5 rounded-[14px] border-[1.5px] border-[#0f5f4e] bg-[#e8f3f0] px-3 pt-3 pb-2.5">
+          <p className={`${KZ} m-0 text-base font-bold leading-[1.7] text-slate-900`}>
+            iDeCo等の<wbr />受け取り方と<wbr />一緒に、<wbr />公的年金の<wbr />受け取り時期も<wbr />ずらすと、<br />手取りが最大<span className="mx-0.5 inline-block text-[24px] leading-[1.35] tracking-[-0.02em] tabular-nums text-[#0f5f4e]">{KZ_REI_SA}</span><wbr />多くなります
+          </p>
+        </div>
+        <p className={`${KZ} mb-[18px] text-[13px] leading-[1.7] text-[#5b6470]`}>
+          ※公的年金の額の<wbr />増減は、<wbr />この手取りに<wbr />入っていません。
+        </p>
+        <p className={`${KZ} m-0 text-base leading-[1.85] text-slate-900`}>
+          有料版は<br />公的年金の<wbr />受け取り時期も<wbr />加味した<br />様々な<wbr />受け取り<wbr />パターンを<wbr />可視化して<br /><b className="font-bold">手取りの差を<wbr />明確にします。</b>
+        </p>
+      </div>
 
       {/* §7-4：橙は購入ボタンだけ。ここは案内なので緑の枠線ボタン */}
       <button

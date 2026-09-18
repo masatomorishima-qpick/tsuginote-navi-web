@@ -40,6 +40,19 @@ function toHankakuDigits(s: string): string {
 const withComma = (s: string): string =>
   s === '' ? '' : Number(s).toLocaleString('en-US');
 
+/**
+ * 画面1のアイコン4つ（決め1337・1338）。基準HTML（219,643 ／ 988e520d）の `div.ic4` から1字1句写しています。
+ * 当社が作ったものです。iDeCo公式のロゴ・キャラクターは使っていません（決め1333）。
+ */
+const ICON_P = { viewBox: '0 0 48 48', width: 34, height: 34, fill: 'none', stroke: 'currentColor',
+  strokeWidth: 2.4, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true } as const;
+const ICON4: { label: string; svg: React.ReactNode }[] = [
+  { label: '退職金', svg: <svg {...ICON_P}><rect x="8" y="17" width="32" height="21" rx="3"/><path d="M18 17v-3.5a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V17"/><path d="M8 25h32"/></svg> },
+  { label: 'iDeCo', svg: <svg {...ICON_P}><circle cx="18" cy="15.5" r="5.5"/><path d="M8 38c0-5.8 4.5-9.5 10-9.5"/><path d="M32 38V22"/><path d="M26.5 27.5L32 22l5.5 5.5"/></svg> },
+  { label: '企業型DC', svg: <svg {...ICON_P}><rect x="8" y="12" width="19" height="26" rx="2"/><path d="M12.5 18h4M19 18h4M12.5 25h4M19 25h4"/><path d="M15.5 38v-6h4v6"/><path d="M35 38V22"/><path d="M29.5 27.5L35 22l5.5 5.5"/></svg> },
+  { label: '公的年金', svg: <svg {...ICON_P}><path d="M8 20h32L24 11 8 20z"/><path d="M13 23v12M20.3 23v12M27.7 23v12M35 23v12"/><path d="M7 38h34"/></svg> },
+];
+
 export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
   const [raw, setRaw] = useState<Record<string, string>>(() => ({
     taishokukinMan: initial?.taishokukinMan ?? '',
@@ -124,64 +137,50 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
   return (
     <div ref={rootRef}>
       {/*
-        ★★★2026-09-16・決め1296（★戦術Cowork `senjutsu_20260916h.md` 2-1・森嶋さんのお決め）
-          ★★**見出し（h1）を、ツール名にしました。**★★★**見出しと副題を入れ替えたものです。**
-          ★前 …… 「退職金・iDeCo・企業型DCの受け取り方で、あなたの手取りはいくら変わるか」
-            ★★その字は、下の**副題**に移りました（★消していません）。
-          ★さらに前（決め1263まで） …… 「退職金とiDeCoの受け取り方で、あなたの手取りは**これだけ変わります**」
-          ★★基準HTML **552行**から1字1句写しています。
-      */}
-      {/*
-        ★★★2026-09-17・決め1306（★戦術Cowork `senjutsu_20260917.md` 2節・森嶋さんのお決め）
-          ★★**見出しから【2026年改正対応】を外しました。**
-          ★理由 …… ★★**3行下の本文に「退職所得控除の2026年（令和8年）改正に対応しています。」が在り、
-            同じことを2回申し上げていました**（★基準HTML 552行と555行）。
-          ★★★**`<title>`（`PAGE_TITLE`）と OGP の「【2026年改正対応】」は、外しません**（★決め1306）──
-            ★①`<title>` は**検索結果に出る字**で、★頁を開く前に「何に対応しているか」を伝える役目です。
-            ★②★★**替えると GA4 の画面名がまた切れます**（★2026-09-16 に1度切れたばかりです）。
-          ★★基準HTML **552行**から1字1句写しています。
-      */}
-      <h1 className="text-[26px] font-bold leading-tight text-slate-900 sm:text-[30px]">
-        老後のお金の受け取りシミュレーション
-      </h1>
+        【2026-09-18・決め1337・1343（戦術Cowork `kaihatsu_ate_20260918d.md` 3-1・森嶋さんの承認済み）】
+          画面1の上半分を、基準HTML（219,643 ／ 988e520d）の `div.hero` のとおりに替えました。
+          中央揃え／アイコンは丸の中／STEP1 のすぐ下に入力欄／
+          「退職所得控除の2026年（令和8年）改正に対応しています」はボタンの中。
+          字とSVGは、基準HTMLの画面1から1字1句写しています（`<br>` の位置も）。
 
-      {/*
-        ★★★2026-09-16・決め1296（★戦術Cowork `senjutsu_20260916h.md` 2-1）── ★**副題**です。
-          ★★**見出しのすぐ下**に置きます。★基準HTML **554行**から1字1句写しています。
-          ★★★**前の副題「公的年金を受け取り始める年齢も変えて、全通りを計算します。」は入れません。**
-            ★理由 …… ★★**無料版は「受け取る年だけ」を計算します。**★購入前の副題で
-            「全通りを計算します」と申し上げるのは言い過ぎでした（★戦術Coworkの自認）。
-            ★中身は、下の本文の**有料版の2行**に入っています。
-          ★★基準HTMLは `<p class="hon"><b>…</b></p>`（★**本文・太字**）です。
-      */}
-      <p className="mt-4 text-base font-bold leading-relaxed text-slate-900">
-        退職金・iDeCo・企業型DCの受け取り方で、あなたの手取りはいくら変わるか
-      </p>
+          外した字（基準HTMLから外れたもの。こちらで足したり消したりはしていません）
+            副題「退職金・iDeCo・企業型DCの受け取り方で、あなたの手取りはいくら変わるか」
+              → 「税金と保険料まで見て、あなたに合う受け取り方を探せます」
+            本文5行（改正対応／無料版では…／有料版では…2行／まず、あなたの数字を5つ入力してください。）
+              → STEP1・STEP2 と、ボタンの中の1行に替わりました。
 
-      <p className="mt-4 text-base leading-relaxed text-slate-800">
-        退職所得控除の<b className="font-bold">2026年（令和8年）改正</b>に対応しています。
-        <br />
-        <b className="font-bold">無料版では、あなたの手取りがいくら変わるかをお出しします。</b>
-        <br />
-        {/*
-          ★★★2026-09-16・決め1296（★戦術Cowork `senjutsu_20260916h.md` 2-2）── ★**2行に分けました。**
-            ★前 …… 「有料版では、あなたの公的年金・保険料・医療費の負担まで見て、
-              最大41,216通りの手取りシミュレーションを抽出します。」
-            ★★理由 …… ★★★**41,216通りを生んでいるのは iDeCo等の受け取り方と公的年金の年齢なのに、
-              その字が1つも入っていませんでした**（★基準HTML 664行「この5つを組み合わせると 41,216通り」と食い違い）。
-            ★「抽出します」→「比べます」…… ★基準HTML 674行「比べるのは、有料版です」に揃えました。
-          ★★基準HTML **555行**から1字1句写しています（★`<br>` の分け方も）。
-        */}
-        <b className="font-bold">
-          有料版では、あなたのiDeCo・企業型DCを、いつ・どの形で受け取るかまで計算します。
-        </b>
-        <br />
-        <b className="font-bold">
-          公的年金を受け取り始める年齢と組み合わせて、保険料・医療費の負担まで見て、最大41,216通りの手取りを比べます。
-        </b>
-        <br />
-        まず、あなたの数字を5つ入力してください。
-      </p>
+          字の大きさは、実装指示書 v4 77行「2. 絶対に守ること」5番（本文16px以上・注記13px以上）に合わせています。
+            基準HTMLの 15px・14px・12.5px・11.5px は、本文16px／注記13px に上げました（字は変えていません）。
+
+          アイコン4つは当社が作ったものです。iDeCo公式のロゴ・キャラクターは使っていません（決め1333）。
+          `aria-hidden` です。文字のラベル（`<span>`）と組でだけ意味を持つので、ラベルを外さないでください。
+      */}
+      <div className="text-center">
+        {/* 見出しは決め1296・1306 のまま（基準HTMLの `.hero h2`）。`<title>` と OGP は触っていません */}
+        <h1 className="mt-0.5 mb-2.5 text-[26px] font-bold leading-[1.35] tracking-[-0.02em] text-slate-900 sm:text-[30px]">
+          老後のお金の受け取りシミュレーション
+        </h1>
+        <p className="text-base font-bold leading-[1.7] text-slate-900">
+          税金と保険料まで見て、
+          <br />
+          あなたに合う受け取り方を探せます
+        </p>
+        <div className="mt-[18px] mb-1.5 flex justify-center gap-1.5">
+          {ICON4.map((ic) => (
+            <div key={ic.label} className="flex-1 text-center">
+              <div className="mx-auto flex h-[62px] w-[62px] items-center justify-center rounded-full bg-[#e8f3f0] text-[#0f5f4e]">
+                {ic.svg}
+              </div>
+              <span className="mt-1.5 block text-[13px] font-bold tracking-[-0.04em] text-slate-900">{ic.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-2.5 rounded-[14px] border-[1.5px] border-[#0f5f4e] bg-[#e8f3f0] px-[15px] py-[13px]">
+        <div className="mb-[3px] text-[13px] font-bold tracking-[0.04em] text-[#0f5f4e]">STEP 1　無料</div>
+        <div className="text-base font-bold leading-[1.65] text-slate-900">まずは受け取り方で手取りの違いがあるかを確認しましょう</div>
+      </div>
 
       <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
         {FIELDS.map((f) => (
@@ -228,14 +227,21 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
         ))}
       </div>
 
+      <div className="mt-2.5 rounded-[14px] border-[1.5px] border-slate-200 bg-white px-[15px] py-[13px]">
+        <div className="mb-[3px] text-[13px] font-bold tracking-[0.04em] text-[#5b6470]">STEP 2　有料版</div>
+        <div className="text-base font-bold leading-[1.65] text-slate-900">公的年金を受け取り始める年齢まで動かして、保険料・医療費の負担も見て、あなたが選べる受け取り方を全部比べます</div>
+      </div>
+
+      {/* 決め1337：「退職所得控除の2026年（令和8年）改正に対応しています」はボタンの中（基準HTML `span.btnsub`） */}
       <button
         type="button"
         onClick={submit}
-        className="mt-6 w-full rounded-xl bg-gradient-to-b from-[#127a63] to-[#0f5f4e] px-6 py-4
+        className="mt-4 w-full rounded-xl bg-gradient-to-b from-[#127a63] to-[#0f5f4e] px-6 py-4
                    text-[18px] font-bold text-white
                    focus:outline-none focus:ring-2 focus:ring-[#0f5f4e] focus:ring-offset-2"
       >
         無料で計算する
+        <span className="mt-[3px] block text-[13px] font-medium tracking-normal opacity-90">退職所得控除の2026年（令和8年）改正に対応しています</span>
       </button>
 
       {/*
@@ -251,11 +257,17 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
             （★`pro_result_view` の `taishoku_band`・`ideco_band`）。★書けない字は書きません。
           ★★基準HTML **566行**から1字1句写しています。
       */}
-      <p className="mt-3 text-[13px] leading-relaxed text-[#5b6470]">
-        あなたが入力した金額を、当社は保存しません。
-        <br />
-        金融商品の販売はありません。
-      </p>
+      {/* 決め1337：字は1文字も変えていません。見せ方だけ、札2つに替えました（基準HTML `div.anshin`） */}
+      <div className="mt-3 mb-0.5 flex flex-col items-center gap-1.5">
+        <p className="inline-flex items-center gap-[5px] rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[13px] text-[#5b6470]">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0 text-[#0f5f4e]"><rect x="4" y="10.5" width="16" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+          あなたが入力した金額を、当社は保存しません。
+        </p>
+        <p className="inline-flex items-center gap-[5px] rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[13px] text-[#5b6470]">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0 text-[#0f5f4e]"><circle cx="12" cy="12" r="8.5"/><path d="M6.2 6.2l11.6 11.6"/></svg>
+          金融商品の販売はありません。
+        </p>
+      </div>
 
       {/*
         ★★★2026-09-16・決め1296（★戦術Cowork `senjutsu_20260916h.md` 2-4・森嶋さんのお決め）
@@ -285,48 +297,27 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
             ★★**その後、決め1263（2026-09-16）と決め1296（同日）で2度変わりました。**
             ★いまの h1 は「老後のお金の受け取りシミュレーション【2026年改正対応】」です。
       */}
-      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-        <p className="text-base leading-relaxed text-slate-800">{REI_MIDASHI}</p>
+      {/*
+        【2026-09-18・決め1338（戦術Cowork `kaihatsu_ate_20260918d.md` 3-1・森嶋さんの承認済み）】
+          例のカードを横3枚にし、金額を先に大きく・条件を下に小さくしました（基準HTML `div.reix.big`）。
+          人物の絵は、横3枚では出しません（基準HTML `.reix.big .rei-av{display:none}`）。
+          0円のカードは置きません（「差が出ない方もいます」は下の字に在ります）。
+          2枚めの金額は紺（#2c4a7c）です（基準HTML 418行 `.rei-av.b + .rei-b .rei-n`）。
+          条件の字は 13px です（基準HTMLは 10.5px。実装指示書 v4「2. 絶対に守ること」5番で 13px に上げました）。
+      */}
+      {/* 基準HTMLの `div.reix.big` は、外枠を持ちません（前はこの section に枠と内側の余白が在りました。横3枚にすると1枚の幅が約22px狭くなるので外しました） */}
+      <section className="mt-6">
+        <p className="text-center text-base font-bold leading-relaxed text-slate-900 [text-wrap:balance]">{REI_MIDASHI}</p>
 
-        <ul className="mt-3 space-y-3">
-          {REI.map((r) => (
-            <li key={r.sa} className="flex items-start gap-3 rounded-xl bg-slate-50 p-3 sm:p-4">
-              {/* 輪郭だけの絵。**写真は使いません**（★81） */}
-              <svg
-                viewBox="0 0 40 40"
-                aria-hidden="true"
-                className="mt-0.5 h-10 w-10 shrink-0 fill-[#9aa5b1]"
-              >
-                <circle cx="20" cy="13" r="7.6" />
-                <path d="M5.8 36c0-7.8 6.4-14.2 14.2-14.2S34.2 28.2 34.2 36z" />
-              </svg>
-              <div className="min-w-0">
-                <p className="text-[15px] leading-relaxed text-slate-700">
-                  {r.jouken.map((line) => (
-                    <span key={line} className="block">{line}</span>
-                  ))}
-                </p>
-                {/*
-                  【2026-09-18・決め1327（戦術Cowork `kaihatsu_ate_20260918.md` 1節・
-                    戦略Coworkのお決めC案の一部）】手取りの実額の行を外しました。
-
-                  外した字 …… `<p className="mt-0.5 text-[15px] tabular-nums text-slate-700">{r.maeAto}</p>`
-                    （中身は「27,597,039円 → 28,409,656円」など3人分）
-
-                  理由（戦略Cowork） …… 手取りの実額は2,700万円台で、差（27万円）より桁が2つ大きい。
-                    並べると、差のほうが小さく見える。見ていただきたいのは差です。
-
-                  残しているもの …… 条件（`r.jouken`）と、差の金額（`r.sa`）。
-                  出典（`REI_SHUTTEN`）は畳んでいません
-                    ── 実装指示書 v4 87行「2. 絶対に守ること」7番（戦術Coworkが戦略Cowork案から止めました）。
-
-                  `Rei1` の型からも `maeAto` が消えています（`rei1.ts` は機械が作る本です。
-                  もとは基準HTML 210,993 ／ `a044f034af84a950498aee48a4ffedbc`）。
-                  もし誰かが基準HTMLに `<p class="rei-s">` を戻したら、
-                  `gamen1_chushutsu.mjs` の門(7)が鳴ります。
-                */}
-                <p className="mt-1.5 text-[20px] font-bold tabular-nums text-[#127a63]">{r.sa}</p>
-              </div>
+        <ul className="mt-3 flex gap-2">
+          {REI.map((r, k) => (
+            <li key={r.sa} className="flex min-w-0 flex-1 flex-col items-center gap-1.5 rounded-xl bg-slate-50 px-2.5 py-3.5 text-center">
+              <p className={`text-[20px] font-bold leading-tight tracking-[-0.04em] tabular-nums ${k === 1 ? 'text-[#2c4a7c]' : 'text-[#127a63]'}`}>{r.sa}</p>
+              <p className="mt-1.5 text-[13px] leading-[1.55] text-slate-700 [word-break:keep-all] [overflow-wrap:anywhere]">
+                {r.jouken.map((line) => (
+                  <span key={line} className="block">{line}</span>
+                ))}
+              </p>
             </li>
           ))}
         </ul>

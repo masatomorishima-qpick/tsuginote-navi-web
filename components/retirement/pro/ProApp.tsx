@@ -32,7 +32,7 @@ import Screen56 from './Screen56';
 import { FIELDS, manToYen, type FreeInput } from './types';
 import { freeResult, type FreeResult } from '@/lib/retirement/pro/free';
 import { track, getProSessionId, getGaIds, captureGclid } from '@/lib/retirement/pro/track';
-// `?op=1` の印を立てる（2026-09-17・戦術Cowork まとめ・3版 6節）。読むだけで使う本なので、この1本は触りません。
+// `?op=1` の印を立てる（2026-09-17・戦術Cowork まとめ・3版 6節・決め1323（経緯は1321・1322））。読むだけで使う本なので、この1本は触りません。
 import { captureOpParam } from '@/lib/shisan/op';
 import { taishokuBandFromYen, idecoBandFromYen, diffBandFromYen } from '@/lib/retirement/pro/band';
 
@@ -133,7 +133,10 @@ export default function ProApp({ genzaiNen, enteredAtResult = false }: Props) {
        *   （決め1267「判断ログの番号は、どのCoworkも自分で付けない」）。
        *   判断ログの **1320番は別のこと**でした ── 内部トラフィックの除外フィルタを
        *   「テスト」→「有効」に変えた件（2026-09-17 22:21・森嶋さん）。
-       *   この直しの番号は、戦術Coworkにお願いしています。返ってきたら、ここに入れます。
+       *   この直しの番号は **1323（経緯は1321・1322）** です（戦術Cowork `kaihatsu_ate_20260918d.md` 4-1）。
+       *   1323 の「2本めの道を作ります」の(1)が「開発Coworkが ProApp.tsx に captureOpParam() を入れる」です。
+       *   1321＝/retirement/pro で captureOpParam() を呼んでいる所が0か所だった件／1322＝過去の28人から森嶋さんの分は外せない件。
+       *   3つとも、書く前に判断ログ（2,078,260 ／ 8c217aa2）を開いて読みました。
        *
        * 【何が欠けていたか】ほかの3本は、前から呼んでいました ──
        *   `app/shisan/AssetConciergeMvp.tsx` 269行／`components/loan/LoanCalculator.tsx` 174行／

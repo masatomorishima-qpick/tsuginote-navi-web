@@ -37,11 +37,16 @@ function H3({ block, children }: { block: string; children: React.ReactNode }) {
   );
 }
 
-function Card({ title, body }: { title: string; body: React.ReactNode }) {
+function Card({ title, body, titleClass }: {
+  title: React.ReactNode;
+  /** 無いカードもあります（「手数料・紹介料」のカードは見出しだけ・決め1343） */
+  body?: React.ReactNode;
+  titleClass?: string;
+}) {
   return (
     <div className="rounded-xl border border-slate-200 p-4">
-      <b className="block text-base font-bold leading-relaxed text-slate-900">{title}</b>
-      <span className="mt-1 block text-base leading-relaxed text-slate-800">{body}</span>
+      <b className={`block text-base font-bold leading-relaxed text-slate-900${titleClass ? ` ${titleClass}` : ''}`}>{title}</b>
+      {body !== undefined ? <span className="mt-1 block text-base leading-relaxed text-slate-800">{body}</span> : null}
     </div>
   );
 }
@@ -138,6 +143,17 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
           title="答えだけでなく、計算の全ステップと根拠の条文をお見せします"
           body="1通りずつ、所得税・住民税・復興特別所得税・防衛特別所得税と手数料まで計算し、条文から別に組み直した計算と突き合わせています"
         />
+        {/*
+          【2026-09-18・決め1343（戦術Cowork `kaihatsu_ate_20260918d.md` 3-3・森嶋さんの承認済み）】4枚めのカード。
+            決め1319(3)で「できないこと」の3枚めから外した字を、1字も変えずにここへ戻しました。
+            根拠 …… 実装指示書 v4 92行「2. 絶対に守ること」12番。
+            見せ方 …… 太字1つ。単語の途中で切らないため、`<wbr>` の位置は基準HTML（219,643 ／ 988e520d）817行から1字1句。
+            この字が買う前の画面に在ることは `kensa/tesuryo_mon.mjs` が数えます（本番化の前の門・戦術Cowork 3-3）。
+        */}
+        <Card
+          titleClass="[word-break:keep-all] [overflow-wrap:anywhere] [line-break:strict]"
+          title={<>当社は<wbr />金融機関からも<wbr />士業からも、<wbr />手数料・紹介料を<wbr />受け取っていません</>}
+        />
       </div>
 
       {/*
@@ -183,12 +199,11 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
           【理由】「手数料・紹介料を受け取っていません」は「できないこと」ではなく
             「しないと決めていること」で、「×」の欄に置くと弱みとして読まれるため。
 
-          【この回は、どこにも足しません】移す先（「有料版が、ほかと違うところ」）は次の回です
-            （戦術Coworkの明示）。
+          【2026-09-18・決め1343 で戻しました】移す先は「有料版が、ほかと違うところ」の4枚めのカードです
+            （この本の「3. ほかと違うところ」）。字は1字も変えていません。
 
-          【先に書いておきます】この回のあいだ、買う前の画面に
-            「手数料・紹介料を受け取っていません」は在りません。
-            サイトからは消えていません ── `app/policy/page.tsx` 101行
+          （2026-09-17〜18 のあいだ、買う前の画面にこの字は在りませんでした。
+            そのあいだもサイトからは消えていません） ── `app/policy/page.tsx` 101行
             「当サイトは金融商品を販売していません。販売による手数料も受け取っていません。」が在り、
             `app/retirement/pro/page.tsx` 78行の `SiteFooter`（`components/SiteFooter.tsx` 37行）から
             1回押せば行けます。

@@ -16,6 +16,7 @@
 
 'use client';
 
+import { wakachi } from './Wakachi';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { FIELDS, type FieldNo, type FreeInput } from './types';
 import { track } from '@/lib/retirement/pro/track';
@@ -139,7 +140,8 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
     onSubmit(v);
   };
 
-  return (
+  // 【2026-09-18・決め1348・1350】単語の途中で改行しないよう、字に <wbr> を自動で入れます（./Wakachi.tsx）。字は変えません。
+  return wakachi(
     <div ref={rootRef}>
       {/*
         【2026-09-18・決め1337・1343（戦術Cowork `kaihatsu_ate_20260918d.md` 3-1・森嶋さんの承認済み）】

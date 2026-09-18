@@ -17,6 +17,7 @@
 
 'use client';
 
+import { wakachi } from './Wakachi';
 import { useEffect, useRef } from 'react';
 import type { FreeResult } from '@/lib/retirement/pro/free';
 import { trackOnce } from '@/lib/retirement/pro/track';
@@ -92,7 +93,8 @@ export default function Screen4({ r }: { r: FreeResult }) {
     return () => io.disconnect();
   }, []);
 
-  return (
+  // 【2026-09-18・決め1348・1350】単語の途中で改行しないよう、字に <wbr> を自動で入れます（./Wakachi.tsx）。字は変えません。
+  return wakachi(
     <section ref={ref} className="mt-12 border-t border-slate-200 pt-8">
       <h2 className="text-[22px] font-bold text-slate-900">退職所得控除について</h2>
       <p className="mt-2 text-base leading-relaxed text-slate-800">
@@ -141,23 +143,16 @@ export default function Screen4({ r }: { r: FreeResult }) {
       </table>
 
       {/*
-        【2026-09-17・決め1319(2)（戦術Cowork まとめ・3版 5-1／戦略Coworkのお決め）】
-          下の段落（228字・太字5か所）を `<details>` に畳みました。
-
-        【中の字は1字も変えていません。】畳んだだけです。
-          summary の字 …… 「この例で、控除が足りているかを見る」（基準HTML 697行から1字1句）。
-
-        【§2の7 に当たらないこと】実装指示書 v4 87行「計算の根拠と出典を折りたたまない」は、
-          この段落には当たりません。ここは「その方の数で書いた、例の説明」で、根拠と出典ではないためです。
-          根拠と出典は、この本の下（「この画面の根拠にした資料」）に在り、そちらは畳みません。
-          この線引きは、戦術Coworkと合っています（便n 2節 → まとめ・3版 5-1）。
-
-        【骨】`<details className="…">` ＋ `<summary className="cursor-pointer …">`。
-          画面5-6（`Screen56.tsx` 204〜205行）と同じ形です。
+        【2026-09-18・決め1349（戦術Cowork `kaihatsu_ate_20260918j.md` B-1・戦略Coworkの止め）】畳みを外しました。
+          前（決め1319(2)・2026-09-17）は、下の段落（228字・太字5か所）を `<details>` に畳んでいました。
+          この段落は計算の根拠そのものなので、実装指示書 v4 87行「2. 絶対に守ること」7番
+          （計算の根拠と出典を折りたたまない）に当たります。基準HTML（226,887 ／ e9045851）809〜810行に合わせ、
+          見出しを本文の太字（`<p><b>…</b></p>`）にして、畳まずに出します。字は1字も変えていません。
+          畳まれていないことは `kensa/tatami_mon.mjs` が数えます。
       */}
       {g.osamaru ? (
-        <details className="mt-3 rounded-xl border border-slate-200 p-4">
-        <summary className="cursor-pointer text-base font-bold text-slate-900">この例で、控除が足りているかを見る</summary>
+        <>
+        <p className="mt-3 text-base leading-relaxed text-slate-900"><b className="font-bold">この例で、控除が足りているかを見る</b></p>
         <p className="mt-2 text-base leading-relaxed text-slate-800">
           {/* §7-8 の規則3：この1文の2つの額をまとめて決める */}
           あなたの退職金{osa[0]}は、退職所得控除{osa[1]}に収まっています。
@@ -183,7 +178,7 @@ export default function Screen4({ r }: { r: FreeResult }) {
             </b>
           )}
         </p>
-        </details>
+        </>
       ) : null}
 
       {A && g.modoruNen !== null ? (

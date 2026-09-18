@@ -18,6 +18,7 @@
 
 'use client';
 
+import { wakachi } from './Wakachi';
 import { useEffect, useRef } from 'react';
 import type { FreeResult } from '@/lib/retirement/pro/free';
 import { track } from '@/lib/retirement/pro/track';
@@ -51,6 +52,8 @@ const KZ = '[word-break:keep-all] [overflow-wrap:anywhere] [line-break:strict]';
  * 基準HTML（219,643 ／ 988e520d）の `span.kz-n` から1字1句。`kensa/kz_rei_ate.py` が engine で当てます。
  */
 const KZ_REI_SA = '＋274,290円';
+/** 同じ数の、断り（「※この◯円は、…」・決め1349）の中の字。固定の字です。`kensa/kz_rei_ate.py` が枠の数と engine の両方に当てます */
+const KZ_REI_SA_DAN = '274,290円';
 
 export default function Screen2({ r, onBuy }: { r: FreeResult; onBuy: () => void }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -63,7 +66,8 @@ export default function Screen2({ r, onBuy }: { r: FreeResult; onBuy: () => void
   // 「なぜ差が出るのか」の1文に出てくる3つの額（§7-8 の規則3）
   const naze = bunAmounts(r.kojo, r.uketori, r.hamidashi);
 
-  return (
+  // 【2026-09-18・決め1348・1350】単語の途中で改行しないよう、字に <wbr> を自動で入れます（./Wakachi.tsx）。字は変えません。
+  return wakachi(
     <div ref={rootRef}>
       <h1 className="text-[26px] font-bold leading-tight text-slate-900 sm:text-[30px]">
         老後のお金の受け取りシミュレーション 計算結果
@@ -135,7 +139,10 @@ export default function Screen2({ r, onBuy }: { r: FreeResult; onBuy: () => void
         有料版で判定します。
       </p>
 
-      {/* 緑カード。引き算は定義上合う（sa = saidai − tedori）。
+      {/* 【2026-09-18・決め1350（戦術Cowork `kaihatsu_ate_20260918j.md` C）】差が0円の方の緑カードの字を
+            「手取りは変わりませんでした」から「手取りは増えませんでした」に替えました（基準HTML 226,887 ／ e9045851 の 704行）。
+            差が0円の方も、受け取り方によっては手取りが少なくなるためです（決め1345〜1347）。数は今までどおり r.tedori と r.kazoeta。
+          緑カード。引き算は定義上合う（sa = saidai − tedori）。
           【E-20】差が0円の方（407人中48人＝12%）には「＋0円」を出さず、文のカードにします。
           **「ありません」ではなく「ありませんでした」。**この計算が置いている前提の中での話です。 */}
       <div className="mt-6 rounded-2xl border border-[#0f5f4e]/25 bg-[#f0f7f4] p-5 text-center">
@@ -155,7 +162,7 @@ export default function Screen2({ r, onBuy }: { r: FreeResult; onBuy: () => void
         ) : (
           <>
             <p className="text-base font-bold text-slate-900">
-              あなたの場合、受け取り方を変えても、手取りは変わりませんでした。
+              あなたの場合、受け取り方を変えても、手取りは増えませんでした。
             </p>
             <div className="mt-1 text-[34px] font-bold leading-tight tabular-nums text-[#0f5f4e]">
               {yen(r.tedori)}
@@ -346,6 +353,7 @@ export default function Screen2({ r, onBuy }: { r: FreeResult; onBuy: () => void
             `r`（freeResult）の数につないではいけません。無料版は公的年金をうかがっていないため、ご本人では計算できない数です。
             この数は `kensa/kz_rei_ate.py` が engine を回して、基準HTMLとこの本の両方と一致することを確かめています。
             前の1行が読んでいた `r.sa`・`r.toorisu`・`r.bunkiSa` は、ここでは1つも読みません。
+          断り（2026-09-18・決め1349）…… 「※この274,290円は、…増減は入っていません。」の数は `KZ_REI_SA_DAN`（固定の字）です。緑の枠の数とずれていないことは `kensa/kz_rei_ate.py` が数えます。
           止め2 …… 単語の途中で改行しない。`<wbr>` の位置は、字と同じく基準HTMLから1字1句写しています。
             `.kz` と同じ3つ（word-break:keep-all ／ overflow-wrap:anywhere ／ line-break:strict）を付けています。
           止め3 …… 絵に、量を表す形（棒・矢印の高さ）を足さない。絵は基準HTMLのSVGを1字1句写したものです。
@@ -377,7 +385,7 @@ export default function Screen2({ r, onBuy }: { r: FreeResult; onBuy: () => void
           </p>
         </div>
         <p className={`${KZ} mb-[18px] text-[13px] leading-[1.7] text-[#5b6470]`}>
-          ※公的年金の額の<wbr />増減は、<wbr />この手取りに<wbr />入っていません。
+          ※この{KZ_REI_SA_DAN}は、<wbr />退職金と<wbr />iDeCo等の<wbr />手取りの差です。<wbr />公的年金を<wbr />遅らせたことによる、<wbr />公的年金<wbr />そのものの<wbr />増減は<wbr />入っていません。
         </p>
         <p className={`${KZ} m-0 text-base leading-[1.85] text-slate-900`}>
           有料版は<br />公的年金の<wbr />受け取り時期も<wbr />加味した<br />様々な<wbr />受け取り<wbr />パターンを<wbr />可視化して<br /><b className="font-bold">手取りの差を<wbr />明確にします。</b>

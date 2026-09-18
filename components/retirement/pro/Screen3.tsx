@@ -14,6 +14,7 @@
 
 'use client';
 
+import { wakachi } from './Wakachi';
 import { useEffect, useRef } from 'react';
 import type { FreeResult } from '@/lib/retirement/pro/free';
 import { trackOnce } from '@/lib/retirement/pro/track';
@@ -48,7 +49,8 @@ export default function Screen3({ r }: { r: FreeResult }) {
     return () => io.disconnect();
   }, []);
 
-  return (
+  // 【2026-09-18・決め1348・1350】単語の途中で改行しないよう、字に <wbr> を自動で入れます（./Wakachi.tsx）。字は変えません。
+  return wakachi(
     <section ref={ref} className="mt-12 border-t border-slate-200 pt-8">
       <h2 className="text-[22px] font-bold text-slate-900">退職金受け取りのポイント</h2>
       <p className="mt-2 text-base leading-relaxed text-slate-800">

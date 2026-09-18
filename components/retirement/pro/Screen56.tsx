@@ -22,6 +22,7 @@
 
 'use client';
 
+import { wakachi } from './Wakachi';
 import { useEffect, useRef } from 'react';
 import type { FreeResult } from '@/lib/retirement/pro/free';
 import { track, trackOnce } from '@/lib/retirement/pro/track';
@@ -72,7 +73,8 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
     return () => { for (const s of stops) s(); };
   }, []);
 
-  return (
+  // 【2026-09-18・決め1348・1350】単語の途中で改行しないよう、字に <wbr> を自動で入れます（./Wakachi.tsx）。字は変えません。
+  return wakachi(
     <section id="pro-pricing" ref={ref} className="mt-12 border-t border-slate-200 pt-8">
       <h2 className="text-[22px] font-bold text-slate-900">
           [有料版]老後のお金の受け取りシミュレーションについて
@@ -241,16 +243,20 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
         />
       </div>
 
-      {/* 7. 計算に入れていないもの */}
-      <details data-block-start="notincluded" className="mt-6 rounded-xl border border-slate-200 p-4">
-        <summary className="cursor-pointer text-base font-bold text-slate-900">そのほか、計算に入れていないもの</summary>
+      {/* 7. 計算に入れていないもの
+          【2026-09-18・決め1349（戦術Cowork `kaihatsu_ate_20260918j.md` B-1）】畳みを外しました（前は `<details>`）。
+          計算に入れていないものは計算の根拠に当たるため、実装指示書 v4 87行「2. 絶対に守ること」7番で畳みません。
+          基準HTML（226,887 ／ e9045851）862〜869行に合わせ、見出しは本文の太字。字は1字も変えていません。
+          計測の区切り（`data-block-start="notincluded"`）は、見出しと並びを包む `<div>` に移しました（`pro_pricing_block_view` の `notincluded` はそのまま測れます）。 */}
+      <div data-block-start="notincluded" className="mt-6">
+        <p className="text-base leading-relaxed text-slate-900"><b className="font-bold">そのほか、計算に入れていないもの</b></p>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-base leading-relaxed text-slate-900">
           <li><b className="font-bold">介護保険料の段階と金額。</b>段階の数も区切りも市区町村の条例で違います。<b className="font-bold">あなたの段階は、お住まいの市区町村にご確認ください。</b></li>
           <li><b className="font-bold">高額療養費・高額介護サービス費。</b>医療費の窓口負担が2割・3割になるかどうかはお伝えしますが、ひと月の自己負担の上限は計算していません</li>
           <li><b className="font-bold">あなたが受け取り切る前に亡くなった場合。</b>残りは相続税の対象に変わります（500万円×相続人の数までは非課税）。このツールは<b className="font-bold">あなたが受け取り切ること</b>を前提に比べています。年金で長く受け取るほど、この残りは大きくなります</li>
           <li><b className="font-bold">一部の所得控除。</b>特定親族特別控除・勤労学生控除・医療費控除・雑損控除・寄附金控除は計算に入れていません。所得金額調整控除も、給与の収入が850万円を超える場合の分は入れていません</li>
         </ul>
-      </details>
+      </div>
 
       {/* 8. お役に立てない場合 */}
       <div data-block-start="notfor" className="mt-6 rounded-xl border border-[#c2841e] bg-[#fdf6e7] p-4">

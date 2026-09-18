@@ -97,7 +97,7 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
         <li><b className="font-bold">公的医療保険料・介護保険料が上がらない</b>のはどれか</li>
       </ul>
 
-      {/* 【E-20】差が0円の方（407人中48人＝12%）には「0円」を出さず、文のカードにします。
+      {/* 【E-20】差が0円の方（407人中48人＝12%）には「0円」を出さず、文のカードにします（2026-09-18・決め1347 で、そのカードの字を替えました。下の覚え書き）。
           **「差が出ます」と断定しない／「有料版でないと分かりません」と書かない。**事実だけを置きます。 */}
       {r.bunkiSa === 'aru' ? (
         <>
@@ -117,16 +117,30 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
           </p>
         </>
       ) : (
-        <div className="mt-4 rounded-2xl border border-[#0f5f4e]/25 bg-[#f0f7f4] p-5">
-          <p className="text-base font-bold leading-relaxed text-slate-900">
-            あなたの場合、退職金とiDeCo等の受け取り方だけを変えても、手取りは変わりませんでした。
+        /*
+          【2026-09-18・決め1347（戦術Cowork `kaihatsu_ate_20260918h.md` B-2・戦略Coworkの止め・森嶋さんのお決め）】
+            差が0円の方（`r.bunkiSa === 'nashi'`＝`free.ts` 237行 `sa > 0 ? 'aru' : 'nashi'`）にだけ出す箱と1行です。
+            上の緑の箱と「この◯円も…」の1行とは、どちらか一方だけが出ます（両方を同時に出さない）。
+            字は基準HTML（224,881 ／ 1e102a66）835〜836行 `data-sa0="1"` の2つから1字1句。差を計算し直していません。
+            前はここに「あなたの場合、退職金とiDeCo等の受け取り方だけを変えても、手取りは変わりませんでした。」と
+            「有料版では、あなたが公的年金を…まだ見ていない部分です。」の箱が在りました（基準HTMLには無い字でした）。
+            「変わりませんでした」は「どう受け取っても同じ額」と読まれるので外しました（決め1345・1346・1347）。
+            出る箱が1つだけであることは `kensa/sa0_hako_mon.tsx` が数えます。
+        */
+        <>
+          <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5">
+            <p className="text-base leading-relaxed text-slate-900">
+              <b className="font-bold">あなたの場合、いちばん多く残るのは、一度にまとめて受け取る方法です。</b>
+              受け取り方によっては、手取りが少なくなることがあります。どの受け取り方でいくら少なくなるかは、有料版でご覧いただけます。
+            </p>
+          </div>
+          <p className="mt-3 text-base leading-relaxed text-slate-800">
+            <b className="font-bold">
+              この結果も、退職金以外の収入・公的年金・すでに受け取った退職手当等・所得控除を「なし」として計算しています。
+            </b>
+            あなたに当てはまるものがあると、実際の金額は変わります。
           </p>
-          <p className="mt-3 text-base leading-relaxed text-slate-900">
-            有料版では、あなたが公的年金を受け取り始める年齢（60歳〜75歳）と、
-            公的医療保険料・介護保険料・医療費の窓口負担も含めて計算します。
-            ここまでの計算では、まだ見ていない部分です。
-          </p>
-        </div>
+        </>
       )}
       <p className="mt-3 text-base leading-relaxed text-slate-800">
         4つとも同じ受け取り方になる方もいます。その場合は「どの見方で比べても同じです」とお伝えします。分かれる場合は、方向ごとに並べて差額を示します。

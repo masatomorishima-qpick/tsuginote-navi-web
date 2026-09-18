@@ -306,8 +306,26 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
                     <span key={line} className="block">{line}</span>
                   ))}
                 </p>
+                {/*
+                  【2026-09-18・決め1327（戦術Cowork `kaihatsu_ate_20260918.md` 1節・
+                    戦略Coworkのお決めC案の一部）】手取りの実額の行を外しました。
+
+                  外した字 …… `<p className="mt-0.5 text-[15px] tabular-nums text-slate-700">{r.maeAto}</p>`
+                    （中身は「27,597,039円 → 28,409,656円」など3人分）
+
+                  理由（戦略Cowork） …… 手取りの実額は2,700万円台で、差（27万円）より桁が2つ大きい。
+                    並べると、差のほうが小さく見える。見ていただきたいのは差です。
+
+                  残しているもの …… 条件（`r.jouken`）と、差の金額（`r.sa`）。
+                  出典（`REI_SHUTTEN`）は畳んでいません
+                    ── 実装指示書 v4 87行「2. 絶対に守ること」7番（戦術Coworkが戦略Cowork案から止めました）。
+
+                  `Rei1` の型からも `maeAto` が消えています（`rei1.ts` は機械が作る本です。
+                  もとは基準HTML 210,993 ／ `a044f034af84a950498aee48a4ffedbc`）。
+                  もし誰かが基準HTMLに `<p class="rei-s">` を戻したら、
+                  `gamen1_chushutsu.mjs` の門(7)が鳴ります。
+                */}
                 <p className="mt-1.5 text-[20px] font-bold tabular-nums text-[#127a63]">{r.sa}</p>
-                <p className="mt-0.5 text-[15px] tabular-nums text-slate-700">{r.maeAto}</p>
               </div>
             </li>
           ))}

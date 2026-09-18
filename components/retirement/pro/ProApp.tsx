@@ -32,7 +32,7 @@ import Screen56 from './Screen56';
 import { FIELDS, manToYen, type FreeInput } from './types';
 import { freeResult, type FreeResult } from '@/lib/retirement/pro/free';
 import { track, getProSessionId, getGaIds, captureGclid } from '@/lib/retirement/pro/track';
-// 決め1320（2026-09-17）：`?op=1` の印を立てる。読むだけで使う本なので、この1本は触りません。
+// `?op=1` の印を立てる（2026-09-17・戦術Cowork まとめ・3版 6節）。読むだけで使う本なので、この1本は触りません。
 import { captureOpParam } from '@/lib/shisan/op';
 import { taishokuBandFromYen, idecoBandFromYen, diffBandFromYen } from '@/lib/retirement/pro/band';
 
@@ -125,8 +125,15 @@ export default function ProApp({ genzaiNen, enteredAtResult = false }: Props) {
       captureGclid();
 
       /**
-       * 【2026-09-17・決め1320（戦術Cowork まとめ・3版 6節）】
+       * 【2026-09-17・戦術Cowork まとめ・3版 6節】
        *   `captureOpParam()` を足しました。`?op=1` で、この端末に運営者の印を立てます。
+       *
+       * 【番号について・2026-09-18 に直しました】
+       *   ここには「決め1320」と書いていました。**開発Coworkが自分で付けた番号で、誤りです**
+       *   （決め1267「判断ログの番号は、どのCoworkも自分で付けない」）。
+       *   判断ログの **1320番は別のこと**でした ── 内部トラフィックの除外フィルタを
+       *   「テスト」→「有効」に変えた件（2026-09-17 22:21・森嶋さん）。
+       *   この直しの番号は、戦術Coworkにお願いしています。返ってきたら、ここに入れます。
        *
        * 【何が欠けていたか】ほかの3本は、前から呼んでいました ──
        *   `app/shisan/AssetConciergeMvp.tsx` 269行／`components/loan/LoanCalculator.tsx` 174行／

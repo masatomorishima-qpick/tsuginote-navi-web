@@ -37,15 +37,19 @@ function H3({ block, children }: { block: string; children: React.ReactNode }) {
   );
 }
 
-function Card({ title, body, titleClass }: {
+/** 単語の途中で改行しない（基準HTML `.kz`・決め1343・1344） */
+const KZ = '[word-break:keep-all] [overflow-wrap:anywhere] [line-break:strict]';
+
+function Card({ title, body, kz }: {
   title: React.ReactNode;
   /** 無いカードもあります（「手数料・紹介料」のカードは見出しだけ・決め1343） */
   body?: React.ReactNode;
-  titleClass?: string;
+  /** 見出しと本文を、単語の途中で切らない組み方にする（基準HTMLの `div.vtxt kz`・決め1344） */
+  kz?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 p-4">
-      <b className={`block text-base font-bold leading-relaxed text-slate-900${titleClass ? ` ${titleClass}` : ''}`}>{title}</b>
+    <div className={`rounded-xl border border-slate-200 p-4${kz ? ` ${KZ}` : ''}`}>
+      <b className="block text-base font-bold leading-relaxed text-slate-900">{title}</b>
       {body !== undefined ? <span className="mt-1 block text-base leading-relaxed text-slate-800">{body}</span> : null}
     </div>
   );
@@ -131,27 +135,35 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
       {/* 3. ほかと違うところ */}
       <H3 block="different">有料版が、ほかと違うところ</H3>
       <div className="mt-3 space-y-3">
+        {/*
+          【2026-09-18・決め1344（戦術Cowork `kaihatsu_ate_20260918f.md` 2-3）】前からある3枚に、単語の途中で切らない組み方を入れました。
+            字も太字の位置も変えていません。`<wbr>` の位置は基準HTML（222,774 ／ 9c153ae4）833〜835行から1字1句（機械で写しました）。
+            前は「介護保険／料」「計／算します」「根拠／の条文」の3か所で、単語の途中で切れていました。
+        */}
         <Card
-          title="公的年金・iDeCo等・税金を、同じ年の上に並べて計算し、国民健康保険料・介護保険料・医療費の負担もチェックできます"
-          body={<>公的年金は年金事務所、iDeCo等は金融機関、税金は税務署。ばらばらに聞くしかなかった3つを、まとめて計算します。税金だけを見て決めると、<b className="font-bold">国民健康保険料の軽減がなくなる案</b>を選んでしまうことがあります</>}
+          kz
+          title={<>公的年金・<wbr />iDeCo等・<wbr />税金を、<wbr />同じ年の上に<wbr />並べて計算し、<wbr />国民健康保険料・<wbr />介護保険料・<wbr />医療費の負担も<wbr />チェックできます</>}
+          body={<>公的年金は<wbr />年金事務所、<wbr />iDeCo等は<wbr />金融機関、<wbr />税金は<wbr />税務署。<wbr />ばらばらに<wbr />聞くしか<wbr />なかった<wbr />3つを、<wbr />まとめて<wbr />計算します。<wbr />税金だけを<wbr />見て<wbr />決めると、<wbr /><b className="font-bold">国民健康保険料の<wbr />軽減が<wbr />なくなる案</b>を<wbr />選んでしまう<wbr />ことがあります</>}
         />
         <Card
-          title="あなたが実際に選べる受け取り方だけを計算します"
-          body={<>退職金を受け取る年を選べる方は多くありません。このツールは、あなたがご入力になった年齢で計算します。<b className="font-bold">あなたが実際に選べない案は出しません。</b></>}
+          kz
+          title={<>あなたが<wbr />実際に<wbr />選べる<wbr />受け取り方だけを<wbr />計算します</>}
+          body={<>退職金を<wbr />受け取る年を<wbr />選べる方は<wbr />多くありません。<wbr />このツールは、<wbr />あなたが<wbr />ご入力になった<wbr />年齢で<wbr />計算します。<wbr /><b className="font-bold">あなたが<wbr />実際に<wbr />選べない案は<wbr />出しません。</b></>}
         />
         <Card
-          title="答えだけでなく、計算の全ステップと根拠の条文をお見せします"
-          body="1通りずつ、所得税・住民税・復興特別所得税・防衛特別所得税と手数料まで計算し、条文から別に組み直した計算と突き合わせています"
+          kz
+          title={<>答えだけでなく、<wbr />計算の<wbr />全ステップと<wbr />根拠の条文を<wbr />お見せします</>}
+          body={<>1通りずつ、<wbr />所得税・<wbr />住民税・<wbr />復興特別所得税・<wbr />防衛特別所得税と<wbr />手数料まで<wbr />計算し、<wbr />条文から<wbr />別に<wbr />組み直した<wbr />計算と<wbr />突き合わせています</>}
         />
         {/*
           【2026-09-18・決め1343（戦術Cowork `kaihatsu_ate_20260918d.md` 3-3・森嶋さんの承認済み）】4枚めのカード。
             決め1319(3)で「できないこと」の3枚めから外した字を、1字も変えずにここへ戻しました。
             根拠 …… 実装指示書 v4 92行「2. 絶対に守ること」12番。
-            見せ方 …… 太字1つ。単語の途中で切らないため、`<wbr>` の位置は基準HTML（219,643 ／ 988e520d）817行から1字1句。
+            見せ方 …… 太字1つ。単語の途中で切らないため、`<wbr>` の位置は基準HTML（219,643 ／ 988e520d）817行から1字1句（222,774 ／ 9c153ae4 では 837行・字は同じ）。
             この字が買う前の画面に在ることは `kensa/tesuryo_mon.mjs` が数えます（本番化の前の門・戦術Cowork 3-3）。
         */}
         <Card
-          titleClass="[word-break:keep-all] [overflow-wrap:anywhere] [line-break:strict]"
+          kz
           title={<>当社は<wbr />金融機関からも<wbr />士業からも、<wbr />手数料・紹介料を<wbr />受け取っていません</>}
         />
       </div>

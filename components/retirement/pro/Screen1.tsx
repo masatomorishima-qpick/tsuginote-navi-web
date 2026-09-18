@@ -16,11 +16,16 @@
 
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { FIELDS, type FieldNo, type FreeInput } from './types';
 import { track } from '@/lib/retirement/pro/track';
 import { observeScrollDepth } from '@/lib/retirement/pro/blocks';
-import { REI, REI_MIDASHI, REI_ZERO, REI_SHUTTEN } from './rei1';
+import { REI, REI_MIDASHI, REI_ZERO, REI_SHUTTEN, REI_CHUU, type Kire } from './rei1';
+
+/** 単語の途中で改行しない（基準HTML `.kz`・決め1343・1344） */
+const KZ = '[word-break:keep-all] [overflow-wrap:anywhere] [line-break:strict]';
+/** `<wbr>` で切った切れはしの並びを、`<wbr />` をはさんで出す（切れはしは `rei1.ts` が基準HTMLから取ったもの） */
+const kireWbr = (k: Kire) => k.map((t, i) => <Fragment key={i}>{i > 0 ? <wbr /> : null}{t}</Fragment>);
 
 type Props = {
   /** 入力が揃ったときに呼ばれる。親が計算して結果に切り替える */
@@ -232,7 +237,8 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
         <div className="text-base font-bold leading-[1.65] text-slate-900">公的年金を受け取り始める年齢まで動かして、保険料・医療費の負担も見て、あなたが選べる受け取り方を全部比べます</div>
       </div>
 
-      {/* 決め1337：「退職所得控除の2026年（令和8年）改正に対応しています」はボタンの中（基準HTML `span.btnsub`） */}
+      {/* 決め1337：「退職所得控除の2026年（令和8年）改正に対応しています」はボタンの中（基準HTML `span.btnsub`）。
+          決め1344：2行になる所は `<wbr>` の3か所だけ（基準HTML 636行から1字1句）。 */}
       <button
         type="button"
         onClick={submit}
@@ -241,7 +247,7 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
                    focus:outline-none focus:ring-2 focus:ring-[#0f5f4e] focus:ring-offset-2"
       >
         無料で計算する
-        <span className="mt-[3px] block text-[13px] font-medium tracking-normal opacity-90">退職所得控除の2026年（令和8年）改正に対応しています</span>
+        <span className={`${KZ} mt-[3px] block text-[13px] font-medium tracking-normal opacity-90`}>退職所得控除の<wbr />2026年（令和8年）<wbr />改正に<wbr />対応しています</span>
       </button>
 
       {/*
@@ -298,29 +304,43 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
             ★いまの h1 は「老後のお金の受け取りシミュレーション【2026年改正対応】」です。
       */}
       {/*
-        【2026-09-18・決め1338（戦術Cowork `kaihatsu_ate_20260918d.md` 3-1・森嶋さんの承認済み）】
-          例のカードを横3枚にし、金額を先に大きく・条件を下に小さくしました（基準HTML `div.reix.big`）。
-          人物の絵は、横3枚では出しません（基準HTML `.reix.big .rei-av{display:none}`）。
-          0円のカードは置きません（「差が出ない方もいます」は下の字に在ります）。
-          2枚めの金額は紺（#2c4a7c）です（基準HTML 418行 `.rei-av.b + .rei-b .rei-n`）。
-          条件の字は 13px です（基準HTMLは 10.5px。実装指示書 v4「2. 絶対に守ること」5番で 13px に上げました）。
+        【2026-09-18・決め1345（戦術Cowork `kaihatsu_ate_20260918f.md` 3-1・森嶋さんの草案）】
+          例のカードを、森嶋さんの草案の形にしました（基準HTML 222,774 ／ 9c153ae4 の 649〜672行・CSS 527〜537行）。
+          1枚 ＝ 名前（Aさん など）／顔（当社が描いた人の形・前から在るSVG）／「手取りの差」／金額／条件3行。
+          3人とも同じ「加入20年、60歳で受け取る」は、カードの下の1行（`REI_CHUU`）にまとめました。
+          Bさんは紺（基準HTML `rei rei3 b`）。どのカードが紺かは `rei1.ts` の `kon` が持ちます（ここで番号を決めません）。
+          字と `<wbr>` は `rei1.ts`（`kensa/gamen1_chushutsu.mjs` が基準HTMLから機械で作る本）から出します。
+          金額は、差の数え方（その方の手取りの最大 − 同じ年にまとめて一時金の手取り）で engine で測った固定の字です。
+          字の大きさは基準HTMLと同じです（名前13px・見出し15px・金額20px・条件13px・下の1行13px。どれも13px以上）。
+
+        【前の形（決め1338）から外したもの】「差 812,617円」の「差」と空白（基準HTMLの字が「812,617円」になりました）。
       */}
-      {/* 基準HTMLの `div.reix.big` は、外枠を持ちません（前はこの section に枠と内側の余白が在りました。横3枚にすると1枚の幅が約22px狭くなるので外しました） */}
+      {/* 基準HTMLの `div.reix.big` は、外枠を持ちません */}
       <section className="mt-6">
         <p className="text-center text-base font-bold leading-relaxed text-slate-900 [text-wrap:balance]">{REI_MIDASHI}</p>
 
-        <ul className="mt-3 flex gap-2">
-          {REI.map((r, k) => (
-            <li key={r.sa} className="flex min-w-0 flex-1 flex-col items-center gap-1.5 rounded-xl bg-slate-50 px-2.5 py-3.5 text-center">
-              <p className={`text-[20px] font-bold leading-tight tracking-[-0.04em] tabular-nums ${k === 1 ? 'text-[#2c4a7c]' : 'text-[#127a63]'}`}>{r.sa}</p>
-              <p className="mt-1.5 text-[13px] leading-[1.55] text-slate-700 [word-break:keep-all] [overflow-wrap:anywhere]">
+        <ul className="mt-3 flex gap-1.5">
+          {REI.map((r) => (
+            <li key={r.na} className="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-2xl border border-slate-200 bg-white px-1 py-3 text-center">
+              <p className="text-[13px] leading-[1.4] text-[#5b6470]">{r.na}</p>
+              {/* 輪郭だけの絵。**写真は使いません**（★81）。実在の方ではありません（見出しに書いています） */}
+              <div className={`mt-0.5 mb-1 flex h-12 w-12 items-center justify-center rounded-full ${r.kon ? 'bg-[#eaf0f8]' : 'bg-[#e8f3f0]'}`}>
+                <svg viewBox="0 0 40 40" aria-hidden="true" className={`h-[30px] w-[30px] ${r.kon ? 'fill-[#2c4a7c]' : 'fill-[#0f5f4e]'}`}>
+                  <circle cx="20" cy="13" r="7.6" />
+                  <path d="M5.8 36c0-7.8 6.4-14.2 14.2-14.2S34.2 28.2 34.2 36z" />
+                </svg>
+              </div>
+              <p className={`${KZ} text-[15px] font-bold leading-[1.4] text-slate-900`}>{r.midashi}</p>
+              <p className={`${KZ} mb-1 text-[20px] font-bold leading-tight tracking-[-0.04em] tabular-nums ${r.kon ? 'text-[#2c4a7c]' : 'text-[#0f5f4e]'}`}>{r.sa}</p>
+              <p className={`${KZ} text-[13px] leading-[1.55] text-[#5b6470]`}>
                 {r.jouken.map((line) => (
-                  <span key={line} className="block">{line}</span>
+                  <span key={line.join('')} className="block">{kireWbr(line)}</span>
                 ))}
               </p>
             </li>
           ))}
         </ul>
+        <p className={`${KZ} mt-2.5 text-center text-[13px] leading-[1.6] text-[#5b6470]`}>{kireWbr(REI_CHUU)}</p>
 
         {/* **本文と同じ 16px。**同じブロックの中に置きます（★81） */}
         <p className="mt-4 text-base leading-relaxed text-slate-800">

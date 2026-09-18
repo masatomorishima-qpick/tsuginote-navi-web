@@ -39,6 +39,7 @@
 
 'use client';
 
+import { wakachi } from './Wakachi';
 import { useEffect, useRef } from 'react';
 import { GAMEN13, type Block13 } from './gamen13';
 import { track } from '@/lib/retirement/pro/track';
@@ -97,7 +98,8 @@ export default function Screen13({ genzaiNen, hitogotoBun, hitogotoAri }: Props)
   };
   GAMEN13.forEach(hito);
 
-  return (
+  // 【2026-09-19・決め1352】単語の途中で改行しないよう、字に <wbr> を自動で入れます（./Wakachi.tsx）。字は変えません。
+  return wakachi(
     <div>
       {GAMEN13.map((b, i) => {
         if (b.kind === 'midashi') {

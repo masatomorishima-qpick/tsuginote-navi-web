@@ -22,6 +22,7 @@
 
 'use client';
 
+import { wakachi, wakachiJi } from './Wakachi';
 import { useEffect } from 'react';
 import type { Bun8 } from '@/lib/retirement/pro/gamen8Bun';
 import { track } from '@/lib/retirement/pro/track';
@@ -44,11 +45,12 @@ type Props = {
 /** `\n` を `<br>` にする。**文の中の改行は `gamen8Bun()` が決めています** */
 function Gyo({ t }: { t: string }) {
   const xs = t.split('\n');
+  // 【2026-09-19・決め1352】1行ずつ、単語の途中で改行しない印（<wbr>）を入れます（./Wakachi.tsx の wakachiJi）。字は変えません
   return (
     <>
       {xs.map((x, i) => (
         <span key={i}>
-          {x}
+          {wakachiJi(x)}
           {i < xs.length - 1 ? <br /> : null}
         </span>
       ))}
@@ -83,7 +85,8 @@ export default function Screen8({ b, pattern, onSusumu, onDownload, downloadMatt
   // §8-3。`pattern` は `gamen8()` の `kado_su` をそのまま渡してください（画面で数えない）
   useEffect(() => { track('pro_result8_view', { pattern }); }, [pattern]);
 
-  return (
+  // 【2026-09-19・決め1352】単語の途中で改行しないよう、字に <wbr> を自動で入れます（./Wakachi.tsx）。字は変えません。
+  return wakachi(
     <div>
       <h1 className="text-[24px] font-bold leading-tight text-slate-900 sm:text-[28px]">
         {b.midashi[0]}

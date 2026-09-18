@@ -38,6 +38,7 @@
 
 'use client';
 
+import { wakachi } from './Wakachi';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { PAID_FIELDS, PAID_GROUPS, PAID_CHROME, type PaidField } from './paidFields';
 import { track } from '@/lib/retirement/pro/track';
@@ -78,7 +79,8 @@ function InfoDialog({ f, onClose }: { f: PaidField; onClose: () => void }) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
-  return (
+  // 【2026-09-19・決め1352】単語の途中で改行しないよう、字に <wbr> を自動で入れます（./Wakachi.tsx）。字は変えません。
+  return wakachi(
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4"
       onClick={onClose}
@@ -434,7 +436,8 @@ export default function Screen7({
   };
 
   let idx = 0;
-  return (
+  // 【2026-09-19・決め1352】単語の途中で改行しないよう、字に <wbr> を自動で入れます（./Wakachi.tsx）。字は変えません。
+  return wakachi(
     <div>
       <h1 className="text-[24px] font-bold leading-tight text-slate-900 sm:text-[28px]">
         {PAID_CHROME.h2}

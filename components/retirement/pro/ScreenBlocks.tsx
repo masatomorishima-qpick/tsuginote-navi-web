@@ -30,6 +30,7 @@
 
 'use client';
 
+import { wakachi } from './Wakachi';
 import type { BlockKyotsu, Kumi } from './gamenBun';
 
 /**
@@ -116,8 +117,10 @@ export default function ScreenBlocks({ kumi }: { kumi: Kumi }) {
       + '  短い画面を黙って出さないために、ここで止めます。',
     );
   }
-  return (
-    <>
+  // 【2026-09-19・決め1352】単語の途中で改行しないよう、字に <wbr> を自動で入れます（./Wakachi.tsx）。字は変えません。
+  //   前は <> </>（枠なし）でした。keep-all を付ける枠が要るので <div> にしました。
+  return wakachi(
+    <div>
       {kumi.dasu.map((b, i) => <Hitotsu key={i} b={b} />)}
       {kaihatsuChu() && kumi.ochita > 0 && (
         <div className="note" data-kaihatsu-obi>
@@ -138,6 +141,6 @@ export default function ScreenBlocks({ kumi }: { kumi: Kumi }) {
           決めで落としたところが{kumi.ochitaNashiKime}か所あります。
         </div>
       )}
-    </>
+    </div>
   );
 }

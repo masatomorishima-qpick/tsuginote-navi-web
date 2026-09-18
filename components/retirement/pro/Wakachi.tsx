@@ -26,8 +26,8 @@
  *   ・英字どうしの間（iDeCo など）
  *   さらに「数字＋単位」（例 21,509,560円・2,352万円・65歳）は `whitespace-nowrap` の span で包み、その中では改行しません。
  *
- * 【当てる範囲】/retirement/pro の無料の画面（Screen1〜Screen56）だけです（2026-09-18 時点）。
- *   /shisan と禁止の本には当てていません。有料の画面は、描いて数えられるようになってから当てます。
+ * 【当てる範囲】/retirement/pro の画面の本（Screen1〜Screen56・Screen7・Screen8・Screen13・ScreenBlocks（画面9〜12））。
+ *   2026-09-19（決め1352）に有料の画面にも当てました。/shisan と禁止の本には当てていません。PaidApp.tsx は触っていません。
  */
 import { Children, Fragment, cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react';
 import { Parser } from '@/lib/retirement/pro/budoux/parser';
@@ -52,7 +52,11 @@ function kirenai(mae: string, ato: string): boolean {
 export function kiremeOf(s: string): number[] {
   const hit = kiokuMap.get(s);
   if (hit) return hit;
-  const out = parser.parseBoundaries(s).filter((i) => !kirenai(s[i - 1], s[i]));
+  const bx = new Set(parser.parseBoundaries(s));
+  // 【2026-09-19】カタカナの直後に漢字が来る所（「シミュレーション｜入力」）も、切れ目にします。
+  //   BudouX はここを切れ目にしないため、画面7の見出しが「…シミュレーション入／力」と切れました（375px・24px の字）。
+  for (let i = 1; i < s.length; i++) if (/[ァ-ヺー]/.test(s[i - 1]) && /[一-龯々]/.test(s[i])) bx.add(i);
+  const out = [...bx].sort((a, b) => a - b).filter((i) => !kirenai(s[i - 1], s[i]));
   if (kiokuMap.size < 2000) kiokuMap.set(s, out);
   return out;
 }
@@ -61,7 +65,8 @@ export function kiremeOf(s: string): number[] {
  * 金額・年齢などの「数字＋単位」のひとまとまり。この中では、どこでも改行しません（`whitespace-nowrap` の span で包みます）。
  *   keep-all だけだと、表の狭い欄で「21,509,56／0円」のように数字の途中で折れました（2026-09-18 に描いて見つけた）。
  */
-const SUJI = /[−＋+\-]?[0-9０-９][0-9０-９,，.．]*(?:万円|千円|億円|円|歳|年|か月|%|％|通り|倍|人|件|回)?/g;
+const SUJI = /(?:(?<![①-⑳㉑-㊿A-Za-z0-9])[−＋+\-])?[0-9０-９][0-9０-９,，.．]*(?:万円|千円|億円|円|歳|年|か月|%|％|通り|倍|人|件|回)?/g;
+// 「⑩-1」「⑯-7」の「-1」は数ではないので、番号の直後の「-」は符号として扱いません（2026-09-19・gamen7_egaku_mon が鳴って気づきました）
 
 function sujiWoTsutsumu(t: string, key: string): ReactNode {
   if (!/[0-9０-９]/.test(t)) return t;
@@ -93,8 +98,9 @@ export function wakachiJi(s: string): ReactNode {
 
 const TOORANAI = new Set(['svg', 'input', 'textarea', 'select', 'option', 'style', 'script', 'wbr', 'br']);
 /** 字として組み替えてよい、自前の部品の値の名前 */
-const JI_NO_PROPS = ['children', 'title', 'body', 'label', 'note', 'value', 'valueNote'];
+const JI_NO_PROPS = ['children', 'title', 'body', 'label', 'note', 'value', 'valueNote', 'hidari', 'migi'];
 // （2026-09-18）どの名前も、Screen2・Screen3・Screen4・Screen56 の自前の部品（Row・Axis・Card・H3）で、字を出すだけに使っていることを確かめました
+// （2026-09-19・決め1352）hidari・migi＝Screen13 の Gyou（字を出すだけ）。Screen8 の Gyo は t を split するので、Gyo の中で wakachiJi を呼びます
 
 type AnyProps = { [key: string]: unknown; className?: unknown; children?: ReactNode; kz?: unknown };
 

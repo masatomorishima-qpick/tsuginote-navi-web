@@ -29,6 +29,7 @@ import Screen2 from './Screen2';
 import Screen3 from './Screen3';
 import Screen4 from './Screen4';
 import Screen56 from './Screen56';
+import Screen56Shita from './Screen56Shita';
 import { FIELDS, manToYen, type FreeInput } from './types';
 import { freeResult, type FreeResult } from '@/lib/retirement/pro/free';
 import { track, getProSessionId, getGaIds, captureGclid } from '@/lib/retirement/pro/track';
@@ -289,16 +290,23 @@ export default function ProApp({ genzaiNen, enteredAtResult = false }: Props) {
       <Screen2
         r={result}
         onBuy={() => {
-          // 有料版の説明へ。画面5-6は次にお送りします
+          // 有料版の説明（画面5-6・`#pro-pricing`）へ。2026-09-19 の並べ替えの前から、行き先は画面5-6の頂です（画面3ではありません）
           document.getElementById('pro-pricing')?.scrollIntoView({ behavior: 'smooth' });
         }}
       />
-      <Screen3 r={result} />
-      <Screen4 r={result} />
+      {/* 【2026-09-19・決め1358（kaihatsu_ate_20260919o.md B-1）】並べ替え。消した字0・畳んだ字0。
+          前 …… 画面2 → 画面3 → 画面4 → 画面5-6（購入ボタン）
+          いま …… 画面2 → 画面5-6（購入ボタン）→ くわしく知りたい方へ（Screen56Shita・「みんなは…」を画面2から移したもの）→ 画面3 → 画面4
+          画面3・画面4 は場所だけ動かし、畳んでいません（実装指示書 v4「2. 絶対に守ること」7番）。
+          計測の名前（`pro_screen3_view`・`pro_screen4_view`・`data-block-start`）は変えていません。並べ替えを本番に入れた日から、
+          「画面3を見た」「画面4を見た」は購入ボタンより後の段になります（前の数と並べられません）。 */}
       <Screen56
         r={result}
         onBuy={onKau}
       />
+      <Screen56Shita />
+      <Screen3 r={result} />
+      <Screen4 r={result} />
     </>
   );
 }

@@ -26,7 +26,7 @@ import { observeScrollDepth } from '@/lib/retirement/pro/blocks';
 import { yen, signedYen, bunAmounts } from '@/lib/retirement/pro/money';
 
 /** 金額の行。右は等幅数字（§7-5） */
-function Row({ label, note, value, strong, strongLabel }: {
+export function Row({ label, note, value, strong, strongLabel }: {
   label: string; note?: string; value: React.ReactNode;
   /** ラベルも値も太字 */ strong?: boolean;
   /** ラベルだけ太字（基準HTMLの「まとめてと分けてを組み合わせた」がこの形） */ strongLabel?: boolean;
@@ -313,28 +313,15 @@ export default function Screen2({ r, onBuy }: { r: FreeResult; onBuy: () => void
         <b className="font-bold">この枠は、受け取る年をずらしたり、一時金と年金に分けたりすると変化します。</b>
         だから<b className="font-bold">同じ金額を受け取っても、受け取り方で手取りが変わります。</b>
       </p>
-
-      <h2 className="mt-8 text-[20px] font-bold text-slate-900">みんなは、どう受け取っているの？</h2>
-      <p className="mt-2 text-base leading-relaxed text-slate-800">
-        iDeCo等を受け取った方が、実際に選んだ受け取り方です。
-      </p>
-      <table className="mt-3 w-full border-collapse">
-        <tbody>
-          <Row label="一度にまとめて受け取った（一時金だけ）" value={<>87.1%<sup>※</sup></>} />
-          <Row label="分けて受け取った（年金だけ）" value="10.4%" />
-          {/* 基準HTMLでは太字は**ラベル側**。値ではない */}
-          <Row label="まとめてと分けてを組み合わせた" value="2.5%" strongLabel />
-        </tbody>
-      </table>
-      <p className="mt-3 text-base leading-relaxed text-slate-800">
-        <b className="font-bold">ほとんどの方が、一度にまとめて受け取っています。</b>でも、
-        <b className="font-bold">みんなと同じ受け取り方が、あなたにいちばん多く残る受け取り方とは限りません。</b>
+      {/* 【2026-09-19・決め1360（戦術Cowork `kaihatsu_ate_20260919p.md` 2）】並べ替えで画面4（10年ルール）が購入ボタンの下へ移ったため、
+          購入ボタンより上に「10年」を1行。基準HTML（228,599 ／ dc2ffbf7）728行 `p.hon.kz` から字と <wbr> 10個を1字1句。
+          `kz` なので改行の部品（Wakachi）は当てません（KZ の keep-all で飛ばされます）。engine.py が10年ルールを計算に入れていること（KAISEI_10NEN）は戦術Coworkが確かめました。 */}
+      <p className={`${KZ} mt-3 text-base leading-relaxed text-slate-800`}>
+        退職金とiDeCo等の<wbr />受け取りの間を<wbr />何年空けるかでも、<wbr />この枠は<wbr />変わります<wbr />（2026年からの<wbr />「10年ルール」）。<wbr />有料版は、<wbr />これも<wbr />計算に<wbr />入れます。
       </p>
 
-      {/* §2の7：出典は折りたたまない */}
-      <p className="mt-3 text-[13px] leading-relaxed text-[#5b6470]">
-        ※運営管理機関連絡協議会「確定拠出年金統計資料（2025年3月末）」（厚生労働省ホームページ掲載）の個人型年金（iDeCo）の実数から当社が算出しました。
-      </p>
+      {/* 【2026-09-19・決め1358（kaihatsu_ate_20260919o.md B）】「みんなは、どう受け取っているの？」の見出し・1行・87.1%の表・1行・出典は、
+          この画面から購入ボタンより下の「くわしく知りたい方へ」（./Screen56Shita.tsx）へ、字を1字も変えずに移しました。並べ替えだけです。 */}
       {/* 上の「出さない場合は下の※をご覧ください」が指す先。**同じ画面に置くこと**（検査あり） */}
       <p className="mt-2 text-[13px] leading-relaxed text-[#5b6470]">
         ※<b className="font-bold text-slate-900">「退職所得の受給に関する申告書」を出さない場合</b>は、

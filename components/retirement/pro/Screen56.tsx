@@ -354,21 +354,9 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
           </p>
         </div>
 
-        {/* B-1b の3：購入で同意。ボタンの直前。折りたたまない・小さくしない（§6の12と同じ扱い） */}
-        <p className="mt-4 text-base leading-relaxed text-slate-900">
-          「有料版購入」を押すと、利用規約と特定商取引法に基づく表記に同意したものとみなします。
-        </p>
-
-        {/* §7-4：橙はこのボタンにだけ */}
-        <button
-          type="button"
-          onClick={() => { track('pro_buy_click', { entry: 'screen5-6' }); onBuy(); }}
-          className="mt-4 w-full rounded-xl bg-[#c2410c] px-6 py-4 text-[18px] font-bold text-white
-                     focus:outline-none focus:ring-2 focus:ring-[#c2410c] focus:ring-offset-2"
-        >
-          有料版購入
-        </button>
-
+        {/* 【2026-09-19・決め1359（戦術Cowork `kaihatsu_ate_20260919p.md` 1）】下の並び（7本・13px）と3つのリンクを、
+            購入ボタンの下から、「返金について」の箱と同意の1行の間へ移しました。字は1字も変えていません。字の大きさ（13px）も同じです。
+            断りは購入ボタンより上（戦略Coworkの条件）。購入ボタンより下には、何も残りません。基準HTML（228,599 ／ dc2ffbf7）842〜861行。 */}
         <ul className="mt-3 list-disc space-y-1 pl-5 text-[13px] leading-relaxed text-[#5b6470]">
           {/*
             ★★★2026-09-16・決め1297（★戦術Cowork `senjutsu_20260916i.md` 1-4）── ★**主語を入れました。**
@@ -392,7 +380,7 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
               ── 275〜285行の `<div className="mt-4 rounded-xl bg-slate-50 p-4">`（見出し「返金について」・3段落）。
               そちらが、実装指示書 v4 922行・1260行の言う「購入ボタンのすぐ上・本文と同じ大きさ・
               折りたたまない」を満たしている本物です。
-              この `<ul>` は買うボタンの **下** で、字も 13px（注記の大きさ）です。
+              この `<ul>` は買うボタンの **下** で、字も 13px（注記の大きさ）です。（2026-09-19・決め1359 で、この `<ul>` は購入ボタンの上へ移しました。字と 13px は同じです）
               ですので、ここに返金を置くと、**同じことを2か所で、しかも下の方が小さく**申し上げることになります。
 
             【どうして入ったか】決め1312 のとき、戦術Coworkは基準HTMLだけを数えて
@@ -420,6 +408,21 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
           <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline">プライバシーポリシー</a>
           （別のタブで開きます）
         </p>
+
+        {/* B-1b の3：購入で同意。ボタンの直前。折りたたまない・小さくしない（§6の12と同じ扱い） */}
+        <p className="mt-4 text-base leading-relaxed text-slate-900">
+          「有料版購入」を押すと、利用規約と特定商取引法に基づく表記に同意したものとみなします。
+        </p>
+
+        {/* §7-4：橙はこのボタンにだけ */}
+        <button
+          type="button"
+          onClick={() => { track('pro_buy_click', { entry: 'screen5-6' }); onBuy(); }}
+          className="mt-4 w-full rounded-xl bg-[#c2410c] px-6 py-4 text-[18px] font-bold text-white
+                     focus:outline-none focus:ring-2 focus:ring-[#c2410c] focus:ring-offset-2"
+        >
+          有料版購入
+        </button>
       </div>
     </section>
   );

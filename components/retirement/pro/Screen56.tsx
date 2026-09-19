@@ -337,23 +337,9 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
           お支払いの控えは、決済画面からお受け取りいただけます。
         </p>
 
-        {/*
-          §6の12：**返金の方針は、折りたたまない・小さくしない。購入ボタンのすぐ上。**
-          特定商取引法15条の3ただし書「顧客にとって見やすい箇所において明瞭に判読できるように表示する」
-        */}
-        <div className="mt-4 rounded-xl bg-slate-50 p-4">
-          <p className="text-base font-bold text-slate-900">返金について</p>
-          <p className="mt-2 text-base leading-relaxed text-slate-900">
-            <b className="font-bold">お客様のご都合による返金は、お受けしていません。</b>ご購入後すぐに計算結果をご覧いただけるためです。
-          </p>
-          <p className="mt-2 text-base leading-relaxed text-slate-900">
-            当社に原因のある不具合があったときは、お支払いいただいた額の全額を返金します。計算に誤りがあった、画面が表示されない、お支払いいただいたのにご利用いただけない、などです。support@tsuginotenavi.jp までご連絡ください。
-          </p>
-          <p className="mt-2 text-base leading-relaxed text-slate-900">
-            推奨する動作環境の外でのご利用と、保守のための一時的な停止は、上記の不具合に含みません。
-          </p>
-        </div>
-
+        {/* 【2026-09-19・決め1361（戦術Cowork `kaihatsu_ate_20260919q.md` B）】決め1359 で「返金の箱と同意の1行の間」に置いた7本と3つのリンクを、
+            返金の箱の前へ入れ替えました。実装指示書 v4 922行・1260行「返金の文が、本文と同じ大きさで、購入ボタンのすぐ上にある」（特定商取引法15条の3ただし書）。
+            字は1字も変えていません。並び …… 7本 → 3つのリンク → 返金の箱 → 同意の1行 → 購入ボタン。基準HTML（228,480 ／ 9b8875bc）836〜861行。 */}
         {/* 【2026-09-19・決め1359（戦術Cowork `kaihatsu_ate_20260919p.md` 1）】下の並び（7本・13px）と3つのリンクを、
             購入ボタンの下から、「返金について」の箱と同意の1行の間へ移しました。字は1字も変えていません。字の大きさ（13px）も同じです。
             断りは購入ボタンより上（戦略Coworkの条件）。購入ボタンより下には、何も残りません。基準HTML（228,599 ／ dc2ffbf7）842〜861行。 */}
@@ -408,6 +394,23 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
           <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline">プライバシーポリシー</a>
           （別のタブで開きます）
         </p>
+
+        {/*
+          §6の12：**返金の方針は、折りたたまない・小さくしない。購入ボタンのすぐ上。**
+          特定商取引法15条の3ただし書「顧客にとって見やすい箇所において明瞭に判読できるように表示する」
+        */}
+        <div className="mt-4 rounded-xl bg-slate-50 p-4">
+          <p className="text-base font-bold text-slate-900">返金について</p>
+          <p className="mt-2 text-base leading-relaxed text-slate-900">
+            <b className="font-bold">お客様のご都合による返金は、お受けしていません。</b>ご購入後すぐに計算結果をご覧いただけるためです。
+          </p>
+          <p className="mt-2 text-base leading-relaxed text-slate-900">
+            当社に原因のある不具合があったときは、お支払いいただいた額の全額を返金します。計算に誤りがあった、画面が表示されない、お支払いいただいたのにご利用いただけない、などです。support@tsuginotenavi.jp までご連絡ください。
+          </p>
+          <p className="mt-2 text-base leading-relaxed text-slate-900">
+            推奨する動作環境の外でのご利用と、保守のための一時的な停止は、上記の不具合に含みません。
+          </p>
+        </div>
 
         {/* B-1b の3：購入で同意。ボタンの直前。折りたたまない・小さくしない（§6の12と同じ扱い） */}
         <p className="mt-4 text-base leading-relaxed text-slate-900">

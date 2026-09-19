@@ -97,10 +97,9 @@ export default function Screen4({ r }: { r: FreeResult }) {
   return wakachi(
     <section ref={ref} className="mt-12 border-t border-slate-200 pt-8">
       <h2 className="text-[22px] font-bold text-slate-900">退職所得控除について</h2>
+      {/* 【2026-09-19・決め1362 ④（戦術Cowork `kaihatsu_ate_20260919q.md` C）】冒頭の1文。「空ける年数」をかっこの中へ。基準HTML（228,480 ／ 9b8875bc）911行から1字1句。 */}
       <p className="mt-2 text-base leading-relaxed text-slate-800">
-        受け取る順番と、<b className="font-bold">退職金を受け取った年から、iDeCo等を受け取る年までの年数</b>
-        を意識しないと、退職所得控除が使えなくなります。この年数のことを、この画面では
-        <b className="font-bold">「空ける年数」</b>と呼びます。
+        受け取る順番と、退職金を受け取った年からiDeCo等を受け取る年までの年数（この画面では<b className="font-bold">「空ける年数」</b>と呼びます）を意識しないと、退職所得控除が使えなくなります。
       </p>
 
       {/* §5-4：状態で色と文が変わる。「ほとんど戻りません」はやめ、**数で書く** */}
@@ -155,22 +154,16 @@ export default function Screen4({ r }: { r: FreeResult }) {
         <p className="mt-3 text-base leading-relaxed text-slate-900"><b className="font-bold">この例で、控除が足りているかを見る</b></p>
         <p className="mt-2 text-base leading-relaxed text-slate-800">
           {/* §7-8 の規則3：この1文の2つの額をまとめて決める */}
+          {/* 【2026-09-19・決め1362 ⑤（`kaihatsu_ate_20260919q.md` C）】最後の「はみ出す◯か月は重なりません」の1文を外し、加入月数を括弧の中へ。
+              数（osa・g.*）は今までと同じ所（gamen4 の g）から出しています。式は持ちません。基準HTML（228,480 ／ 9b8875bc）925行から1字1句。 */}
           あなたの退職金{osa[0]}は、退職所得控除{osa[1]}に収まっています。
-          <b className="font-bold">
-            この場合、重なりを数える期間は勤続{g.kinzokuNensu}年ではなく{g.minashiNensu}年になります。
-          </b>
-          縮めるのは<b className="font-bold">就職の日から</b>なので、
-          <b className="font-bold">{g.chijimeFrom}〜{g.chijimeTo}</b>が重なりを数える期間です。
+          この場合、重なりを数える期間は勤続{g.kinzokuNensu}年ではなく、就職の日から数えた{g.minashiNensu}年（{g.chijimeFrom}〜{g.chijimeTo}）です。
           {A ? (
             <>
-              あなたのiDeCo等の加入期間（{g.kanyuFrom}〜{g.kanyuTo}）と重なるのは、
+              あなたのiDeCo等の加入期間（{g.kanyuFrom}〜{g.kanyuTo}、{g.kanyuTsuki}か月）のうち、重なるのは
               <b className="font-bold">
                 {g.kasanariFrom}〜{g.kasanariTo}の{g.kasanariTsuki}か月＝{Math.floor(g.kasanariTsuki / 12)}年
               </b>です。
-              {/* 「最後の1年」とは限らない（1,200人中311人で違う）。**月数で書く** */}
-              <b className="font-bold">
-                あなたのiDeCo等の加入期間{g.kanyuTsuki}か月のうち、縮めた期間からはみ出す{g.hamideruTsuki}か月は重なりません。
-              </b>
             </>
           ) : (
             <b className="font-bold">
@@ -219,11 +212,12 @@ export default function Screen4({ r }: { r: FreeResult }) {
       {/* §2の7：根拠と出典は折りたたまない */}
       <div className="mt-4 rounded-xl bg-slate-50 p-4 text-[13px] leading-relaxed text-[#5b6470]">
         <b className="block font-bold text-slate-900">この画面の根拠にした資料</b>
+        {/* 【2026-09-19・決め1362 ⑥】出典を短く。資料名・発行者・項目は残しています。基準HTML（228,480 ／ 9b8875bc）936〜937行から1字1句。 */}
         <p className="mt-1">
-          財務省 令和7年度税制改正の大綱「退職手当等…の支払を受ける年の前年以前９年内に老齢一時金の支払を受けている場合には…退職所得控除額の計算における勤続期間等の重複排除の特例の対象とする」「令和８年１月１日以後に老齢一時金の支払を受けている場合であって、同日以後に支払を受けるべき退職手当等について適用する」
+          財務省「令和7年度税制改正の大綱」…退職所得控除額の計算における勤続期間等の重複排除の特例（前年以前9年内に老齢一時金の支払を受けている場合。令和8年1月1日以後に支払を受ける退職手当等に適用）
         </p>
         <p className="mt-1">
-          国税庁「源泉徴収のあらまし」Ⅳ2⑵イ「上記１の⑵に掲げる表又は次のハ以下により計算した退職所得控除額が80万円に満たない場合には、退職所得控除額は80万円とされます（所法30⑥二）」／同ニ「重複している部分の期間…を勤続年数とみなして、上記１の⑵に掲げる表により計算した金額」
+          国税庁「源泉徴収のあらまし」Ⅳ2⑵イ（退職所得控除額が80万円に満たない場合は80万円・所法30⑥二）／同ニ（重複している期間の計算）
         </p>
       </div>
     </section>

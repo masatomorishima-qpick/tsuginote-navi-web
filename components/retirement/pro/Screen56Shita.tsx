@@ -39,7 +39,7 @@ export default function Screen56Shita() {
         </tbody>
       </table>
       <p className="mt-3 text-base leading-relaxed text-slate-800">
-        <b className="font-bold">ほとんどの方が、一度にまとめて受け取っています。</b>でも、
+        {/* 【2026-09-19・決め1362 ②】「ほとんどの方が、一度にまとめて受け取っています。でも、」を外しました（基準HTML 228,480 ／ 9b8875bc 878行） */}
         <b className="font-bold">みんなと同じ受け取り方が、あなたにいちばん多く残る受け取り方とは限りません。</b>
       </p>
 

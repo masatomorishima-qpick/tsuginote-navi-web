@@ -15,6 +15,7 @@
  *
  * 【当てない所】
  *   ・手で <wbr> を入れた所（keep-all の class を持つ要素・`kz` の付いたカード）…… 決め1343〜1345 のまま残します
+ *   ・折らないと決めた要素（whitespace-nowrap の class を持つ要素）…… 2026-09-19・画面8の表
  *   ・svg／input／textarea／select／option／style／script の中
  *   ・字以外の属性（className・href・key など）
  *
@@ -123,6 +124,9 @@ function walk(node: ReactNode): ReactNode {
   if (typeof el.type === 'string') {
     if (TOORANAI.has(el.type)) return el;
     if (typeof p.className === 'string' && p.className.includes('keep-all')) return el;   // 手で <wbr> を入れた所
+    // （2026-09-19・kaihatsu_ate_20260919n.md 3節）折らないと決めた要素（whitespace-nowrap）の中にも <wbr> を入れません。
+    //   <wbr> は nowrap の中でも改行の位置になるため、入れると「折らない」が効きませんでした（画面8の表の1列めで見つけた）
+    if (typeof p.className === 'string' && p.className.includes('whitespace-nowrap')) return el;
     if (p.children === undefined) return el;
     return cloneElement(el, undefined, walk(p.children));
   }

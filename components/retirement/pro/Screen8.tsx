@@ -14,6 +14,8 @@
  *  §7-8   表とカードは円。
  *  §2の10 利用者に見せる文に「画面◯」と書きません。
  *  §5-2   利用者が見るのは第2部の形です。
+ *  （2026-09-19・kaihatsu_ate_20260919n.md 3節）「ファイルの中身」の表の1列めと、一覧の表の右の欄（「変わりません」）は
+ *   `whitespace-nowrap` で折りません。375px で「ファ／イル」「変わりませ／ん」と切れていたためです。字は変えていません。
  *
  * 【E-23】`gamen8()` は、①結論の基準が見つからないときに**例外で止まります。**
  *   この画面は、その例外を**握りつぶしてはいけません。**
@@ -146,7 +148,7 @@ export default function Screen8({ b, pattern, onSusumu, onDownload, downloadMatt
                       {/* ★添え字（税金の字の型・senjutsu_20260905g.md 1番①）。Screen2 の Row の note と同じ形 */}
                       {soe ? <span className="mt-0.5 block text-[13px] text-[#5b6470]">{soe}</span> : null}
                     </td>
-                    <td className="py-2 text-right font-bold tabular-nums text-slate-900">{v}</td>
+                    <td className="whitespace-nowrap py-2 text-right font-bold tabular-nums text-slate-900">{v}</td>
                   </tr>
                 ))}
               </tbody>
@@ -225,14 +227,14 @@ export default function Screen8({ b, pattern, onSusumu, onDownload, downloadMatt
       <table className="mt-4 w-full text-base">
         <thead>
           <tr className="border-b border-slate-300 text-left">
-            <th className="py-2 font-bold text-slate-900">ファイルの中身</th>
+            <th className="whitespace-nowrap py-2 font-bold text-slate-900">ファイルの中身</th>
             <th className="py-2 font-bold text-slate-900">入っているもの</th>
           </tr>
         </thead>
         <tbody>
           {b.fileNakami.map(([a, c]) => (
             <tr key={a} className="border-b border-slate-200 align-top">
-              <td className="py-2 pr-3 text-slate-800">{a}</td>
+              <td className="whitespace-nowrap py-2 pr-3 text-slate-800">{a}</td>
               <td className="py-2 text-slate-800">{c}</td>
             </tr>
           ))}

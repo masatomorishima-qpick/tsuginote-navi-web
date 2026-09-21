@@ -8,7 +8,7 @@
  * **直したいときは、基準HTMLを直して、これを作り直してください。**
  * ここを直接いじると、次に作り直したときに消えます。
  *
- * 抜き出しもと: tsuginote_gamen_base.html（228,486バイト ／ md5 6efb390c2b8ed1ef3befa441bd046ac3）
+ * 抜き出しもと: tsuginote_gamen_base.html（228,883バイト ／ md5 dc34e64b863ad1c812aae48aa11e8541）
  * 項目数: 34
  */
 

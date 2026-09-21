@@ -27,6 +27,8 @@ import { useEffect, useRef } from 'react';
 import type { FreeResult } from '@/lib/retirement/pro/free';
 import { track, trackOnce } from '@/lib/retirement/pro/track';
 import { observePricingBlocks, observeScrollDepth } from '@/lib/retirement/pro/blocks';
+// ★2026-09-22 …… 返金の字は `henkin.ts` の1本だけが持ちます（★基準HTMLから機械で抜き出したもの）
+import { HENKIN_MIDASHI, HENKIN_FUTOJI, HENKIN_DANRAKU } from '@/lib/retirement/pro/henkin';
 
 const KAKAKU = 19_800;
 
@@ -399,17 +401,25 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
           §6の12：**返金の方針は、折りたたまない・小さくしない。購入ボタンのすぐ上。**
           特定商取引法15条の3ただし書「顧客にとって見やすい箇所において明瞭に判読できるように表示する」
         */}
+        {/*
+          ★★★【2026-09-22・戦術Cowork `kaihatsu_ate_20260922b.md`】**返金の字を、この本に書きません。**
+            ★`lib/retirement/pro/henkin.ts` の1本から読みます（★その本は `kensa/henkin_chushutsu.mjs` が
+              基準HTMLから機械で作ったものです）。
+            ★★同じ字が**特定商取引法に基づく表記の頁**にも出ます。★2か所を手で写すと、
+              ★★★**片方だけ直ります**（★実際、9/22 の便で「いまの字は、直す前のもの」とご指摘をいただきました）。
+            ★★`kensa/henkin_mon.tsx` が、基準HTML・この画面・特商法の頁の3つを突き合わせます。
+            ★段落は4本になりました（★前は3本）。★返金の箱と購入ボタンの間は、**同意の1行だけ**のままです（決め1361・(G)）。
+        */}
         <div className="mt-4 rounded-xl bg-slate-50 p-4">
-          <p className="text-base font-bold text-slate-900">返金について</p>
-          <p className="mt-2 text-base leading-relaxed text-slate-900">
-            <b className="font-bold">お客様のご都合による返金は、お受けしていません。</b>ご購入後すぐに計算結果をご覧いただけるためです。
-          </p>
-          <p className="mt-2 text-base leading-relaxed text-slate-900">
-            当社に原因のある不具合があったときは、お支払いいただいた額の全額を返金します。計算に誤りがあった、画面が表示されない、お支払いいただいたのにご利用いただけない、などです。support@tsuginotenavi.jp までご連絡ください。
-          </p>
-          <p className="mt-2 text-base leading-relaxed text-slate-900">
-            推奨する動作環境の外でのご利用と、保守のための一時的な停止は、上記の不具合に含みません。
-          </p>
+          <p className="text-base font-bold text-slate-900">{HENKIN_MIDASHI}</p>
+          {HENKIN_DANRAKU.map((d, i) => (
+            <p key={i} className="mt-2 text-base leading-relaxed text-slate-900">
+              {/* ★1段落めだけ、頭の1文を太字にします（★基準HTMLの `<b>`） */}
+              {i === 0 && d.startsWith(HENKIN_FUTOJI)
+                ? <><b className="font-bold">{HENKIN_FUTOJI}</b>{d.slice(HENKIN_FUTOJI.length)}</>
+                : d}
+            </p>
+          ))}
         </div>
 
         {/* B-1b の3：購入で同意。ボタンの直前。折りたたまない・小さくしない（§6の12と同じ扱い） */}

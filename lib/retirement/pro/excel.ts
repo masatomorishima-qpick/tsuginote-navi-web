@@ -213,7 +213,12 @@ const RETSU_S1 = ['あなたの受け取り方', 'この受け取り方で増え
  *   ★★**シート1の列名と1字1句そろえています**（★上の `RETSU_S1` の3つめ）。
  *   ★並びも**シート1と同じ**にしました（★「増える税金」の次・「手取り」の前）。
  */
-const RETSU_S2 = ['番号', 'あなたの受け取り方', 'この受け取り方で増える税金（円）', '確定申告で戻る額（円）',
+/**
+ * ★★★【2026-09-22・戦術Cowork `kaihatsu_ate_20260922.md` 1節】**「まとめの印」を先頭に足しました。**
+ *   ★結果の画面に出した受け取り方（`g8.houkou`）の行にだけ、★**画面8と同じ見方の印**を入れます。
+ *   ★★「番号」の列は**残します**（★並べ替えても、画面やシート3と突き合わせられるように・戦術Coworkの決め）。
+ */
+const RETSU_S2 = ['まとめの印', '番号', 'あなたの受け取り方', 'この受け取り方で増える税金（円）', '確定申告で戻る額（円）',
   'あなたの手取り（円）', '最初の年に入る額（円）', '受け取り終わる年齢', '保険料・医療費'] as const;
 const RETSU_S3 = ['番号', '年', '年齢', 'その年に手元に入る額（円）', 'その年に増える税金（円）',
   'その年の手数料（円）'] as const;
@@ -520,22 +525,16 @@ export function nyuryokuNoGyou(kou: readonly Kou[], raw: Record<string, string>)
       continue;
     }
     /**
-     * ★★★【2026-09-21・戦術Cowork `kaihatsu_ate_20260921e.md` 4節の門】
-     *   **かっこが2組以上、1行に入らないようにします。**
+     * ★★★【2026-09-21・戦術Cowork `kaihatsu_ate_20260921f.md` 1節】
+     *   **枝番の名前は、いつも `／` でつなぎます。かっこは使いません。**
      *
-     * ★★【戦術Coworkが見ておられない所でした】…… ★短い名前4つを入れたあと、門がまだ**4行**鳴りました。
-     *   ★★原因は**名前の中のかっこではなく、項目の見出しそのもののかっこ**です（★基準HTMLの字）。
-     *     `⑧ あなたが退職した翌年以降の収入見込み（年額）（何歳まで）`
-     *     `㉓ あなたが役員として受け取る退職金（役員退職慰労金）（額）` ほか2行
-     * ★★★【こちらが置いた形】…… ★**項目の見出しにかっこが在るときだけ**、枝番の名前を
-     *   ★かっこではなく `／` でつなぎます。★★これで、戦術Coworkがお示しになった2つの形
-     *   （`㉖ …（19歳以上23歳未満）`・`⑲ …（1件め・勤続期間・加入期間）`）は**1文字も変わりません。**
-     *   ★★**基準HTMLの字（項目の見出し）は1文字も変えていません。**★便でお諮りしています。
+     * ★★【なぜ「いつも」か】…… ★はじめは「項目の見出しにかっこが在るときだけ `／`」にしていましたが、
+     *   ★★それだと**2つの形が混ざります**（★戦術Coworkのお決め）。
+     * ★★★これで、行に出る `（　）` は **基準HTMLの見出しの中のものだけ**になります。
+     *   ★名前が無い行は、見出しだけです（★⑥⑫のように、1行にまとめた組）。
+     *   ★`㉕㉓` の `nai` の字も `／` でつなぎます。
      */
-    const kakkoAri = f.label.includes('（');
-    for (const [na, ji] of kono) {
-      out.push([na ? (kakkoAri ? `${f.label}／${na}` : `${f.label}（${na}）`) : f.label, ji]);
-    }
+    for (const [na, ji] of kono) out.push([na ? `${f.label}／${na}` : f.label, ji]);
   }
   return out;
 }
@@ -570,6 +569,8 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
    */
   /** 1列の上限（★字の数）。★条文のような長い1文で、列が画面より広くならないように */
   const HABA_JOGEN = 60;
+  /** ★シート2の列名の行が、上から何行めか（★注記4行の次） */
+  const S2_MIDASHI = 5;
 
   // ---- 1 結果のまとめ
   const g1: Gyou[] = [];
@@ -639,8 +640,8 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
   s1.commit();
 
   // ---- 2 受け取り方の一覧（全通り）
-  // ★シート2の列名は3行め（★上の2行は注記）。★下へ動かしても見えたままにします
-  const s2 = wb.addWorksheet('受け取り方の一覧', midashiWoTomeru(3));
+  // ★シート2の列名は5行め（★上の4行は注記。★2026-09-22 に2行足しました）。★下へ動かしても見えたままにします
+  const s2 = wb.addWorksheet('受け取り方の一覧', midashiWoTomeru(S2_MIDASHI));
   /**
    * ★★★【2026-09-15・決め1214】**見出しの上に1行**（★戦術Cowork お願い3）。
    *   ★字は**基準HTML 885行から写しました**（★`tsuginote_gamen_base.html` 183,384／`9a309ee9…`）。
@@ -653,16 +654,40 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
    *     ★★**桁は「増える税金」と同じか小さい**ので（★戻る額 ≤ 納めた税）、
    *     ★★★ここでは `x.zei` の桁で数えます（★足りなければ `###` になりますので、下の門で見ます）。
    */
+  /**
+   * ★★★【2026-09-22・戦術Cowork `kaihatsu_ate_20260922.md` 1節】**手取りの多い順に並べます。**
+   *   ★同じ額のときは、**いまの番号の小さい順**（★戦術Coworkの決め）。
+   *   ★★**`D` の並びは変えません。**★ここで作るのは「どの順に書くか」の名簿だけです
+   *     （★`D[i]` と `R[i]` が同じ案である決まりを崩さないため・下の覚え書き）。
+   */
+  const s2Jun = D.map((_, i) => i).sort((a, c) => D[c].tedori - D[a].tedori || a - c);
+  /**
+   * ★「まとめの印」…… 結果の画面に出した受け取り方（`g8.houkou`）の行にだけ入れます。
+   *   ★★字は**画面8の見方の印**（`MIKATA` の頭の○数字）です。★シート1の「見方」の列と同じものを指します。
+   *   ★★★**この本で新しい番号を作っていません**（★1つのファイルの中で `①` が2つの意味を持たないため）。
+   */
+  const shirushi = new Map<number, string>();
+  for (const h of g8.houkou) {
+    const i = D.findIndex((x) => x.lab === h.lab);
+    if (i < 0) continue;
+    shirushi.set(i, h.mikata.map((m) => m.slice(0, 1)).join('／'));
+  }
+  const s2Gyou = (i: number, modoru: number | string) =>
+    [shirushi.get(i) ?? '', i + 1, D[i].lab, D[i].zei, modoru, D[i].tedori, D[i].age0, D[i].owari, hokenNoJi(D[i])];
+
   s2.columns = retsuNoHaba([
     { c: [...RETSU_S2] },
-    ...D.map((x, i) => ({
-      c: [i + 1, x.lab, x.zei, x.zei, x.tedori, x.age0, x.owari, hokenNoJi(x)],
-      okane: [3, 4, 5, 6] as const,
-    })),
+    ...D.map((x, i) => ({ c: s2Gyou(i, x.zei), okane: [4, 5, 6, 7] as const })),
   ], HABA_JOGEN);
   s2.addRow([JI_S2_SHINKOKU]).commit();
   // ★★決め1230 …… ★「増える税金と手取りは…」の**次の行**（★戦術Cowork 3節）
   s2.addRow([b.modoruYokunen]).commit();
+  /**
+   * ★★★【2026-09-22・同 1節】**表の上に2行**（★ふるいの行の上）。
+   *   ★通り数は `D.length` から作ります（★画面9の `toori_kazu` と同じ「◯◯通り」の形）。
+   */
+  s2.addRow([`この表は、計算した${D.length.toLocaleString('en-US')}通りすべてです。手取りの多い順に並んでいます。`]).commit();
+  s2.addRow(['①②③の印は、結果の画面に出した受け取り方です。']).commit();
   s2.addRow([...RETSU_S2]).commit();
   /**
    * ★★★【2026-09-15・決め1225】**全通りに「確定申告で戻る額」を出します。**
@@ -681,14 +706,19 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
    */
   const taiCache = new Map<string, [Record<number, number>, E.KeikaRow[]]>();
   const baseCaches = new Map<number, Map<number, E.ZeiUchiwake>>();
-  D.forEach((x, i) => {
+  for (const i of s2Jun) {
+    const x = D[i];
     const nAge = x.nenkin_age ?? p.koteki_kaishi_age;
     let bc = baseCaches.get(nAge);
     if (!bc) { bc = new Map(); baseCaches.set(nAge, bc); }
     const modoru = E.modoruGaku(p, x.pl, x.zei, bc, taiCache);
-    okane(s2.addRow([i + 1, x.lab, x.zei, modoru, x.tedori, x.age0, x.owari, hokenNoJi(x)]),
-      3, 4, 5, 6).commit();
-  });
+    okane(s2.addRow(s2Gyou(i, modoru)), 4, 5, 6, 7).commit();
+  }
+  /**
+   * ★★★【2026-09-22・同 1節】**見出しの行にふるい（フィルター）を付けます。**
+   *   ★実測 …… 大きさ ＋28バイト ／ 読む時間 ＋5ms（★前の便の3節）。
+   */
+  s2.autoFilter = { from: { row: S2_MIDASHI, column: 1 }, to: { row: S2_MIDASHI + D.length, column: RETSU_S2.length } };
   s2.commit();
 
   // ---- 3 年ごとの内訳（★この便では2本）

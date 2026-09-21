@@ -15,6 +15,15 @@ import Link from 'next/link';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { SITE_URL } from '@/components/loan/LoanArticle';
+/**
+ * ★★★【2026-09-22・戦術Cowork `kaihatsu_ate_20260922b.md` 2節】
+ *   **「返品・キャンセルについて」の字は、この本に書きません。**
+ *   ★`lib/retirement/pro/henkin.ts` の1本から読みます（★`kensa/henkin_chushutsu.mjs` が基準HTMLから機械で作った本）。
+ *   ★★同じ字が**画面5-6（`Screen56.tsx`）**にも出ます。★2か所を手で写すと**片方だけ直ります**
+ *     （★実際、いまの字は直す前のものでした）。
+ *   ★★★`kensa/henkin_mon.tsx` が、基準HTML・画面5-6・この頁の3つを突き合わせます。
+ */
+import { HENKIN_DANRAKU } from '@/lib/retirement/pro/henkin';
 
 const PAGE_PATH = '/retirement/pro/tokushoho';
 
@@ -41,7 +50,11 @@ const DOUSA_KANKYOU =
  *   ★★**替えた日 ＝ 2026-09-16**（★特商法の表示ですので、日を残します）。
  *   ★★`info@blueadventures.jp` は**止めていません**（★両方が届く形・決め1298）。
  */
-const KOUMOKU: ReadonlyArray<readonly [string, string]> = [
+/**
+ * ★中身は字1本か、段落の並び（★返品・キャンセルは4段落です）。
+ *   ★★段落の並びのときは、1段落ずつ `<p>` で出します（★1本につなぐと、読めなくなります）。
+ */
+const KOUMOKU: ReadonlyArray<readonly [string, string | readonly string[]]> = [
   ['サービス名', '老後のお金の受け取りシミュレーション（有料版）'],
   ['販売事業者', 'BlueAdventures'],
   ['運営統括責任者', '森嶋 聖人'],
@@ -55,7 +68,7 @@ const KOUMOKU: ReadonlyArray<readonly [string, string]> = [
   ['購入方法', '当サイトの計算結果の画面で「有料版購入」を押していただくと、決済ページ（Stripe）へ移ります。決済が完了すると、そのままご利用いただけます'],
   ['商品の引渡時期', '決済が完了したあと、ただちにご利用いただけます'],
   ['ご利用いただける期間', 'お支払いの完了後、1年間'],
-  ['返品・キャンセルについて', 'お客様のご都合による返金は、お受けしていません。ご購入後すぐに計算結果をご覧いただけるためです。当社に原因のある不具合があったときは、お支払いいただいた額の全額を返金します。計算に誤りがあった、画面が表示されない、お支払いいただいたのにご利用いただけない、などです。support@tsuginotenavi.jp までご連絡ください。推奨する動作環境の外でのご利用と、保守のための一時的な停止は、上記の不具合に含みません'],
+  ['返品・キャンセルについて', HENKIN_DANRAKU],
   ['適格請求書（インボイス）', '当社は適格請求書発行事業者ではないため、インボイス（適格請求書）の発行はいたしかねます'],
   ['動作環境', `${DOUSA_KANKYOU}これ以外の環境でのご利用は、動作を保証いたしかねます`],
 ];
@@ -76,7 +89,11 @@ export default function TokushohoPage() {
               {KOUMOKU.map(([koumoku, naiyou]) => (
                 <div key={koumoku} className="grid gap-1 py-3 sm:grid-cols-[12rem_1fr] sm:gap-4">
                   <dt className="font-semibold text-slate-900">{koumoku}</dt>
-                  <dd className="break-words">{naiyou}</dd>
+                  <dd className="break-words">
+                    {typeof naiyou === 'string'
+                      ? naiyou
+                      : naiyou.map((d, i) => <p key={i} className={i > 0 ? 'mt-2' : undefined}>{d}</p>)}
+                  </dd>
                 </div>
               ))}
             </dl>

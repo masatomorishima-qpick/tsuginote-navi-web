@@ -10,7 +10,7 @@
  * **実装側で計算し直しません**（指示書 §5-1-2 のお願い1）。
  * **割合の文（「◯%の方は◯円変わります」）は足しません**（同3。出どころに答えられません）。
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（228,480バイト ／ md5 9b8875bc77d5a2be2aa9f6ec63a61e30）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（228,486バイト ／ md5 6efb390c2b8ed1ef3befa441bd046ac3）
  */
 
 /** `<wbr>` で切った切れはしの並び。つなげると1行の字になります（決め1344） */

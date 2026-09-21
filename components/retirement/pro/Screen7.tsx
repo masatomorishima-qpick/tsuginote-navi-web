@@ -46,6 +46,8 @@ import {
   paidKou, ayamariNoJi, ranWoHiku, kotekiJogen, seisuNiSuru, JI,
   type Ran, type Kou, type Ayamari,
 } from '@/lib/retirement/pro/paidRules';
+// ★2026-09-21 …… 入れた額の言い換え（★数の作り方は計算エンジン側の1本）
+import { iikaeNoJi } from '@/lib/retirement/pro/money';
 
 type Props = {
   /** サーバーで求めた `Asia/Tokyo` の年。**既定値を作りません**（§4-4-2） */
@@ -314,11 +316,22 @@ export default function Screen7({
         />
       );
     }
+    /**
+     * ★★★【2026-09-21・戦術Cowork `kaihatsu_ate_20260921d.md` 1節】
+     *   ★**入れた額を、欄のすぐ下に言い換えて出します**（★森嶋さんのお決め・入力の間違いを防ぐため）。
+     *   ★★字を作るのは `money.ts` の `iikaeNoJi()` です ── ★**ここに式はありません**（★移管指示書）。
+     *   ★出す欄 …… ★`man`（万円）と `en`（円）の欄だけ。★空のとき・数として読めないときは出しません。
+     *   ★大きさは本文と同じ（`text-[15px]`・★欄の見出しと同じ）。★折りたたみません。
+     */
+    const iikae = (r.shurui === 'man' || r.shurui === 'en') ? iikaeNoJi(v, r.shurui === 'man' ? '万円' : '円') : null;
     const hako = (
-      <div key={r.kagi} className="mt-2 flex flex-wrap items-center gap-2">
-        {r.ji ? <label htmlFor={id} className="text-[15px] text-slate-800">{r.ji}</label> : null}
-        <div className={r.select || r.shurui === 'erabu' || r.shurui === 'hai' ? '' : 'min-w-[10rem] flex-1'}>{naka}</div>
-        {r.tani && r.shurui !== 'hai' ? <span className="text-[15px] text-slate-800">{r.tani}</span> : null}
+      <div key={r.kagi}>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          {r.ji ? <label htmlFor={id} className="text-[15px] text-slate-800">{r.ji}</label> : null}
+          <div className={r.select || r.shurui === 'erabu' || r.shurui === 'hai' ? '' : 'min-w-[10rem] flex-1'}>{naka}</div>
+          {r.tani && r.shurui !== 'hai' ? <span className="text-[15px] text-slate-800">{r.tani}</span> : null}
+        </div>
+        {iikae ? <p className="mt-1 text-[15px] text-slate-800">{iikae}</p> : null}
       </div>
     );
     // ★期間の組の上に小さく1行（⑲・㉓。字は `RAN_JI`・senjutsu_20260902ai.md 2番の2）

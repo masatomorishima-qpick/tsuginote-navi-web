@@ -21,6 +21,8 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import { FIELDS, type FieldNo, type FreeInput } from './types';
 import { track } from '@/lib/retirement/pro/track';
 import { observeScrollDepth } from '@/lib/retirement/pro/blocks';
+// ★2026-09-21 …… 入れた額の言い換え（★数の作り方は計算エンジン側の1本・有料版と同じ本）
+import { iikaeNoJi } from '@/lib/retirement/pro/money';
 import { REI, REI_MIDASHI, REI_ZERO, REI_SHUTTEN, REI_CHUU, type Kire } from './rei1';
 
 /** 単語の途中で改行しない（基準HTML `.kz`・決め1343・1344） */
@@ -224,6 +226,18 @@ export default function Screen1({ onSubmit, initial, onChangeRaw }: Props) {
               />
               <span className="text-base text-slate-700">{f.unit}</span>
             </div>
+
+            {/**
+              * ★★★【2026-09-21・戦術Cowork `kaihatsu_ate_20260921d.md` 1節の決まり5】
+              *   ★**入れた額を、欄のすぐ下に言い換えて出します。**★無料版も有料版と同じ形です。
+              *   ★出る欄 …… ★**①と③（万円）の2つ**です（★②④⑤は 年・年・歳で、金額の欄ではありません）。
+              *   ★★字を作るのは `money.ts` の `iikaeNoJi()`（★有料版と同じ1本・ここに式はありません）。
+              */}
+            {(() => {
+              if (f.unit !== '万円') return null;
+              const ji = iikaeNoJi(raw[f.key] ?? '', '万円');
+              return ji ? <p className="mt-1 text-base text-slate-800">{ji}</p> : null;
+            })()}
 
             {errors[f.key] ? (
               <p id={`pro-e${f.no}`} role="alert" className="mt-1.5 text-[13px] text-[#8f2f2f]">

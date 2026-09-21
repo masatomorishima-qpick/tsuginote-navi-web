@@ -230,11 +230,168 @@ function kugiru(v: string, tani: string): string {
   return Number(v).toLocaleString('en-US');
 }
 
-function nyuryokuNoGyou(kou: readonly Kou[], raw: Record<string, string>): [string, string][] {
+// ────────────────────────────────────────────────────────────────
+// 列の幅（★2026-09-21・戦術Cowork `kaihatsu_ate_20260921b.md` 1節）
+//
+// ★★【何が起きていたか】…… ★4シートとも `column_dimensions` が空で、どの列も既定の幅でした。
+//   ★LibreOffice で開くと、★**手取りの列が `###`**・★**見出しが途中で切れる**・
+//   ★**受け取り方の名前が「60歳から年」で切れる**、という姿でした（★戦術Coworkが本番のファイルで数えました）。
+//
+// ★★【どう決めるか】…… ★★**中身から機械で決めます**（★数を手で置きません）。
+//   ★1つのセルの見た目の幅を「半角1・全角2」で数え、★その列のいちばん長い所＋ゆとり2 を幅にします。
+//   ★★数の列は、**桁区切りを入れたあとの字**で数えます（★`24,997,800` は8桁ではなく10字です）。
+//   ★上限を置きます ── ★置かないと、条文のような長い1文で列が画面より広くなります。
+//     ★★上限に当たった列は、**となりのセルが空なら字がはみ出して見えます**（★切れません）。
+// ────────────────────────────────────────────────────────────────
+
+/** セル1つの見た目の幅（★半角1・全角2）。★改行があれば、いちばん長い行で数えます */
+export function jiHaba(v: unknown, okane = false): number {
+  if (v === null || v === undefined) return 0;
+  const s = typeof v === 'number' ? (okane ? v.toLocaleString('en-US') : String(v)) : String(v);
+  const gyou = s.split('\n');
+  let max = 0;
+  for (const g of gyou) {
+    let w = 0;
+    for (const c of g) {
+      const n = c.codePointAt(0) ?? 0;
+      // ★半角（ASCII・半角カナ）は1、それ以外（漢字・かな・全角記号）は2
+      w += (n < 0x0100 || (n >= 0xff61 && n <= 0xff9f)) ? 1 : 2;
+    }
+    if (w > max) max = w;
+  }
+  return max;
+}
+
+/** 1行ぶん（★セルの並びと、桁区切りを入れる列の番号・1から数えます） */
+type Gyou = { c: (string | number)[]; okane?: readonly number[] };
+
+/**
+ * 行の並びから、列の幅を決めます。
+ * @param gyou   幅を決めるのに使う行（★長い1文だけの行は、渡さないでください）
+ * @param jogen  1列の上限（★字の数）
+ */
+function retsuNoHaba(gyou: readonly Gyou[], jogen: number, orikaeshi = false): Partial<ExcelJS.Column>[] {
+  const haba: number[] = [];
+  for (const g of gyou) {
+    g.c.forEach((v, i) => {
+      const w = jiHaba(v, !!g.okane?.includes(i + 1));
+      if (w > (haba[i] ?? 0)) haba[i] = w;
+    });
+  }
+  /**
+   * ★★`orikaeshi` …… その列の字を**折り返します**（★上限に当たった長い1文が切れないため）。
+   *   ★★★シート4だけに付けます ── ★シート2は36,225行あり、★1行ずつ高さを測らせると重くなります。
+   *   ★折り返す列は、★**セルの中の改行（`\n`）も見えるようになります**
+   *     （★画面11の表には、2行のセルがあります。★折り返さないと**下の行が見えません**）。
+   */
+  return haba.map((w) => ({
+    width: Math.min(jogen, Math.max(w, 4) + 2),
+    ...(orikaeshi ? { style: { alignment: { wrapText: true, vertical: 'top' } } } : {}),
+  }));
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/** 行を1つ書きます（★お金の列には桁区切りの書式を付けます） */
+function kaku(ws: any, g: Gyou, kugiriFmt: string): void {
+  const row = ws.addRow(g.c);
+  for (const i of g.okane ?? []) row.getCell(i).numFmt = kugiriFmt;
+  row.commit();
+}
+/**
+ * 見出しの行を固定する渡しもの（★下へ動かしても見えたまま）。
+ *
+ * ★★`wb.addWorksheet(名前, これ)` に渡します ── ★**あとから `ws.views = …` とは置けません**
+ *   （★書き出しの `WorksheetWriter` は `views` を読むだけにしています。★実測で止まりました）。
+ * @param gyou 見出しの行が上から何行めか（★1から数えます）
+ */
+function midashiWoTomeru(gyou: number): any {
+  return { views: [{ state: 'frozen', xSplit: 0, ySplit: gyou }] };
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+/**
+ * ★★★【2026-09-21・戦術Cowork `kaihatsu_ate_20260921.md` お願い2 ／ 同 b 2節】
+ *   **中の名前（半角）とローマ字の答えを、買った方に見せません。**
+ *
+ * ★★【本番で出ていた姿】
+ *   ```
+ *   ⑥ あなたが生まれた年月日（hi）    5日
+ *   ⑥ あなたが生まれた年月日（nen）   1973年
+ *   ⑥ あなたが生まれた年月日（tsuki） 5月
+ *   ㉓ あなたが役員として受け取る退職金（役員退職慰労金）（nai）  hai
+ *   ㉕ あなたの配偶者の合計所得金額（nai）                        hai
+ *   ```
+ * ★★【数えました】…… `kensa/excel_gyou_kazoeru.tsx`（★28項目・枝番ぜんぶ＝鍵63本を立てて数える本）
+ *   ★直す前 …… ★**`（半角の名前）` 39行 ／ ローマ字の答え 2行**（`㉕/nai`・`㉓/nai`）でした。
+ *
+ * ★★【直した姿】…… 3つの決まりだけです。
+ *   (1) **年月日・年月の組は、1行にまとめます**（★`1973年5月5日` ／ `1988年4月 〜 2026年3月`）。
+ *       ★★戦術Coworkのお願い（⑥を1行に）を、★**同じ形の組（⑫⑬⑲㉓の期間）にも当てました。**
+ *   (2) のこる枝番の名前は、**`paidRules.ts` の `RAN_JI`（戦術Coworkの字）**を使います。
+ *       ★★**半角の名前を字にしません**（★`nen` → `年`、`shotoku` → `合計所得金額`）。
+ *   (3) `nai` の欄（㉕㉓）は、`Ran` に無い鍵ですので、★**`Kou.nai.ji`（戦術Coworkの字）**を名前にし、
+ *       ★答えは **「はい」「いいえ」**にします。
+ *   ★★★1つの項目が1行しか作らないときは、**枝番の名前を付けません**（★`㉑ あなたの配偶者が生まれた年` が
+ *     `（あなたの配偶者が生まれた年）` と2度出ないため）。
+ */
+/** 年月の組（`hajime/nen` `hajime/tsuki` `owari/nen` `owari/tsuki`）かどうか */
+const KIKAN_EDA = ['hajime/nen', 'hajime/tsuki', 'owari/nen', 'owari/tsuki'] as const;
+/** 生年月日の組（⑥） */
+const HIZUKE_EDA = ['nen', 'tsuki', 'hi'] as const;
+
+/** `1988年4月 〜 2026年3月`。★月が空なら年だけ。★年が空なら、その側を出しません */
+function kikanNoJi(get: (eda: string) => string | undefined): string | null {
+  const gawa = (m: string) => {
+    const n = get(`${m}/nen`), t = get(`${m}/tsuki`);
+    if (!n) return null;
+    return t ? `${n}年${t}月` : `${n}年`;
+  };
+  const h = gawa('hajime'), o = gawa('owari');
+  if (!h && !o) return null;
+  return `${h ?? ''} 〜 ${o ?? ''}`.trim();
+}
+
+/**
+ * 複数件（⑪⑲）は、枝番の名前の前に**件の番号**を付けます（`1/gaku` → `1件め・額`）。
+ * ★件でなければ、名前をそのまま返します。
+ */
+function ken1(eda: string, na: string, ji: string): [string, string] {
+  const m = /^(\d+)\//.exec(eda);
+  return [m ? [`${m[1]}件め`, na].filter(Boolean).join('・') : na, ji];
+}
+
+/** `1973年5月5日`。★月・日が空なら、そこまで */
+function hizukeNoJi(get: (eda: string) => string | undefined): string | null {
+  const n = get('nen'), t = get('tsuki'), h = get('hi');
+  if (!n) return null;
+  if (!t) return `${n}年`;
+  return h ? `${n}年${t}月${h}日` : `${n}年${t}月`;
+}
+
+/** ★`kensa/excel_gyou_kazoeru.tsx` が、この1本をそのまま数えます（★数える本に写しを作らないため） */
+export function nyuryokuNoGyou(kou: readonly Kou[], raw: Record<string, string>): [string, string][] {
   const out: [string, string][] = [];
   for (const f of PAID_FIELDS) {
     const k = kou.find((x) => x.no === f.no);
-    const kagis = Object.keys(raw).filter((x) => x === f.no || x.startsWith(`${f.no}/`)).sort();
+    const aru0 = Object.keys(raw).filter((x) => x === f.no || x.startsWith(`${f.no}/`));
+    /**
+     * ★★★【2026-09-21】**鍵の並びを `paidKou()` の並びにそろえます。**
+     *   ★前は `sort()`（★半角の名前のあいうえお順）でしたので、★★画面7の並びと合っていませんでした
+     *     （例：㉖が `dokyo` → `rojin` → `tokutei`。★画面7は「特定 → 老人 → 同居老親」の順です）。
+     *   ★`nai` の欄（㉕㉓）は、その項目の**先頭**に置きます（★「いない」が先・画面7と同じ）。
+     *   ★この並びに無い鍵は、あとから元の順で足します（★黙って落とさないため）。
+     */
+    const jun: string[] = [];
+    if (k && k.katachi === 'kumi' && k.nai) jun.push(k.nai.kagi);
+    if (k) {
+      if (k.katachi === 'ken') {
+        // ★件ごとにまとめます（★1件めの欄をぜんぶ → 2件めの欄をぜんぶ）
+        for (let n = 1; n <= k.max; n++) for (const r of k.ran) jun.push(r.kagi.replace('{n}', String(n)));
+      } else {
+        for (const r of (k.katachi === 'tan' ? [k.ran] : k.ran)) jun.push(r.kagi);
+      }
+    }
+    const kagis = [...jun.filter((x) => aru0.includes(x)), ...aru0.filter((x) => !jun.includes(x))];
     /**
      * ★★★【2026-09-14・決め1204】**お答えいただいていない欄は、そう書きます。**
      *   ★前は**空欄**でしたので、★★「0円」なのか「お答えいただいていない」のかが**見ても分かりません**でした。
@@ -250,15 +407,96 @@ function nyuryokuNoGyou(kou: readonly Kou[], raw: Record<string, string>): [stri
       out.push([f.label, a ? `${KOTAE_NASHI}（${a}）` : KOTAE_NASHI]);
       continue;
     }
+    /**
+     * ★決まり(1) …… 年月日・年月の組を、1行にまとめます。
+     *   ★`eda` は鍵から項目の番号を取ったもの（`⑫/hajime/nen` → `hajime/nen`、
+     *     `⑲/1/hajime/nen` → `1/hajime/nen`）。★複数件は「件ごと」にまとめます。
+     */
+    const eda = (kagi: string) => (kagi === f.no ? '' : kagi.slice(f.no.length + 1));
+    /** まとめた鍵（★下のふつうの行から外します）。★値は「その組の行を出す鍵」（＝組の先頭の鍵） */
+    const tsukatta = new Map<string, string>();
+    /** 組の行（鍵 → ［枝番の名前・値］） */
+    const kumiGyou = new Map<string, [string, string]>();
+    /**
+     * ★★**期間の組を先に取ります。**★あとで日付の組を取ると、
+     *   ★`⑫/hajime/nen` の `nen` が**日付の組にも当たって**しまいます（★こちらの誤りでした・実測で出ました）。
+     */
+    const atamas = (eda0: readonly string[]) => {
+      const s = new Set<string>();
+      for (const kagi of kagis) {
+        if (tsukatta.has(kagi)) continue;
+        const e = eda(kagi);
+        for (const su of eda0) if (e === su || e.endsWith(`/${su}`)) s.add(e.slice(0, e.length - su.length));
+      }
+      return s;
+    };
+    for (const atama of atamas(KIKAN_EDA)) {
+      const kagi0 = `${f.no}/${atama}hajime/nen`;
+      const aru = (su: string) => kagis.includes(`${f.no}/${atama}${su}`);
+      const ji = kikanNoJi((su) => raw[`${f.no}/${atama}${su}`] || undefined);
+      for (const su of KIKAN_EDA) if (aru(su)) tsukatta.set(`${f.no}/${atama}${su}`, kagi0);
+      // ★枝番の名前 …… 組の先頭の欄の `kumiJi`（⑲㉓）。★無ければ件の番号だけ（⑫⑬）
+      const na = ranWoHiku(kou, kagi0)?.kumiJi ?? '';
+      if (ji) kumiGyou.set(kagi0, [na, ji]);
+    }
+    for (const atama of atamas(HIZUKE_EDA)) {
+      const kagi0 = `${f.no}/${atama}nen`;
+      const aru = (su: string) => kagis.includes(`${f.no}/${atama}${su}`);
+      /**
+       * ★★**年だけの欄を、日付の組にしません。**
+       *   ★`⑲/{n}/nen` は「受け取った年」・`㉑/nen` は「配偶者が生まれた年」で、★日付の組ではありません
+       *     （★こちらの誤りでした ── ★実測で `⑲ …（1件め）　1990年` と、名前が消えて出ました）。
+       *   ★月か日がいっしょに在るときだけ、組にします。
+       */
+      if (!aru('tsuki') && !aru('hi')) continue;
+      const ji = hizukeNoJi((su) => raw[`${f.no}/${atama}${su}`] || undefined);
+      for (const su of HIZUKE_EDA) if (aru(su)) tsukatta.set(`${f.no}/${atama}${su}`, kagi0);
+      if (ji) kumiGyou.set(kagi0, ['', ji]);
+    }
+
+    /** 1つの項目ぶんの行（枝番の名前・値）。★あとで、1行だけなら名前を落とせることがあります */
+    const kono: [string, string][] = [];
     for (const kagi of kagis) {
+      const matome = tsukatta.get(kagi);
+      if (matome !== undefined) {
+        // ★組にまとめた鍵 …… 先頭の鍵の所で1行だけ出します（★鍵の並びのまま）
+        const g = matome === kagi ? kumiGyou.get(kagi) : undefined;
+        if (g) kono.push(ken1(eda(kagi), g[0], g[1]));
+        continue;
+      }
       const r = ranWoHiku(kou, kagi);
       const v = raw[kagi];
-      const ji = r?.sentaku ? (r.sentaku.find((s) => s.kagi === v)?.ji ?? v)
+      /**
+       * ★決まり(3) …… `nai` の欄（㉕㉓）は `Ran` に無い鍵です。★`Kou.nai`（戦術Coworkの字）で出します。
+       *   ★★前はここで `r` が `undefined` になり、★**raw の字（`hai`）がそのまま出ていました。**
+       */
+      const nai = k && k.katachi === 'kumi' && k.nai && k.nai.kagi === kagi ? k.nai : null;
+      const ji = nai ? (v === 'hai' ? 'はい' : 'いいえ')
+        : r?.sentaku ? (r.sentaku.find((s) => s.kagi === v)?.ji ?? v)
         : r?.shurui === 'hai' ? (v === 'hai' ? 'はい' : 'いいえ')
         : v === 'wakaranai' ? 'わからない'
         : r?.tani ? `${kugiru(v, r.tani)}${r.tani}` : v;
-      out.push([kagi === f.no ? f.label : `${f.label}（${kagi.slice(f.no.length + 1)}）`, ji]);
+      /**
+       * ★決まり(2) …… 枝番の名前は `RAN_JI`（`r.ji`）。★無ければ半角の名前に**落としません** ──
+       *   ★★名前が無い欄は、この時点で `⑧`（項目そのもの）か、上で組にまとめた欄だけです。
+       */
+      const e = eda(kagi);
+      const na = kagi === f.no ? '' : (nai ? nai.ji : (r?.ji ?? e));
+      kono.push(ken1(e, na, ji));
     }
+    /**
+     * ★★**1行しか作らない項目は、枝番の名前を落とします** ── ★ただし、次の2つだけです。
+     *   (ア) 名前が空（★項目そのものの欄・組にまとめた欄）
+     *   (イ) 名前が、項目の見出しの終わりと同じ（★`㉑ あなたの配偶者が生まれた年（あなたの配偶者が生まれた年）` を避けます）
+     * ★★★これ以外は**落としません** ── ★落とすと、
+     *   ★`㉕ あなたの配偶者の合計所得金額｜はい`（★何に「はい」なのか分かりません）や、
+     *   ★`⑪ …｜0`（★知らない鍵の値が、答えのように出ます）になります。★どちらも実測で出ました。
+     */
+    if (kono.length === 1 && (kono[0][0] === '' || f.label.endsWith(kono[0][0]))) {
+      out.push([f.label, kono[0][1]]);
+      continue;
+    }
+    for (const [na, ji] of kono) out.push([na ? `${f.label}（${na}）` : f.label, ji]);
   }
   return out;
 }
@@ -284,9 +522,19 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
   const { g8, D, R, p } = k;
   const b = k.kekka.bun8;
 
+  /**
+   * ★★★【2026-09-21・戦術Cowork `kaihatsu_ate_20260921b.md` 1節】**列の幅を、中身から決めます。**
+   *   ★幅は**シートを作る前**に渡さなければなりません（★`exceljs` の書き出しは、
+   *     ★★最初の行を書いた時点で「列の決まり」を本に書いてしまいます）。
+   *   ★ですので、★**行をいったんためて**から、幅を数え、シートを作って書きます。
+   *   ★★シート2だけは**ためません**（★36,225行を持つと重くなります）── ★中身を先に1度なでて幅を数えます。
+   */
+  /** 1列の上限（★字の数）。★条文のような長い1文で、列が画面より広くならないように */
+  const HABA_JOGEN = 60;
+
   // ---- 1 結果のまとめ
-  const s1 = wb.addWorksheet('結果のまとめ');
-  s1.addRow([b.midashi.join('')]).commit();
+  const g1: Gyou[] = [];
+  g1.push({ c: [b.midashi.join('')] });
   /**
    * ★★★【2026-09-14・決め1207】**1つの文を、2つのセルに分けません。**
    *
@@ -302,23 +550,24 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
    */
   const atamaGyou = b.atama.lbl.split('\n');
   atamaGyou[atamaGyou.length - 1] = `${atamaGyou[atamaGyou.length - 1]} ${b.atama.ookii}。`;
-  for (const g of atamaGyou) s1.addRow([g]).commit();
-  if (b.atama.sub) s1.addRow([b.atama.sub]).commit();
-  s1.addRow([b.judge.hon.replace(/\n/g, '')]).commit();
-  if (b.judge.hosoku) s1.addRow([b.judge.hosoku]).commit();
-  s1.addRow([]).commit();
+  for (const g of atamaGyou) g1.push({ c: [g] });
+  if (b.atama.sub) g1.push({ c: [b.atama.sub] });
+  g1.push({ c: [b.judge.hon.replace(/\n/g, '')] });
+  if (b.judge.hosoku) g1.push({ c: [b.judge.hosoku] });
+  g1.push({ c: [] });
   /**
    * ★★★【2026-09-15・決め1230】**列名の上に1行**（★戦術Cowork 3節）。
    *   ★字は `gamen8Bun()` の `modoruYokunen` が持ちます（★基準HTML 894行から1字1句写したもの）。
    *   ★★シート2にも同じ所に入れます（★どちらにも「確定申告で戻る額」の列が在るためです）。
    */
-  s1.addRow([b.modoruYokunen]).commit();
-  s1.addRow([...RETSU_S1]).commit();
+  g1.push({ c: [b.modoruYokunen] });
+  /** ★シート1の列名の行が、上から何行めか（★固定する行・幅を数える先頭） */
+  const s1Midashi = g1.length + 1;
+  g1.push({ c: [...RETSU_S1] });
   for (const h of g8.houkou) {
     const row = D.find((x) => x.lab === h.lab);
     // ★★決め1214 …… 「確定申告で戻る額」を3列目に（★画面8のカードと同じ並び）
-    okane(s1.addRow([h.lab, h.zei, h.modoru, h.tedori, row ? hokenNoJi(row) : '', h.mikata.join('／')]),
-      2, 3, 4).commit();
+    g1.push({ c: [h.lab, h.zei, h.modoru, h.tedori, row ? hokenNoJi(row) : '', h.mikata.join('／')], okane: [2, 3, 4] });
   }
   /**
    * ★★★【2026-09-15・決め1227】**表のあとに、2行**（★置き場所はシート1の表の下のまま・戦術Cowork 3-3）。
@@ -332,17 +581,40 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
    * ★★決め1227 …… **同じことを、画面とファイルに同じ字で出さない。**
    * ★★**1行に1つの文**（★決め1207）。
    */
-  s1.addRow([]).commit();
-  for (const x of b.nokoranaiFile) s1.addRow([x]).commit();
+  g1.push({ c: [] });
+  for (const x of b.nokoranaiFile) g1.push({ c: [x] });
+  const s1 = wb.addWorksheet('結果のまとめ', midashiWoTomeru(s1Midashi));
+  /**
+   * ★幅は**表の所だけ**から数えます（★`s1Midashi` 行め以降）。
+   *   ★上の1文ずつの行は、★**A列だけ**に長い文が入っていますので、★幅に数えるとA列が画面より広くなります。
+   *   ★★となりのセルが空ですので、★その文は**はみ出して見えます**（★切れません）。
+   */
+  s1.columns = retsuNoHaba(g1.slice(s1Midashi - 1), HABA_JOGEN);
+  for (const g of g1) kaku(s1, g, KUGIRI);
   s1.commit();
 
   // ---- 2 受け取り方の一覧（全通り）
-  const s2 = wb.addWorksheet('受け取り方の一覧');
+  // ★シート2の列名は3行め（★上の2行は注記）。★下へ動かしても見えたままにします
+  const s2 = wb.addWorksheet('受け取り方の一覧', midashiWoTomeru(3));
   /**
    * ★★★【2026-09-15・決め1214】**見出しの上に1行**（★戦術Cowork お願い3）。
    *   ★字は**基準HTML 885行から写しました**（★`tsuginote_gamen_base.html` 183,384／`9a309ee9…`）。
    *   ★★シート2には列を足していません ── ★**測って便に書きました**（★重さの数は便の3節）。
    */
+  /**
+   * ★★★【2026-09-21】**幅を、行を書く前に数えます**（★36,225行をためないため）。
+   *   ★数えるのは **列名の行と、`D` の中身**です（★上の2行は1文ずつですので、外します・シート1と同じ）。
+   *   ★「確定申告で戻る額」は `modoruGaku()` を呼ばないと出ませんが、
+   *     ★★**桁は「増える税金」と同じか小さい**ので（★戻る額 ≤ 納めた税）、
+   *     ★★★ここでは `x.zei` の桁で数えます（★足りなければ `###` になりますので、下の門で見ます）。
+   */
+  s2.columns = retsuNoHaba([
+    { c: [...RETSU_S2] },
+    ...D.map((x, i) => ({
+      c: [i + 1, x.lab, x.zei, x.zei, x.tedori, x.age0, x.owari, hokenNoJi(x)],
+      okane: [3, 4, 5, 6] as const,
+    })),
+  ], HABA_JOGEN);
   s2.addRow([JI_S2_SHINKOKU]).commit();
   // ★★決め1230 …… ★「増える税金と手取りは…」の**次の行**（★戦術Cowork 3節）
   s2.addRow([b.modoruYokunen]).commit();
@@ -375,7 +647,7 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
   s2.commit();
 
   // ---- 3 年ごとの内訳（★この便では2本）
-  const s3 = wb.addWorksheet('年ごとの内訳');
+  const g3: Gyou[] = [];
   const ketsuron = D.find((x) => x.lab === g8.houkou[0]?.lab) ?? null;
   const ichiji = ichijikinNoAn(k, IDECO_NAME);
   const an = [ketsuron, ichiji].filter((x): x is Row => x !== null);
@@ -384,12 +656,14 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
     .map((x) => ({ x, i: D.indexOf(x), ...nenNoHani(R[D.indexOf(x)][1]) }));
 
   // ★添え字（税金の字の型・senjutsu_20260905g.md 1番②）。★シート3の先頭の行に1つ
-  s3.addRow([JI_S3_SOEJI]).commit();
+  g3.push({ c: [JI_S3_SOEJI] });
   // ★注記は、拠出が終わってから受け取り始めるまでの年がある案が1つでもあるときだけ（senjutsu_20260903c.md 1番の字）
-  if (anRows.some((a) => a.first < a.uketoriFirst)) s3.addRow([JI_S3_KOZA]).commit();
-  s3.addRow([...RETSU_S3]).commit();
+  if (anRows.some((a) => a.first < a.uketoriFirst)) g3.push({ c: [JI_S3_KOZA] });
+  /** ★シート3の列名の行が、上から何行めか（★注記が1行のときと2行のときがあります） */
+  const s3Midashi = g3.length + 1;
+  g3.push({ c: [...RETSU_S3] });
   anRows.forEach((a, n) => {
-    if (n > 0) s3.addRow([]).commit();          // ★案と案の間に空の行を1つ（どこまでが1つの案か分かるように）
+    if (n > 0) g3.push({ c: [] });          // ★案と案の間に空の行を1つ（どこまでが1つの案か分かるように）
     const r = R[a.i][1];
     let gKei = 0, zKei = 0, tKei = 0;
     for (let y = a.first; y <= a.last; y++) {
@@ -397,19 +671,32 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
       const zei = r.harau?.[y] ?? 0;
       const tesu = r.tesuryo_by_year?.[y] ?? 0;
       gKei += gaku; zKei += zei; tKei += tesu;
-      okane(s3.addRow([a.i + 1, y, p.age(y), gaku, zei, tesu]), 4, 5, 6).commit();
+      g3.push({ c: [a.i + 1, y, p.age(y), gaku, zei, tesu], okane: [4, 5, 6] });
     }
     // ★合計と手取りの2行（案ごと）。★「年」の列に語を置きます（その行が「年」の行ではないため）
-    okane(s3.addRow([a.i + 1, '合計', '', gKei, zKei, tKei]), 4, 5, 6).commit();
-    okane(s3.addRow([a.i + 1, '手取り', '', gKei - zKei - tKei, '', '']), 4).commit();
+    g3.push({ c: [a.i + 1, '合計', '', gKei, zKei, tKei], okane: [4, 5, 6] });
+    g3.push({ c: [a.i + 1, '手取り', '', gKei - zKei - tKei, '', ''], okane: [4] });
   });
+  const s3 = wb.addWorksheet('年ごとの内訳', midashiWoTomeru(s3Midashi));
+  // ★幅は表の所だけから（★上の注記は1文ずつ・A列にだけ入りますので、はみ出して見えます）
+  s3.columns = retsuNoHaba(g3.slice(s3Midashi - 1), HABA_JOGEN);
+  for (const g of g3) kaku(s3, g, KUGIRI);
   s3.commit();
 
   // ---- 4 計算の内容と根拠
-  const s4 = wb.addWorksheet('計算の内容と根拠');
-  s4.addRow(['ご入力の内容']).commit();
-  for (const [l, val] of nyuryokuNoGyou(paidKou(k.kekka.genzaiNen), raw)) s4.addRow([l, val]).commit();
-  s4.addRow([]).commit();
+  const g4: Gyou[] = [];
+  /**
+   * ★★★【2026-09-21】**この節の行だけで、A列とB列の幅を決めます。**
+   *   ★下の「計算の全ステップ」「根拠にした条文」は、★**A列に長い1文**が入る行が多くあります。
+   *   ★それを幅に数えると、A列が画面より広くなります。★となりが空なら、はみ出して見えます。
+   */
+  const s4Haba: Gyou[] = [];
+  g4.push({ c: ['ご入力の内容'] });
+  for (const [l, val] of nyuryokuNoGyou(paidKou(k.kekka.genzaiNen), raw)) {
+    g4.push({ c: [l, val] });
+    s4Haba.push({ c: [l, val] });
+  }
+  g4.push({ c: [] });
 
   /**
    * ★★★【2026-09-15・決め1231】**計算の全ステップ**（★戦術Cowork `senjutsu_20260915e.md` 1節）。
@@ -430,7 +717,7 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
    *   ★★★**画面9詳細は作りません**（★1案あたりが重くなります）── ★`setaiNoJi()` が正本です。
    */
   const setai = setaiNoJi(p, k.kyuchiHabuita, HIHOKENSHA, KYUYO_SHOTOKUSHA);
-  s4.addRow(['計算の全ステップ']).commit();
+  g4.push({ c: ['計算の全ステップ'] });
   /**
    * ★★★【2026-09-15・決め1233】**画面のことを言う2つの字を、ファイルには出しません**（★基準HTML 895行の覚え書き）。
    *
@@ -456,8 +743,8 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
         setaiKubun: setai.setaiKubun, hikazeiGendo: setai.hikazeiGendo,
       }),
       gyouNashi11(t));
-    s4.addRow([]).commit();
-    s4.addRow([`番号 ${a.i + 1}`, a.x.lab]).commit();
+    g4.push({ c: [] });
+    g4.push({ c: [`番号 ${a.i + 1}`, a.x.lab] });
     for (const blk of kumi.dasu) {
       // ★決め1233(1) …… 「一覧で選ぶと切り替わる」の1文は、ファイルに出しません
       if ((blk.kind === 'hako' || blk.kind === 'hon') && blk.na.includes('an_bun')) continue;
@@ -469,9 +756,9 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
         shiryo = blk.bun;
         continue;
       }
-      if (blk.kind === 'hyo') for (const g of blk.gyou) s4.addRow([...g.cells]).commit();
-      else if (blk.kind === 'ret') for (const kk of blk.koumoku) s4.addRow(['', kk.bun]).commit();
-      else s4.addRow([blk.bun]).commit();
+      if (blk.kind === 'hyo') for (const g of blk.gyou) { g4.push({ c: [...g.cells] }); s4Haba.push({ c: [...g.cells] }); }
+      else if (blk.kind === 'ret') for (const kk of blk.koumoku) g4.push({ c: ['', kk.bun] });
+      else g4.push({ c: [blk.bun] });
     }
   }
   if (shiryo !== null) {
@@ -480,12 +767,12 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
       // ★見出しの字が変わった日に、黙って古い形で出さないための止めです
       throw new Error('「この画面の根拠にした資料」で始まっていません。基準HTMLの画面11の見出しが変わっています。');
     }
-    s4.addRow([]).commit();
-    s4.addRow([`${b.konkyoShiryo}\n${shiryo.slice(ATAMA.length)}`]).commit();
+    g4.push({ c: [] });
+    g4.push({ c: [`${b.konkyoShiryo}\n${shiryo.slice(ATAMA.length)}`] });
   }
 
-  s4.addRow([]).commit();
-  s4.addRow(['根拠にした条文']).commit();
+  g4.push({ c: [] });
+  g4.push({ c: ['根拠にした条文'] });
   for (const blk of GAMEN13) {
     if (blk.kind === 'hyo') {
       for (const g of blk.gyou) {
@@ -493,17 +780,21 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
           // ★その方によって変わる行：縮めた年がある方だけ（ari:true・画面13と同じ文）。無い方は行ごと出さない
           const bun = hitogotoBun(k.kekka.hitogoto13)[g.hidari];
           if (!bun) continue;
-          s4.addRow([g.hidari, bun]).commit();
+          g4.push({ c: [g.hidari, bun] }); s4Haba.push({ c: [g.hidari, bun] });
           continue;
         }
-        s4.addRow([g.hidari, g.migi]).commit();
+        g4.push({ c: [g.hidari, g.migi] }); s4Haba.push({ c: [g.hidari, g.migi] });
       }
     } else if (blk.kind === 'ret') {
-      for (const kk of blk.koumoku) s4.addRow(['', kk]).commit();
+      for (const kk of blk.koumoku) g4.push({ c: ['', kk] });
     } else {
-      s4.addRow([blk.bun]).commit();
+      g4.push({ c: [blk.bun] });
     }
   }
+  // ★シート4に「列名の行」はありません（★表ではなく、読む本です）。★先頭の1行を固定します
+  const s4 = wb.addWorksheet('計算の内容と根拠', midashiWoTomeru(1));
+  s4.columns = retsuNoHaba(s4Haba, HABA_JOGEN, true);
+  for (const g of g4) kaku(s4, g, KUGIRI);
   s4.commit();
 
   void v;

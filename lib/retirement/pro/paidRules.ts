@@ -34,6 +34,8 @@ import { FIELDS, type FreeInput } from '@/components/retirement/pro/types';
 import { PAID_FIELDS } from '@/components/retirement/pro/paidFields';
 import type { PaidInput, Kikan, Sumi, Nengetsu, Kyuchi } from './paidInput';
 import { kurisageJogenAge } from './zeisei';
+// ★2026-09-21 …… `seisuNiSuru` は `money.ts` の1本です（★下の「字 → 整数」の覚え書き）
+import { seisuNiSuru } from './money';
 // ⑯【2026-09-06】★入口の検査で、旧長期（所得税）の段の式を使います。
 //   ★★**式をここに書き写しません**（★`engine.ts` の1本を呼びます・§「実装側に式を持たせない」）
 import { hokenDan, HOKEN_SHOTOKU_KYUCHOUKI, JISHIN_KOJO_JOGEN } from './engine';
@@ -348,17 +350,15 @@ export function inputsKaraRaw(inputs: unknown): Record<string, string> {
 }
 
 // ---------------------------------------------------------------- 字 → 整数
-/** 全角の数字・カンマ・空白を整えます。★小数点はそのまま残す（seisu で落とすため） */
-export function seisuNiSuru(s: string): { ok: true; n: number } | { ok: false; kara: true } | { ok: false; kara: false } {
-  const t = s.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
-    .replace(/[,，、\s　]/g, '')
-    .replace(/[－−―]/g, '-');
-  if (t === '') return { ok: false, kara: true };
-  if (!/^-?\d+$/.test(t)) return { ok: false, kara: false };
-  const n = Number(t);
-  if (!Number.isSafeInteger(n)) return { ok: false, kara: false };
-  return { ok: true, n };
-}
+/**
+ * 全角の数字・カンマ・空白を整えます。★小数点はそのまま残す（seisu で落とすため）。
+ *
+ * ★★【2026-09-21】★**中身は `money.ts` に移しました**（★1文字も変えていません）。
+ *   ★理由 …… ★無料版の画面も入れた額の言い換えを出しますが、★この本は `engine.ts` を読みますので、
+ *     ★★無料版に計算エンジンを丸ごと持ちこんでしまいます。
+ *   ★ここは**同じ名前で出し直すだけ**です（★`Screen7.tsx` などの呼ぶ側は1行も直りません）。
+ */
+export { seisuNiSuru };
 
 export type Kimari = 'hissu' | 'seisu' | 'min' | 'max' | 'sentaku' | 'koe';
 export type Ayamari = { no: string; kagi: string; kimari: Kimari; /** 越えの字（あれば） */ ji?: string };

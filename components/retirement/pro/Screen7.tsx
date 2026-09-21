@@ -321,7 +321,11 @@ export default function Screen7({
      *   ★**入れた額を、欄のすぐ下に言い換えて出します**（★森嶋さんのお決め・入力の間違いを防ぐため）。
      *   ★★字を作るのは `money.ts` の `iikaeNoJi()` です ── ★**ここに式はありません**（★移管指示書）。
      *   ★出す欄 …… ★`man`（万円）と `en`（円）の欄だけ。★空のとき・数として読めないときは出しません。
-     *   ★大きさは本文と同じ（`text-[15px]`・★欄の見出しと同じ）。★折りたたみません。
+     *   ★★大きさは **`text-base`（16px）**です（★2026-09-21・戦術Cowork `kaihatsu_ate_20260921e.md` 2節）。
+     *     ★はじめ `text-[15px]`（欄の見出しと同じ）にしていましたが、★★**入れた額が合っているかを見るための字**で、
+     *       ★**55〜65歳の方がいちばん見落としてはいけない所**ですので、★欄の見出しより小さくしません。
+     *     ★無料版（`Screen1.tsx`）も `text-base` で、**同じ大きさ**です。
+     *   ★折りたたみません。
      */
     const iikae = (r.shurui === 'man' || r.shurui === 'en') ? iikaeNoJi(v, r.shurui === 'man' ? '万円' : '円') : null;
     const hako = (
@@ -331,7 +335,7 @@ export default function Screen7({
           <div className={r.select || r.shurui === 'erabu' || r.shurui === 'hai' ? '' : 'min-w-[10rem] flex-1'}>{naka}</div>
           {r.tani && r.shurui !== 'hai' ? <span className="text-[15px] text-slate-800">{r.tani}</span> : null}
         </div>
-        {iikae ? <p className="mt-1 text-[15px] text-slate-800">{iikae}</p> : null}
+        {iikae ? <p className="mt-1 text-base text-slate-800">{iikae}</p> : null}
       </div>
     );
     // ★期間の組の上に小さく1行（⑲・㉓。字は `RAN_JI`・senjutsu_20260902ai.md 2番の2）

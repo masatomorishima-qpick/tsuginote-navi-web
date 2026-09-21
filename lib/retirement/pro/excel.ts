@@ -334,6 +334,29 @@ function midashiWoTomeru(gyou: number): any {
  *   ★★★1つの項目が1行しか作らないときは、**枝番の名前を付けません**（★`㉑ あなたの配偶者が生まれた年` が
  *     `（あなたの配偶者が生まれた年）` と2度出ないため）。
  */
+/**
+ * ★★★【2026-09-21・戦術Cowork `kaihatsu_ate_20260921e.md` 4節】**Excel の行だけで使う、短い名前。**
+ *
+ * ★★【なぜ要るか】…… ★画面7の欄の見出し（`paidRules.ts` の `RAN_JI`）は、
+ *   ★**項目の見出しが上に在る**ことを前提にした字です（例：`19歳以上23歳未満の方（特定扶養親族）`）。
+ *   ★★Excel の行は **項目の見出しと名前が1行に並びます**ので、
+ *     ★`㉖ 扶養親族のうち、年齢で区分が変わる方の人数（19歳以上23歳未満の方（特定扶養親族））` と、
+ *     ★★**かっこが二重**になります。
+ * ★★★**画面7の字（`RAN_JI`）は1文字も変えていません。**★Excel の行だけの差し替えです。
+ * ★★鍵は**そのままの形**（複数件は `{n}`）で引きます ── ★`dokyo` のような末尾だけで引くと、
+ *   ★★`㉖/dokyo`（同居老親等）と `㉗/dokyo`（同居特別障害者）を**取り違えます**。
+ */
+const EXCEL_NA: Record<string, string> = {
+  '㉖/tokutei': '19歳以上23歳未満',
+  '㉖/rojin': '70歳以上',
+  '㉖/dokyo': '同居している70歳以上の親',
+  // ★⑲の期間の組 …… 組の行を出す鍵（先頭の欄）で引きます
+  '⑲/{n}/hajime/nen': '勤続期間・加入期間',
+};
+
+/** 複数件の番号を `{n}` に戻した鍵（★`EXCEL_NA` を引くため） */
+const kagiKata = (kagi: string): string => kagi.replace(/\/\d+\//, '/{n}/');
+
 /** 年月の組（`hajime/nen` `hajime/tsuki` `owari/nen` `owari/tsuki`）かどうか */
 const KIKAN_EDA = ['hajime/nen', 'hajime/tsuki', 'owari/nen', 'owari/tsuki'] as const;
 /** 生年月日の組（⑥） */
@@ -435,8 +458,8 @@ export function nyuryokuNoGyou(kou: readonly Kou[], raw: Record<string, string>)
       const aru = (su: string) => kagis.includes(`${f.no}/${atama}${su}`);
       const ji = kikanNoJi((su) => raw[`${f.no}/${atama}${su}`] || undefined);
       for (const su of KIKAN_EDA) if (aru(su)) tsukatta.set(`${f.no}/${atama}${su}`, kagi0);
-      // ★枝番の名前 …… 組の先頭の欄の `kumiJi`（⑲㉓）。★無ければ件の番号だけ（⑫⑬）
-      const na = ranWoHiku(kou, kagi0)?.kumiJi ?? '';
+      // ★枝番の名前 …… Excel だけの短い名前 → 組の先頭の欄の `kumiJi`（⑲㉓）→ 無ければ件の番号だけ（⑫⑬）
+      const na = EXCEL_NA[kagiKata(kagi0)] ?? ranWoHiku(kou, kagi0)?.kumiJi ?? '';
       if (ji) kumiGyou.set(kagi0, [na, ji]);
     }
     for (const atama of atamas(HIZUKE_EDA)) {
@@ -481,7 +504,7 @@ export function nyuryokuNoGyou(kou: readonly Kou[], raw: Record<string, string>)
        *   ★★名前が無い欄は、この時点で `⑧`（項目そのもの）か、上で組にまとめた欄だけです。
        */
       const e = eda(kagi);
-      const na = kagi === f.no ? '' : (nai ? nai.ji : (r?.ji ?? e));
+      const na = kagi === f.no ? '' : (nai ? nai.ji : (EXCEL_NA[kagiKata(kagi)] ?? r?.ji ?? e));
       kono.push(ken1(e, na, ji));
     }
     /**
@@ -496,7 +519,23 @@ export function nyuryokuNoGyou(kou: readonly Kou[], raw: Record<string, string>)
       out.push([f.label, kono[0][1]]);
       continue;
     }
-    for (const [na, ji] of kono) out.push([na ? `${f.label}（${na}）` : f.label, ji]);
+    /**
+     * ★★★【2026-09-21・戦術Cowork `kaihatsu_ate_20260921e.md` 4節の門】
+     *   **かっこが2組以上、1行に入らないようにします。**
+     *
+     * ★★【戦術Coworkが見ておられない所でした】…… ★短い名前4つを入れたあと、門がまだ**4行**鳴りました。
+     *   ★★原因は**名前の中のかっこではなく、項目の見出しそのもののかっこ**です（★基準HTMLの字）。
+     *     `⑧ あなたが退職した翌年以降の収入見込み（年額）（何歳まで）`
+     *     `㉓ あなたが役員として受け取る退職金（役員退職慰労金）（額）` ほか2行
+     * ★★★【こちらが置いた形】…… ★**項目の見出しにかっこが在るときだけ**、枝番の名前を
+     *   ★かっこではなく `／` でつなぎます。★★これで、戦術Coworkがお示しになった2つの形
+     *   （`㉖ …（19歳以上23歳未満）`・`⑲ …（1件め・勤続期間・加入期間）`）は**1文字も変わりません。**
+     *   ★★**基準HTMLの字（項目の見出し）は1文字も変えていません。**★便でお諮りしています。
+     */
+    const kakkoAri = f.label.includes('（');
+    for (const [na, ji] of kono) {
+      out.push([na ? (kakkoAri ? `${f.label}／${na}` : `${f.label}（${na}）`) : f.label, ji]);
+    }
   }
   return out;
 }
@@ -561,7 +600,7 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
    *   ★★シート2にも同じ所に入れます（★どちらにも「確定申告で戻る額」の列が在るためです）。
    */
   g1.push({ c: [b.modoruYokunen] });
-  /** ★シート1の列名の行が、上から何行めか（★固定する行・幅を数える先頭） */
+  /** ★シート1の列名の行が、上から何行めか（★幅を数える先頭。★固定はしません・決め＝便e 3節） */
   const s1Midashi = g1.length + 1;
   g1.push({ c: [...RETSU_S1] });
   for (const h of g8.houkou) {
@@ -583,7 +622,13 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
    */
   g1.push({ c: [] });
   for (const x of b.nokoranaiFile) g1.push({ c: [x] });
-  const s1 = wb.addWorksheet('結果のまとめ', midashiWoTomeru(s1Midashi));
+  /**
+   * ★★★【2026-09-21・戦術Cowork `kaihatsu_ate_20260921e.md` 3節】**シート1は固定しません。**
+   *   ★列名の行が8行めにあり、★シート1は全14行です。★8行を固定すると**動かせる行が6行**になり、
+   *     ★★**表が短いので、固定の値打ちがありません**（★戦術Coworkのお決め）。
+   *   ★シート2（3行）・シート3（2行）・シート4（1行）の固定は、そのままです。
+   */
+  const s1 = wb.addWorksheet('結果のまとめ');
   /**
    * ★幅は**表の所だけ**から数えます（★`s1Midashi` 行め以降）。
    *   ★上の1文ずつの行は、★**A列だけ**に長い文が入っていますので、★幅に数えるとA列が画面より広くなります。

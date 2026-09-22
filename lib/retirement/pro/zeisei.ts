@@ -37,6 +37,22 @@ export function shotokuzei(kazei: number, nenbun: number): number {
 
 /** 所得税の基礎控除（所得税法86条＋措置法41条の16の2）
  *  令和8・9年分 104万（合計所得489万以下）／67万（655万以下）／62万 */
+
+/**
+ * ★★★【2026-09-22・決め（戦術Cowork `kaihatsu_ate_20260922k.md` 4節）】**基礎控除が0円になる合計所得金額の線**。
+ *
+ * ★★**2つに分けています。1つにまとめません。**
+ *   ★いまは同じ 2,500万円ですが、**別の法律の数**です。★1つの名前にまとめると、片方が変わった日に、
+ *     触っていないもう片方まで動きます（★基礎控除そのものの額は、もう分かれています ──
+ *     所得税は令和7年改正で本則58万→62万＋加算、住民税の43万は変わっていません）。
+ * ★★この線は、`kojo_zero_bun`（画面11・所得控除が全部0円の年の一文）の**分け**にも使います。
+ *   ★A「合計所得金額が2,500万円を超えますので基礎控除は0円」＝所得税の話ですので、`_SHOTOKU` を読みます。
+ * ★★★**数は、この2つの名前にだけ書きます**（★下の2つの関数も、ここを読みます）。
+ */
+/** ★根拠 …… 所得税法86条1項（★合計所得金額 2,400万円超で逓減し、**2,500万円超で 0円**）。★上の `kisoShotoku()` の覚え書きと同じ条文です */
+export const KISO_ZERO_KOE_SHOTOKU = 25_000_000;
+/** ★根拠 …… 地方税法314条の2第2項（★個人住民税の基礎控除。★合計所得金額 2,400万円超で逓減し、**2,500万円超で 0円**）。★下の `kisoJumin()` の覚え書きと同じ条文です */
+export const KISO_ZERO_KOE_JUMIN = 25_000_000;
 // --- 施行令70条1項：控除を減らすかどうかを見る「窓」（前年以前◯年内）------------
 //  **法令の数値は必ずここに置く。**画面に出す「空ける年数」は、窓の外に出る最小の年数＝この値＋1年。
 export const MADO_DC_ATO = 19;    // その年に受け取るのが確定拠出年金の一時金（＝iDeCo等があと）
@@ -66,7 +82,7 @@ export function kisoShotoku(goukei: number, nenbun: number): number {
   if (base !== null) return base;
   if (g <= 24_000_000) return 480_000;
   if (g <= 24_500_000) return 320_000;
-  if (g <= 25_000_000) return 160_000;
+  if (g <= KISO_ZERO_KOE_SHOTOKU) return 160_000;   // ★2,500万円の線は `KISO_ZERO_KOE_SHOTOKU` の1か所だけに書きます
   return 0;
 }
 
@@ -75,7 +91,7 @@ export function kisoJumin(goukei: number): number {
   const g = Math.trunc(goukei);
   if (g <= 24_000_000) return 430_000;
   if (g <= 24_500_000) return 290_000;
-  if (g <= 25_000_000) return 150_000;
+  if (g <= KISO_ZERO_KOE_JUMIN) return 150_000;     // ★2,500万円の線は `KISO_ZERO_KOE_JUMIN` の1か所だけに書きます
   return 0;
 }
 

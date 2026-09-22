@@ -53,7 +53,30 @@ export interface Bun11 {
    * ★★★決め1113 …… `{tai_gen}` ＝ **その年に受け取る退職手当等の名前**を `KeikaRow.gens` の順に「・」で。
    *   ★画面10（993行）と画面11（1109行・1112行）の**3か所**に同じ字が出ます。
    */
-  tai_gen: string;
+  tai_gen: string | null;
+  /**
+   * ★★★【2026-09-22・決め（戦術Cowork `kaihatsu_ate_20260922k.md` 3節）】**退職の年に退職所得が無い方**の一文。
+   *   ★その方は、上の `tai_gen` から下の `jumin_taishoku` までの **9つが `null`**＝退職の段（見出し＋表）が
+   *     **節ごと落ちます**（★`Screens912.tsx` の「退職の年の節」・代表 `tai_gen`）。
+   *   ★★**この一文は節の外に置きます**（★節の中に置くと一緒に落ちます・便k 3-1）。
+   *   ★★どんな方か …… ★**退職金 0円**（①に0万円）で、iDeCo等を年金か別の年の一時金で受け取る案。
+   *     ★golden 250人では seed 36 の1人（★187通りのうち 186通り）。★前はここで `throw` していました（575〜577行）。
+   *   ★★分けは「**退職の年に退職所得の行（`keika`）が無い**」です。★「退職金0円」ではありません
+   *     （★退職金0円・企業年金ありの方は、企業年金の行が立ちますので、表が出ます ── 便h 5節で数えました）。
+   *   ★ほかの方は `null`。
+   */
+  tai_nashi_bun: string | null;
+  /**
+   * ★★★【2026-09-22・決め（`kaihatsu_ate_20260922k.md` 2節）】画面10「この画面の前提」の**1文目**。
+   *   ★前は `{tai_age}`・`{tai_gen}`・`{shunyu}`・`{nensu}` を箱の中で組み立てていましたが、
+   *     ★`tai_gen` が `null` の方は**箱ごと落ちます**ので、★**1文目を1本の印にして、エンジンが2通りから選びます**。
+   *   A（退職の年に退職所得がある方）　あなたは{tai_age}で{tai_gen} {shunyu}を受け取ります（勤続{nensu}）。
+   *   B（無い方）　　　　　　　　　　　あなたは{tai_age}で退職され、その年に受け取る退職金は0円とお答えいただいています（勤続{nensu}）。
+   *   ★★Bの `{nensu}` は `keika` の行から取れません（★行が無いため）。★①〜②でお答えの退職金の期間から
+   *     `E.gassanNensu()` で出します（★退職金1本の方の `KeikaRow.nensu` と同じ式です）。
+   *   ★★基準HTML 1185行に印 `zentei_tai_bun` が入った日に効きます（★それまでは値だけが在ります）。
+   */
+  zentei_tai_bun: string;
   /**
    * ★★★決め1113 4-1 …… `{tai_uchiwake_bun}` ＝ **2本以上の方の内わけ**。
    *   ★1本だけの方は `null`（★**その行だけ**が落ちます ── 表の中の行ですので）。
@@ -70,19 +93,19 @@ export interface Bun11 {
    *   ★★決め1114で `{tai_gen}` の `data-mada` が外れ、★**表が出るようになって、はじめて止まりました**
    *     （★`kumitate()` が「かたまりに {kojo} が入っていません」で止めました ── ★門が鳴りました）。
    */
-  kojo: number;
+  kojo: number | null;
   /** ★その年に受け取る退職手当等の額（★`KeikaRow.shunyu`。★2本以上の方は**合計**です） */
-  shunyu: number;
+  shunyu: number | null;
   /** ★その年の退職所得（★`KeikaRow.shotoku`） */
-  shotoku: number;
+  shotoku: number | null;
   /** ★決め1077 …… 退職所得控除の式（★本則＋減額＋最低保障＋障害加算を、在るものだけ並べた字） */
-  kojo_shiki: string;
+  kojo_shiki: string | null;
   /** ★決め1036(1) …… 「→ 控除に収まるので、あなたの退職所得」／「→ 控除を超えますので、…」 */
-  tai_hantei_bun: string;
+  tai_hantei_bun: string | null;
   /** ★決め1078 …… その退職所得にかかる所得税（★`KeikaRow.gensen_ari` ＝申告書を出した場合） */
-  shotokuzei_tai: number;
+  shotokuzei_tai: number | null;
   /** ★決め1078 …… その退職所得にかかる住民税（★その年に差し引かれます） */
-  jumin_taishoku: number;
+  jumin_taishoku: number | null;
   // ── 年金の表（★基準HTML 1117〜1130行・**年金収入がはじめて0でなくなる年**・決め1085） ---
   /** ★決め1086 …… その年が1つも無い方だけの1文。★ほかの方は `null`（かたまりごと落ちます） */
   nenkin_nashi_bun: string | null;
@@ -104,6 +127,8 @@ export interface Bun11 {
   kyuyo: number;
   /** ★決め1066 …… 所得控除の内わけ（★0円でない項目だけを、決まった順で「名前 額」／でつないだ字） */
   kojo_uchiwake: string;
+  /** ★所得控除が9項目ぜんぶ0円の年にだけ出す一文（★決め・便j 2-2）。★それ以外は `null` */
+  kojo_zero_bun: string | null;
   /** ★決め1066 …… 所得税の所得控除の合計 */
   kojo_goukei: number;
   /** ★決め1065 …… その年の所得にかかる住民税（★総合課税分・翌年度に納めます） */
@@ -150,7 +175,7 @@ export interface Bun11 {
    * ★★★【2026-09-13・回4】画面10（993行）の `{nensu}` …… **退職金の勤続年数**。
    *   ★`{tai_gen}`・`{shunyu}` と**同じ行**（`KeikaRow`）から出します。
    */
-  nensu: string;
+  nensu: string | null;
   // ── ★★★2本目の表（★基準HTML 1117〜1124行・決め1101・**`{nenkin_gen}` の一時金の年**） -----
   /** ★見出しの支給源名（★「iDeCo等の一時金」の形）。★この年が無い方は `null`＝**節ごと落ちます** */
   ichiji_gen: string | null;
@@ -202,8 +227,8 @@ export interface Bun11 {
     nenkin_shunyu: number;
     /** 軽減判定所得 */
     keigen_shotoku: number;
-    /** ★`退職所得 −（収入 − 控除）÷ 2`（★決め1107・0なら足し算が合っています） */
-    kubun_sa: number;
+    /** ★`退職所得 −（収入 − 控除）÷ 2`（★決め1107・0なら足し算が合っています）。★退職の年に退職所得が無い方は `null` */
+    kubun_sa: number | null;
     /** ★2本目の同じもの（★その年が無い方は `null`） */
     ichiji_kubun_sa: number | null;
   };
@@ -226,12 +251,57 @@ const KOJO_NA: readonly [keyof E.KojoUchiwake, string][] = [
  * ★★★`{kojo_uchiwake}` ── **0円でない項目だけ**を、決め1066の順で「名前 額」と並べ、「／」でつなぐ。
  *
  * ★★項目が1つだけのときも同じ形です（★決め1066）。
- * ★★★**1つも無いことがあります**（★所得控除の合計が0円の方）。★そのときは空の字ではなく `null` を返します
- *   ── ★`kumitate()` は空の字を「入れ忘れ」として止めます（`gamenBun.ts` 237行）。
+ * ★★★**1つも無いことがあります**（★所得控除の合計が0円の方）。
+ *   ★★【2026-09-22・決め（戦術Cowork `kaihatsu_ate_20260922k.md` 1節・(ア)）】★そのときは **`基礎控除 0円`** を返します。
+ *     ★前は `null` を返し、★呼ぶ側（680行あたり）が `throw` していました。
+ *     ★★**なぜ `基礎控除 0円` か** …… ★行の形が、ほかの方と同じになります（「所得税の所得控除の合計／基礎控除 0円 …… 0円」）。
+ *       ★★同じ場所に同じ形で額だけが0、という見え方が、いちばん誤解が少ない（★戦術Coworkの決め）。
+ *     ★★★**事実です** …… ★9項目がぜんぶ0円になるのは、`Z.kisoShotoku()` が0を返すとき＝**合計所得金額が
+ *       2,500万円を超える年**だけです（所得税法86条の逓減）。★その年の基礎控除は、法どおり0円です。
+ *       ★golden 250人・473,416通りで **229通り・3人**（`kensa/g11_tomari_kazoeru.tsx`）。
+ *     ★理由は、表の下の `kojo_zero_bun`（★`kojoZeroBun()`）が言います。
  */
-export function kojoUchiwakeJi(u: E.KojoUchiwake): string | null {
+export function kojoUchiwakeJi(u: E.KojoUchiwake): string {
   const xs = KOJO_NA.filter(([k]) => u[k] !== 0).map(([k, na]) => `${na} ${en(u[k])}`);
-  return xs.length ? xs.join('／') : null;
+  return xs.length ? xs.join('／') : `${KOJO_NA[0][1]} ${en(0)}`;
+}
+
+/**
+ * ★★★`{kojo_zero_bun}` ── **所得控除が9項目ぜんぶ0円の年**にだけ出す一文（★決め・戦術Cowork `kaihatsu_ate_20260922j.md` 2-2）。
+ *   ★それ以外の方は `null`（★その方には存在しない＝落ちます）。
+ *
+ * ★字は3つ（★並びは A→B→C・★1本につなぎます）
+ *   A（いつも）　この年は、あなたの合計所得金額が2,500万円を超えますので、基礎控除は0円です。
+ *   B（★退職所得を除くと2,500万円以下になる年だけ）　合計所得金額には、この年のあなたの退職所得が入ります。
+ *   C（いつも）　ほかの所得控除も、この年はいずれも0円です。
+ *
+ * ★★分けはここ（エンジン側）に置きます。
+ *   ★Bの分け …… **`sougou ≦ KISO_ZERO_KOE_SHOTOKU`**。★`shotokuKumitate()` は `goukei = sougou + trunc(taiShotoku)`
+ *     （`engine.ts` 1097行）ですので、「合計所得金額 − 退職所得」は **`sougou` そのもの**です。★引き算を新しく書きません。
+ *   ★2,500万円は `zeisei.ts` の **`KISO_ZERO_KOE_SHOTOKU`** の1か所から読みます（★A は所得税の基礎控除の話です）。
+ *
+ * ★★★番人 …… **この一文を出すとき、`goukei > KISO_ZERO_KOE_SHOTOKU` を満たさなければ止めます。**
+ *   ★A の字が事実でなくなる道を、先に塞ぎます（★9項目ぜんぶ0円なのに合計所得金額が2,500万円以下なら、
+ *     基礎控除が0になった理由が法の逓減ではない＝どこかが違っています）。
+ *
+ * @param zenbuZero  9項目がぜんぶ0円か（★`kojoUchiwakeJi()` と同じ見方で、呼ぶ側が決めます）
+ * @param sougou     その年の総所得（★`shotokuKumitate().sougou`）
+ * @param goukei     その年の合計所得金額（★`shotokuKumitate().goukei`・★退職所得を含む）
+ * @param hyoNen     その年（★止めるときの字のため）
+ */
+export function kojoZeroBun(zenbuZero: boolean, sougou: number, goukei: number, hyoNen: number): string | null {
+  if (!zenbuZero) return null;
+  if (!(goukei > Z.KISO_ZERO_KOE_SHOTOKU)) {
+    throw new Error(
+      `所得控除が9項目とも0円なのに、合計所得金額（${goukei}円・${hyoNen}年）が `
+      + `${Z.KISO_ZERO_KOE_SHOTOKU}円を超えていません。基礎控除が0円になった理由が法の逓減ではありません。`
+      + 'こちらでは決めません。戦術Coworkに投げてください。',
+    );
+  }
+  const A = 'この年は、あなたの合計所得金額が2,500万円を超えますので、基礎控除は0円です。';
+  const B = '合計所得金額には、この年のあなたの退職所得が入ります。';
+  const C = 'ほかの所得控除も、この年はいずれも0円です。';
+  return sougou <= Z.KISO_ZERO_KOE_SHOTOKU ? A + B + C : A + C;
 }
 
 /**
@@ -527,6 +597,31 @@ export function taiUchiwakeBun(p: E.Jinbutsu, plan: E.Plan, k: E.KeikaRow): stri
 }
 
 /** ★決め1086 の字（★年金として受け取る所得が1つも無い方） */
+/**
+ * ★★★【2026-09-22・決め（戦術Cowork `kaihatsu_ate_20260922k.md` 3-2）】退職の年に退職所得が無い方の一文。
+ *   ★`nenkin_nashi_bun` と同じ形（「…を0円とお答えいただいて…ありません。」）。★字は便k 3-2 から1字1句。
+ */
+const TAI_NASHI = (taishokuAge: number) =>
+  `あなたが${taishokuAge}歳で受け取る退職金を0円とお答えいただいていますので、その年に受け取る退職所得はありません。`;
+/**
+ * ★★★【2026-09-22・決め（`kaihatsu_ate_20260922k.md` 2-4）】画面10「この画面の前提」の1文目（★A／B）。
+ *   ★字は便k 2-4 から1字1句。★A は基準HTML 1185行の1文目と同じ字です（★印4つを組み立てたもの）。
+ */
+const ZENTEI_TAI_A = (taishokuAge: number, taiGen: string, shunyu: number, nensu: number) =>
+  `あなたは${taishokuAge}歳で${taiGen} ${en(shunyu)}を受け取ります（勤続${nensu}年）。`;
+const ZENTEI_TAI_B = (taishokuAge: number, nensu: number) =>
+  `あなたは${taishokuAge}歳で退職され、その年に受け取る退職金は0円とお答えいただいています（勤続${nensu}年）。`;
+/**
+ * ★Bの `{nensu}` …… ★退職の年に `keika` の行が無い方は、`KeikaRow.nensu` が取れません。
+ *   ★①〜②でお答えの**退職金の期間**（`p.gens` の `dc` でない支給源の `kikan`）から、`E.gassanNensu()` で出します。
+ *   ★★これは、退職金1本の方の `KeikaRow.nensu`（`engine.ts` 939行 `gassanNensu(gs.map(([g]) => g.kikan))`）と
+ *     **同じ式**です（★式を2か所に書いていません。★同じ関数を呼んでいます）。
+ *   ★★0円の支給源も入れます（★期間はお答えいただいたものです。額が0でも期間は在ります）。
+ */
+function taiNensuKaraNyuryoku(p: E.Jinbutsu): number {
+  return E.gassanNensu(p.gens.filter((g) => !g.dc).map((g) => g.kikan));
+}
+
 const NENKIN_NASHI = (nenkinGen: string) =>
   `あなたの公的年金の額を0円とお答えいただいており、${nenkinGen}も一時金でお受け取りになりますので、`
   + '年金として受け取る所得はありません。';
@@ -572,12 +667,19 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
 
   // ── 退職金の表 …… **退職の年**（★`{tai_age}` と同じ年です） -----------------
   const taiNen = p.year(taishokuAge);
-  const k = r.keika.find((x) => x.year === taiNen);
-  if (!k) {
-    throw new Error(`退職の年（${taiNen}年・${taishokuAge}歳）の計算過程が \`keika\` にありません。`);
-  }
-  const taiU = E.nenkanZeiUchiwake(p, taiNen, r.detail[taiNen]?.ideco_nenkin ?? 0,
-                                   k.shotoku, true, kakekinOf(r, taiNen));
+  const k0 = r.keika.find((x) => x.year === taiNen) ?? null;
+  /**
+   * ★★★【2026-09-22・決め（`kaihatsu_ate_20260922k.md` 3節）】★前はここで `throw` していました
+   *   （「退職の年の計算過程が `keika` にありません」）。★★退職金0円の方は、iDeCo等を年金で受け取る案の
+   *   **ぜんぶ**でここに来ます（★seed 36 …… 187通りのうち 186通り）。★19,800円をお払いになった方が
+   *   一覧のどの行を選んでも止まる形でしたので、★**止めずに、退職の段を `null`（節ごと落ちる）にし、
+   *   一文 `tai_nashi_bun` を出します**。
+   * ★`k` が `null` の間は、退職の段の9つが `null` です（★下の戻りの所）。
+   */
+  const k = k0;
+  const taiU = k === null ? null
+    : E.nenkanZeiUchiwake(p, taiNen, r.detail[taiNen]?.ideco_nenkin ?? 0,
+                          k.shotoku, true, kakekinOf(r, taiNen));
 
   /**
    * ── ★★★2本目の表 …… **退職の年いがいに退職所得の年が在る方**（★決め1101・実測 78人／250・31.2%）
@@ -677,32 +779,42 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
   const keigen = S.keigenHanteiShotoku(hyoAge, jo.nenkin_zatsu, jo.kyuyo);
   const osamaru = S.keigenWariai(keigen, 1, 1) === 7;
 
+  /**
+   * ★★【2026-09-22・決め（`kaihatsu_ate_20260922k.md` 1節）】★前はここで、9項目ぜんぶ0円の方を `throw` していました。
+   *   ★いまは `基礎控除 0円` の字を出し、★下の `kojo_zero_bun` が理由を言います。
+   *   ★9項目ぜんぶ0円かどうかは、★`kojoUchiwakeJi()` と**同じ見方**（`KOJO_NA` の9つが全部0）で決めます。
+   */
   const uchiwakeJi = kojoUchiwakeJi(u.kojo_uchiwake);
-  if (uchiwakeJi === null) {
-    throw new Error(`所得控除が1つも0円でない項目を持ちません（${hyoNen}年・合計 ${u.kojo_goukei}円）。`);
-  }
+  const kojoZenbuZero = KOJO_NA.every(([k]) => u.kojo_uchiwake[k] === 0);
+  const sk = E.shotokuKumitate(p, hyoNen, nen[hyoNen] ?? 0, taiShotokuOf(r, hyoNen));
+  const kojoZeroBunJi = kojoZeroBun(kojoZenbuZero, sk.sougou, sk.goukei, hyoNen);
 
   return {
     an_bun: plan.label,
     // ── ★★★回3の2種類（★決め1113） --------------------------------------
-    tai_gen: taiGenJi(k),
-    tai_uchiwake_bun: taiUchiwakeBun(p, plan, k),
+    tai_gen: k === null ? null : taiGenJi(k),
+    tai_nashi_bun: k === null ? TAI_NASHI(taishokuAge) : null,
+    zentei_tai_bun: k === null
+      ? ZENTEI_TAI_B(taishokuAge, taiNensuKaraNyuryoku(p))
+      : ZENTEI_TAI_A(taishokuAge, taiGenJi(k), k.shunyu, k.nensu),
+    tai_uchiwake_bun: k === null ? null : taiUchiwakeBun(p, plan, k),
     // ★上の覚え書きの3つ（★`data-mada` は1度も付いていませんでしたが、渡す所が0か所でした）
-    kojo: k.kojo_adj,
-    shunyu: k.shunyu,
-    shotoku: k.shotoku,
-    kojo_shiki: kojoShikiJi(k),
-    tai_hantei_bun: k.shotoku === 0
+    kojo: k === null ? null : k.kojo_adj,
+    shunyu: k === null ? null : k.shunyu,
+    shotoku: k === null ? null : k.shotoku,
+    kojo_shiki: k === null ? null : kojoShikiJi(k),
+    tai_hantei_bun: k === null ? null : (k.shotoku === 0
       ? '→ 控除に収まるので、あなたの退職所得'
-      : '→ 控除を超えますので、あなたの退職所得',
-    shotokuzei_tai: k.gensen_ari,
-    jumin_taishoku: taiU.jumin_taishoku,
+      : '→ 控除を超えますので、あなたの退職所得'),
+    shotokuzei_tai: k === null ? null : k.gensen_ari,
+    jumin_taishoku: taiU === null ? null : taiU.jumin_taishoku,
     nenkin_nashi_bun: nenkinNen === null ? NENKIN_NASHI(nenkinGen) : null,
     /** ★★決め1181 …… `nenkin_nashi_bun` と**裏返し**です（★同じ1つの条件で分けます） */
     nenkin_setsu_midashi: nenkinNen === null ? null : '年金の所得',
     nenkin_toshi_bun: toshiBun,
     kyuyo: j.kyuyo,
     kojo_uchiwake: uchiwakeJi,
+    kojo_zero_bun: kojoZeroBunJi,
     kojo_goukei: u.kojo_goukei,
     jumin: u.jumin_sougou,
     jumin_hantei_bun: jo.hikazei
@@ -732,7 +844,7 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
     zatsu: j.zatsu,
     shotokuzei: E.nenkanZeiUchiwake(p, hyoNen, nen[hyoNen] ?? 0, 0,
                                     true, kakekinOf(r, hyoNen)).shotokuzei,
-    nensu: `${k.nensu}年`,
+    nensu: k === null ? null : `${k.nensu}年`,
     // ── ★★★2本目の表の9種類（★決め1101）
     // ★`{tai_gen}` と同じ字の作り方にそろえました（★決め1113。★2本目の年は実測でいつも1本です）
     ichiji_gen: ik === null ? null : `${taiGenJi(ik)}の一時金`,
@@ -754,7 +866,8 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
      *   ★決め1113で `{tai_gen}` の字が決まったいま、**同じ画面で2通りに書きません**）。
      *   ★前の回は `k.gens.join('と')` でしたので、「退職金とiDeCoと企業年金」でした。
      */
-    kubun_bun: kubunBunJi(k, taiGenJi(k)),
+    /** ★退職の年に退職所得が無い方は `null`（★退職の段と一緒に落ちます。★`kubun_bun` は退職の段の下の1文です） */
+    kubun_bun: k === null ? null : kubunBunJi(k, taiGenJi(k)),
     ichiji_kubun_bun: ik === null ? null
       : kubunBunJi(ik, `${taiGenJi(ik)}の一時金`),
     shirabeta: {
@@ -763,7 +876,7 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
       toshi_bun_kata: toshiKata,
       kawaru_age: kawaruAge,
       zatsu: j.zatsu, nenkin_shunyu: j.nenkinShunyu, keigen_shotoku: keigen,
-      kubun_sa: kubunSa(k), ichiji_kubun_sa: ik === null ? null : kubunSa(ik),
+      kubun_sa: k === null ? null : kubunSa(k), ichiji_kubun_sa: ik === null ? null : kubunSa(ik),
     },
   };
 }

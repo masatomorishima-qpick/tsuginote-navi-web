@@ -819,13 +819,23 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
     const t = r.tesuryo_uchiwake;
     if (!t) throw new Error('`evaluate()` が `tesuryo_uchiwake` を返していません。');
     const b11 = gamen11Bun(p, a.x.pl, r, g8.kijun.taishoku_age, IDECO_NAME);
+    /**
+     * ★★★【2026-09-22・開発Coworkの落ち】★決め1180（`tai_uchiwake_bun` が `null` の方は**その行だけ**落とす）が、
+     *   ★★**ここには当たっていませんでした**（★`gyouNashi11(t)` しか渡していませんでした）。
+     *   ★`null` は `kumitate()` で**かたまりごと**落ちますので、★★★**1本だけの方のシート4から、
+     *     退職金の表（退職所得控除・収入・退職所得・所得税・住民税の6行）が丸ごと消えていました**
+     *     （★golden 250人・画面8に出した案 564本のうち **202本＝35.8%**）。
+     *   ★★見本の Excel は2本の方でしたので、`file_nakami_mon`・`mihon_excel` では見つかりませんでした。
+     *   ★★★`gyouNashi11()` に `b11` を渡す形にし、**画面側と同じ1本の正本**を読みます。
+     *   ★`kensa/excel_g11_mon.tsx` が、画面側と Excel 側の `kumitate()` が1かたまりも違わないことを数えます。
+     */
     const kumi = kumitate(GAMEN11, MADA11,
       atai11({
         bun11: b11, tesuryo: t, nenkinGen: IDECO_NAME,
         taishokuAge: g8.kijun.taishoku_age,
         setaiKubun: setai.setaiKubun, hikazeiGendo: setai.hikazeiGendo,
       }),
-      gyouNashi11(t));
+      gyouNashi11(t, b11));
     g4.push({ c: [] });
     g4.push({ c: [`番号 ${a.i + 1}`, a.x.lab] });
     for (const blk of kumi.dasu) {

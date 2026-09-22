@@ -446,8 +446,15 @@ export function gyouNashi912(m: Moto912): string[] {
   const t = m.r.tesuryo_uchiwake;
   if (!t) throw new Error('`evaluate()` が `tesuryo_uchiwake` を返していません。');
   const out: string[] = [];
-  /** ★★決め1231 …… 手数料の行の正本は `gamen11Atai.ts` の `gyouNashi11()` です（★写しを置きません） */
-  out.push(...gyouNashi11(t));
+  /**
+   * ★★決め1231 …… 手数料の行の正本は `gamen11Atai.ts` の `gyouNashi11()` です（★写しを置きません）。
+   * ★★★【2026-09-22】★`tai_uchiwake_bun`（決め1180）も、`gyouNashi11()` に移しました。
+   *   ★★前はこの本の下（★515行あたり）に `if (m.bun11.tai_uchiwake_bun === null) out.push(...)` と
+   *     **画面側だけ**に書いてあり、★★★**Excel（`excel.ts`）には当たっていませんでした**
+   *     （★1本だけの方の Excel シート4から、退職金の表が丸ごと消えていました ── 202本／564本）。
+   *   ★**同じ決めを2か所に書いていたのが原因です。**★正本を1つにし、ここは呼ぶだけです。
+   */
+  out.push(...gyouNashi11(t, m.bun11));
   /**
    * ★★★確定申告（★戦術Cowork `senjutsu_20260908d.md` 4節の表）
    *
@@ -506,8 +513,10 @@ export function gyouNashi912(m: Moto912): string[] {
    * ★★【なぜ `ochita` が減るか】★戦術Coworkが**この1件について止めを明示に解きました**（★決め1180）──
    *   ★`ochita` が減るのは**直った結果**であって、★**数え方を変えたのではありません。**
    *   ★★減った数は便に書きます（★黙って減らさない）。
+   *
+   * ★★★【2026-09-22】★この行は `gamen11Atai.ts` の `gyouNashi11()` に移しました（★上の 450行あたり）。
+   *   ★ここに残しておくと、**同じ決めが2か所**になります（★Excel に当たらなかった原因そのものです）。
    */
-  if (m.bun11.tai_uchiwake_bun === null) out.push('tai_uchiwake_bun');
   return out;
 }
 

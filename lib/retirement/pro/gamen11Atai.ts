@@ -60,14 +60,21 @@ export function atai11(m: Moto11): Record<string, string | null> {
     // ── 退職金の表（★決め1113・回3）
     tai_age: `${m.taishokuAge}歳`,
     tai_gen: b.tai_gen,
+    /**
+     * ★★★【2026-09-22・決め（便k 3節）】退職の年に退職所得が無い方は、`tai_gen` から `jumin_taishoku` までが `null`
+     *   ＝ 退職の段が節ごと落ち、★代わりに `tai_nashi_bun`（節の外）が出ます。★`zentei_tai_bun` は画面10の1文目です。
+     *   ★どちらも、基準HTMLに印が入った日に効きます（★それまでは値だけが在ります）。
+     */
+    tai_nashi_bun: b.tai_nashi_bun,
+    zentei_tai_bun: b.zentei_tai_bun,
     tai_uchiwake_bun: b.tai_uchiwake_bun,
     kojo_shiki: b.kojo_shiki,
-    kojo: en(b.kojo),
-    shunyu: en(b.shunyu),
+    kojo: enKa(b.kojo),
+    shunyu: enKa(b.shunyu),
     tai_hantei_bun: b.tai_hantei_bun,
-    shotoku: en(b.shotoku),
-    shotokuzei_tai: en(b.shotokuzei_tai),
-    jumin_taishoku: en(b.jumin_taishoku),
+    shotoku: enKa(b.shotoku),
+    shotokuzei_tai: enKa(b.shotokuzei_tai),
+    jumin_taishoku: enKa(b.jumin_taishoku),
     kubun_bun: b.kubun_bun,
     // ── 2本目の表（★決め1101）。★その年が無い方は9種類とも `null` ＝ 見出しごと落ちます
     ichiji_gen: b.ichiji_gen,
@@ -93,6 +100,8 @@ export function atai11(m: Moto11): Record<string, string | null> {
     zatsu_zero_bun: b.zatsu_zero_bun,
     kyuyo: en(b.kyuyo),
     kojo_uchiwake: b.kojo_uchiwake,
+    /** ★所得控除が9項目ぜんぶ0円の年にだけ出す一文（★決め・便j 2-2／便k 1節）。★基準HTMLに印が入った日に効きます */
+    kojo_zero_bun: b.kojo_zero_bun,
     kojo_goukei: en(b.kojo_goukei),
     shotokuzei: en(b.shotokuzei),
     setai_kubun: m.setaiKubun,
@@ -113,14 +122,26 @@ export function atai11(m: Moto11): Record<string, string | null> {
 }
 
 /**
- * ★★手数料の表で、**行ごと落とすもの**。
- *   ★`kyufu_gyou`／`koza_gyou` が `false` の方は、★その行が**存在しません**
+ * ★★画面11で、**行ごと落とすもの**（★画面と Excel の**両方**が、この1本を読みます）。
+ *
+ * ★手数料の表 …… `kyufu_gyou`／`koza_gyou` が `false` の方は、★その行が**存在しません**
  *   （★「0回」「0か月」と書くと、かかったように読めます）。
+ *
+ * ★★★退職金の表 …… **`tai_uchiwake_bun` が `null`（★1本だけの方）は、その行だけを落とします**（★決め1180）。
+ *   ★★★【2026-09-22・開発Coworkの落ち】★決め1180（2026-09-14）で、この行を**画面側（`Screens912.tsx` の
+ *     `gyouNashi912()`）にだけ**足し、★**Excel（`excel.ts` 828行）には足していませんでした。**
+ *     ★Excel は `gyouNashi11(t)` しか渡していませんので、★`tai_uchiwake_bun` の `null` が
+ *     `kumitate()` の「かたまりごと落ちる」に当たり、★★★**1本だけの方の Excel のシート4から、
+ *     退職金の表が丸ごと消えていました**（★golden 250人・画面8に出した案 564本のうち **202本＝35.8%**）。
+ *   ★★見本の Excel（森嶋さんの入力）は iDeCo等を一時金で受け取る**2本の方**でしたので、見つかりませんでした。
+ *   ★★★**同じ決めを2か所に書いていたのが原因です。**★ここを1本の正本にし、画面側はこれを呼ぶだけにしました。
+ *   ★`kensa/excel_g11_mon.tsx` が、★画面側と Excel 側の `kumitate()` が**1かたまりも違わない**ことを数えます。
  */
-export function gyouNashi11(t: E.TesuryoUchiwake): string[] {
+export function gyouNashi11(t: E.TesuryoUchiwake, b11: Pick<Bun11, 'tai_uchiwake_bun'>): string[] {
   const out: string[] = [];
   if (!t.kyufu_gyou) out.push('kyufu_tanka', 'kyufu_kaisu', 'kyufu_kei');
   if (!t.koza_gyou) out.push('koza_tanka', 'koza_tsuki', 'koza_kei');
+  if (b11.tai_uchiwake_bun === null) out.push('tai_uchiwake_bun');
   return out;
 }
 

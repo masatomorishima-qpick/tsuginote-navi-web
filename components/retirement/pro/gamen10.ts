@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（231,608バイト ／ md5 f92d0fe894531eb57272c73996b8440d）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（232,032バイト ／ md5 5095f522024056405a5ebbd67f9723c7）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */
@@ -35,7 +35,7 @@ export type Block10 =
 
 export const GAMEN10: readonly Block10[] = [
   { kind: 'midashi', lv: 2, bun: "退職金受け取りパターン比較" },
-  { kind: 'hako', bun: "この画面の前提\nあなたは{tai_age}で{tai_gen} {shunyu}を受け取ります（勤続{nensu}）。{nenkin_gen} {ideco_zandaka}（加入{ideco_kanyu_nensu}）、公的年金 年 {koteki_nenkin}（{koteki_kaishi_age}から受け取る場合の額）。{tai_age}以降の給与はありません。", na: ["tai_age","tai_gen","shunyu","nensu","nenkin_gen","ideco_zandaka","ideco_kanyu_nensu","koteki_nenkin","koteki_kaishi_age"] },
+  { kind: 'hako', bun: "この画面の前提\n{zentei_tai_bun}{nenkin_gen} {ideco_zandaka}（加入{ideco_kanyu_nensu}）、公的年金 年 {koteki_nenkin}（{koteki_kaishi_age}から受け取る場合の額）。{tai_age}以降の給与はありません。", na: ["zentei_tai_bun","nenkin_gen","ideco_zandaka","ideco_kanyu_nensu","koteki_nenkin","koteki_kaishi_age","tai_age"] },
   { kind: 'hon', bun: "{kurabe_bun}", na: ["kurabe_bun"] },
   { kind: 'hon', bun: "{an_onaji_bun}", na: ["an_onaji_bun"] },
   { kind: 'midashi', lv: 3, bun: "① {sa_hajime_age}から先、退職金と{nenkin_gen}の受け取り方でどう変わるか" },
@@ -56,10 +56,10 @@ export const GAMEN10: readonly Block10[] = [
 ] as const;
 
 /** その方によって変わるものの**種類**（`data-na` の異なり数） */
-export const HITOGOTO_SHURUI: readonly string[] = ["tai_age","tai_gen","shunyu","nensu","nenkin_gen","ideco_zandaka","ideco_kanyu_nensu","koteki_nenkin","koteki_kaishi_age","kurabe_bun","an_onaji_bun","sa_hajime_age","an_a","an_b","sa_hajime_bun","gyakuten_bun","sa_saishu_bun","kurisage_age","an_b_mijikai","an_1_label","an_2_label","toori_kazu","ruikei_min","ruikei_max","kuuhaku_kaishi_age","kuuhaku_owari_age","oitsuku_bun","sa_90","sa_saishu","gurafu_ji","tedori"];
+export const HITOGOTO_SHURUI: readonly string[] = ["zentei_tai_bun","nenkin_gen","ideco_zandaka","ideco_kanyu_nensu","koteki_nenkin","koteki_kaishi_age","tai_age","kurabe_bun","an_onaji_bun","sa_hajime_age","an_a","an_b","sa_hajime_bun","gyakuten_bun","sa_saishu_bun","kurisage_age","an_b_mijikai","an_1_label","an_2_label","toori_kazu","ruikei_min","ruikei_max","kuuhaku_kaishi_age","kuuhaku_owari_age","oitsuku_bun","sa_90","sa_saishu","gurafu_ji","tedori"];
 
 /** その方によって変わるものの**箇所**（同じ名前が2か所なら2と数えます・判断ログ83③） */
-export const HITOGOTO_KASHO = 45;
+export const HITOGOTO_KASHO = 42;
 
 /** **エンジンにまだ出口が無いもの**（`data-mada`・判断ログ83②）。**0になるまで本番化しません** */
 export const MADA_NA: readonly string[] = [];

@@ -71,10 +71,10 @@ export interface Bun11 {
    *   ★前は `{tai_age}`・`{tai_gen}`・`{shunyu}`・`{nensu}` を箱の中で組み立てていましたが、
    *     ★`tai_gen` が `null` の方は**箱ごと落ちます**ので、★**1文目を1本の印にして、エンジンが2通りから選びます**。
    *   A（退職の年に退職所得がある方）　あなたは{tai_age}で{tai_gen} {shunyu}を受け取ります（勤続{nensu}）。
-   *   B（無い方）　　　　　　　　　　　あなたは{tai_age}で退職され、その年に受け取る退職金は0円とお答えいただいています（勤続{nensu}）。
-   *   ★★Bの `{nensu}` は `keika` の行から取れません（★行が無いため）。★①〜②でお答えの退職金の期間から
-   *     `E.gassanNensu()` で出します（★退職金1本の方の `KeikaRow.nensu` と同じ式です）。
-   *   ★★基準HTML 1185行に印 `zentei_tai_bun` が入った日に効きます（★それまでは値だけが在ります）。
+   *   B（無い方）　　　　　　　　　　　あなたは{tai_age}で退職され、その年に受け取る退職金は0円とお答えいただいています。
+   *   ★★Bに「（勤続{nensu}）」は入れません（★2026-09-22・戦術Cowork `kaihatsu_ate_20260922l.md` 5節。
+   *     ★退職金0円の方の期間が手取りに効くかが分かるまで）。
+   *   ★★基準HTML 1185行（232,032 ／ 5095f522…）に印 `zentei_tai_bun` が入りました（★2026-09-22・便l 2-1(1)）。
    */
   zentei_tai_bun: string;
   /**
@@ -609,18 +609,14 @@ const TAI_NASHI = (taishokuAge: number) =>
  */
 const ZENTEI_TAI_A = (taishokuAge: number, taiGen: string, shunyu: number, nensu: number) =>
   `あなたは${taishokuAge}歳で${taiGen} ${en(shunyu)}を受け取ります（勤続${nensu}年）。`;
-const ZENTEI_TAI_B = (taishokuAge: number, nensu: number) =>
-  `あなたは${taishokuAge}歳で退職され、その年に受け取る退職金は0円とお答えいただいています（勤続${nensu}年）。`;
 /**
- * ★Bの `{nensu}` …… ★退職の年に `keika` の行が無い方は、`KeikaRow.nensu` が取れません。
- *   ★①〜②でお答えの**退職金の期間**（`p.gens` の `dc` でない支給源の `kikan`）から、`E.gassanNensu()` で出します。
- *   ★★これは、退職金1本の方の `KeikaRow.nensu`（`engine.ts` 939行 `gassanNensu(gs.map(([g]) => g.kikan))`）と
- *     **同じ式**です（★式を2か所に書いていません。★同じ関数を呼んでいます）。
- *   ★★0円の支給源も入れます（★期間はお答えいただいたものです。額が0でも期間は在ります）。
+ * ★★★【2026-09-22・戦術Cowork `kaihatsu_ate_20260922l.md` 5節】★Bに「（勤続{nensu}年）」を**入れません**。
+ *   ★理由（戦術）…… 退職金が0円の方に「（勤続2年）」と出すと、その期間が手取りに効いていると読まれる。
+ *     ★効いているかどうかが分かるまで（★便l 5-1・お願い4）、外したままにします。
+ *   ★前の回（便k）にあった `taiNensuKaraNyuryoku()`（①〜②の期間から `E.gassanNensu()`）は、使う所が0か所になりましたので消しました。
  */
-function taiNensuKaraNyuryoku(p: E.Jinbutsu): number {
-  return E.gassanNensu(p.gens.filter((g) => !g.dc).map((g) => g.kikan));
-}
+const ZENTEI_TAI_B = (taishokuAge: number) =>
+  `あなたは${taishokuAge}歳で退職され、その年に受け取る退職金は0円とお答えいただいています。`;
 
 const NENKIN_NASHI = (nenkinGen: string) =>
   `あなたの公的年金の額を0円とお答えいただいており、${nenkinGen}も一時金でお受け取りになりますので、`
@@ -795,7 +791,7 @@ export function gamen11Bun(moto: E.Jinbutsu, plan: E.Plan, r: E.EvalResult,
     tai_gen: k === null ? null : taiGenJi(k),
     tai_nashi_bun: k === null ? TAI_NASHI(taishokuAge) : null,
     zentei_tai_bun: k === null
-      ? ZENTEI_TAI_B(taishokuAge, taiNensuKaraNyuryoku(p))
+      ? ZENTEI_TAI_B(taishokuAge)
       : ZENTEI_TAI_A(taishokuAge, taiGenJi(k), k.shunyu, k.nensu),
     tai_uchiwake_bun: k === null ? null : taiUchiwakeBun(p, plan, k),
     // ★上の覚え書きの3つ（★`data-mada` は1度も付いていませんでしたが、渡す所が0か所でした）

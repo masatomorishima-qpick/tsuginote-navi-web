@@ -9,7 +9,7 @@
  *   ★★**動かすときに字を触らずに済むよう、字はこの1本に集めてあります。**
  * ★★★`kensa/nayami_mon.tsx` が、基準HTMLを読み直して突き合わせます。
  *
- * 抜き出しもと: tsuginote_gamen_base.html（231,608バイト ／ md5 f92d0fe894531eb57272c73996b8440d）
+ * 抜き出しもと: tsuginote_gamen_base.html（232,032バイト ／ md5 5095f522024056405a5ebbd67f9723c7）
  */
 
 /** かたまりの見出し（★`data-block-start="nayami"`） */

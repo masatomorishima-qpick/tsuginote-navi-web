@@ -28,6 +28,7 @@ import ExcelJS from 'exceljs';
 import type { Keisan } from './kekka';
 import type { PaidInput } from './paidInput';
 import type { Row } from './gamen8';
+import { hokenBun } from './ichiran';
 /**
  * ★★★【2026-09-15・決め1225】**`import type` をやめました。**
  *   ★シート2の「確定申告で戻る額」で `E.modoruGaku()` を**呼ぶ**ようになったためです。
@@ -103,12 +104,12 @@ export function nenNoHani(r: E.EvalResult): { uketoriFirst: number; first: numbe
   };
 }
 
-/** 保険料の字（画面9の字・2つ） */
-export function hokenNoJi(x: Row): string {
-  if (x.h.length === 0) return '保険料は変わりません';
-  const age = Math.min(...x.h.map((k) => k.age));
-  return `${age}歳から保険料が上がる場合があります`;
-}
+/**
+ * ★★★【2026-09-22・便l 1-1「同じ決めを2か所に書かない」】保険料の字（画面9の字・2つ）の正本は
+ *   `ichiran.ts` の `hokenBun()` です。★前はここに `hokenNoJi()` として**同じ決めがもう1本**在りました
+ *   （★画面側 `hokenBun()`・Excel 側 `hokenNoJi()`。★golden 250人・全通り 473,416 で字の違い 0 でしたが、
+ *   ★片方だけ直る形そのものでしたので、消して `hokenBun(x.h)` を呼びます）。
+ */
 
 /** ⑳を結論の案にそろえた「一時金の案」（senjutsu_20260902x.md 2番・y.md 2番）。★無ければ null（400人では0人） */
 export function ichijikinNoAn(k: Keisan, idecoName: string): Row | null {
@@ -615,7 +616,7 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
   for (const h of g8.houkou) {
     const row = D.find((x) => x.lab === h.lab);
     // ★★決め1214 …… 「確定申告で戻る額」を3列目に（★画面8のカードと同じ並び）
-    g1.push({ c: [h.lab, h.zei, h.modoru, h.tedori, row ? hokenNoJi(row) : '', h.mikata.join('／')], okane: [2, 3, 4] });
+    g1.push({ c: [h.lab, h.zei, h.modoru, h.tedori, row ? hokenBun(row.h) : '', h.mikata.join('／')], okane: [2, 3, 4] });
   }
   /**
    * ★★★【2026-09-15・決め1227】**表のあとに、2行**（★置き場所はシート1の表の下のまま・戦術Cowork 3-3）。
@@ -681,7 +682,7 @@ export async function excelWoTsukuru(k: Keisan, v: PaidInput, raw: Record<string
     shirushi.set(i, h.mikata.map((m) => m.slice(0, 1)).join('／'));
   }
   const s2Gyou = (i: number, modoru: number | string) =>
-    [shirushi.get(i) ?? '', i + 1, D[i].lab, D[i].zei, modoru, D[i].tedori, D[i].age0, D[i].owari, hokenNoJi(D[i])];
+    [shirushi.get(i) ?? '', i + 1, D[i].lab, D[i].zei, modoru, D[i].tedori, D[i].age0, D[i].owari, hokenBun(D[i].h)];
 
   s2.columns = retsuNoHaba([
     { c: [...RETSU_S2] },

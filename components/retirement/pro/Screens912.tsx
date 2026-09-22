@@ -283,8 +283,10 @@ export function atai912(m: Moto912): Record<string, string | null> {
      * ★★★回4の、画面11の5種類 ＋ 画面10の `{nensu}`（★戦術Cowork `senjutsu_20260913f.md` 4-3）。
      *   ★★**`data-mada` は1度も付いていませんでしたが、渡す所が0か所**でした。
      *   ★`nenkin_kojo` は**引く数**ですので、★**符号はここで付けます**（★見本「−600,000円」）。
+     *   ★★【2026-09-22・基準HTML 5095f522…】画面10 1185行の1文目が `{zentei_tai_bun}` 1本の印になり、
+     *     ★`{nensu}` の印は基準HTMLから**0か所**になりました（★機械で数えました）。★ここで渡すのをやめました
+     *     （★`Bun11.nensu` は `ZENTEI_TAI_A` の中で使います）。
      */
-    nensu: m.bun11.nensu,
     /**
      * ★★★回4の画面9詳細・42種類（★戦術Cowork `senjutsu_20260913f.md` 4-3）。
      *
@@ -761,7 +763,13 @@ export const OCHITE_YOI: Readonly<Record<string, Readonly<Record<string, number>
   画面9: {},
   '画面9 詳細': {},
   画面10: {},
-  画面11: {},
+  /**
+   * ★★★【2026-09-22・戦術Cowork `kaihatsu_ate_20260922l.md` 3節・★決め番号は戦術Coworkが付けます】
+   *   `tai_gen` …… 退職の年に退職所得が無い方（★`gamen11Bun()` が `null` を返す方）は、
+   *   ★見出し「あなたの{tai_gen}（{tai_age}）」（基準HTML 1295行）と ★退職金の表（1298行・表で1かたまり）の
+   *   **2つ**が落ちます。★数は戦術Coworkが数えました（★`{kubun_bun}` 1304行は別の印で、この数に入りません）。
+   */
+  画面11: { tai_gen: 2 },
   画面12: {},
 };
 

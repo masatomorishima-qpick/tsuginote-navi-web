@@ -63,7 +63,7 @@ export function atai11(m: Moto11): Record<string, string | null> {
     /**
      * ★★★【2026-09-22・決め（便k 3節）】退職の年に退職所得が無い方は、`tai_gen` から `jumin_taishoku` までが `null`
      *   ＝ 退職の段が節ごと落ち、★代わりに `tai_nashi_bun`（節の外）が出ます。★`zentei_tai_bun` は画面10の1文目です。
-     *   ★どちらも、基準HTMLに印が入った日に効きます（★それまでは値だけが在ります）。
+     *   ★どちらも、基準HTML 232,032 ／ 5095f522…（2026-09-22・便l 2-1）で印が入り、効いています。
      */
     tai_nashi_bun: b.tai_nashi_bun,
     zentei_tai_bun: b.zentei_tai_bun,
@@ -100,7 +100,7 @@ export function atai11(m: Moto11): Record<string, string | null> {
     zatsu_zero_bun: b.zatsu_zero_bun,
     kyuyo: en(b.kyuyo),
     kojo_uchiwake: b.kojo_uchiwake,
-    /** ★所得控除が9項目ぜんぶ0円の年にだけ出す一文（★決め・便j 2-2／便k 1節）。★基準HTMLに印が入った日に効きます */
+    /** ★所得控除が9項目ぜんぶ0円の年にだけ出す一文（★決め・便j 2-2／便k 1節）。★基準HTML 5095f522…（便l 2-1(3)）で印が入りました */
     kojo_zero_bun: b.kojo_zero_bun,
     kojo_goukei: en(b.kojo_goukei),
     shotokuzei: en(b.shotokuzei),

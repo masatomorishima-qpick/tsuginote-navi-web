@@ -10,7 +10,7 @@
 import type { Metadata } from 'next';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
-import { Breadcrumb, SITE_URL, ORG_NAME } from '@/components/loan/LoanArticle';
+import { Breadcrumb, SITE_URL, ORG_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import ProApp from '@/components/retirement/pro/ProApp';
 import { tokyoYear } from '@/lib/retirement/pro/now';
 
@@ -18,6 +18,15 @@ const PAGE_PATH = '/retirement/pro';
 const PAGE_TITLE = '老後のお金の受け取りシミュレーション【2026年改正対応】';
 const PAGE_DESCRIPTION =
   '退職金とiDeCo等の受け取り方で、あなたの手取りがいくら変わるかを計算します。退職所得控除の2026年（令和8年）改正に対応。特定の金融機関・金融商品の推奨は行いません。';
+
+/*
+  【2026-09-22・戦術Cowork `kaihatsu_ate_20260922c.md` 0節（(ア)のお答え）】
+    この頁だけ OGP画像が指定されておらず、SNS・LINE に貼っても絵が出ませんでした。
+    `/loan`・`/retirement`・`/company` と同じく、`/og` の自動生成のカード（1200×630）を指します。
+    専用の絵を作らない理由（戦術Cowork）……「題名を変えた日に、絵だけ古びる形を作りません」。
+    組み立て方は `app/loan/page.tsx` 29行・42行と同じです（字も数も、そこから写しました）。
+*/
+const OG_IMAGE = ogImageUrl(PAGE_TITLE);
 
 export const metadata: Metadata = {
   title: `${PAGE_TITLE}｜つぎの手ナビ`,
@@ -30,8 +39,14 @@ export const metadata: Metadata = {
     siteName: 'つぎの手ナビ',
     type: 'website',
     locale: 'ja_JP',
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: PAGE_TITLE }],
   },
-  twitter: { card: 'summary_large_image', title: PAGE_TITLE, description: PAGE_DESCRIPTION },
+  twitter: {
+    card: 'summary_large_image',
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
 };
 
 const jsonLd = {

@@ -8,7 +8,14 @@
  *
  * 【区切りの決め方】モックアップの `data-block-start="..."` の印から、
  * **次の印の直前まで**が1ブロック（§8-5）。解釈の余地をなくすため、印はHTML側に置く。
- * 11ブロックあり、**測るのは `photo` を除く10**（先頭は必ず見えるため）。
+ * 10ブロックあり、**測るのは `nayami` を除く9**（先頭は必ず見えるため）。
+ *
+ * ★★【2026-09-22・決め1401】**頭の印が `photo` から `nayami` に替わりました。**
+ *   ★基準HTMLの写真の箱（`data-block-start="photo"`）が、悩みのカード3枚に置き換わったためです。
+ *   ★★**測らない扱いは、そのまま引き継ぎます。**★頭のかたまりは必ず見えますので、
+ *     測っても全員になり、離脱の場所が分かりません（★上の「先頭は必ず見えるため」と同じ理由です）。
+ *   ★★★**測るブロックの顔ぶれ（`MEASURED_BLOCKS` の9つ）は、1つも変えていません。**
+ *     ★GA4の `pro_pricing_block_view` の数の並びが、この日で切れません。
  *
  * 【一度だけ】同じブロックは何度画面に入っても1回しか送らない。
  * スクロールで行き来すると数が水増しされ、到達率が読めなくなる。
@@ -18,7 +25,7 @@
 
 import { trackOnce, type PricingBlock } from './track';
 
-/** §8-5 の一覧。**`photo` は測らない。** */
+/** §8-5 の一覧。**`nayami` は測らない。** */
 /**
  * ★★★【2026-09-17・決め1313（★戦術Cowork `senjutsu_20260917d.md` 2-2）】
  *   ★**`'ai'` を外しました。**★`Screen56.tsx` から「AIに聞けば無料でできるのでは」の
@@ -34,7 +41,7 @@ export const MEASURED_BLOCKS: readonly PricingBlock[] = [
   'cannot', 'notincluded', 'notfor', 'inputs', 'prepare', 'price',
 ] as const;
 
-const NOT_MEASURED = 'photo';
+const NOT_MEASURED = 'nayami';
 
 function isMeasured(v: string): v is PricingBlock {
   return (MEASURED_BLOCKS as readonly string[]).includes(v);
@@ -63,7 +70,7 @@ export function observePricingBlocks(root: ParentNode = document): () => void {
     for (const e of entries) {
       if (!e.isIntersecting) continue;
       const v = (e.target as HTMLElement).dataset.blockStart ?? '';
-      if (!isMeasured(v)) continue;            // photo と未知の値は測らない
+      if (!isMeasured(v)) continue;            // nayami と未知の値は測らない
       trackOnce(`block:${v}`, 'pro_pricing_block_view', { block: v });
       io.unobserve(e.target);                  // 一度でよい
     }

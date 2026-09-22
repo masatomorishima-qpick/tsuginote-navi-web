@@ -2,7 +2,10 @@
  * components/retirement/pro/Screen56.tsx — 有料版の説明と購入（無料の最後の画面）
  *
  * 【この画面のいちばん大事なこと】
- *  §8-5：**11ブロックあり、`photo` を除く10を測ります**（イベント#10 `pro_pricing_block_view`）。
+ *  §8-5：**10ブロックあり、`nayami` を除く9を測ります**（イベント#10 `pro_pricing_block_view`）。
+ *    ★2026-09-22 …… 頭の印が `photo` から `nayami` に替わりました（★悩みのカード3枚に置き換えたため）。
+ *    ★★**測らない扱いは、そのまま引き継ぎます**（★頭のかたまりは必ず見えるので、測っても全員になります）。
+ *    ★★★**測るブロックの顔ぶれは1つも変わっていません**（★9つのまま ── GA4の数の並びが切れません）。
  *  §8-4「ここを削ると、離脱の原因が永久に分からなくなります」。
  *  区切りは `data-block-start` の印から**次の印の直前まで**。印はHTML側に置きます。
  *
@@ -22,6 +25,7 @@
 
 'use client';
 
+import Image from 'next/image';
 import { wakachi } from './Wakachi';
 import { useEffect, useRef } from 'react';
 import type { FreeResult } from '@/lib/retirement/pro/free';
@@ -29,6 +33,10 @@ import { track, trackOnce } from '@/lib/retirement/pro/track';
 import { observePricingBlocks, observeScrollDepth } from '@/lib/retirement/pro/blocks';
 // ★2026-09-22 …… 返金の字は `henkin.ts` の1本だけが持ちます（★基準HTMLから機械で抜き出したもの）
 import { HENKIN_MIDASHI, HENKIN_FUTOJI, HENKIN_DANRAKU } from '@/lib/retirement/pro/henkin';
+// ★2026-09-22 …… 悩みのカード3枚の字・絵の道・alt は `nayami.ts` の1本だけが持ちます（★機械で抜き出したもの）
+import {
+  NAYAMI_MIDASHI, NAYAMI_KOTOWARI, NAYAMI_KADO, NAYAMI_E_HABA, NAYAMI_E_TAKASA,
+} from '@/lib/retirement/pro/nayami';
 
 const KAKAKU = 19_800;
 
@@ -42,6 +50,65 @@ function H3({ block, children }: { block: string; children: React.ReactNode }) {
 
 /** 単語の途中で改行しない（基準HTML `.kz`・決め1343・1344） */
 const KZ = '[word-break:keep-all] [overflow-wrap:anywhere] [line-break:strict]';
+
+/**
+ * ★★★【2026-09-22・決め1401・1402（戦術Cowork `kaihatsu_ate_20260922e.md` 1節・`…f.md` 2節）】
+ *   **悩みのカード3枚。**★前はここに灰色の「ここに写真を入れます」の箱が在りました
+ *   （★`data-block-start="photo"`）。★基準HTMLから `photo` は消え、この3枚に置き換わりました。
+ *
+ * ★★**この場所は仮です。**★「手取りに差が出る理由」のコーナーができたら、3枚はその下へ移ります
+ *   （★森嶋さんの草案P5の順・決め1402）。★★**ですので、ひとかたまりで動かせる形にしてあります** ──
+ *   ★見出し・断りの1行・カード3枚が、この1つの本の中に閉じています。★動かすときは、
+ *   ★★`<Nayami />` の1行を別の所へ移すだけです（★字も組み方も触りません）。
+ *
+ * ★★★**字と絵の道と `alt` は、この本が持っていません。**★`lib/retirement/pro/nayami.ts` が持ちます
+ *   （★`kensa/nayami_chushutsu.mjs` が基準HTMLから機械で抜き出したもの・
+ *     ★`kensa/nayami_mon.tsx` が基準HTMLを読み直して突き合わせます）。
+ *
+ * ★絵の読み込み（★戦術Cowork `kaihatsu_ate_20260922e.md` 5節・4つとも賛成をいただいています）
+ *   ・`width`/`height` を渡して**場所を先に取ります**（★絵が届いたときに、下の字が跳ねません）
+ *   ・`sizes` は記事の図版と同じ字（★375px の方に 1600px の絵をそのまま送りません）
+ *   ・地に薄い緑（`#e8f3f0`）を敷きます（★読み込み中も、白い穴になりません）
+ *   ・★★**3枚とも `loading="lazy"`**（`priority` を1枚も付けていません）。
+ *     ★★★**理由は測った数です**（★下の 便 `kaihatsu_20260922d.md` 3節）── ★3枚は画面5-6の頭に在り、
+ *     ★画面2の頂から **7,000px 以上**下です。★最初に出る画面（375×667px）には1枚も入りません。
+ *     ★`priority` は「最初の画面に出る絵」に付けるものですので、付けると **LCP の邪魔**になります。
+ */
+function Nayami() {
+  /*
+    ★★★【2026-09-22・この回のこちらの落ち】★はじめ、字の3本に `KZ` を付けて書きました。
+      ★★`KZ`（`keep-all`）は、`Wakachi.tsx` の `walk()` が「**手で `<wbr>` を入れた所**」と見なして
+        **素通りする印**です（★決め1343〜1345）。★手で `<wbr>` を入れていませんので、
+        ★★**この3枚だけ、文節の切れ目が1つも入らない字**になりました。
+      ★375px で描いて数えたら、1枚めの太字が「同じ年に受け取る／と、税を軽くする枠…」と
+        **単語の途中で切れました**（★`kensa/egaki/kire.cjs` …… 単語の途中 7 → 9）。
+      ★★`KZ` を外し、**この本の中でも `wakachi()` を呼ぶ**形に直しました
+        （★`<Nayami />` は部品ですので、`Screen56` の外側の `wakachi()` は中まで届きません）。
+  */
+  return wakachi(
+    <div className="mt-4">
+      <h3 data-block-start="nayami" className="text-[18px] font-bold text-slate-900">
+        {NAYAMI_MIDASHI}
+      </h3>
+      <p className="mt-1 text-[13px] leading-relaxed text-[#5b6470]">{NAYAMI_KOTOWARI}</p>
+      {NAYAMI_KADO.map((k) => (
+        <div key={k.michi} className="mt-4">
+          <Image
+            src={k.michi}
+            alt={k.alt}
+            width={NAYAMI_E_HABA}
+            height={NAYAMI_E_TAKASA}
+            loading="lazy"
+            sizes="(max-width: 768px) 100vw, 768px"
+            className="block h-auto w-full rounded-[14px] bg-[#e8f3f0]"
+          />
+          <p className="mt-2 text-base font-bold leading-relaxed text-slate-900">{k.futoji}</p>
+          <p className="mt-1 text-base leading-relaxed text-slate-800">{k.ji}</p>
+        </div>
+      ))}
+    </div>,
+  );
+}
 
 function Card({ title, body, kz }: {
   title: React.ReactNode;
@@ -82,15 +149,8 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
           [有料版]老後のお金の受け取りシミュレーションについて
       </h2>
 
-      {/* 1. 写真（測りません。先頭なので必ず見えます） */}
-      <div
-        data-block-start="photo"
-        className="mt-4 flex h-40 items-center justify-center rounded-2xl bg-slate-100 text-center text-[13px] leading-relaxed text-[#5b6470]"
-      >
-        ここに写真を入れます
-        <br />
-        （安心感・上質な時間を連想させるもの）
-      </div>
+      {/* 1. 悩みのカード3枚（測りません。先頭なので必ず見えます） */}
+      <Nayami />
 
       {/* 2. 4つの見方 */}
       <H3 block="4views">有料版では、あなたの受け取り方を4つの見方で比べます</H3>

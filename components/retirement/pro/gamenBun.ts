@@ -33,6 +33,8 @@
  *   金額は本物らしく見えるので、**受け取った方には見分けられません。**
  */
 
+import { enMoji } from '@/lib/retirement/pro/money';
+
 /**
  * 表の1行。`cells` は左から順のセル
  *
@@ -386,7 +388,7 @@ export function kumitate(
 }
 
 /** 円の表記。**エンジンは数を返し、コンマはここで付けます** */
-export const en = (v: number): string => `${v.toLocaleString('en-US')}円`;
+export const en = (v: number): string => enMoji(v);   // ★マイナスは「−」（money.ts・2026-09-24）
 /** 符号つきの円（マイナスは全角の − ＝基準HTMLと同じ字） */
 export const enFu = (v: number): string =>
   v < 0 ? `−${Math.abs(v).toLocaleString('en-US')}円` : en(v);

@@ -50,6 +50,18 @@ export type FreeResult = {
   // ---- 緑カード（画面2・画面5-6）／画面3の簡易比較 ----
   saidai: number; sa: number;
   bunkiSa: 'aru' | 'nashi';
+  // ---- 幅の帯（画面2・決め1426・戦術Cowork `kaihatsu_ate_20260924b.md` 3節）----
+  /** 全通り（`kazoeta` の数）の手取りの**最小**。帯の左端の額 */
+  saisho: number;
+  /**
+   * ▲（いまの受け取り方＝基準）の位置。**0＝左端（最小）〜1＝右端（最大）**。
+   * `(tedori − saisho) ÷ (saidai − saisho)`。★`saidai − saisho` が 0 の方は **1**（▲を右端・0で割らない）
+   */
+  ichi: number;
+  /** `ichi` を百分率にし、小数1けたにした字（読み上げの字「左から◯%の位置」に入れる）。例 "6.2" */
+  ichiHyoji: string;
+  /** ▲の下の字のそろえ方（基準HTMLの覚え書き「▲が左半分なら左そろえ、右半分なら右そろえ」）。`ichi < 0.5` で 'hidari' */
+  ichiSoroe: 'hidari' | 'migi';
   // ---- なぜ差が出るのか ----
   nenbetsu: Nenbetsu[];
   kinzokuNensu: number; kojo: number; hamidashi: number; kazei: number;
@@ -184,6 +196,24 @@ export function freeResult(args: {
   let saidai = -Infinity;
   for (const [, r] of R) if (r.tedori > saidai) saidai = r.tedori;
   const sa = saidai - sh.tedori;
+  /**
+   * 【2026-09-24・決め1426（戦術Cowork `kaihatsu_ate_20260924b.md` 3節）】幅の帯
+   *   左端＝全通りの手取りの最小／右端＝`saidai`／▲＝基準の手取り（`sh.tedori`）。
+   *   ★最大と同じく、**一覧（R）だけから取ります**。基準を初期値にしません（E-20）。
+   */
+  let saisho = Infinity;
+  for (const [, r] of R) if (r.tedori < saisho) saisho = r.tedori;
+  const haba = saidai - saisho;
+  // ★幅が0の方は ▲を右端（1）に置きます。0で割りません（同 3節の★★）
+  const ichi = haba === 0 ? 1 : (sh.tedori - saisho) / haba;
+  /**
+   * ★番人（幅の帯）…… ▲は帯の中（0〜1）でなければ止めます。
+   *   基準が一覧に無い方（E-20）では、基準の手取りが一覧の最小より少ない・最大より多いことが起こりえます。
+   *   そのときは帯の外に▲を描くことになります。★黙って端に寄せません。
+   */
+  if (!(ichi >= 0 && ichi <= 1)) {
+    throw new Error(`幅の帯の▲の位置（${ichi}）が0〜1の外です。基準の手取り ${sh.tedori}・最小 ${saisho}・最大 ${saidai}。`);
+  }
 
   // --- なぜ差が出るのか（**年ごと**）--------------------------------------
   // 基準が2つの年に分かれる方では、枠も年ごとに分かれます。1年ぶんの表に押し込めません。
@@ -235,6 +265,9 @@ export function freeResult(args: {
     modoru: gs.zei - sh.zei, tedori: sh.tedori,
     saidai, sa,
     bunkiSa: sa > 0 ? 'aru' : 'nashi',
+    saisho, ichi,
+    ichiHyoji: (Math.round(ichi * 1000) / 10).toFixed(1),
+    ichiSoroe: ichi < 0.5 ? 'hidari' : 'migi',
     nenbetsu,
     kinzokuNensu: kt ? kt.nensu : 0,
     kojo: kt ? kt.kojoAdj : 0,

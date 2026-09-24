@@ -25,7 +25,7 @@
 
 import { trackOnce, type PricingBlock } from './track';
 
-/** §8-5 の一覧。**`nayami` は測らない。** */
+/** §8-5 の一覧。**`nayami`・`riyu`・`seido` は測らない（`NOT_MEASURED`）。** */
 /**
  * ★★★【2026-09-17・決め1313（★戦術Cowork `senjutsu_20260917d.md` 2-2）】
  *   ★**`'ai'` を外しました。**★`Screen56.tsx` から「AIに聞けば無料でできるのでは」の
@@ -41,7 +41,13 @@ export const MEASURED_BLOCKS: readonly PricingBlock[] = [
   'cannot', 'notincluded', 'notfor', 'inputs', 'prepare', 'price',
 ] as const;
 
-const NOT_MEASURED = 'nayami';
+/**
+ * ★測らない印（★送りません）。
+ * ★★【2026-09-23・決め1415 の回】`riyu`（手取りに差が出る理由）と `seido`（悩みの見出しの直後のリード文）が入りました。
+ *   ★前は `nayami` の1つだけで、★この2つは「一覧に無い印」として開発中に console に出るだけで、送ってはいませんでした。
+ *   ★★送るかどうかは戦術Coworkの決めです（★便 `kaihatsu_20260923c.md` で尋ねています）。★それまでは、いまと同じく**送りません**。
+ */
+export const NOT_MEASURED: readonly string[] = ['nayami', 'riyu', 'seido'];
 
 function isMeasured(v: string): v is PricingBlock {
   return (MEASURED_BLOCKS as readonly string[]).includes(v);
@@ -61,7 +67,7 @@ export function observePricingBlocks(root: ParentNode = document): () => void {
 
   for (const el of nodes) {
     const v = el.dataset.blockStart ?? '';
-    if (v !== NOT_MEASURED && !isMeasured(v)) {
+    if (!NOT_MEASURED.includes(v) && !isMeasured(v)) {
       console.warn(`[pro:blocks] §8-5 の一覧にない data-block-start があります: "${v}"`);
     }
   }
@@ -70,7 +76,7 @@ export function observePricingBlocks(root: ParentNode = document): () => void {
     for (const e of entries) {
       if (!e.isIntersecting) continue;
       const v = (e.target as HTMLElement).dataset.blockStart ?? '';
-      if (!isMeasured(v)) continue;            // nayami と未知の値は測らない
+      if (!isMeasured(v)) continue;            // NOT_MEASURED（nayami・riyu・seido）と未知の値は測らない
       trackOnce(`block:${v}`, 'pro_pricing_block_view', { block: v });
       io.unobserve(e.target);                  // 一度でよい
     }

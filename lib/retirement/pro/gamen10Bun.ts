@@ -34,9 +34,10 @@
 import * as Z from './zeisei';
 import * as E from './engine';
 import { data10, type Data10 } from './chart10';
+import { enMoji } from './money';
 
 /** 円の字（★`gamen11Bun.ts` と同じ形） */
-const en = (n: number) => `${n.toLocaleString('en-US')}円`;
+const en = (n: number) => enMoji(n);   // ★マイナスは「−」（money.ts・2026-09-24）
 
 /** ★★図の右端（★決め1038 …… **寿命の見立てではなく、図の右端**です） */
 export const AGE_MIGI = 90;

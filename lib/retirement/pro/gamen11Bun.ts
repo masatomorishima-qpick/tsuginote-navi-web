@@ -35,12 +35,13 @@
 import * as Z from './zeisei';
 import * as S from './sakaime';
 import * as E from './engine';
+import { enMoji } from './money';
 
 /** ★画面11の年金の表が見る年齢の範囲（★`gamen8.ts` の `AGE_FROM`／`AGE_TO` と同じ 55〜100歳） */
 export const AGE_FROM = 55, AGE_TO = 100;
 
 /** 円の字（★3桁区切り＋「円」。★`gamenBun.en()` と同じ形ですが、こちらは `lib` 側です） */
-const en = (n: number) => `${n.toLocaleString('en-US')}円`;
+const en = (n: number) => enMoji(n);   // ★マイナスは「−」（money.ts・2026-09-24）
 /** 万円の字（★式の中だけ。★「800万」「70万」「40万」） */
 const man = (n: number) => `${n / 10_000}万`;
 

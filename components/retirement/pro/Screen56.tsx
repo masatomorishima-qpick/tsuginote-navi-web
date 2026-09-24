@@ -35,8 +35,9 @@ import { observePricingBlocks, observeScrollDepth } from '@/lib/retirement/pro/b
 import { HENKIN_MIDASHI, HENKIN_FUTOJI, HENKIN_DANRAKU } from '@/lib/retirement/pro/henkin';
 // ★2026-09-22 …… 悩みのカード3枚の字・絵の道・alt は `nayami.ts` の1本だけが持ちます（★機械で抜き出したもの）
 import {
-  NAYAMI_MIDASHI, NAYAMI_KOTOWARI, NAYAMI_KADO, NAYAMI_E_HABA, NAYAMI_E_TAKASA,
+  NAYAMI_MIDASHI, NAYAMI_SEIDO, NAYAMI_KOTOWARI, NAYAMI_KADO, NAYAMI_E_HABA, NAYAMI_E_TAKASA,
 } from '@/lib/retirement/pro/nayami';
+import { RIYU_MIDASHI, RIYU_KADO, RIYU_E_HABA, RIYU_E_TAKASA } from '@/lib/retirement/pro/riyu';
 
 const KAKAKU = 19_800;
 
@@ -74,6 +75,43 @@ const KZ = '[word-break:keep-all] [overflow-wrap:anywhere] [line-break:strict]';
  *     ★画面2の頂から **7,000px 以上**下です。★最初に出る画面（375×667px）には1枚も入りません。
  *     ★`priority` は「最初の画面に出る絵」に付けるものですので、付けると **LCP の邪魔**になります。
  */
+/**
+ * ★★【2026-09-23・決め1415・戦術Cowork `kaihatsu_ate_20260923c.md`】「手取りに差が出る理由」（理由2つ）。
+ *   ★字と絵は `riyu.ts`（★`kensa/riyu_chushutsu.mjs` が基準HTMLから機械で作った本）だけが持ちます。
+ *   ★★置き方（森嶋さんのお決め）…… **狭い画面では縦に2つ、広い画面では横に2つ**。
+ *     ★横に並べるのは **640px 以上**（Tailwind の `sm:`）。★375px の絵は悩みのカードと同じ 343×193px。
+ *     ★640px を選んだ数（2026-09-23・dev・見本の方）…… 横に並べると、600px では字が 3行／4行、★640px で 3行／3行
+ *       （★375px の縦並びと同じ行の数）・太字はどの幅でも1行。★ `kaihatsu_20260923c.md` 3節。
+ *   ★`Nayami` と同じく、この本の中で `wakachi()` を呼びます（★外側の `wakachi()` は部品の中まで届きません）。
+ *   ★`data-block-start="riyu"` は `blocks.ts` の測る名前に**入っていません**（★送りません）。
+ */
+function Riyu() {
+  return wakachi(
+    <div className="mt-4">
+      <h3 data-block-start="riyu" className="text-[18px] font-bold text-slate-900">
+        {RIYU_MIDASHI}
+      </h3>
+      <div className="sm:grid sm:grid-cols-2 sm:gap-4">
+        {RIYU_KADO.map((k) => (
+          <div key={k.michi} className="mt-4">
+            <Image
+              src={k.michi}
+              alt={k.alt}
+              width={RIYU_E_HABA}
+              height={RIYU_E_TAKASA}
+              loading="lazy"
+              sizes="(max-width: 639px) 100vw, 384px"
+              className="block h-auto w-full rounded-[14px] bg-[#e8f3f0]"
+            />
+            <p className="mt-2 text-base font-bold leading-relaxed text-slate-900">{k.futoji}</p>
+            <p className="mt-1 text-base leading-relaxed text-slate-800">{k.ji}</p>
+          </div>
+        ))}
+      </div>
+    </div>,
+  );
+}
+
 function Nayami() {
   /*
     ★★★【2026-09-22・この回のこちらの落ち】★はじめ、字の3本に `KZ` を付けて書きました。
@@ -90,6 +128,8 @@ function Nayami() {
       <h3 data-block-start="nayami" className="text-[18px] font-bold text-slate-900">
         {NAYAMI_MIDASHI}
       </h3>
+      {/* ★2026-09-23（決め1415）…… 見出しの直後のリード文（`data-block-start="seido"`・全員に出ます） */}
+      <p data-block-start="seido" className="mt-2 text-base leading-relaxed text-slate-800">{NAYAMI_SEIDO}</p>
       <p className="mt-1 text-[13px] leading-relaxed text-[#5b6470]">{NAYAMI_KOTOWARI}</p>
       {NAYAMI_KADO.map((k) => (
         <div key={k.michi} className="mt-4">
@@ -149,7 +189,10 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
           [有料版]老後のお金の受け取りシミュレーションについて
       </h2>
 
-      {/* 1. 悩みのカード3枚（測りません。先頭なので必ず見えます） */}
+      {/* 1. 手取りに差が出る理由（★2026-09-23・決め1415。測りません） */}
+      <Riyu />
+
+      {/* 1-2. 悩みのカード3枚（測りません） */}
       <Nayami />
 
       {/* 2. 4つの見方 */}

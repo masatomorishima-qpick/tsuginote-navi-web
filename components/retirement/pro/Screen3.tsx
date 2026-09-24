@@ -17,6 +17,7 @@
 import { wakachi } from './Wakachi';
 import { useEffect, useRef } from 'react';
 import type { FreeResult } from '@/lib/retirement/pro/free';
+import { yen } from '@/lib/retirement/pro/money';   // ★マイナスは「−」（2026-09-24・戦術Cowork kaihatsu_ate_20260924c.md 3-1）
 import { trackOnce } from '@/lib/retirement/pro/track';
 
 /** 年金で受け取れる期間の幅（5年〜20年・1年きざみ）。エンジンの列挙と同じ */
@@ -120,7 +121,7 @@ export default function Screen3({ r }: { r: FreeResult }) {
               </b>
             </td>
             <td className="py-3 text-right text-base tabular-nums text-slate-900">
-              {r.tedori.toLocaleString('en-US')}円
+              {yen(r.tedori)}
             </td>
           </tr>
           <tr className="border-b border-slate-200">
@@ -128,7 +129,7 @@ export default function Screen3({ r }: { r: FreeResult }) {
               <b className="font-bold">あなたの手取りは、いちばん多くて</b>
             </td>
             <td className="py-3 text-right text-base tabular-nums text-slate-900">
-              {r.saidai.toLocaleString('en-US')}円
+              {yen(r.saidai)}
             </td>
           </tr>
           <tr>

@@ -24,6 +24,7 @@ import { gamen8Bun } from './gamen8Bun';
 import { ichiranMatome } from './ichiran';
 import type { Hitogoto13 } from '@/components/retirement/pro/gamen13Bun';
 import type { Kekka } from './kekkaKata';
+import { enMoji } from './money';
 export type { Kekka } from './kekkaKata';
 
 /** 計算の戻り。★`R`・`D` は口の中だけで使い、行にも返りにも入れません */
@@ -47,7 +48,7 @@ export type Keisan = {
 const TAI_NAME = '退職金';
 const IDECO_NAME = 'iDeCo等';
 
-const en = (n: number): string => `${n.toLocaleString('en-US')}円`;
+const en = (n: number): string => enMoji(n);   // ★マイナスは「−」（money.ts・2026-09-24）
 
 /**
  * 画面13の「その方によって変わる行」の8値（`gamen13Bun.ts` の注記のとおり・判断ログ82）。

@@ -13,8 +13,22 @@
  * そこで **1文ぶんの額をまとめて渡す `bunAmounts()`** を使います。
  */
 
-/** 規則1・4：必ず円 */
-export const yen = (n: number): string => `${Math.trunc(n).toLocaleString('en-US')}円`;
+/**
+ * 規則1・4：必ず円
+ * 【2026-09-24・戦術Cowork `kaihatsu_ate_20260924c.md` 3-1】マイナスは「−」（U+2212）で書きます（基準HTMLの金額の書き方）。
+ *   前は `toLocaleString` のまま半角の「-」でした（画面2の幅の帯の左端などで「-34,088円」と出ていました）。
+ */
+export const yen = (n: number): string => enMoji(Math.trunc(n));
+
+/**
+ * 円の字（★切り捨てをしない形）。マイナスは「−」（U+2212）。
+ * 【2026-09-24・戦術Cowork `kaihatsu_ate_20260924c.md` 3-1「字の形が2通りあるのは、そのままにしません」】
+ *   画面8〜12の本がそれぞれ持っていた `en()`・`y()`（`${n.toLocaleString('en-US')}円`）は、マイナスで半角の「-」を出していました
+ *   （golden 250人で1か所 ── 画面8の「増える税金の差」`-5,000円`・seed 237）。★その6本は、この1本を呼ぶ形にしました。
+ */
+export function enMoji(n: number): string {
+  return n < 0 ? `\u2212${(-n).toLocaleString('en-US')}円` : `${n.toLocaleString('en-US')}円`;
+}
 
 /** 万で割り切れるか */
 export const isMan = (n: number): boolean => Math.trunc(n) % 10_000 === 0;

@@ -42,9 +42,10 @@ import * as E from './engine';
 import * as S from './sakaime';
 import * as Z from './zeisei';
 import { setaiNoJi } from './gamen11Atai';
+import { enMoji } from './money';
 
 /** 円の表記（★`gamen10Bun.ts`・`gamen11Bun.ts` と同じ形） */
-const en = (n: number) => `${n.toLocaleString('en-US')}円`;
+const en = (n: number) => enMoji(n);   // ★マイナスは「−」（money.ts・2026-09-24）
 /** 引く数の円（★見本は「−1,100,000円」。★マイナスは U+2212・0のときは「0円」） */
 const enHiku = (n: number) => (n === 0 ? '0円' : `−${Math.abs(n).toLocaleString('en-US')}円`);
 

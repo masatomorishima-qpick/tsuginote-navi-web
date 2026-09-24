@@ -8,7 +8,7 @@
  *   ★見出しの直後にリード文（`NAYAMI_SEIDO`）が入りました。★字はこの1本に集めてあります。
  * ★★★`kensa/nayami_mon.tsx` が、基準HTMLを読み直して突き合わせます。
  *
- * 抜き出しもと: tsuginote_gamen_base.html（231,585バイト ／ md5 fff8b350b32682a0676565790b3ca255）
+ * 抜き出しもと: tsuginote_gamen_base.html（234,403バイト ／ md5 1cc89a004078cb08e5988bf5b92d086d）
  */
 
 /** かたまりの見出し（★`data-block-start="nayami"`） */

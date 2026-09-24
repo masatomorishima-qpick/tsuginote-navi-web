@@ -49,7 +49,22 @@ export function bunAmounts(...ns: number[]): string[] {
 
 /** 符号つき（緑カードの「＋274,290円」）。規則1のところで使う */
 export const signedYen = (n: number): string =>
-  `${n < 0 ? '−' : '＋'}${Math.abs(Math.trunc(n)).toLocaleString('en-US')}円`;
+  Math.trunc(n) === 0 ? '0円' : `${n < 0 ? '−' : '＋'}${Math.abs(Math.trunc(n)).toLocaleString('en-US')}円`;
+
+/**
+ * 【2026-09-24・戦術Cowork `kaihatsu_ate_20260924f.md` 2節の決め】★0に向きはありません。★0円のときは「＋」も「−」も付けず「0円」。
+ *   前は画面2の明細表が記号を決め打ちで付けていて、「−0円」（golden 250人中19人）「＋0円」（65人）が出ていました。
+ * `hikuYen` …… 引く額（源泉徴収・手数料）。0円なら「0円」、そのほかは「−◯円」
+ * `tasuYen` …… 足す額（確定申告で戻る額）。0円なら「0円」、0円より多ければ「＋◯円」、少なければ「−◯円」
+ * ★`kensa/fugou_mon.tsx` が、「＋0」「−0」「+0」「-0」が出たら鳴らします。
+ */
+export function hikuYen(n: number): string {
+  return tasuYen(-n);   // ★引く額を「引く向きの数」にして書きます（★0円なら「0円」・★画面は止めません）
+}
+export function tasuYen(n: number): string {
+  const t = Math.trunc(n);
+  return t === 0 ? '0円' : t > 0 ? `\uFF0B${t.toLocaleString('en-US')}円` : `\u2212${(-t).toLocaleString('en-US')}円`;
+}
 
 // ────────────────────────────────────────────────────────────────
 // 入れた額の言い換え（★2026-09-21・戦術Cowork `kaihatsu_ate_20260921d.md` 1節）

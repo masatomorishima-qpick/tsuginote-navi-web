@@ -24,7 +24,7 @@ import { useEffect, useRef } from 'react';
 import type { FreeResult } from '@/lib/retirement/pro/free';
 import { track } from '@/lib/retirement/pro/track';
 import { observeScrollDepth } from '@/lib/retirement/pro/blocks';
-import { yen } from '@/lib/retirement/pro/money';
+import { yen, hikuYen, tasuYen } from '@/lib/retirement/pro/money';
 
 /** 金額の行。右は等幅数字（§7-5） */
 export function Row({ label, note, value, strong, strongLabel }: {
@@ -187,11 +187,20 @@ export default function Screen2({ r, onBuy }: { r: FreeResult; onBuy: () => void
               <Row
                 label="受け取るときに引かれる税金"
                 note="勤め先や、iDeCo等を扱う金融機関が、あなたに渡すときに引きます（源泉徴収）"
-                value={`−${r.gensen.toLocaleString('en-US')}円`}
+                value={hikuYen(r.gensen)}
               />
-              <Row label="iDeCo等の給付事務手数料" value={`−${r.tesuryo.toLocaleString('en-US')}円`} />
-              <Row label="確定申告で戻る額" note="戻るのは翌年です" value={`＋${r.modoru.toLocaleString('en-US')}円`} />
+              {/* 【2026-09-24・決め1431（戦術Cowork `kaihatsu_ate_20260924f.md` 1節）】前の字「iDeCo等の給付事務手数料」は、額（`r.tesuryo`）に口座管理手数料も入っているのに
+                  給付事務手数料だけの名前でした（golden 250人中23人・受け取る年が2つに分かれる方ぜんぶで、字と額が合っていませんでした）。基準HTML（234,403 ／ 1cc89a00）から1字1句 */}
+              <Row label="iDeCo等の手数料" note="給付事務手数料と口座管理手数料の合計です" value={hikuYen(r.tesuryo)} />
+              {/* 【2026-09-24・同 2節】0円のときは記号を付けません（money.ts の hikuYen・tasuYen） */}
+              <Row label="確定申告で戻る額" note="戻るのは翌年です" value={tasuYen(r.modoru)} />
               <Row label="あなたの手取り" value={yen(r.tedori)} strong />
+              {/* 【2026-09-24・決め1430（戦術Cowork `kaihatsu_ate_20260924e.md` 1節）】基準の手取りが0円より少ない方にだけ（★エンジンが null を返す方には出しません） */}
+              {r.tesuryo_ooi_bun !== null ? (
+                <tr>
+                  <td colSpan={2} className="pb-3 text-[13px] leading-relaxed text-[#5b6470]">{r.tesuryo_ooi_bun}</td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
         </div>

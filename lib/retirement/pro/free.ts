@@ -62,6 +62,12 @@ export type FreeResult = {
   ichiHyoji: string;
   /** ▲の下の字のそろえ方（基準HTMLの覚え書き「▲が左半分なら左そろえ、右半分なら右そろえ」）。`ichi < 0.5` で 'hidari' */
   ichiSoroe: 'hidari' | 'migi';
+  /**
+   * 明細表の「あなたの手取り」の行のすぐ下の1文（基準HTML `data-na="tesuryo_ooi_bun"`・決め1430・戦術Cowork `kaihatsu_ate_20260924e.md` 1節）。
+   * ★基準の手取り（`tedori`）が0円より少ない方にだけ字、ほかの方は `null`。
+   * ★字は「手数料のほうが、受け取る額より多い」と言っています。★そうでない方に出た日は `kensa/gamen2_awase.tsx` が鳴ります。
+   */
+  tesuryo_ooi_bun: string | null;
   // ---- なぜ差が出るのか ----
   nenbetsu: Nenbetsu[];
   kinzokuNensu: number; kojo: number; hamidashi: number; kazei: number;
@@ -115,6 +121,9 @@ export type Gamen4 = {
   /** 「受け取る順番で、空ける年数が変わります」。**20年・10年を直に書かない** */
   junban: [string, number][];
 };
+
+/** ★決め1430 の字（`tesuryo_ooi_bun`）。基準HTML（233,695 ／ e7cd0a02）の画面2から1字1句 */
+const TESURYO_OOI = 'あなたの場合、iDeCo等の手数料のほうが、受け取る額より多くなります。';
 
 /** 無料版の5項目（円・年・歳）から、画面2〜5-6に出す数字を出す */
 export function freeResult(args: {
@@ -268,6 +277,7 @@ export function freeResult(args: {
     saisho, ichi,
     ichiHyoji: (Math.round(ichi * 1000) / 10).toFixed(1),
     ichiSoroe: ichi < 0.5 ? 'hidari' : 'migi',
+    tesuryo_ooi_bun: sh.tedori < 0 ? TESURYO_OOI : null,
     nenbetsu,
     kinzokuNensu: kt ? kt.nensu : 0,
     kojo: kt ? kt.kojoAdj : 0,

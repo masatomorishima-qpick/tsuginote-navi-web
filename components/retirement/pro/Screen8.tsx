@@ -25,7 +25,7 @@
 'use client';
 
 import { wakachi, wakachiJi } from './Wakachi';
-import { useEffect } from 'react';
+import { Fragment, useEffect } from 'react';
 import type { Bun8 } from '@/lib/retirement/pro/gamen8Bun';
 import { track } from '@/lib/retirement/pro/track';
 
@@ -187,17 +187,13 @@ export default function Screen8({ b, pattern, onSusumu, onDownload, downloadMatt
         </div>
       ))}
 
-      {/* ---- 注意点 ---- */}
-      <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
-        <p className="text-base font-bold text-slate-900">注意点</p>
-        <div className="mt-1.5 text-base leading-relaxed text-slate-800">
-          {b.chui.map((x, i) => <p key={i}>・{x}</p>)}
-        </div>
-      </div>
-
-      <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
-        <p className="text-base leading-relaxed text-slate-800">{b.shinkokusho}</p>
-      </div>
+      {/* ---- 注意点 ----
+          【2026-09-25・決め1449（校閲 #57・森嶋さんの変更案 P10「カードにしない」）】注意点の枠と申告書の枠を、1つの段落（枠なし）にまとめました。
+          基準HTML（233,168 ／ f58c3c6d）1052〜1055行の `p.chu`。字は `gamen8Bun()` の `chui` が持ちます。 */}
+      <p className="mt-5 text-[13px] leading-relaxed text-[#5b6470]">
+        <b className="font-bold">注意点</b>
+        {b.chui.map((x, i) => <Fragment key={i}><br />・{x}</Fragment>)}
+      </p>
 
       {/* ---- ファイルで受け取る ---- */}
       <h2 className="mt-8 text-[19px] font-bold text-slate-900">結果をファイルで受け取る</h2>
@@ -246,7 +242,7 @@ export default function Screen8({ b, pattern, onSusumu, onDownload, downloadMatt
             直っていましたが、★★★**この1行だけが古いまま残っていました**（★基準HTMLの「PDF」は0か所）。
             ★19,800円をお支払いになった方に、**作らないものをお渡しすると書いていました**。
             ★いまは基準HTML 891行から1字1句写しています。 */}
-        Excel（.xlsx）です。表計算ソフトをお持ちでない方も、この画面は、お送りするメールのリンクから、ご購入から1年のあいだ何度でもお開きになれます。
+        ファイルはExcel（.xlsx）形式です。表計算ソフトをお持ちでない方も、この画面は、お送りするメールのリンクから、ご購入から1年間、何度でもお開きいただけます。
       </p>
 
       {/* ---- 詳細を見る ---- */}

@@ -17,7 +17,7 @@ export type FreeInput = {
   kinzokuNensu: number;
   /** ③ あなたのiDeCo等の残高（万円） */
   idecoMan: number;
-  /** ④ あなたが③に加入していた期間（年） */
+  /** ④ あなたがiDeCo等に加入していた年数（年） */
   kanyuNensu: number;
   /** ⑤ あなたが退職金を受け取る予定の年齢（歳） */
   taishokuAge: number;
@@ -48,7 +48,7 @@ export const FIELDS: ReadonlyArray<{
     //     ★窓が広がる → 前に受け取ったものが多く「重複」に数えられる → **控除が減り、税が増えます**（★不利側）。
     //   ★★基準HTMLの2か所は戦術Coworkが直しました（★`paidFields.ts` は抜き出しですので、もう直っています）。
     note: 'iDeCo・企業型DC', unit: '万円', min: 0, max: 20_000, placeholder: '500' },
-  { no: 4, key: 'kanyuNensu', label: '④ あなたが③に加入していた期間',
+  { no: 4, key: 'kanyuNensu', label: '④ あなたがiDeCo等に加入していた年数',
     unit: '年', min: 1, max: 60, placeholder: '20' },
   { no: 5, key: 'taishokuAge', label: '⑤ あなたが退職金を受け取る予定の年齢',
     unit: '歳', min: 50, max: 75, placeholder: '60' },

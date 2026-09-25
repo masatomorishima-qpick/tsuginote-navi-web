@@ -12,7 +12,7 @@
  * 名前は基準HTMLの `data-na`（＝エンジンの鍵の名前・判断ログ83①）です。
  * **推測では立てていません。印だけを見ています。**
  *
- * もと: bin/senjutsu/tsuginote_gamen_base.html（234,403バイト ／ md5 1cc89a004078cb08e5988bf5b92d086d）
+ * もと: bin/senjutsu/tsuginote_gamen_base.html（233,785バイト ／ md5 826475b1a35543440d3ff55261481c27）
  */
 
 /** 表の1行。`cells` は左から順のセル。`na` は、この行に出る `{名前}` の一覧 */

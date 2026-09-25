@@ -150,8 +150,10 @@ function Nayami() {
   );
 }
 
-function Card({ title, body, kz }: {
+function Card({ title, body, kz, batsu }: {
   title: React.ReactNode;
+  /** 「できないこと」のカードの頭の「×」（基準HTMLの `div.fico`。太字の外に置きます） */
+  batsu?: boolean;
   /** 無いカードもあります（「手数料・紹介料」のカードは見出しだけ・決め1343） */
   body?: React.ReactNode;
   /** 見出しと本文を、単語の途中で切らない組み方にする（基準HTMLの `div.vtxt kz`・決め1344） */
@@ -159,7 +161,8 @@ function Card({ title, body, kz }: {
 }) {
   return (
     <div className={`rounded-xl border border-slate-200 p-4${kz ? ` ${KZ}` : ''}`}>
-      <b className="block text-base font-bold leading-relaxed text-slate-900">{title}</b>
+      {batsu ? <span className="mr-1 text-base text-slate-900" aria-hidden="true">×</span> : null}
+      <b className={`${batsu ? 'inline' : 'block'} text-base font-bold leading-relaxed text-slate-900`}>{title}</b>
       {body !== undefined ? <span className="mt-1 block text-base leading-relaxed text-slate-800">{body}</span> : null}
     </div>
   );
@@ -209,7 +212,7 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
       {r.bunkiSa === 'aru' ? (
         <>
           <div className="mt-4 rounded-2xl border border-[#0f5f4e]/25 bg-[#f0f7f4] p-5 text-center">
-            <p className="text-base font-bold text-slate-900">あなたの場合、一度にまとめて受け取るより</p>
+            <p className="text-base font-bold text-slate-900">あなたの場合、いまの受け取り方より</p>
             <div className="mt-1 text-[34px] font-bold leading-tight tabular-nums text-[#0f5f4e]">
               {r.sa.toLocaleString('en-US')}円
             </div>
@@ -237,8 +240,8 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
         <>
           <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5">
             <p className="text-base leading-relaxed text-slate-900">
-              <b className="font-bold">あなたの場合、いちばん多く残るのは、一度にまとめて受け取る方法です。</b>
-              受け取り方によっては、手取りが少なくなることがあります。どの受け取り方でいくら少なくなるかは、有料版でご覧いただけます。
+              <b className="font-bold">あなたの場合、手取りがいちばん多いのは、いまの受け取り方です。</b>
+              受け取り方によっては、手取りが少なくなることがあります。どの受け取り方でいくら少なくなるかは、有料版でお渡しする一覧でご覧いただけます。
             </p>
           </div>
           <p className="mt-3 text-base leading-relaxed text-slate-800">
@@ -250,31 +253,31 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
         </>
       )}
       <p className="mt-3 text-base leading-relaxed text-slate-800">
-        4つとも同じ受け取り方になる方もいます。その場合は「どの見方で比べても同じです」とお伝えします。分かれる場合は、方向ごとに並べて差額を示します。
+        4つの見方のどれで比べても、同じ受け取り方になる方もいます。その場合は、そのことをお伝えします。分かれる場合は、方向ごとに並べて差額をお示しします。
       </p>
 
-      {/* 3. ほかと違うところ */}
-      <H3 block="different">有料版が、ほかと違うところ</H3>
+      {/* 3. 有料版でご提供するもの（★2026-09-25・決め1449 で見出しを替え、2枚め・3枚めを1枚にしました） */}
+      <H3 block="different">有料版でご提供するもの</H3>
       <div className="mt-3 space-y-3">
         {/*
           【2026-09-18・決め1344（戦術Cowork `kaihatsu_ate_20260918f.md` 2-3）】前からある3枚に、単語の途中で切らない組み方を入れました。
             字も太字の位置も変えていません。`<wbr>` の位置は基準HTML（222,774 ／ 9c153ae4）833〜835行から1字1句（機械で写しました）。
             前は「介護保険／料」「計／算します」「根拠／の条文」の3か所で、単語の途中で切れていました。
         */}
+        {/*
+          【2026-09-25・決め1449（戦術Cowork `kaihatsu_ate_20260925g.md` 1節の1・校閲）】カードを3枚＋中立の1枚から、2枚＋中立の1枚にしました。
+            2枚め（前の「実際に選べる受け取り方だけ」）と3枚め（前の「全ステップと根拠の条文」）を1枚にしています。
+            字・太字・`<wbr>` の位置は、基準HTML（233,168 ／ f58c3c6d）798〜799行から1字1句（`kensa/gamen56_awase.tsx` が数えます）。
+        */}
         <Card
           kz
-          title={<>公的年金・<wbr />iDeCo等・<wbr />税金を、<wbr />同じ年の上に<wbr />並べて計算し、<wbr />国民健康保険料・<wbr />介護保険料・<wbr />医療費の負担も<wbr />チェックできます</>}
-          body={<>公的年金は<wbr />年金事務所、<wbr />iDeCo等は<wbr />金融機関、<wbr />税金は<wbr />税務署。<wbr />ばらばらに<wbr />聞くしか<wbr />なかった<wbr />3つを、<wbr />まとめて<wbr />計算します。<wbr />税金だけを<wbr />見て<wbr />決めると、<wbr /><b className="font-bold">国民健康保険料の<wbr />軽減が<wbr />なくなる案</b>を<wbr />選んでしまう<wbr />ことがあります</>}
+          title={<>公的年金・<wbr />iDeCo等・<wbr />税金を<wbr />年ごとに<wbr />並べて計算し、<wbr />公的医療保険料・<wbr />介護保険料・<wbr />医療費の負担も<wbr />確かめられます</>}
+          body={<>公的年金は<wbr />年金事務所、<wbr />iDeCo等は<wbr />金融機関、<wbr />税金は<wbr />税務署。<wbr />ばらばらに<wbr />聞くしか<wbr />なかった<wbr />3つを、<wbr />まとめて<wbr />計算します。<wbr />税金だけを<wbr />見て<wbr />決めると、<wbr /><b className="font-bold">公的医療保険料の<wbr />軽減が<wbr />なくなる<wbr />受け取り方</b>を<wbr />選んでしまう<wbr />ことがあります</>}
         />
         <Card
           kz
-          title={<>あなたが<wbr />実際に<wbr />選べる<wbr />受け取り方だけを<wbr />計算します</>}
-          body={<>退職金を<wbr />受け取る年を<wbr />選べる方は<wbr />多くありません。<wbr />このツールは、<wbr />あなたが<wbr />ご入力になった<wbr />年齢で<wbr />計算します。<wbr /><b className="font-bold">あなたが<wbr />実際に<wbr />選べない案は<wbr />出しません。</b></>}
-        />
-        <Card
-          kz
-          title={<>答えだけでなく、<wbr />計算の<wbr />全ステップと<wbr />根拠の条文を<wbr />お見せします</>}
-          body={<>1通りずつ、<wbr />所得税・<wbr />住民税・<wbr />復興特別所得税・<wbr />防衛特別所得税と<wbr />手数料まで<wbr />計算し、<wbr />条文から<wbr />別に<wbr />組み直した<wbr />計算と<wbr />突き合わせています</>}
+          title={<>あなたが<wbr />選べる<wbr />受け取り方と、<wbr />その根拠が<wbr />わかります</>}
+          body={<>あなたが<wbr />ご入力になった<wbr />年齢と条件で、<wbr />選べる<wbr />受け取り方を<wbr />すべて<wbr />計算します。<wbr />1通りずつ、<wbr />所得税・<wbr />住民税・<wbr />復興特別所得税・<wbr />防衛特別所得税と<wbr />手数料まで<wbr />計算し、<wbr />条文をもとに<wbr />別の方法で<wbr />組み立てた<wbr />計算とも<wbr />照らし合わせています。<wbr />計算の<wbr />全ステップと<wbr />根拠にした<wbr />条文は、<wbr />お渡しする<wbr />ファイルに<wbr />入っています。<wbr /><b className="font-bold">お勤め先や<wbr />金融機関に<wbr />よっては、<wbr />選べる<wbr />受け取り方が<wbr />限られる<wbr />ことがあります。</b></>}
         />
         {/*
           【2026-09-18・決め1343（戦術Cowork `kaihatsu_ate_20260918d.md` 3-3・森嶋さんの承認済み）】4枚めのカード。
@@ -300,25 +303,28 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
             ★**画面に無いのに一覧に在ると、`pro_pricing_block_view` の `ai` がただ 0件になり、
               ★★「ai で全員落ちた」と読まれる道が在ります。**
       */}
-      {/* 5. そのほかに含まれるもの */}
+      {/* 5. そのほか、計算に含まれるもの */}
       <details data-block-start="included" className="mt-6 rounded-xl border border-slate-200 p-4">
-        <summary className="cursor-pointer text-base font-bold text-slate-900">そのほかに含まれるもの</summary>
+        <summary className="cursor-pointer text-base font-bold text-slate-900">そのほか、計算に含まれるもの</summary>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-base leading-relaxed text-slate-900">
           <li>あなたが確定申告をした場合に戻る額</li>
-          <li>iDeCo等の給付事務手数料・口座管理手数料</li>
+          {/* 【2026-09-25・決め1449（戦術Cowork `kaihatsu_ate_20260925h.md` 1-7）】440円を企業型DCにも当てていることを、前提として書きました */}
+          <li>iDeCo等の給付事務手数料（1回440円。企業型DCも同じ額で計算しています）・口座管理手数料</li>
           <li>あなたがすでに受け取った退職手当等（前の勤め先の退職金・企業年金の一時金・iDeCo等の一時金）による、退職所得控除の調整</li>
         </ul>
       </details>
 
       {/* 6. できないこと */}
-      <H3 block="cannot">できないこと</H3>
+      <H3 block="cannot">できないこと・計算に含まれないもの</H3>
       <div className="mt-3 space-y-3">
         <Card
-          title="× 保険料そのものの金額。"
-          body={<>計算に使う率が市区町村によって違い、全国分のデータが公表されていないためです。かわりに<b className="font-bold">上がるかどうか</b>と、<b className="font-bold">あなたの所得が国の定める基準をいくら超えるか</b>をお伝えします。<b className="font-bold">あなたが実際にお支払いになる金額は、お住まいの市区町村にご確認ください。</b></>}
+          batsu
+          title="公的医療保険料・介護保険料の金額。"
+          body={<>計算に使う率が市区町村ごとに違うためです。かわりに、<b className="font-bold">保険料が上がるかどうか</b>と、<b className="font-bold">あなたの所得が国の定める基準をいくら超えるか</b>をお伝えします。<b className="font-bold">実際の金額は、お住まいの市区町村にご確認ください。</b></>}
         />
         <Card
-          title="× 運用による増減。"
+          batsu
+          title="運用による増減。"
           body={<>年金で受け取る間も運用は続きますが、将来の利回りは分からないため<b className="font-bold">0%</b>で計算しています</>}
         />
         {/*
@@ -343,8 +349,8 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
             なお、この約束は実装指示書 v4 92行「2. 絶対に守ること」12番にも在ります。
         */}
         <Card
-          title="× 書類の作成・代筆、金融商品のご紹介。"
-          body="期待のずれを防ぐため、ここに書いています"
+          batsu
+          title="書類の作成・代筆と、金融商品のご紹介は行っていません。"
         />
       </div>
 
@@ -356,7 +362,8 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
       <div data-block-start="notincluded" className="mt-6">
         <p className="text-base leading-relaxed text-slate-900"><b className="font-bold">そのほか、計算に入れていないもの</b></p>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-base leading-relaxed text-slate-900">
-          <li><b className="font-bold">介護保険料の段階と金額。</b>段階の数も区切りも市区町村の条例で違います。<b className="font-bold">あなたの段階は、お住まいの市区町村にご確認ください。</b></li>
+          {/* 【2026-09-25・決め1449（戦術Cowork `kaihatsu_ate_20260925h.md` 1-5）】第1〜第3段階の境目は実装が判定しています（`sakaime.ts` 111〜120行）ので、字を実装に合わせました */}
+          <li><b className="font-bold">介護保険料の金額と、第3段階より上の段階。</b>第1段階から第3段階までの境目を超えるかどうかは、国の基準（介護保険法施行令）でお伝えします。それより上の段階の数と区切りは、市区町村の条例で違います。<b className="font-bold">あなたの段階は、お住まいの市区町村にご確認ください。</b></li>
           <li><b className="font-bold">高額療養費・高額介護サービス費。</b>医療費の窓口負担が2割・3割になるかどうかはお伝えしますが、ひと月の自己負担の上限は計算していません</li>
           <li><b className="font-bold">あなたが受け取り切る前に亡くなった場合。</b>残りは相続税の対象に変わります（500万円×相続人の数までは非課税）。このツールは<b className="font-bold">あなたが受け取り切ること</b>を前提に比べています。年金で長く受け取るほど、この残りは大きくなります</li>
           <li><b className="font-bold">一部の所得控除。</b>特定親族特別控除・勤労学生控除・医療費控除・雑損控除・寄附金控除は計算に入れていません。所得金額調整控除も、給与の収入が850万円を超える場合の分は入れていません</li>
@@ -365,7 +372,7 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
 
       {/* 8. お役に立てない場合 */}
       <div data-block-start="notfor" className="mt-6 rounded-xl border border-[#c2841e] bg-[#fdf6e7] p-4">
-        <b className="text-base font-bold leading-relaxed text-slate-900">次の場合は、有料版ではお役に立てません。</b>
+        <b className="text-base font-bold leading-relaxed text-slate-900">有料版がお役に立てない場合</b>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-base leading-relaxed text-slate-900">
           {/*
             ★★★2026-09-16・決め1264（★戦術Cowork `senjutsu_20260915l.md` 1-3）
@@ -383,17 +390,17 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
       {/* 9. ご入力いただくこと */}
       <H3 block="inputs">有料版でご入力いただくこと</H3>
       <p className="mt-2 text-base leading-relaxed text-slate-800">
-        いまの5項目に加えて、<b className="font-bold">15項目</b>をうかがいます。
+        ご入力いただくのは、<b className="font-bold">基本の20項目</b>と、あてはまる方だけの<b className="font-bold">詳細8項目</b>です。基本の20項目のうち、はじめの5項目は、無料版でご入力いただいた内容を引き継ぎます。
       </p>
       <p className="mt-1 text-base leading-relaxed text-[#5b6470]">
-        生まれた年月日／退職後の収入／企業年金／公的年金の見込額／勤続期間／iDeCo等の加入期間／すでに受け取った退職手当等／扶養しているご家族／社会保険料／生命保険料／まとまった支出の予定／年金の受取回数／公的年金を受け取り始める年齢
+        退職金の見込額／勤続年数／iDeCo等の残高／iDeCo等に加入していた年数／退職金を受け取る予定の年齢／生年月日／退職金を受け取る年の、それ以外の収入／退職した翌年以降の収入／企業年金（確定給付）／老齢厚生年金の見込額／老齢基礎年金の見込額／まとまった支出の予定／勤続期間（入社した年月と退職する年月）／iDeCo等の加入期間（始めた年月と終わる年月）／すでに受け取った退職手当等／扶養しているご家族／社会保険料／生命保険料・地震保険料／iDeCo等を年金で受け取る場合の回数／公的年金を受け取り始める年齢
       </p>
       <p className="mt-3 text-base leading-relaxed text-slate-800">
-        このほかに<b className="font-bold">「詳細を入力する」8項目</b>があります。
+        <b className="font-bold">「詳細を入力する」の8項目</b>は次のとおりです。
         <b className="font-bold">あてはまる方が入力すると、より精度の高い計算結果になります。</b>
       </p>
       <p className="mt-1 text-base leading-relaxed text-[#5b6470]">
-        配偶者がいる／19歳以上23歳未満・70歳以上のご家族を扶養している／障害者手帳をお持ちの方がいる／寡婦・ひとり親／役員退職慰労金がある／障害が原因で退職する／お住まいの市区町村
+        配偶者の所得／配偶者の生まれた年／あなたの厚生年金の加入が20年以上か／19歳以上23歳未満・70歳以上のご家族の人数／障害者控除・寡婦控除・ひとり親控除／役員退職慰労金／障害が原因の退職／お住まいの市区町村
       </p>
 
       {/* 10. ご用意いただくもの */}
@@ -408,11 +415,11 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
         <tbody>
           <tr className="border-b border-slate-200">
             <td className="py-3 pr-3 text-base text-slate-900">ねんきん定期便</td>
-            <td className="py-3 text-base leading-relaxed text-slate-900">⑩ あなたの老齢厚生年金・老齢基礎年金の見込額</td>
+            <td className="py-3 text-base leading-relaxed text-slate-900">あなたの公的年金（老齢厚生年金・老齢基礎年金）の見込額</td>
           </tr>
           <tr>
             <td className="py-3 pr-3 text-base text-slate-900">源泉徴収票</td>
-            <td className="py-3 text-base leading-relaxed text-slate-900">⑮ あなたの社会保険料等の金額</td>
+            <td className="py-3 text-base leading-relaxed text-slate-900">あなたの社会保険料の金額<br />あなたの生命保険料・地震保険料の金額</td>
           </tr>
         </tbody>
       </table>
@@ -422,19 +429,22 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
         消えていると「後出しにしない」という約束が消えます。**落とさないこと。**
       */}
       <p className="mt-3 text-base leading-relaxed text-slate-800">
-        そろっていなくても始められます。勤続期間とiDeCo等の加入期間は
+        <b className="font-bold">そろっていなくても始められます。</b>勤続期間とiDeCo等の加入期間は
         <b className="font-bold">「わからない」を選べます</b>
-        （<b className="font-bold">あなたに不利な側</b>で計算し、どう置いたかをお示しします）。
+        （その場合は、<b className="font-bold">あなたに不利になる側</b>で計算します）。{/* 【2026-09-25・決め1449（戦術Cowork `kaihatsu_ate_20260925h.md` 1-4）】置き方を示す約束の字を外しました（実装に置き方を出す所が0か所のため） */}
         ねんきん定期便の額は、あとから入れ直せます。
+      </p>
+      <p className="mt-3 text-base leading-relaxed text-slate-800">
+        年末調整を受けていない方（給与が2,000万円を超える方など）は、源泉徴収票にこれらの欄がありません。確定申告書の控えか、保険料控除証明書をご覧ください。
       </p>
 
       {/* 11. 価格とボタン。**画面下に固定しない**（§2の6） */}
       <div data-block-start="price" className="mt-8 rounded-2xl border-2 border-[#0f5f4e]/25 p-5">
-        <p className="text-base font-bold text-slate-900">有料版価格</p>
+        <p className="text-base font-bold text-slate-900">有料版の価格</p>
         <div className="mt-1 text-[34px] font-bold leading-tight tabular-nums text-slate-900">
           {KAKAKU.toLocaleString('en-US')}円<span className="ml-1 text-base font-bold">（税込）</span>
         </div>
-        <p className="mt-1 text-base leading-relaxed text-slate-800">購入から1年間、何度でも計算し直せます。</p>
+        <p className="mt-1 text-base leading-relaxed text-slate-800"><b className="font-bold">購入から1年間、何度でも計算し直せます。</b>お送りするメールのリンクからお開きください。</p>
 
         {/* §3-3の3：インボイスを発行できないことを、購入ボタンの手前に */}
         <p className="mt-4 text-base leading-relaxed text-slate-900">
@@ -481,13 +491,14 @@ export default function Screen56({ r, onBuy }: { r: FreeResult; onBuy: () => voi
 
             【止め】基準HTMLの字を直す前に、本番実装の同じ所を開いて数える（決め1326・`tome.md` A2）。
           */}
+          {/* 【2026-09-25・決め1449（校閲）】「結果を開き直すリンク」の1本を、「当社に保存され…」のすぐ下へ移しました（基準HTML 233,168 ／ f58c3c6d） */}
           <li><b className="font-bold">あなたが入力した内容は当社に保存され、直したいところだけ変えられます。</b></li>
-          <li><b className="font-bold">計算し直すと、前の結果は残りません。</b>残しておきたいときは、先にファイルをダウンロードしてください。</li>
-          <li><b className="font-bold">あなたが入力した内容とメールアドレスは、ご利用いただける期間（購入から1年）が過ぎたあと、60日以内に削除します。</b></li>
-          <li><b className="font-bold">それより前に削除してほしいときは、support@tsuginotenavi.jp までご連絡ください。</b>ご購入時のメールアドレス宛に、ご本人の確認のご連絡をします。</li>
           <li>ご購入時のメールアドレスに、結果を開き直すリンクをお送りします。</li>
+          <li><b className="font-bold">計算し直すと、前の結果は残りません。</b>残しておきたいときは、計算し直す前に、結果のファイル（Excel）をダウンロードしてください。</li>
+          <li><b className="font-bold">あなたが入力した内容とメールアドレスは、ご利用いただける期間（購入から1年）が過ぎたあと、60日以内に削除します。</b></li>
+          <li><b className="font-bold">それより前に削除してほしいときは、support@tsuginotenavi.jp までご連絡ください。</b>ご購入時のメールアドレス宛に、ご本人確認のご連絡をいたします。</li>
           <li>都度のお支払いです。自動更新はありません。</li>
-          <li>決済はStripeを利用します。あなたのメールアドレスは米国のStripe, Inc.およびResendに送られます。</li>
+          <li>決済にはStripeを、メールの送信にはResendを利用します。このため、あなたのメールアドレスは、米国のStripe, Inc.と、Resend（メール送信サービス）に提供されます。</li>
         </ul>
 
         {/* B-1b の2：3つのリンク。★必ず別のタブで開く（同じタブで移ると、戻ったときに入力が消えるため） */}

@@ -36,18 +36,14 @@ export default function ArigatouPage() {
       <main className="flex-1">
         <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
           <h1 className={H1}>ご購入ありがとうございます</h1>
-          <p className={P}>お手続きが完了しました。</p>
+          {/* 【2026-09-25・決め1449（戦術Cowork `kaihatsu_ate_20260925g.md` 2節・森嶋さんの変更案 P8）】字を替えました。
+              前の字は、便 kaihatsu_20260925h に1字1句写しています。 */}
           <p className={P}>
-            ご購入のときにご入力いただいたメールアドレスに、計算結果を開くためのリンクをお送りします。
-            <br />
-            メールは、ふつう数分以内に届きます。
+            ご購入のときにご入力いただいたメールアドレスに、有料版をお使いいただくためのリンクをお送りします。メールは、通常数分以内に届きます。
           </p>
+          <p className={P}>メールが届かないときは、迷惑メールのフォルダをご確認ください。</p>
           <p className={P}>
-            メールが届かないときは、迷惑メールのフォルダをご確認ください。
-            <br />
-            それでも見つからないときは、support@tsuginotenavi.jp までご連絡ください。
-            <br />
-            ご購入のときにご入力いただいたメールアドレスをお知らせいただければ、お調べします。
+            それでも見つからない場合は、support@tsuginotenavi.jp 宛に、ご購入時にご入力いただいたメールアドレスをお知らせください。
           </p>
           <p className="mt-8">
             <Link href={PRO_PATH} className="font-medium text-emerald-700 hover:text-emerald-800">

@@ -34,8 +34,8 @@ export default function Screen56Shita() {
         <tbody>
           <Row label="一度にまとめて受け取った（一時金だけ）" value={<>87.1%<sup>※</sup></>} />
           <Row label="分けて受け取った（年金だけ）" value="10.4%" />
-          {/* 基準HTMLでは太字は**ラベル側**。値ではない */}
-          <Row label="まとめてと分けてを組み合わせた" value="2.5%" strongLabel />
+          {/* 【2026-09-25】基準HTML（233,168 ／ f58c3c6d）894行は、ラベルも値も `<b>` です（★前の覚え書き「太字はラベル側。値ではない」は基準HTMLと違っていました・`kensa/gamen56_awase.tsx` で見つけました） */}
+          <Row label="まとめてと分けてを組み合わせた" value="2.5%" strong />
         </tbody>
       </table>
       <p className="mt-3 text-base leading-relaxed text-slate-800">

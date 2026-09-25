@@ -6,7 +6,7 @@
  * ★決め1415（2026-09-23・戦術Cowork `kaihatsu_ate_20260923c.md`）。★悩みのカード（`nayami.ts`）とは別の1本です。
  * ★★★`kensa/riyu_mon.tsx` が、基準HTMLを読み直して突き合わせます。
  *
- * 抜き出しもと: tsuginote_gamen_base.html（234,403バイト ／ md5 1cc89a004078cb08e5988bf5b92d086d）
+ * 抜き出しもと: tsuginote_gamen_base.html（233,785バイト ／ md5 826475b1a35543440d3ff55261481c27）
  */
 
 /** かたまりの見出し（★`data-block-start="riyu"`） */

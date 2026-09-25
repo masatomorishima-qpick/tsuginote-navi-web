@@ -2,6 +2,7 @@
  *  対象外／空ければ解決／金額が小さい／空けられない
  *  **判定もエンジンで計算する。別式を持たせない**（A-11） */
 import * as E from './engine';
+import { IDECO_NAME } from './kimeta';
 
 export const IDECO_KIGEN_AGE = 75;      // 老齢給付金の請求期限
 export const SPAN_IDECO_SAKI = 10;      // iDeCo等が先：前年以前9年内 → 10年以上空ければ調整なし
@@ -13,7 +14,7 @@ function hito(taishokukin: number, kinzokuNensu: number, zandaka: number,
   const owari = E.ym(uketoriNen, 3);
   return new E.Jinbutsu({ seinen, gens: [
     new E.Gen('退職金', Math.trunc(taishokukin), [owari - Math.trunc(kinzokuNensu) * 12 + 1, owari]),
-    new E.Gen('iDeCo等', Math.trunc(zandaka), [owari - Math.trunc(kanyuNensu) * 12 + 1, owari], true),
+    new E.Gen(IDECO_NAME, Math.trunc(zandaka), [owari - Math.trunc(kanyuNensu) * 12 + 1, owari], true),
   ]});
 }
 
@@ -26,7 +27,7 @@ export function fueruZei(taishokukin: number, kinzokuNensu: number, zandaka: num
     koteki_nenkin: p.koteki_nenkin, koteki_kaishi_age: p.koteki_kaishi_age });
   const [t0] = E.taishokuByYear(nashi, new E.Plan({ uketori_nen: { '退職金': uketoriNen } }));
   const [t1, k1] = E.taishokuByYear(p, new E.Plan({
-    uketori_nen: { '退職金': uketoriNen, 'iDeCo等': uketoriNen - 1 } }));
+    uketori_nen: { '退職金': uketoriNen, [IDECO_NAME]: uketoriNen - 1 } }));
   const zei = (shotoku: number) =>
     E.nenkanZei(nashi, uketoriNen, 0, shotoku, false) - E.nenkanZei(nashi, uketoriNen, 0, 0, false);
   const sa = zei(t1[uketoriNen] ?? 0) - zei(t0[uketoriNen] ?? 0);

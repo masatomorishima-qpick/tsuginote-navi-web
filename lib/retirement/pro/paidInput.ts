@@ -13,6 +13,7 @@
  */
 import * as E from './engine';
 import * as Z from './zeisei';
+import { IDECO_NAME } from './kimeta';
 
 // ---------------------------------------------------------------- ⑰（E-24・未決）
 /**
@@ -223,7 +224,7 @@ export function toJinbutsu(v: PaidInput): Kumitate {
       kikanOf(v.kinzokuKikan, v.kinzokuNensu, owari),
       false, v.kinzokuKikan === 'wakaranai', false, v.shogaiTaishoku),
     // ③ iDeCo等。**`dc: true` は確定拠出年金だけ**（取り違え4）
-    new E.Gen('iDeCo等', Math.trunc(v.ideco),
+    new E.Gen(IDECO_NAME, Math.trunc(v.ideco),
       kikanOf(v.kanyuKikan, v.kanyuNensu, owari),
       true, v.kanyuKikan === 'wakaranai'),
   ];
@@ -362,7 +363,7 @@ export function toJinbutsu(v: PaidInput): Kumitate {
 
 /** 一時金でだけ受け取る支給源の名前（`build()` の第2引数） */
 export function ichijikinOnly(p: E.Jinbutsu): string[] {
-  return p.gens.filter((g) => g.name !== 'iDeCo等').map((g) => g.name);
+  return p.gens.filter((g) => g.name !== IDECO_NAME).map((g) => g.name);
 }
 
 /** 併給のときに一時金にする割合（%）の候補。対応表 §2-3 */

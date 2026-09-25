@@ -35,6 +35,7 @@ import { hokenBun } from './ichiran';
  *   ★★**式はこの本に持ちません**（★§2の3）── ★呼ぶだけです。
  */
 import * as E from './engine';
+import { IDECO_NAME, HIHOKENSHA, KYUYO_SHOTOKUSHA } from './kimeta';
 import { PAID_FIELDS } from '@/components/retirement/pro/paidFields';
 import { GAMEN13 } from '@/components/retirement/pro/gamen13';
 import { hitogotoBun } from '@/components/retirement/pro/gamen13Bun';
@@ -63,16 +64,10 @@ export const JI_S3_SOEJI =
   'あなたの給与と公的年金はそのままにして、退職金とiDeCo等をこの受け取り方にしたときに、その年に増える税金です。給与や公的年金にかかる税は、この額に入っていません';
 
 /**
- * ★★★【2026-09-15・決め1231】**シート4の「計算の全ステップ」が渡す2つ**。
- *
- * ★★★**これは既定値ではありません。**★`paidInput.ts` に欄が**0か所**ですので、
- *   ★**こちらが「1人」と決めて渡しています**（★`gamen8.ts` 248行・`_hakaru.tsx` 374行と**同じ数**です）。
- * ★★★**欄ができた日は、ここを入力から渡してください**（★呼ばれる側に既定を置かないでください）。
+ * ★★★【2026-09-15・決め1231】**シート4の「計算の全ステップ」が渡す2つ**（`HIHOKENSHA`・`KYUYO_SHOTOKUSHA`）と、iDeCo等の名前（`IDECO_NAME`）。
+ * ★★2026-09-25（便m 2節）から、**`kimeta.ts` の1か所だけが持ちます**（★`gamen8.ts` の `S.check()` も同じ本を読みます）。
+ * ★★★これは既定値ではありません ── ★`paidInput.ts` に欄が0か所ですので、こちらが「1人」と決めて渡しています。
  */
-const HIHOKENSHA = 1;
-const KYUYO_SHOTOKUSHA = 1;
-/** ★iDeCo等の名前（★`kekka.ts` の `IDECO_NAME` と同じ字。★シート3の `ichijikinNoAn()` にも渡しています） */
-const IDECO_NAME = 'iDeCo等';
 
 /**
  * ★シート3が出す年の範囲（senjutsu_20260903c.md 5番・d.md 1番）。

@@ -2,6 +2,7 @@
  *  build() が全通り、evaluate() が1通り。条文の根拠は Python 版のコメントを参照。 */
 import * as Z from './zeisei';
 import { fdiv } from './zeisei';
+import { IDECO_NAME } from './kimeta';
 type Umare = [number, number] | null;
 
 export const REIWA_OFFSET = 2018;
@@ -195,7 +196,7 @@ export interface JinbutsuInit {
 export class Jinbutsu {
   seinen: number; umare: Umare = null; gens: Gen[] = [];
   koteki_nenkin = 0; koteki_kaishi_age = 65;
-  shunyu_by_age: Record<number, number> = {}; ideco_gen = 'iDeCo等';
+  shunyu_by_age: Record<number, number> = {}; ideco_gen = IDECO_NAME;
   shakai_hoken = 0; fuyou_nin = 0; kyuchi = 1;
   shishutsu: Record<number, number> = {}; kosei_nenkin = 0;
   haigusha_seinen: number | null = null; ko_nin = 0; kosei_20nen = false;

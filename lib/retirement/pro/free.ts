@@ -22,6 +22,7 @@
 import * as E from './engine';
 import * as Z from './zeisei';
 import { hantei, type Hantei } from './hantei';
+import { IDECO_NAME } from './kimeta';
 
 /** 併給のときに一時金にする割合（%）の候補。指示書 §4-3 の呼び方と同じ */
 const HEIKYU_WARIAI = [10, 20, 30, 40, 50, 60, 70, 80, 90];
@@ -143,7 +144,7 @@ export function freeResult(args: {
     umare: null,
     gens: [
       new E.Gen('退職金', Math.trunc(taishokukin), [owari - kinzokuNensu * 12 + 1, owari]),
-      new E.Gen('iDeCo等', Math.trunc(ideco), [owari - kanyuNensu * 12 + 1, owari], true),
+      new E.Gen(IDECO_NAME, Math.trunc(ideco), [owari - kanyuNensu * 12 + 1, owari], true),
     ],
     // 以下はすべて既定（なし）のまま。**無料版は聞いていません**（§5-3）
     koteki_nenkin: 0,
@@ -185,7 +186,7 @@ export function freeResult(args: {
    *   **これは既定値ではありません。**「無料版は⑳を軸にしない」という決めを、ここに書いています。
    *   ★**②A（`nenkinKouho`）は使いません。**無料版は⑳を聞いていないためです
    */
-  const R = E.build(p, ['退職金'], 'iDeCo等', genzaiNen, {
+  const R = E.build(p, ['退職金'], IDECO_NAME, genzaiNen, {
     heikyuWariai: HEIKYU_WARIAI,
     nenkinAges: [p.koteki_kaishi_age],
     genzaiNen,

@@ -768,8 +768,19 @@ export const OCHITE_YOI: Readonly<Record<string, Readonly<Record<string, number>
    *   `tai_gen` …… 退職の年に退職所得が無い方（★`gamen11Bun()` が `null` を返す方）は、
    *   ★見出し「あなたの{tai_gen}（{tai_age}）」（基準HTML 1295行）と ★退職金の表（1298行・表で1かたまり）の
    *   **2つ**が落ちます。★数は戦術Coworkが数えました（★`{kubun_bun}` 1304行は別の印で、この数に入りません）。
+   *
+   * ★★★【2026-09-25・戦術Cowork `kaihatsu_ate_20260922m.md` 1-1（★数は戦術Coworkが基準HTMLを数えたもの）・森嶋さんのご承認】
+   *   ★退職金の表（基準HTML 1298〜1303行・表で1かたまり）は、`tai_gen` のほかに次の7つでも `null` で落ちます ──
+   *     `kojo_shiki`・`kojo`・`shunyu`・`tai_hantei_bun`・`shotoku`・`shotokuzei_tai`・`jumin_taishoku`（★7つとも、この表の中だけ・各1）。
+   *   ★`tai_nashi_bun`（1295行）・`kojo_zero_bun`（1330行）…… 各1。
+   *   ★★決め番号は、戦術Coworkから受け取ったら書き入れます（★決め1147(2)）。
    */
-  画面11: { tai_gen: 2 },
+  画面11: {
+    tai_gen: 2,
+    kojo_shiki: 1, kojo: 1, shunyu: 1, tai_hantei_bun: 1, shotoku: 1, shotokuzei_tai: 1, jumin_taishoku: 1,
+    tai_nashi_bun: 1,
+    kojo_zero_bun: 1,
+  },
   画面12: {},
 };
 

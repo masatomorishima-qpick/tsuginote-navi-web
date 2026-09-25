@@ -14,6 +14,7 @@
  */
 import * as E from './engine';
 import * as S from './sakaime';
+import { IDECO_NAME, HIHOKENSHA, KYUYO_SHOTOKUSHA } from './kimeta';
 
 /**
  * 4つの見方。**「税金がいちばん少ない」は入れません**
@@ -209,7 +210,7 @@ export type Gamen8 = {
  * @param uketoriNen **受け取る年（＝退職の年）**。★呼び出し側から渡します（既定値を作りません）
  */
 export function zenToori(R: [E.Plan, E.EvalResult][], p: E.Jinbutsu, uketoriNen: number,
-                         idecoName = 'iDeCo等'): Row[] {
+                         idecoName = IDECO_NAME): Row[] {
   /**
    * この受け取り方で、**新たに**超える境目があるか（§6の10）。
    * **その案の⑳で所得を組み立てます。入力された⑳ではありません。**
@@ -245,7 +246,7 @@ export function zenToori(R: [E.Plan, E.EvalResult][], p: E.Jinbutsu, uketoriNen:
      *     ★★**これは既定値ではありません** ── ★呼ぶ側が「1人」と決めて渡しています。
      *     ★★★**欄ができた日は、ここを入力から渡してください**（★`check()` 側に既定を戻さないでください）。
      */
-    return S.check(ari, nashi, 1, 1, q.kyuchi, q.fuyouKei());
+    return S.check(ari, nashi, HIHOKENSHA, KYUYO_SHOTOKUSHA, q.kyuchi, q.fuyouKei());
   };
 
   // --- 全通りを、画面8が見る形に並べ直す ---
@@ -282,7 +283,7 @@ export function gamen8(p: E.Jinbutsu, genzaiNen: number,
                        R: [E.Plan, E.EvalResult][],
                        opts: { taishokuNen: number; taishokuAge: number;
                                taiName: string; idecoName?: string; d?: Row[] }): Gamen8 {
-  const idecoName = opts.idecoName ?? 'iDeCo等';
+  const idecoName = opts.idecoName ?? IDECO_NAME;
 
   // ★3つ目は「受け取る年」です（今年ではありません・senjutsu_20260902ah.md 1番）
   const D: Row[] = opts.d ?? zenToori(R, p, opts.taishokuNen, idecoName);

@@ -57,6 +57,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.9,
     })),
+    // 給湯器「お湯が出ない」診断（2026-10-28 新設）。検索広告の着地ページだが、
+    // 本文（目安表・FAQ）はサーバー出力なので自然検索にも載せる。
+    {
+      url: `${baseUrl}/kyutoki/oyu-ga-denai`,
+      lastModified: new Date("2026-10-28T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // 退職金・年金（2026-08-03 新設・駅1）。/loan と同じくレジストリ参照。
     // 記事は lib/retirement/articles.ts に1件足すだけでここにも自動で載る。
     {

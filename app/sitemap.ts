@@ -65,6 +65,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    // パーソナルジム相性診断（2026-10-28 新設）。ソーシャルメディア広告の着地ページ。
+    {
+      url: `${baseUrl}/gym/aisho`,
+      lastModified: new Date("2026-10-28T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
     // 退職金・年金（2026-08-03 新設・駅1）。/loan と同じくレジストリ参照。
     // 記事は lib/retirement/articles.ts に1件足すだけでここにも自動で載る。
     {

@@ -158,7 +158,7 @@ export default function OyuGaDenaiPage() {
 
           <p role="note" className="flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2.5 text-[13px] font-bold text-red-800">
             <TriangleAlert size={16} className="shrink-0" aria-hidden="true" />
-            ガスのにおいがしたら、診断より先にガス会社へ
+            <span>ガスのにおいがしたら、診断より先に<span className="whitespace-nowrap">ガス会社へ</span></span>
           </p>
 
           <OyuDiagnosis lcdFontClass={lcdFont.className} />

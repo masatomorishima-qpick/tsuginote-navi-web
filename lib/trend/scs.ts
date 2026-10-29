@@ -135,12 +135,20 @@ export const SCS: TrendConfig = {
   partners: {
     suika: {
       key: 'suika', name: 'SUIKA VPN Team IP Service', asp: 'a8',
-      reward: 39200, rewardPoint: '専属固定IPの初回利用（共用は契約800〜8,000円）', href: '', vetted: false,
+      reward: 39200, rewardPoint: '専属固定IPの初回利用（共用は契約800〜8,000円）',
+      // 2026-10-29 リンク発行。どのサイトで提携したかの確認が済むまで vetted は false（表示しない）
+      href: 'https://px.a8.net/svt/ejp?a8mat=4BERA4+B3HWGQ+4R3G+BWVTE',
+      beacon: 'https://www11.a8.net/0.gif?a8mat=4BERA4+B3HWGQ+4R3G+BWVTE',
+      vetted: false,
       pitch: '社員ごとに固定のIPアドレスを割り当て、社外からの接続元を絞る仕組み', cta: '固定IPの仕組みを見る',
     },
     sitelock: {
       key: 'sitelock', name: 'SiteLock', asp: 'a8',
-      reward: 3500, rewardPoint: '新規成約（プランにより500〜10,000円）', href: '', vetted: false,
+      reward: 3500, rewardPoint: '新規成約（プランにより500〜10,000円）',
+      // 2026-10-29 即時提携。どのサイトで提携したかの確認が済むまで vetted は false（表示しない）
+      href: 'https://px.a8.net/svt/ejp?a8mat=4BERA4+BD0U56+2KX0+1ZJG1U',
+      beacon: 'https://www18.a8.net/0.gif?a8mat=4BERA4+BD0U56+2KX0+1ZJG1U',
+      vetted: false,
       pitch: 'ホームページの脆弱性やマルウェアを見張るサービス', cta: 'ホームページの見張りを見る',
     },
   },

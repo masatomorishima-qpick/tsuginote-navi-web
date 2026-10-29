@@ -278,10 +278,15 @@ export default function TrendCheck({ id }: { id: string }) {
             </div>
             <p className="text-lg font-black text-slate-900">{p.name}</p>
             <p className="text-sm text-slate-600">{p.pitch}</p>
-            <a href={p.href} target="_blank" rel="sponsored noopener noreferrer" onClick={() => onPartnerClick(p, i + 1)} className={primaryBtn}>
+            <a href={p.href} target="_blank" rel="sponsored noopener" onClick={() => onPartnerClick(p, i + 1)} className={primaryBtn}>
               {p.cta} <ArrowRight size={20} aria-hidden="true" />
             </a>
             <p className="text-center text-[11px] text-slate-500">{p.name}のサイトに移動します</p>
+            {p.beacon && (
+              // A8 の表示計測（1×1の画像）。広告リンクと一緒に置く決まり。
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={p.beacon} width={1} height={1} alt="" className="absolute h-px w-px opacity-0" />
+            )}
           </div>
         ))}
 

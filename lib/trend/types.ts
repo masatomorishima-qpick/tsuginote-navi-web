@@ -26,6 +26,8 @@ export type TrendPartner = {
   rewardPoint: string;
   /** 空のあいだは表示しない */
   href: string;
+  /** A8 の表示計測用の1×1画像（広告リンクと一緒に発行されるもの） */
+  beacon?: string;
   /** 案件の掲載条件（検索広告の可否・禁止語）を確かめたら true */
   vetted: boolean;
   /** 結果画面での一言（事実だけ。言い切りは書かない） */

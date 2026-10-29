@@ -133,7 +133,7 @@ function Survey({ log }: { log: (e: string, p?: Record<string, string | number>,
     return (
       <div className="flex items-center gap-3 rounded-2xl bg-rose-50 p-4 text-[14px] font-bold text-rose-800">
         <MessageSquareHeart size={22} className="shrink-0" aria-hidden="true" />
-        ありがとうございます。診断の改善に使います。
+        ご回答ありがとうございます。診断の改善に使います。
       </div>
     );
   }
@@ -142,7 +142,7 @@ function Survey({ log }: { log: (e: string, p?: Record<string, string | number>,
   return (
     <div className="flex flex-col gap-3 rounded-2xl bg-slate-50 p-4">
       <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-        <span className="flex items-center gap-1.5"><MessageSquareHeart size={15} aria-hidden="true" />ひとこと教えてください</span>
+        <span className="flex items-center gap-1.5"><MessageSquareHeart size={15} aria-hidden="true" />よろしければ教えてください</span>
         <span>任意・匿名 {i + 1}/{qs.length}</span>
       </div>
       <p className="text-[17px] font-bold leading-snug text-slate-900">{q.q}</p>
@@ -321,7 +321,7 @@ export default function AishoDiagnosis() {
         <button type="button" onClick={start} className={primaryBtn}>
           7問で診断する <ArrowRight size={20} aria-hidden="true" />
         </button>
-        <p className="text-center text-xs text-slate-500">無料・登録不要・名前や連絡先は聞きません</p>
+        <p className="text-center text-xs text-slate-500">無料・登録不要。名前や連絡先の入力はありません</p>
       </>
     );
   } else if (view.kind === 'step') {
@@ -404,7 +404,7 @@ export default function AishoDiagnosis() {
         </div>
 
         {/* 4タイプの中での位置 */}
-        <div className="grid grid-cols-2 gap-2" role="img" aria-label={`4タイプのうち${t.name}`}>
+        <div className="grid grid-cols-2 gap-2" role="img" aria-label={`${t.name}（4タイプ中）`}>
           {TYPE_GRID.map((k) => {
             const on = k === t.key;
             const I = TYPE_STYLE[k].icon;
@@ -455,7 +455,7 @@ export default function AishoDiagnosis() {
                 <a
                   href={p.href}
                   target="_blank"
-                  rel="sponsored noopener noreferrer"
+                  rel="sponsored noopener"
                   onClick={() => onPartnerClick(p, i + 1)}
                   className={primaryBtn}
                 >
@@ -468,7 +468,7 @@ export default function AishoDiagnosis() {
         )}
 
         <div className="flex flex-col gap-2">
-          <p className="text-sm font-bold text-slate-700">体験の前に、この4つ</p>
+          <p className="text-sm font-bold text-slate-700">体験の前に確かめる4点</p>
           <ul className="grid grid-cols-2 gap-2">
             {CONTRACT_CHECKS.map((c) => {
               const I = CHECK_ICONS[c.key] ?? CircleCheck;

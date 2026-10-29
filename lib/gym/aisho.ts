@@ -12,18 +12,18 @@
  * 送客先の選定基準（全部満たすジムだけ vetted: true にする）
  *   - 料金表（総額）を公式サイトで公開している
  *   - 解約・返金の条件を公式サイトで公開している
- *   - 体験・カウンセリング当日の契約を迫らない（口コミ・相談事例で確認）
+ *   - 体験・カウンセリング当日の契約を求めない方針を公式に示している（口コミ・相談事例でも確認）
  *   - 案件の掲載ルールで、ソーシャルメディア広告からの送客が許可されている
  *
  * 背景：国民生活センターに寄せられたパーソナルジムの相談は 2024年度 885件 → 2025年度 1,457件
- *   （2026-10-07 公表）。無料体験からの長時間勧誘、高額な解約料、予約が取れない、が中心。
+ *   （2026-10-07 公表）。無料体験後の長時間の勧誘、解約料、予約が取れない、などの相談が目立つ。
  *
  * 2026-10-28 作成。
  */
 
 export const LP_ID = 'gym-aisho';
 /** 診断の文言・分岐・アンケートを変えたら上げる。GA4 と lp_event_logs に毎回送る。 */
-export const VERSION = 'v1-2026-10-28';
+export const VERSION = 'v2-2026-10-29';
 
 export type Goal = 'lose' | 'tone' | 'fitness' | 'care';
 export type Exp = 'none' | 'past' | 'now';
@@ -78,17 +78,17 @@ export const STEPS: Step[] = [
   {
     id: 'style', q: 'どんな教わり方が合う？',
     opts: [
-      { v: 'praise', t: 'ほめて伸ばす' },
-      { v: 'strict', t: 'しっかり厳しく' },
-      { v: 'logic', t: '理屈で納得したい' },
-      { v: 'leave', t: 'おまかせ' },
+      { v: 'praise', t: 'ほめられたい' },
+      { v: 'strict', t: '厳しめがいい' },
+      { v: 'logic', t: '理由を知りたい' },
+      { v: 'leave', t: 'おまかせしたい' },
     ],
   },
   {
     id: 'food', q: '食事の指導は？',
     opts: [
       { v: 'strict', t: 'しっかり管理' },
-      { v: 'loose', t: 'ゆるく' },
+      { v: 'loose', t: 'ゆるめに' },
       { v: 'none', t: 'いらない' },
     ],
   },
@@ -104,7 +104,7 @@ export const STEPS: Step[] = [
     id: 'plan', q: '通い方と予算は？',
     pairs: [
       { key: 'freq', label: '頻度', opts: [{ v: 'w1', t: '週1' }, { v: 'w2', t: '週2' }, { v: 'w3', t: '週3〜' }] },
-      { key: 'budget', label: '月の予算', opts: [{ v: 'lt2', t: '〜2万' }, { v: '2to4', t: '2〜4万' }, { v: 'gt4', t: '4万〜' }] },
+      { key: 'budget', label: '月の予算', opts: [{ v: 'lt2', t: '2万円未満' }, { v: '2to4', t: '2〜4万円' }, { v: 'gt4', t: '4万円以上' }] },
     ],
   },
   {
@@ -132,7 +132,7 @@ export const TYPES: Record<TypeKey, TrainerType> = {
   bansou: {
     key: 'bansou', name: '伴走型', h: '一緒に続けてくれる人',
     why: '小さな前進をほめて、続ける仕組みを作ってくれるタイプ。',
-    traits: ['できた所をほめる', 'ペースを合わせる', '休んだ時に声をかける'],
+    traits: ['できたところをほめる', 'ペースを合わせる', '休んだときに声をかける'],
   },
   kanri: {
     key: 'kanri', name: '管理型', h: '数字で引っぱる人',
@@ -146,8 +146,8 @@ export const TYPES: Record<TypeKey, TrainerType> = {
   },
   hippari: {
     key: 'hippari', name: 'おまかせ型', h: '全部組んでくれる人',
-    why: 'メニューを全部決めて、迷わせずに進めるタイプ。',
-    traits: ['毎回メニューを用意', '考えなくていい', '手早く進む'],
+    why: 'メニューを全部決めてくれて、迷わず進められるタイプ。',
+    traits: ['毎回メニューを用意', '考えなくていい', '時間をむだにしない'],
   },
 };
 
@@ -166,7 +166,7 @@ export function conditionsFor(a: Answers): string[] {
   if (a.goal === 'care') c.push('姿勢・体の不調の相談に強い');
   if (a.food === 'strict') c.push('食事指導がコースに入っている');
   if (a.food === 'none') c.push('食事指導なしのコースがある');
-  if (a.budget === 'lt2') c.push('月2万円までの回数制がある');
+  if (a.budget === 'lt2') c.push('月2万円未満の回数制がある');
   if (a.budget === 'gt4' && a.goal === 'lose') c.push('短期集中のコースがある');
   if (a.freq === 'w1') c.push('月4回のコースがある');
   if (a.exp === 'none') c.push('体験でトレーナーを確かめられる');
@@ -176,9 +176,9 @@ export function conditionsFor(a: Answers): string[] {
 
 /** 契約前のチェック（国民生活センターに寄せられている相談の中身から） */
 export const CONTRACT_CHECKS: { key: string; h: string; d: string }[] = [
-  { key: 'total', h: '総額', d: '入会金・コース代・食事指導の合計が先に出るか' },
-  { key: 'cancel', h: '解約・返金', d: '途中でやめた時の返金と解約料' },
-  { key: 'sameday', h: '当日契約', d: '体験当日に迫られたら、持ち帰って比べる' },
+  { key: 'total', h: '総額', d: '入会金・コース代・食事指導の合計を契約前に示してくれるか' },
+  { key: 'cancel', h: '解約・返金', d: '途中でやめたときの返金と解約料' },
+  { key: 'sameday', h: '当日契約', d: '体験当日に契約を迫られたら、持ち帰って比べる' },
   { key: 'booking', h: '予約', d: '希望の曜日・時間に取れるか' },
 ];
 
@@ -194,7 +194,7 @@ export type SurveyQ = {
 
 export const SURVEY: SurveyQ[] = [
   {
-    id: 'quit', q: 'ジムを辞めた・合わなかった経験は？',
+    id: 'quit', q: 'ジムをやめた・合わなかった経験は？',
     opts: [
       { v: 'yes', t: 'ある' },
       { v: 'no', t: 'ない' },
@@ -202,10 +202,10 @@ export const SURVEY: SurveyQ[] = [
     ],
   },
   {
-    id: 'reasons', q: '辞めた理由は？（いくつでも）', multi: true, onlyIfQuit: true,
+    id: 'reasons', q: 'やめた理由は？（いくつでも）', multi: true, onlyIfQuit: true,
     opts: [
-      { v: 'price', t: '料金' },
-      { v: 'pushy', t: '勧誘' },
+      { v: 'price', t: '料金が高い' },
+      { v: 'pushy', t: '勧誘がしつこい' },
       { v: 'booking', t: '予約が取れない' },
       { v: 'trainer', t: 'トレーナーと合わない' },
       { v: 'result', t: '効果が出ない' },

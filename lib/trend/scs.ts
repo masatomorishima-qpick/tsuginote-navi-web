@@ -1,0 +1,160 @@
+import type { TrendConfig, TrendResult } from './types';
+
+/**
+ * 波：セキュリティ対策評価制度（SCS評価制度）の準備度チェック（企業向け）。/check/scs
+ *
+ * 検知（2026-10-29）：「scs評価制度」は月18,100回・前年にはなかった新しい語（入札の低額帯 97円）。
+ *   「セキュリティ対策評価制度」は月8,100回・前年比+83%（85円）。キーワードプランナー 2025/10〜2026/9。
+ * 制度の事実（情報処理推進機構、2026-10-28 更新）：★3は専門家確認付き自己評価で要求項目26件、
+ *   ★4は評価機関による第三者評価で43件。2027年3月の受付開始に向けて準備中。
+ *   https://www.ipa.go.jp/security/scs/details.html
+ *
+ * 注意：このチェックの設問は「準備のよくある観点」で、制度の要求事項そのものではない。
+ *   ★の取得を約束する書き方はしない。
+ *
+ * 紹介先（A8）：SiteLock（ホームページの脆弱性・改ざん対策）、SUIKA VPN（社員の固定IP）。
+ *   承認と掲載条件の確認が済むまで href は空のまま（表示されない）。
+ */
+
+const judge = (a: Record<string, string>): TrendResult => {
+  const gaps: TrendResult['gaps'] = [];
+  const partners: string[] = [];
+
+  if (a.it === 'none') gaps.push({ icon: 'userCog', t: '情報システムの担当者を決める（兼任でもよい）' });
+  if (a.it === 'part') gaps.push({ icon: 'userCog', t: '担当者が対策に使える時間を確保する' });
+  if (a.remote === 'often' || a.remote === 'sometimes') {
+    gaps.push({ icon: 'network', t: '社外から接続できる人と経路を絞る' });
+    partners.push('suika');
+  }
+  if (a.web === 'self') {
+    gaps.push({ icon: 'globe', t: 'ホームページの更新と改ざんの見張りを決まりにする' });
+    partners.push('sitelock');
+  }
+  if (a.patch !== 'rule') gaps.push({ icon: 'refresh', t: 'パソコンとサーバーの更新を決まりにする' });
+  if (a.backup !== 'offsite') gaps.push({ icon: 'hardDrive', t: '社外の場所にもバックアップを取る' });
+
+  const n = gaps.length;
+  const urgent = a.demand === 'asked';
+  if (n <= 1) {
+    return {
+      level: 'high', title: '準備はかなり進んでいる',
+      lead: urgent ? '取引先の期限に合わせて、公式の要求事項で自己評価を始めましょう。' : '公式の要求事項で自己評価をすると、残りの点が分かります。',
+      gaps, partners,
+    };
+  }
+  if (n <= 3) {
+    return {
+      level: 'mid', title: 'いくつか足りない点がある',
+      lead: urgent ? '取引先から求められているなら、下の点から先に手を付けましょう。' : '受付開始（2027年3月の予定）までに、下の点を埋めておくと進めやすくなります。',
+      gaps, partners,
+    };
+  }
+  return {
+    level: 'low', title: 'これから準備を始める段階',
+    lead: '担当者を決め、下の点を1つずつ埋めるところからです。中小企業向けの支援も使えます。',
+    gaps, partners,
+  };
+};
+
+export const SCS: TrendConfig = {
+  id: 'scs',
+  lpId: 'trend-scs',
+  version: 'v1-2026-10-29',
+  intro: [
+    { icon: 'list', t: '8問に答える' },
+    { icon: 'gauge', t: '準備の度合い' },
+    { icon: 'clipboard', t: '次にやること' },
+  ],
+  startLabel: '1分でチェックする',
+  steps: [
+    {
+      id: 'demand', q: '取引先から、この制度の話は？', cols: 3,
+      opts: [
+        { v: 'asked', t: '求められた', icon: 'alert' },
+        { v: 'talk', t: '話が出ている', icon: 'mail' },
+        { v: 'none', t: 'まだない', icon: 'help' },
+      ],
+    },
+    {
+      id: 'size', q: '会社の人数は？',
+      opts: [
+        { v: 's', t: '〜20人' }, { v: 'm', t: '21〜100人' },
+        { v: 'l', t: '101〜300人' }, { v: 'xl', t: '301人〜' },
+      ],
+    },
+    {
+      id: 'it', q: '情報システムの担当は？', cols: 3,
+      opts: [
+        { v: 'dedicated', t: '専任がいる', icon: 'userCog' },
+        { v: 'part', t: '兼任', icon: 'users' },
+        { v: 'none', t: 'いない', icon: 'userX' },
+      ],
+    },
+    {
+      id: 'remote', q: '社外から会社のシステムに接続する？', hint: 'テレワーク・出張・外部の業者など', cols: 3,
+      opts: [
+        { v: 'often', t: 'よくある', icon: 'wifi' },
+        { v: 'sometimes', t: 'たまに', icon: 'laptop' },
+        { v: 'no', t: 'ない', icon: 'building' },
+      ],
+    },
+    {
+      id: 'web', q: '自社のホームページは？', cols: 3,
+      opts: [
+        { v: 'self', t: '自社で管理', icon: 'globe' },
+        { v: 'vendor', t: '外注で管理', icon: 'briefcase' },
+        { v: 'none', t: 'ない', icon: 'x' },
+      ],
+    },
+    {
+      id: 'patch', q: 'パソコンやサーバーの更新は？', cols: 3,
+      opts: [
+        { v: 'rule', t: '決まりがある', icon: 'check' },
+        { v: 'person', t: '人まかせ', icon: 'users' },
+        { v: 'unknown', t: '分からない', icon: 'help' },
+      ],
+    },
+    {
+      id: 'backup', q: 'データのバックアップは？', cols: 3,
+      opts: [
+        { v: 'offsite', t: '社外にもある', icon: 'cloud' },
+        { v: 'onsite', t: '社内だけ', icon: 'server' },
+        { v: 'none', t: '取っていない', icon: 'x' },
+      ],
+    },
+    {
+      id: 'star', q: '目指す星は？', cols: 3,
+      opts: [
+        { v: 's3', t: '★3', icon: 'star' },
+        { v: 's4', t: '★4', icon: 'badge' },
+        { v: 'unknown', t: 'まだ分からない', icon: 'help' },
+      ],
+    },
+  ],
+  judge,
+  partners: {
+    suika: {
+      key: 'suika', name: 'SUIKA VPN Team IP Service', asp: 'a8',
+      reward: 39200, rewardPoint: '専属固定IPの初回利用（共用は契約800〜8,000円）', href: '', vetted: false,
+      pitch: '社員ごとに固定のIPアドレスを割り当て、社外からの接続元を絞る仕組み', cta: '固定IPの仕組みを見る',
+    },
+    sitelock: {
+      key: 'sitelock', name: 'SiteLock', asp: 'a8',
+      reward: 3500, rewardPoint: '新規成約（プランにより500〜10,000円）', href: '', vetted: false,
+      pitch: 'ホームページの脆弱性やマルウェアを見張るサービス', cta: 'ホームページの見張りを見る',
+    },
+  },
+  nextSteps: [
+    { icon: 'clipboard', h: '公式の要求事項で自己評価', d: '★3は26項目、★4は43項目', href: 'https://www.ipa.go.jp/security/scs/details.html' },
+    { icon: 'signature', h: '確認してくれる専門家を探す', d: '★3は専門家の確認つきの自己評価' },
+    { icon: 'shieldCheck', h: '足りない点を埋める', d: '上の結果の点から' },
+    { icon: 'calendar', h: '受付開始までの予定を立てる', d: '2027年3月の受付開始に向けて準備中' },
+  ],
+  fallback: {
+    h: '中小企業向けの見守りサービス',
+    d: '情報処理推進機構が基準を満たすサービスを登録・公開している',
+    href: 'https://www.ipa.go.jp/security/sme/otasuketai/index.html',
+    label: '登録サービスの一覧を見る',
+  },
+  disclaimer: 'このチェックは準備のよくある観点をもとにした目安で、制度の要求事項そのものではありません。評価と登録は制度の手続きに沿って行われます。',
+};

@@ -146,7 +146,7 @@ export default function OyuGaDenaiPage() {
           <div className="grid grid-cols-[1fr_auto] items-center gap-3">
             <div className="flex flex-col gap-3">
               <span className="self-start rounded-full bg-white px-3 py-1 text-xs font-bold text-sky-800 ring-1 ring-sky-200">給湯器トラブル診断</span>
-              <h1 className="text-[40px] font-black leading-[1.1] tracking-tight text-slate-900">お湯が<br />出ない？</h1>
+              <h1 className="text-[34px] font-black leading-[1.1] tracking-tight text-slate-900 min-[380px]:text-[40px]"><span className="whitespace-nowrap">お湯が</span><br /><span className="whitespace-nowrap">出ない？</span></h1>
               <p className="text-[18px] font-bold leading-snug text-slate-700">
                 直す？替える？<br /><span className="text-orange-600">30秒</span>でわかる。
               </p>

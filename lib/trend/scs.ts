@@ -59,7 +59,7 @@ const judge = (a: Record<string, string>): TrendResult => {
 export const SCS: TrendConfig = {
   id: 'scs',
   lpId: 'trend-scs',
-  version: 'v2-2026-10-29',
+  version: 'v3-2026-10-29',
   intro: [
     { icon: 'list', t: '8つの質問' },
     { icon: 'gauge', t: '準備状況' },

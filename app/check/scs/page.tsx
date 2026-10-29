@@ -92,6 +92,9 @@ export default function ScsCheckPage() {
             </div>
             <div className="w-[120px] sm:w-[160px]"><ShieldStars /></div>
           </div>
+          <p className="-mt-2 text-[14px] leading-relaxed text-slate-600">
+            自社のセキュリティ対策の水準を、取引先に示すための国の制度。申請の受付は2027年3月から（予定）
+          </p>
           <p className="-mt-1 text-[18px] font-bold leading-snug text-slate-700">
             8つの質問、<span className="text-orange-600">1分</span>でわかる。
           </p>

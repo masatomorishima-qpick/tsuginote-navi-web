@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react';
 import { sendGAEvent } from '@next/third-parties/google';
 import {
-  ArrowRight, Bath, Building2, CircleCheck, CircleHelp, Clock, Droplet, Droplets, Flame, Gauge,
-  House, Plug, RefreshCw, Scale, ShieldCheck, Snowflake, Thermometer, TriangleAlert, Waves, Wrench, Zap,
+  ArrowRight, Bath, Building2, CircleCheck, Clock, Droplet, Droplets, Flame, Gauge,
+  House, Plug, RefreshCw, Scale, Snowflake, Thermometer, TriangleAlert, Waves, Wrench, Zap,
   type LucideProps,
 } from 'lucide-react';
 import { trackEvent } from '@/lib/trackEvent';
@@ -31,6 +31,7 @@ import {
  *     「どの広告グループ → どの回答 → 送客したか」を SQL で追える。
  *
  * 2026-10-28 v2：文字を減らし、選択肢をアイコン付きのカードにした。画面下に固定の開始ボタンを追加。
+ * 2026-10-29 v4：開始ボタンをなくし、最初の質問を最初の画面に出す。kyutoki_diag_start は最初の回答の時点で出す。
  */
 
 type Icon = ComponentType<LucideProps>;
@@ -53,7 +54,6 @@ const OPT_ICONS: Record<string, Icon> = {
 };
 
 type View =
-  | { kind: 'start' }
   | { kind: 'step'; step: Step }
   | { kind: 'stop'; key: StopKey }
   | { kind: 'result' };
@@ -135,8 +135,11 @@ function Nav({ onBack, onRestart }: { onBack: () => void; onRestart?: () => void
   );
 }
 
+/** 最初の質問（開始ボタンを挟まず、最初の画面から答えられるようにする。2026-10-29 v4） */
+const FIRST_STEP = activeSteps({})[0];
+
 export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string }) {
-  const [view, setView] = useState<View>({ kind: 'start' });
+  const [view, setView] = useState<View>({ kind: 'step', step: FIRST_STEP });
   const [answers, setAnswers] = useState<Answers>({});
   const [history, setHistory] = useState<StepId[]>([]);
   const [panelVisible, setPanelVisible] = useState(true);
@@ -176,12 +179,14 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
     scrollToPanel();
   };
 
-  const start = () => {
-    log('kyutoki_diag_start');
-    goNext({});
-  };
+  // 「診断開始」は最初の質問に答えた時点で数える（開始ボタンをなくしたため）
+  const started = useRef(false);
 
   const choose = (step: Step, value: string) => {
+    if (!started.current) {
+      started.current = true;
+      log('kyutoki_diag_start', { first: step.id });
+    }
     const a = { ...answers, [step.id]: value } as Answers;
     setAnswers(a);
     setHistory((h) => [...h, step.id]);
@@ -200,7 +205,7 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
     const h = [...history];
     const last = h.pop();
     if (!last) {
-      setView({ kind: 'start' });
+      setView({ kind: 'step', step: FIRST_STEP });
       return;
     }
     const a = { ...answers };
@@ -214,7 +219,7 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
   const restart = () => {
     setAnswers({});
     setHistory([]);
-    setView({ kind: 'start' });
+    setView({ kind: 'step', step: FIRST_STEP });
   };
 
   const continueAfterFreeze = () => {
@@ -226,8 +231,7 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
 
   const onSticky = () => {
     log('kyutoki_sticky_click', { view: view.kind });
-    if (view.kind === 'start') start();
-    else scrollToPanel();
+    scrollToPanel();
   };
 
   // 結果表示のログは、表示された時に1回だけ出す
@@ -266,33 +270,7 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
 
   let body: React.ReactNode;
 
-  if (view.kind === 'start') {
-    body = (
-      <>
-        <Lcd msg="お湯が出ない？" num="" blink fontClass={lcdFontClass} />
-        <ol className="grid grid-cols-3 gap-2 text-center">
-          {[
-            { icon: CircleHelp, t: '6つの質問' },
-            { icon: Scale, t: '修理か交換かの目安' },
-            { icon: ShieldCheck, t: '依頼先の案内' },
-          ].map(({ icon: I, t }) => (
-            <li key={t} className="flex flex-col items-center gap-1.5 rounded-xl bg-slate-50 px-1 py-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-sky-700 ring-1 ring-slate-200">
-                <I size={18} aria-hidden="true" />
-              </span>
-              <span className="text-[12px] font-bold leading-tight text-slate-700">
-                {t}
-              </span>
-            </li>
-          ))}
-        </ol>
-        <button type="button" onClick={start} className={primaryBtn}>
-          30秒で診断する <ArrowRight size={20} aria-hidden="true" />
-        </button>
-        <p className="text-center text-xs text-slate-500">無料・登録不要。名前や連絡先の入力はありません</p>
-      </>
-    );
-  } else if (view.kind === 'step') {
+  if (view.kind === 'step') {
     const step = view.step;
     const idx = steps.findIndex((s) => s.id === step.id);
     const withIcons = step.opts.some((o) => OPT_ICONS[`${step.id}:${o.v}`]);
@@ -341,7 +319,11 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
             </ul>
           </details>
         )}
-        {history.length > 0 && <Nav onBack={back} />}
+        {history.length > 0 ? (
+          <Nav onBack={back} />
+        ) : (
+          <p className="text-center text-xs text-slate-500">無料・登録不要。名前や連絡先の入力はありません</p>
+        )}
       </>
     );
   } else if (view.kind === 'stop') {
@@ -464,7 +446,7 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
     );
   }
 
-  const showSticky = !panelVisible && (view.kind === 'start' || view.kind === 'step');
+  const showSticky = !panelVisible && view.kind === 'step';
 
   return (
     <>
@@ -479,7 +461,7 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
       {showSticky && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))] backdrop-blur sm:hidden">
           <button type="button" onClick={onSticky} className={primaryBtn}>
-            {view.kind === 'start' ? '30秒で診断する' : '診断の続きへ'} <ArrowRight size={20} aria-hidden="true" />
+            {history.length === 0 ? '30秒で診断する' : '診断の続きへ'} <ArrowRight size={20} aria-hidden="true" />
           </button>
         </div>
       )}

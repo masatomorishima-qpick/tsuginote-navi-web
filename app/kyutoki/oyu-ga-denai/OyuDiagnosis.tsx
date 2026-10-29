@@ -289,7 +289,7 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
         <button type="button" onClick={start} className={primaryBtn}>
           30秒で診断する <ArrowRight size={20} aria-hidden="true" />
         </button>
-        <p className="text-center text-xs text-slate-500">無料・登録不要。この診断では名前や連絡先を入力しません</p>
+        <p className="text-center text-xs text-slate-500">無料・登録不要。名前や連絡先の入力はありません</p>
       </>
     );
   } else if (view.kind === 'step') {

@@ -9,6 +9,8 @@ import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import OyuDiagnosis from './OyuDiagnosis';
+import LpViewTracker from '@/components/lp/LpViewTracker';
+import { LP_ID, VERDICT_VERSION } from '@/lib/kyutoki/diagnosis';
 
 /**
  * 給湯器「お湯が出ない」診断 LP（2026-10-28 新設 / 同日 v2 で全面デザイン改修）。
@@ -129,6 +131,7 @@ export default function OyuGaDenaiPage() {
     <div className="flex min-h-screen flex-col bg-[#f6f8fa]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <GuideHeader />
+      <LpViewTracker lpId={LP_ID} version={VERDICT_VERSION} />
 
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-28 sm:pb-16">
         {/* 広告であることの表示（A8 の条件：ファーストビューに置く） */}

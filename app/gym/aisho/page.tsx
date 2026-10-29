@@ -6,7 +6,8 @@ import {
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
-import { TYPES } from '@/lib/gym/aisho';
+import { TYPES, LP_ID, VERSION } from '@/lib/gym/aisho';
+import LpViewTracker from '@/components/lp/LpViewTracker';
 import AishoDiagnosis from './AishoDiagnosis';
 
 /**
@@ -133,6 +134,7 @@ export default function GymAishoPage() {
     <div className="flex min-h-screen flex-col bg-[#f8f6f7]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <GuideHeader />
+      <LpViewTracker lpId={LP_ID} version={VERSION} />
 
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-28 sm:pb-16">
         <p className="-mb-10 flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">

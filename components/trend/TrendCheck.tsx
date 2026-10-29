@@ -10,6 +10,7 @@ import {
   type LucideProps,
 } from 'lucide-react';
 import { trackEvent } from '@/lib/trackEvent';
+import LpViewTracker from '@/components/lp/LpViewTracker';
 import { TRENDS } from '@/lib/trend/registry';
 import type { IconName, TrendLevel, TrendPartner, TrendStep } from '@/lib/trend/types';
 
@@ -344,6 +345,7 @@ export default function TrendCheck({ id }: { id: string }) {
 
   return (
     <>
+      <LpViewTracker lpId={cfg.lpId} version={cfg.version} />
       <div
         ref={panelRef}
         id="check"

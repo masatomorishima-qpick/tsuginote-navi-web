@@ -14,7 +14,7 @@ import AishoDiagnosis from './AishoDiagnosis';
  *
  * 考え方：ジムが個室化して口コミが効きにくい。店より「担当トレーナーとの相性」が満足を決める。
  *   7問で「合うトレーナーのタイプ」と「ジムを選ぶ条件」を出し、条件に合う提携ジムの体験へ送る。
- *   結果のあとに任意・匿名のアンケート（辞めた理由など）を置き、次の改善と事業検討の材料にする。
+ *   結果のあとに任意・匿名のアンケート（やめた理由など）を置き、次の改善と事業検討の材料にする。
  *
  * 集客はソーシャルメディア広告が主（「パーソナルジム 選び方」の検索は月140回程度と小さい）。
  * 判定・アンケート・紹介先の設定は lib/gym/aisho.ts に集約。
@@ -25,7 +25,7 @@ const PAGE_PATH = '/gym/aisho';
 const TITLE = 'パーソナルジム相性診断｜合うトレーナーのタイプがわかる';
 const DESCRIPTION =
   '7問に答えると、あなたに合うパーソナルトレーナーのタイプと、ジムを選ぶ条件がわかります。体験の前に確かめたい4つの点も紹介します。';
-const DATE_MODIFIED = '2026-10-28';
+const DATE_MODIFIED = '2026-10-29';
 const KOKUSEN_URL = 'https://www.kokusen.go.jp/news/data/n-20261007_1.html';
 
 export const metadata: Metadata = {
@@ -46,19 +46,19 @@ export const metadata: Metadata = {
 
 const FAQS = [
   {
-    q: '体験の当日に契約しないといけない？',
+    q: '体験の当日に契約しないといけませんか？',
     a: 'いいえ。「今日だけの価格」と言われても、総額と解約の条件を書面でもらい、持ち帰って比べてかまいません。',
   },
   {
-    q: '途中で担当を変えられる？',
-    a: 'ジムによります。体験のときに「担当を変えたい時はどうするか」を聞いておくと、合わなかった時に困りません。',
+    q: '途中で担当を変えられますか？',
+    a: 'ジムによります。体験のときに「担当を変えたいときはどうするか」を聞いておくと、合わなかったときに困りません。',
   },
   {
-    q: '紹介先はどうやって選んでいる？',
-    a: '料金の総額と解約の条件を公開していて、体験当日の契約を迫らないジムだけを載せます。紹介料を受け取りますが、診断の結果は回答だけで決まります。',
+    q: '紹介先はどうやって選んでいますか？',
+    a: '料金の総額と解約の条件を公開していて、体験当日の契約を求めない方針であることを確認したジムだけを載せます。紹介料を受け取っていますが、診断の結果は回答だけで決まります。',
   },
   {
-    q: 'アンケートの回答はどう使う？',
+    q: 'アンケートの回答はどう使いますか？',
     a: '名前や連絡先は聞かず、集計して診断の改善に使います。答えなくても結果は見られます。',
   },
 ];
@@ -137,7 +137,7 @@ export default function GymAishoPage() {
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-28 sm:pb-16">
         <p className="-mb-10 flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">
           <span className="rounded border border-slate-300 px-1.5 tracking-widest">PR</span>
-          紹介料を受け取ります・ジムの運営はしていません
+          当サイトは紹介料を受け取っています（ジムの運営はしていません）
           <Link href="/policy" className="text-sky-800 underline underline-offset-2">中立性ポリシー</Link>
         </p>
 
@@ -154,7 +154,7 @@ export default function GymAishoPage() {
             </div>
           </div>
           <p className="-mt-1 text-[18px] font-bold leading-snug text-slate-700">
-            合うトレーナーが<span className="text-rose-600">30秒</span>でわかる。
+            合うトレーナーが<span className="text-rose-600">約1分</span>でわかる。
           </p>
 
           <AishoDiagnosis />
@@ -163,8 +163,8 @@ export default function GymAishoPage() {
         {/* 相談件数の伸び：横棒で見せる */}
         <section className={SECTION} aria-labelledby="soudan">
           <div className="flex flex-col gap-1.5">
-            <h2 id="soudan" className={H2}>契約トラブル、1年で1.6倍</h2>
-            <p className="text-[15px] text-slate-600">無料体験からの長時間の勧誘、高額な解約料が中心です。</p>
+            <h2 id="soudan" className={H2}>相談件数、1年で約1.6倍</h2>
+            <p className="text-[15px] text-slate-600">無料体験のあとの長時間の勧誘や、解約料についての相談が目立ちます。</p>
           </div>
           <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200" role="img" aria-label="パーソナルトレーニングの相談件数。2024年度885件、2025年度1,457件">
             {[
@@ -189,7 +189,7 @@ export default function GymAishoPage() {
 
         {/* 4つのタイプ */}
         <section className={SECTION} aria-labelledby="types">
-          <h2 id="types" className={H2}>トレーナーは4タイプ</h2>
+          <h2 id="types" className={H2}>4つのタイプで診断</h2>
           <ul className="grid grid-cols-2 gap-3">
             {(Object.keys(TYPES) as (keyof typeof TYPES)[]).map((k) => {
               const t = TYPES[k];
@@ -207,14 +207,14 @@ export default function GymAishoPage() {
           </ul>
         </section>
 
-        {/* 体験の前に見る4つ */}
+        {/* 体験の前に確かめる4点 */}
         <section className={SECTION} aria-labelledby="check">
-          <h2 id="check" className={H2}>体験の前に見る4つ</h2>
+          <h2 id="check" className={H2}>体験の前に確かめる4点</h2>
           <ul className="grid grid-cols-2 gap-3">
             {[
               { icon: Receipt, h: '総額', d: '入会金・コース代・食事指導の合計' },
-              { icon: Undo2, h: '解約・返金', d: '途中でやめた時にいくら戻るか' },
-              { icon: Hourglass, h: '当日契約', d: '迫られたら持ち帰って比べる' },
+              { icon: Undo2, h: '解約・返金', d: '途中でやめたときにいくら戻るか' },
+              { icon: Hourglass, h: '当日契約', d: '契約を迫られたら持ち帰って比べる' },
               { icon: CalendarClock, h: '予約', d: '希望の曜日・時間に取れるか' },
             ].map(({ icon: I, h, d }) => (
               <li key={h} className="flex flex-col gap-2 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
@@ -232,10 +232,10 @@ export default function GymAishoPage() {
           <h2 id="about" className={H2}>このページについて</h2>
           <ul className="grid gap-3">
             {[
-              { icon: Store, h: 'ジムを運営しない第三者', d: '特定のジムの店舗ではありません' },
-              { icon: Receipt, h: '総額と解約条件を公開するジムだけ', d: '当日契約を迫らないことも確認します' },
+              { icon: Store, h: 'ジムを運営しない第三者のサイト', d: '特定のジムの店舗ではありません' },
+              { icon: Receipt, h: '総額と解約条件を公開するジムだけ', d: '当日契約を求めない方針かも確認します' },
               { icon: Handshake, h: '診断は紹介料で変わらない', d: '結果は回答だけで決まります' },
-              { icon: UserRoundX, h: '名前や連絡先は聞かない', d: 'アンケートも匿名です' },
+              { icon: UserRoundX, h: '名前や連絡先の入力は不要', d: 'アンケートも匿名です' },
             ].map(({ icon: I, h, d }) => (
               <li key={h} className="flex items-center gap-4 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
@@ -264,7 +264,7 @@ export default function GymAishoPage() {
         </section>
 
         <p className="text-[11px] leading-relaxed text-slate-400">
-          診断は回答にもとづく一般的な目安で、効果を約束するものではありません。料金・解約条件・体験の内容は各ジムの公表内容によります。最終更新：2026年10月28日
+          診断は回答にもとづく一般的な目安で、効果を約束するものではありません。料金・解約条件・体験の内容は各ジムの公表内容によります。最終更新：2026年10月29日
         </p>
       </main>
       <SiteFooter />

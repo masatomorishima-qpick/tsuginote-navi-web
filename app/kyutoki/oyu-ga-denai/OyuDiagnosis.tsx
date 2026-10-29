@@ -83,26 +83,26 @@ function readAttribution(): Attribution {
 
 const STOPS: Record<StopKey, { danger?: boolean; icon: Icon; label: string; h: string; lcd: string; items: string[]; note?: string; cont?: string }> = {
   gas: {
-    danger: true, icon: TriangleAlert, label: '今すぐ', lcd: '使用中止',
+    danger: true, icon: TriangleAlert, label: 'いますぐ', lcd: '使用中止',
     h: 'ガス会社へ連絡してください',
-    items: ['火やスイッチに触れない', '窓を開けて換気する', '屋外から、ガス会社の緊急連絡先へ電話'],
+    items: ['火を使わない。換気扇や電気のスイッチにも触れない', '窓や玄関の扉を開けて換気する', '屋外のメーターガス栓を閉める', '屋外から、ガス会社の緊急連絡先へ電話'],
   },
   freeze: {
-    icon: Snowflake, label: '凍結かもしれません', lcd: '凍結?',
+    icon: Snowflake, label: '凍結かもしれません', lcd: '凍結？',
     h: '昼まで待ってみましょう',
-    items: ['気温が上がると解けることが多い', '配管に熱湯はかけない', 'リモコンの電源は入れたまま'],
+    items: ['気温が上がると解けることが多い', '配管に熱湯はかけない', '給湯器の電源プラグは抜かない（凍結を防ぐ機能が止まります）'],
     note: '昼を過ぎても出なければ、故障を疑います。',
-    cont: '解けても出ないので先へ',
+    cont: '昼を過ぎても出ない',
   },
   nowater: {
-    icon: Droplet, label: '水道の問題かもしれません', lcd: '断水?',
+    icon: Droplet, label: '水道の問題かもしれません', lcd: '断水？',
     h: '断水や水道管の凍結を確認',
     items: ['ほかの蛇口から水が出るか', '出なければ水道局の断水情報を見る'],
   },
   rent: {
     icon: Building2, label: '賃貸の場合', lcd: '管理会社',
     h: 'まず管理会社か大家さんへ',
-    items: ['給湯器は建物の設備で、手配は管理会社が多い', '費用の負担は賃貸契約で決まっている', '「症状・いつから・エラー番号」を伝える'],
+    items: ['給湯器は建物の設備で、手配は管理会社が多い', '費用の負担は賃貸契約で決まっていることが多い', '「症状・いつから・エラー番号」を伝える'],
   },
 };
 
@@ -272,16 +272,16 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
         <Lcd msg="お湯が出ない？" num="" blink fontClass={lcdFontClass} />
         <ol className="grid grid-cols-3 gap-2 text-center">
           {[
-            { icon: CircleHelp, t: '5問に答える' },
-            { icon: Scale, t: '修理か交換か' },
-            { icon: ShieldCheck, t: '頼み先も' },
-          ].map(({ icon: I, t }, i) => (
+            { icon: CircleHelp, t: '6つの質問' },
+            { icon: Scale, t: '修理か交換かの目安' },
+            { icon: ShieldCheck, t: '依頼先の案内' },
+          ].map(({ icon: I, t }) => (
             <li key={t} className="flex flex-col items-center gap-1.5 rounded-xl bg-slate-50 px-1 py-3">
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-sky-700 ring-1 ring-slate-200">
                 <I size={18} aria-hidden="true" />
               </span>
               <span className="text-[12px] font-bold leading-tight text-slate-700">
-                <span className="mr-0.5 text-sky-700">{i + 1}</span>{t}
+                {t}
               </span>
             </li>
           ))}
@@ -289,7 +289,7 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
         <button type="button" onClick={start} className={primaryBtn}>
           30秒で診断する <ArrowRight size={20} aria-hidden="true" />
         </button>
-        <p className="text-center text-xs text-slate-500">無料・登録不要・名前や連絡先は聞きません</p>
+        <p className="text-center text-xs text-slate-500">無料・登録不要。この診断では名前や連絡先を入力しません</p>
       </>
     );
   } else if (view.kind === 'step') {
@@ -407,7 +407,7 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
         {pk ? (
           <div className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-orange-800">あなたの地域に対応</span>
+              <span className="text-xs font-bold text-orange-800">あなたの地域に対応する会社</span>
               <span className="rounded border border-orange-300 px-1.5 text-[10px] tracking-widest text-orange-800">PR</span>
             </div>
             <div>

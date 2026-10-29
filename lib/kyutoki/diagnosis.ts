@@ -14,7 +14,7 @@
 
 export const LP_ID = 'kyutoki-oyu-ga-denai';
 /** 診断の文言・分岐を変えたら上げる。GA4 と lp_event_logs に毎回送るので、版ごとの成績を比べられる。 */
-export const VERDICT_VERSION = 'v2-2026-10-28';
+export const VERDICT_VERSION = 'v3-2026-10-29';
 
 export type Area =
   | 'tokyo' | 'kanagawa' | 'chiba' | 'saitama' | 'aichi' | 'shizuoka'
@@ -68,12 +68,12 @@ export const STEPS: Step[] = [
     ],
   },
   {
-    id: 'cold', lcd: '凍結チェック', q: 'いまの状況は？',
+    id: 'cold', lcd: '凍結チェック', q: 'いまの状況に近いのは？',
     when: (a) => a.symptom === 'none',
     opts: [
-      { v: 'freeze', t: '寒い朝。水は出る' },
+      { v: 'freeze', t: '寒い朝で、水は出る' },
       { v: 'nowater', t: '水も出ない' },
-      { v: 'no', t: 'どちらでもない' },
+      { v: 'no', t: 'あてはまらない' },
     ],
   },
   {
@@ -85,10 +85,10 @@ export const STEPS: Step[] = [
   },
   {
     id: 'age', lcd: '使用年数', q: '使い始めて何年ですか？',
-    hint: '本体ラベルの製造年でOK。だいたいで大丈夫です。',
+    hint: '本体ラベルの製造年でかまいません。だいたいで大丈夫です。',
     opts: [
       { v: 'lt7', t: '7年未満' },
-      { v: '7to10', t: '7〜10年' },
+      { v: '7to10', t: '7〜9年' },
       { v: 'gt10', t: '10年以上' },
       { v: 'unknown', t: 'わからない' },
     ],
@@ -99,7 +99,7 @@ export const STEPS: Step[] = [
       { v: 'tokyo', t: '東京都' }, { v: 'kanagawa', t: '神奈川県' },
       { v: 'chiba', t: '千葉県' }, { v: 'saitama', t: '埼玉県' },
       { v: 'aichi', t: '愛知県' }, { v: 'shizuoka', t: '静岡県' },
-      { v: 'ng', t: '北海道・東北北部・新潟・沖縄' }, { v: 'other', t: 'その他の府県' },
+      { v: 'ng', t: '北海道・青森・岩手・秋田・新潟・沖縄' }, { v: 'other', t: 'その他の府県' },
     ],
   },
 ];
@@ -127,13 +127,13 @@ export function verdictOf(a: Answers): Verdict {
   switch (a.age) {
     case 'gt10':
       return {
-        mode: 'replace', label: '10年以上', h: '交換がおすすめ',
+        mode: 'replace', label: '10年以上', h: '交換を考える時期です',
         why: '修理部品が手に入らないことがある年数です。',
       };
     case '7to10':
       return {
-        mode: 'both', label: '7〜10年', h: '修理と交換を比べましょう',
-        why: '直しても、別の部品が続けて傷みやすい時期です。',
+        mode: 'both', label: '7〜9年', h: '修理と交換を比べましょう',
+        why: '直しても、ほかの部品が傷みやすい時期です。',
       };
     case 'lt7':
       return {
@@ -165,8 +165,9 @@ export function selfCheck(a: Answers): string[] {
   }
   return [
     'リモコンの電源が入っているか',
-    'ガスメーターが赤く点滅 → 復帰ボタンを押して3分待つ',
     'ガスコンロは使えるか',
+    'ガスメーターのランプが赤く点滅していないか',
+    '点滅していたら、ガス機器をすべて止めて復帰ボタンを押し、3分待つ（ガスのにおいがするときは押さない）',
   ];
 }
 
@@ -216,6 +217,7 @@ export const PARTNERS: Record<PartnerKey, Partner> = {
     points: ['見積もり無料', '10年保証（各社公表）', '45都府県'],
     href: '', // ★A8 承認後に広告リンクを貼る（s00000027639001）
     a8ProgramId: 's00000027639001', reward: 6000, heater: 'eco', acceptsRepair: false,
+    // ★リンクを貼るときに、成果対象外の地域が「ng」の選択肢（北海道・青森・岩手・秋田・新潟・沖縄）と一致するか確かめる
     areas: [...SIX, 'other'],
   },
 };

@@ -20,38 +20,38 @@ const judge = (a: Record<string, string>): TrendResult => {
   const gaps: TrendResult['gaps'] = [];
   const partners: string[] = [];
 
-  if (a.it === 'none') gaps.push({ icon: 'userCog', t: '情報システムの担当者を決める（兼任でもよい）' });
+  if (a.it === 'none') gaps.push({ icon: 'userCog', t: '情報システムの担当者を決める（兼任でも可）' });
   if (a.it === 'part') gaps.push({ icon: 'userCog', t: '担当者が対策に使える時間を確保する' });
   if (a.remote === 'often' || a.remote === 'sometimes') {
-    gaps.push({ icon: 'network', t: '社外から接続できる人と経路を絞る' });
+    gaps.push({ icon: 'network', t: '社外からの接続（リモートアクセス）を許可する人と経路を限定する' });
     partners.push('suika');
   }
   if (a.web === 'self') {
-    gaps.push({ icon: 'globe', t: 'ホームページの更新と改ざんの見張りを決まりにする' });
+    gaps.push({ icon: 'globe', t: 'Webサイトの脆弱性対策と改ざん検知を行う' });
     partners.push('sitelock');
   }
-  if (a.patch !== 'rule') gaps.push({ icon: 'refresh', t: 'パソコンとサーバーの更新を決まりにする' });
-  if (a.backup !== 'offsite') gaps.push({ icon: 'hardDrive', t: '社外の場所にもバックアップを取る' });
+  if (a.patch !== 'rule') gaps.push({ icon: 'refresh', t: 'パソコンやサーバーのアップデートの社内ルールを決める' });
+  if (a.backup !== 'offsite') gaps.push({ icon: 'hardDrive', t: 'バックアップを社外（クラウドなど）にも保管する' });
 
   const n = gaps.length;
   const urgent = a.demand === 'asked';
   if (n <= 1) {
     return {
-      level: 'high', title: '準備はかなり進んでいる',
-      lead: urgent ? '取引先の期限に合わせて、公式の要求事項で自己評価を始めましょう。' : '公式の要求事項で自己評価をすると、残りの点が分かります。',
+      level: 'high', title: '準備は進んでいます',
+      lead: urgent ? '取引先の期限に合わせて、公式の要求事項に沿った自己評価を始めましょう。' : '公式の要求事項に沿って自己評価すると、残りの課題がわかります。',
       gaps, partners,
     };
   }
   if (n <= 3) {
     return {
-      level: 'mid', title: '一部が足りない',
-      lead: urgent ? '取引先から求められているなら、下の点から先に手を付けましょう。' : '受付開始（2027年3月の予定）までに、下の点を埋めておくと進めやすくなります。',
+      level: 'mid', title: '一部の対策が不足しています',
+      lead: urgent ? '取引先から求められている場合は、下記の対策を優先して進めましょう。' : '受付開始（2027年3月予定）までに下記の対策を整えておくと、申請をスムーズに進められます。',
       gaps, partners,
     };
   }
   return {
-    level: 'low', title: 'これから準備を始める段階',
-    lead: '担当者を決め、下の点を1つずつ埋めるところからです。中小企業向けの支援も使えます。',
+    level: 'low', title: 'これから準備が必要です',
+    lead: 'まずは担当者を決め、下記の対策に一つずつ取り組みましょう。中小企業向けの支援サービスも活用できます。',
     gaps, partners,
   };
 };
@@ -59,75 +59,75 @@ const judge = (a: Record<string, string>): TrendResult => {
 export const SCS: TrendConfig = {
   id: 'scs',
   lpId: 'trend-scs',
-  version: 'v1-2026-10-29',
+  version: 'v2-2026-10-29',
   intro: [
-    { icon: 'list', t: '8問に答える' },
-    { icon: 'gauge', t: '準備の度合い' },
-    { icon: 'clipboard', t: '次にやること' },
+    { icon: 'list', t: '8つの質問' },
+    { icon: 'gauge', t: '準備状況' },
+    { icon: 'clipboard', t: 'やるべきこと' },
   ],
-  startLabel: '1分でチェックする',
+  startLabel: '診断を始める（約1分）',
   steps: [
     {
-      id: 'demand', q: '取引先から、この制度の話は？', cols: 3,
+      id: 'demand', q: '取引先から、この制度への対応を求められていますか？', cols: 3,
       opts: [
-        { v: 'asked', t: '求められた', icon: 'alert' },
+        { v: 'asked', t: '求められている', icon: 'alert' },
         { v: 'talk', t: '話が出ている', icon: 'mail' },
         { v: 'none', t: 'まだない', icon: 'help' },
       ],
     },
     {
-      id: 'size', q: '会社の人数は？',
+      id: 'size', q: '従業員数は？',
       opts: [
         { v: 's', t: '〜20人' }, { v: 'm', t: '21〜100人' },
         { v: 'l', t: '101〜300人' }, { v: 'xl', t: '301人〜' },
       ],
     },
     {
-      id: 'it', q: '情報システムの担当は？', cols: 3,
+      id: 'it', q: '情報システムの担当者はいますか？', cols: 3,
       opts: [
         { v: 'dedicated', t: '専任がいる', icon: 'userCog' },
-        { v: 'part', t: '兼任', icon: 'users' },
+        { v: 'part', t: '兼任がいる', icon: 'users' },
         { v: 'none', t: 'いない', icon: 'userX' },
       ],
     },
     {
-      id: 'remote', q: '社外から会社のシステムに接続する？', hint: 'テレワーク・出張・外部の業者など', cols: 3,
+      id: 'remote', q: '社外から社内のシステムに接続することはありますか？', hint: 'テレワーク、出張先、外部業者からの接続など', cols: 3,
       opts: [
         { v: 'often', t: 'よくある', icon: 'wifi' },
-        { v: 'sometimes', t: 'たまに', icon: 'laptop' },
+        { v: 'sometimes', t: 'たまにある', icon: 'laptop' },
         { v: 'no', t: 'ない', icon: 'building' },
       ],
     },
     {
-      id: 'web', q: '自社のホームページは？', cols: 3,
+      id: 'web', q: '自社のWebサイトの管理は？', cols: 3,
       opts: [
         { v: 'self', t: '自社で管理', icon: 'globe' },
-        { v: 'vendor', t: '外注で管理', icon: 'briefcase' },
-        { v: 'none', t: 'ない', icon: 'x' },
+        { v: 'vendor', t: '制作会社に委託', icon: 'briefcase' },
+        { v: 'none', t: 'サイトはない', icon: 'x' },
       ],
     },
     {
-      id: 'patch', q: 'パソコンやサーバーの更新は？', cols: 3,
+      id: 'patch', q: 'パソコンやサーバーのアップデートは？', cols: 3,
       opts: [
-        { v: 'rule', t: '決まりがある', icon: 'check' },
-        { v: 'person', t: '人まかせ', icon: 'users' },
-        { v: 'unknown', t: '分からない', icon: 'help' },
+        { v: 'rule', t: '社内ルールがある', icon: 'check' },
+        { v: 'person', t: '各自にまかせている', icon: 'users' },
+        { v: 'unknown', t: 'わからない', icon: 'help' },
       ],
     },
     {
       id: 'backup', q: 'データのバックアップは？', cols: 3,
       opts: [
-        { v: 'offsite', t: '社外にもある', icon: 'cloud' },
-        { v: 'onsite', t: '社内だけ', icon: 'server' },
+        { v: 'offsite', t: '社外にも保管', icon: 'cloud' },
+        { v: 'onsite', t: '社内のみ', icon: 'server' },
         { v: 'none', t: '取っていない', icon: 'x' },
       ],
     },
     {
-      id: 'star', q: '目指す星は？', cols: 3,
+      id: 'star', q: '目指すのは★3と★4のどちらですか？', cols: 3,
       opts: [
         { v: 's3', t: '★3', icon: 'star' },
         { v: 's4', t: '★4', icon: 'badge' },
-        { v: 'unknown', t: 'まだ分からない', icon: 'help' },
+        { v: 'unknown', t: 'まだ決めていない', icon: 'help' },
       ],
     },
   ],
@@ -140,7 +140,7 @@ export const SCS: TrendConfig = {
       href: 'https://px.a8.net/svt/ejp?a8mat=4BERA4+B3HWGQ+4R3G+BWVTE',
       beacon: 'https://www11.a8.net/0.gif?a8mat=4BERA4+B3HWGQ+4R3G+BWVTE',
       vetted: true,
-      pitch: '社員ごとに固定のIPアドレスを割り当て、社外からの接続元を絞る仕組み', cta: '固定IPの仕組みを見る',
+      pitch: 'テレワークなど社外からの通信を専用のVPNでまとめ、接続元を1つの固定IPアドレスにするサービス。社内システムやクラウドへのアクセスを固定IPで制限できます。', cta: 'サービス内容を見る',
     },
     sitelock: {
       key: 'sitelock', name: 'SiteLock', asp: 'a8',
@@ -149,20 +149,20 @@ export const SCS: TrendConfig = {
       href: 'https://px.a8.net/svt/ejp?a8mat=4BERA4+BD0U56+2KX0+1ZJG1U',
       beacon: 'https://www18.a8.net/0.gif?a8mat=4BERA4+BD0U56+2KX0+1ZJG1U',
       vetted: true,
-      pitch: 'ホームページの脆弱性やマルウェアを見張るサービス', cta: '見張りの内容を見る',
+      pitch: 'Webサイトの脆弱性診断、改ざん検知、マルウェアの検知・駆除を行うサービス。', cta: 'サービス内容を見る',
     },
   },
   nextSteps: [
-    { icon: 'clipboard', h: '公式の要求事項で自己評価', d: '★3は26項目、★4は43項目', href: 'https://www.ipa.go.jp/security/scs/details.html' },
-    { icon: 'signature', h: '確認してくれる専門家を探す', d: '★3は専門家の確認つきの自己評価' },
-    { icon: 'shieldCheck', h: '足りない点を埋める', d: '上の結果の点から' },
-    { icon: 'calendar', h: '受付開始までの予定を立てる', d: '2027年3月の受付開始に向けて準備中' },
+    { icon: 'clipboard', h: '要求事項に沿って自己評価する', d: '要求項目は★3が26件、★4が43件', href: 'https://www.ipa.go.jp/security/scs/details.html' },
+    { icon: 'signature', h: '確認を依頼する専門家を探す', d: '★3は専門家による確認付きの自己評価' },
+    { icon: 'shieldCheck', h: '不足している対策を進める', d: '上記の診断結果をもとに' },
+    { icon: 'calendar', h: '受付開始に向けて計画を立てる', d: '受付開始は2027年3月の予定' },
   ],
   fallback: {
-    h: '中小企業向けの見守りサービス',
-    d: '情報処理推進機構が基準を満たすサービスを登録・公開している',
+    h: '中小企業向けの「サイバーセキュリティお助け隊サービス」',
+    d: '情報処理推進機構（IPA）が、基準を満たすサービスを認定・公開しています',
     href: 'https://www.ipa.go.jp/security/sme/otasuketai/index.html',
-    label: '登録サービスの一覧を見る',
+    label: '認定サービスの一覧を見る',
   },
-  disclaimer: 'このチェックは準備のよくある観点をもとにした目安で、制度の要求事項そのものではありません。評価と登録は制度の手続きに沿って行われます。',
+  disclaimer: 'この診断は一般的なセキュリティ対策の観点をもとにした目安で、制度の要求事項そのものではありません。評価・登録は制度の手続きに従って行われます。',
 };

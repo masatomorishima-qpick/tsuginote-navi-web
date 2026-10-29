@@ -13,9 +13,9 @@ import TrendCheck from '@/components/trend/TrendCheck';
  */
 
 const PAGE_PATH = '/check/scs';
-const TITLE = 'SCS評価制度 準備度チェック｜★3に向けて足りない点がわかる';
+const TITLE = 'SCS評価制度の準備状況チェック｜★3の登録に向けて不足している対策を確認';
 const DESCRIPTION =
-  'サプライチェーン強化に向けたセキュリティ対策評価制度（SCS評価制度）の準備度を8問でチェック。★3・★4の違いと登録までの流れも図で整理しています。';
+  'サプライチェーン強化に向けたセキュリティ対策評価制度（SCS評価制度）への準備状況を8つの質問で診断。★3・★4の違いと登録までの流れも図で整理しています。';
 const IPA_URL = 'https://www.ipa.go.jp/security/scs/details.html';
 const DIR_URL = 'https://www.dir.co.jp/report/technology/feature/20260610_025814.pdf';
 
@@ -31,10 +31,10 @@ export const metadata: Metadata = {
 };
 
 const FAQS = [
-  { q: '取得は義務？', a: '法的な強制力のない任意の制度です。ただ、普及すれば取引先が契約の条件にする可能性があるとされています。' },
-  { q: 'いつから申し込める？', a: '2027年3月の受付開始に向けて準備が進められています（情報処理推進機構、2026年10月28日更新）。' },
-  { q: '★3と★4の違いは？', a: '★3は専門家の確認つきの自己評価（要求項目26件）、★4は評価機関による第三者評価（43件）です。' },
-  { q: '紹介先はどう選んでいる？', a: 'チェックで足りない可能性が出た点に合うサービスだけを表示します。紹介料を受け取りますが、チェックの結果は回答だけで決まります。' },
+  { q: '取得は義務ですか？', a: '法的な強制力のない任意の制度です。ただし、普及が進めば、取引先の選定や契約の判断で重視される可能性があると指摘されています（大和総研、2026年6月）。' },
+  { q: 'いつから申請できますか？', a: '2027年3月に受付を開始する予定です（情報処理推進機構、2026年10月28日更新）。' },
+  { q: '★3と★4の違いは何ですか？', a: '★3は専門家による確認付きの自己評価（要求項目26件）、★4は評価機関による第三者評価（要求項目43件）です。' },
+  { q: '紹介しているサービスはどう選んでいますか？', a: '診断で不足している可能性がある対策に関係するサービスだけを表示しています。当サイトは紹介料を受け取りますが、診断結果は回答内容だけで決まります。' },
 ];
 
 const jsonLd = {
@@ -78,7 +78,7 @@ export default function ScsCheckPage() {
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-28 sm:pb-16">
         <p className="-mb-10 flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">
           <span className="rounded border border-slate-300 px-1.5 tracking-widest">PR</span>
-          紹介料を受け取ります・制度の評価は行いません
+          当サイトは紹介先から紹介料を受け取っています。制度の評価・登録は行いません
           <Link href="/policy" className="text-sky-800 underline underline-offset-2">中立性ポリシー</Link>
         </p>
 
@@ -93,7 +93,7 @@ export default function ScsCheckPage() {
             <div className="w-[120px] sm:w-[160px]"><ShieldStars /></div>
           </div>
           <p className="-mt-1 text-[18px] font-bold leading-snug text-slate-700">
-            8問・<span className="text-orange-600">1分</span>でわかる。
+            8つの質問、<span className="text-orange-600">1分</span>でわかる。
           </p>
           <TrendCheck id="scs" />
         </section>
@@ -102,7 +102,7 @@ export default function ScsCheckPage() {
           <h2 id="stars" className={H2}>★3と★4</h2>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { icon: Star, h: '★3', how: '専門家の確認つきの自己評価', n: 26 },
+              { icon: Star, h: '★3', how: '専門家による確認付きの自己評価', n: 26 },
               { icon: BadgeCheck, h: '★4', how: '評価機関による第三者評価', n: 43 },
             ].map(({ icon: I, h, how, n }) => (
               <div key={h} className="flex flex-col gap-2 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
@@ -126,10 +126,10 @@ export default function ScsCheckPage() {
           <ol className="grid gap-2">
             {[
               { icon: ClipboardCheck, h: '自己評価', d: '要求事項と評価基準に沿って記入' },
-              { icon: PenLine, h: '専門家の確認と署名', d: '社内外の確認責任者が確認' },
-              { icon: FileCheck2, h: '自己適合宣言', d: '経営層が宣言する' },
-              { icon: Send, h: '登録の申請', d: '制度の運営機関へ' },
-              { icon: BadgeCheck, h: '台帳に公開', d: 'ロゴマークが発行される' },
+              { icon: PenLine, h: '確認責任者の確認・署名', d: '社内外の確認責任者が内容を確認し、署名' },
+              { icon: FileCheck2, h: '自己適合宣言', d: '経営層が宣言' },
+              { icon: Send, h: '登録申請', d: '制度の運営機関へ申請' },
+              { icon: BadgeCheck, h: '登録・公開', d: '台帳への掲載とロゴマークの発行' },
             ].map(({ icon: I, h, d }, i) => (
               <li key={h} className="flex items-center gap-4 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-700"><I size={20} aria-hidden="true" /></span>
@@ -146,9 +146,9 @@ export default function ScsCheckPage() {
           <h2 id="about" className={H2}>このページについて</h2>
           <ul className="grid gap-3">
             {[
-              { icon: Store, h: '制度の評価機関ではない', d: '評価や登録は行いません' },
-              { icon: Handshake, h: 'チェックは紹介料で変わらない', d: '結果は回答だけで決まります' },
-              { icon: UserRoundX, h: '名前や連絡先は聞かない', d: '会社名も入力不要です' },
+              { icon: Store, h: '当サイトは評価機関ではありません', d: '制度の評価・登録は行いません' },
+              { icon: Handshake, h: '診断結果は紹介料に左右されません', d: '結果は回答内容だけで決まります' },
+              { icon: UserRoundX, h: '個人情報の入力は不要です', d: '会社名・氏名・連絡先の入力欄はありません' },
             ].map(({ icon: I, h, d }) => (
               <li key={h} className="flex items-center gap-4 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600"><I size={22} aria-hidden="true" /></span>
@@ -177,7 +177,7 @@ export default function ScsCheckPage() {
         <p className="text-[11px] leading-relaxed text-slate-400">
           制度の内容は<a href={IPA_URL} target="_blank" rel="noopener noreferrer" className="underline">情報処理推進機構</a>と
           <a href={DIR_URL} target="_blank" rel="noopener noreferrer" className="underline">大和総研のレポート</a>をもとにしています。
-          制度は準備中のため、内容が変わる場合があります。最終更新：2026年10月29日
+          制度は運用開始に向けて準備中のため、内容が変更される場合があります。最終更新：2026年10月29日
         </p>
       </main>
       <SiteFooter />

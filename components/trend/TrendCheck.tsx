@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react';
 import { sendGAEvent } from '@next/third-parties/google';
 import {
-  ArrowRight, BadgeCheck, Briefcase, Building2, Calculator, CalendarClock, Car, Check, CircleCheck, CircleHelp,
+  ArrowRight, BadgeCheck, Briefcase, Building2, Calculator, CalendarClock, Car, CircleCheck, CircleHelp,
   ClipboardCheck, Cloud, CreditCard, Fuel, Gauge, Globe, Handshake, HardDrive, Hourglass, House, KeyRound, Laptop,
   ListChecks, Lock, Mail, MonitorSmartphone, Network, RefreshCw, ScanSearch, Server, ShieldAlert, ShieldCheck,
   Signature, Star, Store, TriangleAlert, UserCog, UserRoundX, Users, Wifi, X,
@@ -174,16 +174,14 @@ export default function TrendCheck({ id }: { id: string }) {
     body = (
       <>
         <ol className="grid grid-cols-3 gap-2 text-center">
-          {cfg.intro.map(({ icon, t }, i) => {
+          {cfg.intro.map(({ icon, t }) => {
             const I = ICONS[icon];
             return (
               <li key={t} className="flex flex-col items-center gap-1.5 rounded-xl bg-slate-50 px-1 py-3">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-sky-700 ring-1 ring-slate-200">
                   <I size={18} aria-hidden="true" />
                 </span>
-                <span className="text-[12px] font-bold leading-tight text-slate-700">
-                  <span className="mr-0.5 text-sky-700">{i + 1}</span>{t}
-                </span>
+                <span className="text-[12px] font-bold leading-tight text-slate-700">{t}</span>
               </li>
             );
           })}
@@ -191,7 +189,7 @@ export default function TrendCheck({ id }: { id: string }) {
         <button type="button" onClick={start} className={primaryBtn}>
           {cfg.startLabel} <ArrowRight size={20} aria-hidden="true" />
         </button>
-        <p className="text-center text-xs text-slate-500">無料・登録不要・名前や連絡先は聞きません</p>
+        <p className="text-center text-xs text-slate-500">無料・登録不要。会社名や連絡先の入力はありません</p>
       </>
     );
   } else if (view.kind === 'step') {
@@ -241,11 +239,11 @@ export default function TrendCheck({ id }: { id: string }) {
     body = (
       <>
         <div className="flex flex-col items-center gap-2 pt-1 text-center">
-          <span className="text-xs font-bold text-slate-500">準備の度合い</span>
+          <span className="text-xs font-bold text-slate-500">準備状況</span>
           <span className={`flex h-16 w-16 items-center justify-center rounded-full ${ls.bg}`}>
             <LI size={32} aria-hidden="true" />
           </span>
-          <div className="flex gap-1.5" role="img" aria-label={`3段階のうち${ls.bar}`}>
+          <div className="flex gap-1.5" role="img" aria-label={`3段階中${ls.bar}段階目`}>
             {[1, 2, 3].map((n) => (
               <span key={n} className={`h-2 w-10 rounded-full ${n <= ls.bar ? 'bg-current ' + ls.tone : 'bg-slate-200'}`} />
             ))}
@@ -256,7 +254,7 @@ export default function TrendCheck({ id }: { id: string }) {
 
         {r.gaps.length > 0 && (
           <div className="rounded-2xl bg-slate-50 p-4">
-            <p className="mb-2 text-sm font-bold text-slate-700">足りない可能性がある点</p>
+            <p className="mb-2 text-sm font-bold text-slate-700">不足している可能性がある対策</p>
             <ul className="grid gap-2">
               {r.gaps.map((g) => {
                 const I = ICONS[g.icon];
@@ -273,7 +271,7 @@ export default function TrendCheck({ id }: { id: string }) {
         {ps.map((p, i) => (
           <div key={p.key} className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-orange-800">足りない点に合うサービス</span>
+              <span className="text-xs font-bold text-orange-800">不足している対策に役立つサービス</span>
               <span className="rounded border border-orange-300 px-1.5 text-[10px] tracking-widest text-orange-800">PR</span>
             </div>
             <p className="text-lg font-black text-slate-900">{p.name}</p>
@@ -281,7 +279,7 @@ export default function TrendCheck({ id }: { id: string }) {
             <a href={p.href} target="_blank" rel="sponsored noopener" onClick={() => onPartnerClick(p, i + 1)} className={primaryBtn}>
               {p.cta} <ArrowRight size={20} aria-hidden="true" />
             </a>
-            <p className="text-center text-[11px] text-slate-500">{p.name}のサイトに移動します</p>
+            <p className="text-center text-[11px] text-slate-500">{p.name}の公式サイトに移動します</p>
             {p.beacon && (
               // A8 の表示計測（1×1の画像）。広告リンクと一緒に置く決まり。
               // eslint-disable-next-line @next/next/no-img-element
@@ -291,7 +289,7 @@ export default function TrendCheck({ id }: { id: string }) {
         ))}
 
         <div className="flex flex-col gap-2">
-          <p className="text-sm font-bold text-slate-700">次にやること</p>
+          <p className="text-sm font-bold text-slate-700">次にやるべきこと</p>
           <ol className="grid gap-2">
             {cfg.nextSteps.map((s, i) => {
               const I = ICONS[s.icon];
@@ -335,7 +333,7 @@ export default function TrendCheck({ id }: { id: string }) {
         <div className="flex items-center justify-between pt-1 text-sm">
           <button type="button" onClick={back} className="py-2 text-slate-500 underline-offset-4 hover:underline">← 戻る</button>
           <button type="button" onClick={restart} className="flex items-center gap-1 py-2 text-slate-500 underline-offset-4 hover:underline">
-            <Check size={14} aria-hidden="true" />最初から
+            <RefreshCw size={14} aria-hidden="true" />最初からやり直す
           </button>
         </div>
       </>
@@ -357,7 +355,7 @@ export default function TrendCheck({ id }: { id: string }) {
       {showSticky && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))] backdrop-blur sm:hidden">
           <button type="button" onClick={onSticky} className={primaryBtn}>
-            {view.kind === 'start' ? cfg.startLabel : 'チェックの続きへ'} <ArrowRight size={20} aria-hidden="true" />
+            {view.kind === 'start' ? cfg.startLabel : '診断の続きへ'} <ArrowRight size={20} aria-hidden="true" />
           </button>
         </div>
       )}

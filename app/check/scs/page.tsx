@@ -86,12 +86,16 @@ export default function ScsCheckPage() {
           <div className="grid grid-cols-[1fr_auto] items-center gap-3">
             <div className="flex flex-col gap-3">
               <span className="self-start rounded-full bg-white px-3 py-1 text-xs font-bold text-sky-800 ring-1 ring-sky-200">SCS評価制度</span>
-              <h1 className="text-[34px] font-black leading-[1.15] tracking-tight text-slate-900">
+              <h1 className="text-[30px] font-black leading-[1.15] tracking-tight text-slate-900 min-[380px]:text-[34px]">
                 <span className="whitespace-nowrap">★3の準備、</span><br /><span className="whitespace-nowrap">何が足りない？</span>
               </h1>
             </div>
-            <div className="w-[120px] sm:w-[160px]"><ShieldStars /></div>
+            <div className="w-[96px] min-[380px]:w-[120px] sm:w-[160px]"><ShieldStars /></div>
           </div>
+          <p className="-mt-2 text-[14px] leading-relaxed text-slate-600">
+            <span className="whitespace-nowrap">取引先に自社の対策の水準を示す、</span><span className="whitespace-nowrap">国の制度。</span><br />
+            <span className="whitespace-nowrap">申請は2027年3月から（予定）</span>
+          </p>
           <p className="-mt-1 text-[18px] font-bold leading-snug text-slate-700">
             8つの質問、<span className="text-orange-600">1分</span>でわかる。
           </p>

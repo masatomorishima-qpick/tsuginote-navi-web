@@ -137,7 +137,7 @@ export default function OyuGaDenaiPage() {
         {/* 広告であることの表示（A8 の条件：ファーストビューに置く） */}
         <p className="-mb-10 flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">
           <span className="rounded border border-slate-300 px-1.5 tracking-widest">PR</span>
-          当サイトは紹介料を受け取っています（工事は行いません）
+          <span>当サイトは紹介料を受け取っています<span className="whitespace-nowrap">（工事は行いません）</span></span>
           <Link href="/policy" className="text-sky-800 underline underline-offset-2">中立性ポリシー</Link>
         </p>
 
@@ -146,7 +146,7 @@ export default function OyuGaDenaiPage() {
           <div className="grid grid-cols-[1fr_auto] items-center gap-3">
             <div className="flex flex-col gap-3">
               <span className="self-start rounded-full bg-white px-3 py-1 text-xs font-bold text-sky-800 ring-1 ring-sky-200">給湯器トラブル診断</span>
-              <h1 className="text-[40px] font-black leading-[1.1] tracking-tight text-slate-900">お湯が<br />出ない？</h1>
+              <h1 className="text-[34px] font-black leading-[1.1] tracking-tight text-slate-900 min-[380px]:text-[40px]"><span className="whitespace-nowrap">お湯が</span><br /><span className="whitespace-nowrap">出ない？</span></h1>
               <p className="text-[18px] font-bold leading-snug text-slate-700">
                 直す？替える？<br /><span className="text-orange-600">30秒</span>でわかる。
               </p>
@@ -158,7 +158,7 @@ export default function OyuGaDenaiPage() {
 
           <p role="note" className="flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2.5 text-[13px] font-bold text-red-800">
             <TriangleAlert size={16} className="shrink-0" aria-hidden="true" />
-            ガスのにおいがしたら、診断より先にガス会社へ
+            <span>ガスのにおいがしたら、診断より先に<span className="whitespace-nowrap">ガス会社へ</span></span>
           </p>
 
           <OyuDiagnosis lcdFontClass={lcdFont.className} />

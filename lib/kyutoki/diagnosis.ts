@@ -181,6 +181,8 @@ export type Partner = {
   who: string;
   points: string[];
   href: string;
+  /** A8 の表示計測用の1×1画像（広告リンクと一緒に発行されるもの）。リンクの近くに置く。 */
+  beacon?: string;
   a8ProgramId: string;
   /** 報酬（税抜・円）。粗利の試算に使う。 */
   reward: number;
@@ -196,14 +198,16 @@ export const PARTNERS: Record<PartnerKey, Partner> = {
   oyu: {
     key: 'oyu', name: 'お湯が出ない.com', who: 'ガス給湯器の修理・交換',
     points: ['見積もり無料', '最短即日（各社公表）', '東京・神奈川'],
-    href: '', // ★A8 承認後に広告リンクを貼る（s00000015892034）
+    href: 'https://px.a8.net/svt/ejp?a8mat=4BEQI6+4DRWUY+3EMG+5MFT42', // 2026-10-29 承認（株式会社GRACE）
+    beacon: 'https://www17.a8.net/0.gif?a8mat=4BEQI6+4DRWUY+3EMG+5MFT42',
     a8ProgramId: 's00000015892034', reward: 2500, heater: 'gas', acceptsRepair: true,
     areas: ['tokyo', 'kanagawa'],
   },
   kyutto: {
     key: 'kyutto', name: 'きゅっと', who: 'エコキュートの修理・交換',
     points: ['見積もり無料', '最短即日（各社公表）', '1都3県・愛知・静岡'],
-    href: '', // ★A8 承認後に広告リンクを貼る（s00000015892033）
+    href: 'https://px.a8.net/svt/ejp?a8mat=4BEQI6+4QA0KA+3EMG+5GHH2A', // 2026-10-29 承認（株式会社GRACE）
+    beacon: 'https://www11.a8.net/0.gif?a8mat=4BEQI6+4QA0KA+3EMG+5GHH2A',
     a8ProgramId: 's00000015892033', reward: 5500, heater: 'eco', acceptsRepair: true,
     areas: SIX,
   },

@@ -422,18 +422,27 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
             <a
               href={pk.main.href}
               target="_blank"
-              rel="sponsored noopener noreferrer"
+              rel="sponsored noopener"
               onClick={() => onPartnerClick(pk.main, 'main')}
               className={primaryBtn}
             >
               無料で見積もりを申し込む <ArrowRight size={20} aria-hidden="true" />
             </a>
             <p className="text-center text-[11px] text-slate-500">{pk.main.name}のサイトに移動します</p>
+            {pk.main.beacon && (
+              // A8 の表示計測（1×1の画像）。広告リンクと一緒に置く決まり。
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={pk.main.beacon} width={1} height={1} alt="" className="absolute h-px w-px opacity-0" />
+            )}
+            {pk.sub?.beacon && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={pk.sub.beacon} width={1} height={1} alt="" className="absolute h-px w-px opacity-0" />
+            )}
             {pk.sub && (
               <a
                 href={pk.sub.href}
                 target="_blank"
-                rel="sponsored noopener noreferrer"
+                rel="sponsored noopener"
                 onClick={() => onPartnerClick(pk.sub as Partner, 'sub')}
                 className="text-center text-sm font-bold text-sky-800 underline underline-offset-4"
               >

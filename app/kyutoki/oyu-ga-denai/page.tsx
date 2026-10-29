@@ -137,7 +137,7 @@ export default function OyuGaDenaiPage() {
         {/* 広告であることの表示（A8 の条件：ファーストビューに置く） */}
         <p className="-mb-10 flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">
           <span className="rounded border border-slate-300 px-1.5 tracking-widest">PR</span>
-          当サイトは紹介料を受け取っています（工事は行いません）
+          <span>当サイトは紹介料を受け取っています<span className="whitespace-nowrap">（工事は行いません）</span></span>
           <Link href="/policy" className="text-sky-800 underline underline-offset-2">中立性ポリシー</Link>
         </p>
 

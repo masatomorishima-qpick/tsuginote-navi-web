@@ -72,6 +72,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.6,
     },
+    // トレンド速攻ページ（2026-10-29 新設）。設定は lib/trend/、画面は components/trend/TrendCheck.tsx。
+    {
+      url: `${baseUrl}/check/scs`,
+      lastModified: new Date("2026-10-29T09:00:00+09:00"),
+      changeFrequency: "weekly",
+      priority: 0.6,
+    },
     // 退職金・年金（2026-08-03 新設・駅1）。/loan と同じくレジストリ参照。
     // 記事は lib/retirement/articles.ts に1件足すだけでここにも自動で載る。
     {

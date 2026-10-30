@@ -4,8 +4,8 @@ import {
   CircleDollarSign, Gauge, HardHat, Handshake, MapPin, Receipt,
   RefreshCw, Scale, ShieldCheck, TriangleAlert, UserRoundX, Wrench,
 } from 'lucide-react';
-import GuideHeader from '@/components/GuideHeader';
-import SiteFooter from '@/components/SiteFooter';
+import LpHeader from '@/components/lp/LpHeader';
+import LpFooter from '@/components/lp/LpFooter';
 import { SITE_URL, SITE_NAME } from '@/components/loan/LoanArticle';
 import OyuDiagnosis from './OyuDiagnosis';
 import LpViewTracker from '@/components/lp/LpViewTracker';
@@ -122,7 +122,7 @@ export default function OyuGaDenaiView({ hero = 'default' }: { hero?: Hero }) {
   return (
     <div className="flex min-h-screen flex-col bg-[#f6f8fa]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <GuideHeader />
+      <LpHeader />
       <LpViewTracker lpId={LP_ID} version={VERDICT_VERSION} />
 
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-28 sm:pb-16">
@@ -249,7 +249,7 @@ export default function OyuGaDenaiView({ hero = 'default' }: { hero?: Hero }) {
           診断は一般的な目安で、故障の原因を特定するものではありません。各社の対応時間や保証は各社の公表内容によります。最終更新：2026年10月29日
         </p>
       </main>
-      <SiteFooter />
+      <LpFooter />
     </div>
   );
 }

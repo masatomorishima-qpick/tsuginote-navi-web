@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BadgeCheck, ClipboardCheck, FileCheck2, Handshake, PenLine, Send, Star, Store, UserRoundX } from 'lucide-react';
-import GuideHeader from '@/components/GuideHeader';
-import SiteFooter from '@/components/SiteFooter';
+import LpHeader from '@/components/lp/LpHeader';
+import LpFooter from '@/components/lp/LpFooter';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import TrendCheck from '@/components/trend/TrendCheck';
 import CheckEntryButton from '@/components/trend/CheckEntryButton';
@@ -75,7 +75,7 @@ export default function ScsCheckPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[#f6f8fa]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <GuideHeader />
+      <LpHeader />
 
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-28 sm:pb-16">
         <p className="-mb-10 flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">
@@ -189,7 +189,7 @@ export default function ScsCheckPage() {
           制度は運用開始に向けて準備中のため、内容が変更される場合があります。最終更新：2026年10月29日
         </p>
       </main>
-      <SiteFooter />
+      <LpFooter />
     </div>
   );
 }

@@ -3,8 +3,8 @@ import Link from 'next/link';
 import {
   Brain, CalendarClock, ClipboardCheck, Handshake, HeartHandshake, Hourglass, ListChecks, Receipt, Store, Undo2, UserRoundX,
 } from 'lucide-react';
-import GuideHeader from '@/components/GuideHeader';
-import SiteFooter from '@/components/SiteFooter';
+import LpHeader from '@/components/lp/LpHeader';
+import LpFooter from '@/components/lp/LpFooter';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import { TYPES, LP_ID, VERSION } from '@/lib/gym/aisho';
 import LpViewTracker from '@/components/lp/LpViewTracker';
@@ -133,7 +133,7 @@ export default function GymAishoPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[#f8f6f7]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <GuideHeader />
+      <LpHeader />
       <LpViewTracker lpId={LP_ID} version={VERSION} />
 
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-28 sm:pb-16">
@@ -269,7 +269,7 @@ export default function GymAishoPage() {
           診断は回答にもとづく一般的な目安で、効果を約束するものではありません。料金・解約条件・体験の内容は各ジムの公表内容によります。最終更新：2026年10月29日
         </p>
       </main>
-      <SiteFooter />
+      <LpFooter />
     </div>
   );
 }

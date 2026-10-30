@@ -12,6 +12,7 @@ import {
 import { trackEvent } from '@/lib/trackEvent';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import { TRENDS } from '@/lib/trend/registry';
+import A8BrandsafeBanner from '@/components/trend/A8BrandsafeBanner';
 import type { IconName, TrendLevel, TrendPartner, TrendStep } from '@/lib/trend/types';
 
 /**
@@ -277,11 +278,16 @@ export default function TrendCheck({ id }: { id: string }) {
             </div>
             <p className="text-lg font-black text-slate-900">{p.name}</p>
             <p className="text-sm text-slate-600">{p.pitch}</p>
-            <a href={p.href} target="_blank" rel="sponsored noopener" onClick={() => onPartnerClick(p, i + 1)} className={primaryBtn}>
-              {p.cta} <ArrowRight size={20} aria-hidden="true" />
-            </a>
+            {p.a8Banner ? (
+              // バナーのみ使用可の案件：A8 のバナーをそのまま出す（文字のボタンは出さない）
+              <A8BrandsafeBanner spec={p.a8Banner} onClick={() => onPartnerClick(p, i + 1)} />
+            ) : (
+              <a href={p.href} target="_blank" rel="sponsored noopener" onClick={() => onPartnerClick(p, i + 1)} className={primaryBtn}>
+                {p.cta} <ArrowRight size={20} aria-hidden="true" />
+              </a>
+            )}
             <p className="text-center text-[11px] text-slate-500">{p.name}の公式サイトに移動します</p>
-            {p.beacon && (
+            {p.beacon && !p.a8Banner && (
               // A8 の表示計測（1×1の画像）。広告リンクと一緒に置く決まり。
               // eslint-disable-next-line @next/next/no-img-element
               <img src={p.beacon} width={1} height={1} alt="" className="absolute h-px w-px opacity-0" />

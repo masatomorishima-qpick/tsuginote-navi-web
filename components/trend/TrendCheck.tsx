@@ -111,6 +111,8 @@ export default function TrendCheck({ id }: { id: string }) {
   };
 
   const choose = (step: TrendStep, value: string) => {
+    // 1問目を最初の画面に出している場合は、最初の回答を「診断の開始」として記録する
+    if (view.kind === 'start') log('trend_check_start', { inline: 1 });
     const a = { ...answers, [step.id]: value };
     setAnswers(a);
     setHistory((h) => [...h, step.id]);
@@ -166,41 +168,19 @@ export default function TrendCheck({ id }: { id: string }) {
 
   const onSticky = () => {
     log('trend_sticky_click', { view: view.kind });
-    if (view.kind === 'start') start();
+    if (view.kind === 'start' && !cfg.firstStepInline) start();
     else scrollToPanel();
   };
 
-  let body: React.ReactNode;
-
-  if (view.kind === 'start') {
-    body = (
-      <>
-        <ol className="grid grid-cols-3 gap-2 text-center">
-          {cfg.intro.map(({ icon, t }) => {
-            const I = ICONS[icon];
-            return (
-              <li key={t} className="flex flex-col items-center gap-1.5 rounded-xl bg-slate-50 px-1 py-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-sky-700 ring-1 ring-slate-200">
-                  <I size={18} aria-hidden="true" />
-                </span>
-                <span className="text-[12px] font-bold leading-tight text-slate-700">{t}</span>
-              </li>
-            );
-          })}
-        </ol>
-        <button type="button" onClick={start} className={primaryBtn}>
-          {cfg.startLabel} <ArrowRight size={20} aria-hidden="true" />
-        </button>
-        <p className="text-center text-xs text-slate-500">無料・登録不要。会社名や連絡先の入力はありません</p>
-      </>
-    );
-  } else if (view.kind === 'step') {
-    const step = view.step;
+  const renderStep = (step: TrendStep, isStart: boolean) => {
     const idx = cfg.steps.findIndex((s) => s.id === step.id);
     const cols = step.cols === 3 ? 'grid-cols-3' : 'grid-cols-2';
-    body = (
+    return (
       <>
-        <div className="text-xs font-bold text-slate-500">質問 {idx + 1} / {cfg.steps.length}</div>
+        <div className="flex items-center justify-between text-xs font-bold text-slate-500">
+          <span>質問 {idx + 1} / {cfg.steps.length}</span>
+          {isStart && <span className="font-normal">約1分・登録不要</span>}
+        </div>
         <div className="flex gap-1.5" aria-hidden="true">
           {cfg.steps.map((s, i) => (
             <span key={s.id} className={`h-1.5 flex-1 rounded-full ${i <= idx ? 'bg-sky-600' : 'bg-slate-200'}`} />
@@ -228,11 +208,45 @@ export default function TrendCheck({ id }: { id: string }) {
             );
           })}
         </div>
-        <div className="pt-1 text-sm">
-          <button type="button" onClick={back} className="py-2 text-slate-500 underline-offset-4 hover:underline">← 戻る</button>
-        </div>
+        {isStart ? (
+          <p className="text-center text-xs text-slate-500">会社名や連絡先の入力はありません</p>
+        ) : (
+          <div className="pt-1 text-sm">
+            <button type="button" onClick={back} className="py-2 text-slate-500 underline-offset-4 hover:underline">← 戻る</button>
+          </div>
+        )}
       </>
     );
+  };
+
+  let body: React.ReactNode;
+
+  if (view.kind === 'start' && cfg.firstStepInline) {
+    body = renderStep(cfg.steps[0], true);
+  } else if (view.kind === 'start') {
+    body = (
+      <>
+        <ol className="grid grid-cols-3 gap-2 text-center">
+          {cfg.intro.map(({ icon, t }) => {
+            const I = ICONS[icon];
+            return (
+              <li key={t} className="flex flex-col items-center gap-1.5 rounded-xl bg-slate-50 px-1 py-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-sky-700 ring-1 ring-slate-200">
+                  <I size={18} aria-hidden="true" />
+                </span>
+                <span className="text-[12px] font-bold leading-tight text-slate-700">{t}</span>
+              </li>
+            );
+          })}
+        </ol>
+        <button type="button" onClick={start} className={primaryBtn}>
+          {cfg.startLabel} <ArrowRight size={20} aria-hidden="true" />
+        </button>
+        <p className="text-center text-xs text-slate-500">無料・登録不要。会社名や連絡先の入力はありません</p>
+      </>
+    );
+  } else if (view.kind === 'step') {
+    body = renderStep(view.step, false);
   } else {
     const r = cfg.judge(answers);
     const ls = LEVEL_STYLE[r.level];

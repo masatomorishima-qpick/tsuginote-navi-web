@@ -63,6 +63,11 @@ export type TrendConfig = {
   /** 開始画面の3つの手順 */
   intro: { icon: IconName; t: string }[];
   startLabel: string;
+  /**
+   * true なら、開始ボタンを置かず、最初の画面に1問目をそのまま出す（1問目に答えた時点で trend_check_start）。
+   * 2026-10-31 /check/scs で追加：広告から来た人の半分が8秒以内に、開始ボタンを押さずに帰っていたため。
+   */
+  firstStepInline?: boolean;
   steps: TrendStep[];
   judge: (a: Record<string, string>) => TrendResult;
   partners: Record<string, TrendPartner>;

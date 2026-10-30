@@ -59,13 +59,15 @@ const judge = (a: Record<string, string>): TrendResult => {
 export const SCS: TrendConfig = {
   id: 'scs',
   lpId: 'trend-scs',
-  version: 'v4-2026-10-30',
+  version: 'v5-2026-10-31',
   intro: [
     { icon: 'list', t: '8つの質問' },
     { icon: 'gauge', t: '準備状況' },
     { icon: 'clipboard', t: 'やるべきこと' },
   ],
   startLabel: '診断を始める（約1分）',
+  // v5（10/31）：1問目を最初の画面にそのまま出す。v4までは開始ボタンを押した人が訪問20人中1人だった
+  firstStepInline: true,
   steps: [
     {
       id: 'demand', q: '取引先から、この制度への対応を求められていますか？', cols: 3,

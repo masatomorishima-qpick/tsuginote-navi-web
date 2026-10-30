@@ -5,6 +5,8 @@ import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import TrendCheck from '@/components/trend/TrendCheck';
+import CheckEntryButton from '@/components/trend/CheckEntryButton';
+import { SCS } from '@/lib/trend/scs';
 
 /**
  * トレンド速攻ページ 1本目：SCS評価制度の準備度チェック（2026-10-29 新設）。
@@ -123,6 +125,7 @@ export default function ScsCheckPage() {
           <p className="text-[12px] text-slate-500">
             出典：<a href={IPA_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">情報処理推進機構（2026年10月28日更新）</a>
           </p>
+          <CheckEntryButton lpId={SCS.lpId} section="stars" label="自社は何が足りない？ 1分で診断" />
         </section>
 
         <section className={SECTION} aria-labelledby="flow">
@@ -144,6 +147,7 @@ export default function ScsCheckPage() {
               </li>
             ))}
           </ol>
+          <CheckEntryButton lpId={SCS.lpId} section="flow" label="★3に向けて不足を確かめる（1分）" />
         </section>
 
         <section className={SECTION} aria-labelledby="about">
@@ -176,6 +180,7 @@ export default function ScsCheckPage() {
               <p className="mt-3 text-[14px] leading-relaxed text-slate-600">{f.a}</p>
             </details>
           ))}
+          <div className="pt-3"><CheckEntryButton lpId={SCS.lpId} section="faq" label="準備状況を診断する（8問・1分）" /></div>
         </section>
 
         <p className="text-[11px] leading-relaxed text-slate-400">

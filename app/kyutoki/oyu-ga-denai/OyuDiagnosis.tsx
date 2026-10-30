@@ -375,17 +375,6 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
           )}
         </div>
 
-        <div className="rounded-2xl bg-slate-50 p-4">
-          <p className="mb-2 text-sm font-bold text-slate-700">呼ぶ前に1分チェック</p>
-          <ul className="grid gap-1.5">
-            {selfCheck(answers).map((t) => (
-              <li key={t} className="flex items-start gap-2 text-[14px] text-slate-700">
-                <CircleCheck size={17} className="mt-0.5 shrink-0 text-emerald-600" aria-hidden="true" />{t}
-              </li>
-            ))}
-          </ul>
-        </div>
-
         {pk ? (
           <div className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
             <div className="flex items-center justify-between">
@@ -408,7 +397,7 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
               onClick={() => onPartnerClick(pk.main, 'main')}
               className={primaryBtn}
             >
-              無料で見積もりを申し込む <ArrowRight size={20} aria-hidden="true" />
+              <span className="whitespace-nowrap">無料で見積もりを頼む</span> <ArrowRight size={20} aria-hidden="true" />
             </a>
             <p className="text-center text-[11px] text-slate-500">{pk.main.name}のサイトに移動します</p>
             {pk.main.beacon && (
@@ -441,6 +430,21 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
             </div>
           </div>
         )}
+
+        {/* v5：自己点検は紹介先の下に、折りたたみで。結果まで来た人が点検項目を読んで帰る流れ（10/30 の記録：2〜5分滞在して未クリック）を切るため */}
+        <details className="group rounded-2xl bg-slate-50 px-4 py-3" onToggle={(e) => { if ((e.currentTarget as HTMLDetailsElement).open) log('kyutoki_selfcheck_open'); }}>
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-bold text-slate-700">
+            呼ぶ前に自分で試せること（{selfCheck(answers).length}つ）
+            <span aria-hidden="true" className="text-xl text-slate-400 transition group-open:rotate-45">＋</span>
+          </summary>
+          <ul className="mt-3 grid gap-1.5">
+            {selfCheck(answers).map((t) => (
+              <li key={t} className="flex items-start gap-2 text-[14px] text-slate-700">
+                <CircleCheck size={17} className="mt-0.5 shrink-0 text-emerald-600" aria-hidden="true" />{t}
+              </li>
+            ))}
+          </ul>
+        </details>
         <Nav onBack={back} onRestart={restart} />
       </>
     );

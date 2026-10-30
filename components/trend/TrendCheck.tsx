@@ -240,7 +240,7 @@ export default function TrendCheck({ id }: { id: string }) {
     body = (
       <>
         <div className="flex flex-col items-center gap-2 pt-1 text-center">
-          <span className="text-xs font-bold text-slate-500">準備状況</span>
+          <span className="text-xs font-bold text-slate-500">{cfg.labels?.score ?? '準備状況'}</span>
           <span className={`flex h-16 w-16 items-center justify-center rounded-full ${ls.bg}`}>
             <LI size={32} aria-hidden="true" />
           </span>
@@ -255,7 +255,7 @@ export default function TrendCheck({ id }: { id: string }) {
 
         {r.gaps.length > 0 && (
           <div className="rounded-2xl bg-slate-50 p-4">
-            <p className="mb-2 text-sm font-bold text-slate-700">不足している可能性がある対策</p>
+            <p className="mb-2 text-sm font-bold text-slate-700">{cfg.labels?.gaps ?? '不足している可能性がある対策'}</p>
             <ul className="grid gap-2">
               {r.gaps.map((g) => {
                 const I = ICONS[g.icon];
@@ -272,7 +272,7 @@ export default function TrendCheck({ id }: { id: string }) {
         {ps.map((p, i) => (
           <div key={p.key} className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-orange-800">不足している対策に役立つサービス</span>
+              <span className="text-xs font-bold text-orange-800">{cfg.labels?.partner ?? '不足している対策に役立つサービス'}</span>
               <span className="rounded border border-orange-300 px-1.5 text-[10px] tracking-widest text-orange-800">PR</span>
             </div>
             <p className="text-lg font-black text-slate-900">{p.name}</p>
@@ -290,7 +290,7 @@ export default function TrendCheck({ id }: { id: string }) {
         ))}
 
         <div className="flex flex-col gap-2">
-          <p className="text-sm font-bold text-slate-700">次にやるべきこと</p>
+          <p className="text-sm font-bold text-slate-700">{cfg.labels?.next ?? '次にやるべきこと'}</p>
           <ol className="grid gap-2">
             {cfg.nextSteps.map((s, i) => {
               const I = ICONS[s.icon];
@@ -357,7 +357,7 @@ export default function TrendCheck({ id }: { id: string }) {
       {showSticky && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))] backdrop-blur sm:hidden">
           <button type="button" onClick={onSticky} className={primaryBtn}>
-            {view.kind === 'start' ? cfg.startLabel : '診断の続きへ'} <ArrowRight size={20} aria-hidden="true" />
+            {view.kind === 'start' ? cfg.startLabel : (cfg.labels?.resume ?? '診断の続きへ')} <ArrowRight size={20} aria-hidden="true" />
           </button>
         </div>
       )}

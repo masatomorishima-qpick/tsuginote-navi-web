@@ -33,7 +33,7 @@ export type TrendPartner = {
    * 値は A8 の発行コード（brandsafe_js_async の引数）から写す。href はバナー内のリンクなので空でよいが、
    * 表示の条件（href あり）を満たすため、クリック先の URL（https://px.a8.net/svt/ejp?a8mat=...）を入れておく。
    */
-  a8Banner?: { site: string; article: string; link: string; image: string; mid: string; token: string; a8mat: string };
+  a8Banner?: { site: string; article: string; link: string; image: string; mid: string; token: string; a8mat: string; beaconHost?: string };
   /** 案件の掲載条件（検索広告の可否・禁止語）を確かめたら true */
   vetted: boolean;
   /** 結果画面での一言（事実だけ。言い切りは書かない） */

@@ -30,6 +30,8 @@ export type A8BannerSpec = {
   token: string;
   /** 発行コードの第4引数（a8mat） */
   a8mat: string;
+  /** 1×1画像のホスト名（発行コードの www18 など。省略時 www19） */
+  beaconHost?: string;
 };
 
 let loading: Promise<void> | null = null;
@@ -76,7 +78,7 @@ export default function A8BrandsafeBanner({ spec, onClick }: { spec: A8BannerSpe
       <div ref={ref} id={divId} onClickCapture={onClick} className="flex min-h-[60px] w-full justify-center [&_img]:h-auto [&_img]:max-w-full" />
       {/* A8 の表示計測（1×1の画像）。広告リンクと一緒に置く決まり。 */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={`https://www19.a8.net/0.gif?a8mat=${spec.a8mat}`} width={1} height={1} alt="" className="absolute h-px w-px opacity-0" />
+      <img src={`https://${spec.beaconHost ?? 'www19'}.a8.net/0.gif?a8mat=${spec.a8mat}`} width={1} height={1} alt="" className="absolute h-px w-px opacity-0" />
     </div>
   );
 }

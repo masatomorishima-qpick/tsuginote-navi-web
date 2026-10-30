@@ -14,13 +14,13 @@
 
 export const LP_ID = 'kyutoki-oyu-ga-denai';
 /** 診断の文言・分岐を変えたら上げる。GA4 と lp_event_logs に毎回送るので、版ごとの成績を比べられる。 */
-export const VERDICT_VERSION = 'v5-2026-10-30';
+export const VERDICT_VERSION = 'v5b-2026-10-30';
 
 export type Area =
   | 'tokyo' | 'kanagawa' | 'chiba' | 'saitama' | 'aichi' | 'shizuoka'
   | 'ng' | 'other';
 export type HeaterType = 'gas' | 'eco' | 'elec';
-export type Symptom = 'none' | 'lukewarm' | 'error' | 'leak' | 'gas';
+export type Symptom = 'none' | 'lukewarm' | 'error' | 'remote' | 'leak' | 'gas';
 export type Cold = 'freeze' | 'nowater' | 'no';
 export type Home = 'own' | 'rent';
 export type Age = 'lt7' | '7to10' | 'gt10' | 'unknown';
@@ -55,6 +55,7 @@ export const STEPS: Step[] = [
       { v: 'none', t: 'お湯が出ない' },
       { v: 'lukewarm', t: 'ぬるい・水になる' },
       { v: 'error', t: 'エラー番号が出る' },
+      { v: 'remote', t: 'リモコンが映らない' },
       { v: 'leak', t: '水漏れ・異音' },
       { v: 'gas', t: 'ガスのにおいがする', danger: true },
     ],
@@ -161,6 +162,14 @@ export function selfCheck(a: Answers): string[] {
       'お湯を使い切っていないか',
       '専用のブレーカーが落ちていないか',
       'エラー番号をメモしておく',
+    ];
+  }
+  if (a.symptom === 'remote') {
+    return [
+      '給湯器専用のブレーカーが落ちていないか（分電盤を見る）',
+      '屋外の本体のコンセントが抜けていないか',
+      '台所と浴室、両方のリモコンが消えているか（片方だけならリモコンの故障）',
+      '停電のあとなら、ブレーカーを一度切って入れ直す',
     ];
   }
   return [

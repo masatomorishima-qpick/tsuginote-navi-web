@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type ComponentType } from 're
 import { sendGAEvent } from '@next/third-parties/google';
 import {
   ArrowRight, Bath, Building2, CircleCheck, Clock, Droplet, Droplets, Flame, Gauge,
-  House, Plug, RefreshCw, Scale, Snowflake, Thermometer, TriangleAlert, Waves, Wrench, Zap,
+  House, MonitorOff, Plug, RefreshCw, Scale, Snowflake, Thermometer, TriangleAlert, Waves, Wrench, Zap,
   type LucideProps,
 } from 'lucide-react';
 import { trackEvent } from '@/lib/trackEvent';
@@ -41,6 +41,7 @@ const OPT_ICONS: Record<string, Icon> = {
   'symptom:none': Droplets,
   'symptom:lukewarm': Thermometer,
   'symptom:error': Gauge,
+  'symptom:remote': MonitorOff,
   'symptom:leak': Waves,
   'symptom:gas': Flame,
   'type:gas': Flame,

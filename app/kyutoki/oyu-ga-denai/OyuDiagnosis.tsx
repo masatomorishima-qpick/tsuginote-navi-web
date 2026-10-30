@@ -395,6 +395,13 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
                 <li key={t} className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700 ring-1 ring-orange-200">{t}</li>
               ))}
             </ul>
+            {/* v7（10/31）：ガスで交換を考える判定のとき、押す前に費用の目安を1行。10/30の記録で「交換の時期」と出た4人が誰も押さなかったため。数字は /kyutoki/kokan-hiyou と同じ出典 */}
+            {answers.type === 'gas' && v.mode !== 'repair' && (
+              <p className="flex flex-col items-center gap-0.5 rounded-xl bg-white px-4 py-3 text-center ring-1 ring-orange-200">
+                <span className="text-[12px] text-slate-500">交換の目安（工事費込み）</span>
+                <span className="text-[14px] text-slate-700">ふろ給湯器で<b className="ml-1 text-[22px] font-black text-slate-900">15〜20万円</b></span>
+              </p>
+            )}
             <a
               href={pk.main.href}
               target="_blank"
@@ -404,7 +411,10 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
             >
               <span className="whitespace-nowrap">無料で見積もりを頼む</span> <ArrowRight size={20} aria-hidden="true" />
             </a>
-            <p className="text-center text-[11px] text-slate-500">{pk.main.name}のサイトに移動します</p>
+            <p className="text-center text-[11px] text-slate-500">
+              {pk.main.name}のサイトに移動します
+              {answers.type === 'gas' && v.mode !== 'repair' && <><br />費用の目安：東京ガスの公表相場（2026年10月）</>}
+            </p>
             {pk.main.beacon && (
               // A8 の表示計測（1×1の画像）。広告リンクと一緒に置く決まり。
               // eslint-disable-next-line @next/next/no-img-element

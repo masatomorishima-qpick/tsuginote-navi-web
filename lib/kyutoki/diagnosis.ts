@@ -14,7 +14,7 @@
 
 export const LP_ID = 'kyutoki-oyu-ga-denai';
 /** 診断の文言・分岐を変えたら上げる。GA4 と lp_event_logs に毎回送るので、版ごとの成績を比べられる。 */
-export const VERDICT_VERSION = 'v6-2026-10-31';
+export const VERDICT_VERSION = 'v7-2026-10-31';
 
 export type Area =
   | 'tokyo' | 'kanagawa' | 'chiba' | 'saitama' | 'aichi' | 'shizuoka'

@@ -14,13 +14,14 @@
 
 export const LP_ID = 'kyutoki-oyu-ga-denai';
 /** 診断の文言・分岐を変えたら上げる。GA4 と lp_event_logs に毎回送るので、版ごとの成績を比べられる。 */
-export const VERDICT_VERSION = 'v5c-2026-10-30';
+export const VERDICT_VERSION = 'v6-2026-10-31';
 
 export type Area =
   | 'tokyo' | 'kanagawa' | 'chiba' | 'saitama' | 'aichi' | 'shizuoka'
   | 'ng' | 'other';
 export type HeaterType = 'gas' | 'eco' | 'elec';
-export type Symptom = 'none' | 'lukewarm' | 'error' | 'remote' | 'leak' | 'gas';
+/** fine：いまは使えるが、年数が気になって来た人（寿命・交換費用の広告から来る人）。 */
+export type Symptom = 'none' | 'lukewarm' | 'error' | 'remote' | 'leak' | 'fine' | 'gas';
 export type Cold = 'freeze' | 'nowater' | 'no';
 export type Home = 'own' | 'rent';
 export type Age = 'lt7' | '7to10' | 'gt10' | 'unknown';
@@ -57,6 +58,7 @@ export const STEPS: Step[] = [
       { v: 'error', t: 'エラー番号が出る' },
       { v: 'remote', t: 'リモコンが映らない' },
       { v: 'leak', t: '水漏れ・異音' },
+      { v: 'fine', t: '今は使える', s: '年数が気になる' },
       { v: 'gas', t: 'ガスのにおいがする', danger: true },
     ],
   },
@@ -125,6 +127,31 @@ export type Mode = 'replace' | 'both' | 'repair';
 export type Verdict = { mode: Mode; label: string; h: string; why: string };
 
 export function verdictOf(a: Answers): Verdict {
+  // v6：今は使える人（寿命・交換費用の広告から来る人）。壊れていないので「修理」は出さない。
+  if (a.symptom === 'fine') {
+    switch (a.age) {
+      case 'gt10':
+        return {
+          mode: 'replace', label: '10年以上', h: '交換を考える時期です',
+          why: '壊れる前なら、急がずに見積もりを比べられます。修理部品がない年数でもあります。',
+        };
+      case '7to10':
+        return {
+          mode: 'both', label: '7〜9年', h: 'そろそろ交換の準備を',
+          why: '10年が近づくと修理部品が手に入りにくくなります。見積もりだけ先に取っておくと安心です。',
+        };
+      case 'lt7':
+        return {
+          mode: 'repair', label: '7年未満', h: 'まだ替えなくて大丈夫です',
+          why: '使い始めて7年未満なら、多くは修理で直せます。10年が近づいたら、もう一度確かめましょう。',
+        };
+      default:
+        return {
+          mode: 'both', label: '年数不明', h: '製造年を確かめましょう',
+          why: '本体のラベルに製造年があります。10年を過ぎていたら、交換の見積もりを取りましょう。',
+        };
+    }
+  }
   switch (a.age) {
     case 'gt10':
       return {
@@ -162,6 +189,13 @@ export function selfCheck(a: Answers): string[] {
       'お湯を使い切っていないか',
       '専用のブレーカーが落ちていないか',
       'エラー番号をメモしておく',
+    ];
+  }
+  if (a.symptom === 'fine') {
+    return [
+      '本体のラベルで製造年を見る',
+      '号数（16・20・24）と、追いだきができるかをメモする',
+      'リモコンに「888」と出ていても故障ではない（点検時期のお知らせ）',
     ];
   }
   if (a.symptom === 'remote') {
@@ -254,8 +288,10 @@ function serves(p: Partner, a: Answers, mode: Mode): boolean {
 /** 送客先は1つに絞る（main）。交換寄りで、別の交換先もあれば控えめに sub を出す。 */
 export function pickPartners(a: Answers, v: Verdict): { main: Partner; sub: Partner | null } | null {
   // ガス：交換寄り（10年以上）は交換専門の GAS-Q を先に。迷う・修理寄りは修理もできるお湯が出ない.com を先に。
+  // v6：今は使える人で7年未満は紹介しない（直すものも替える理由もない）。今は使える人は交換の会社を先に。
+  if (a.symptom === 'fine' && a.age === 'lt7') return null;
   const order: PartnerKey[] = a.type === 'gas'
-    ? (v.mode === 'replace' ? ['gasq', 'oyu'] : ['oyu', 'gasq'])
+    ? (v.mode === 'replace' || a.symptom === 'fine' ? ['gasq', 'oyu'] : ['oyu', 'gasq'])
     : ['kyutto', 'cools'];
   const candidates = order.map((k) => PARTNERS[k]).filter((p) => serves(p, a, v.mode));
   if (candidates.length === 0) return null;
@@ -265,6 +301,7 @@ export function pickPartners(a: Answers, v: Verdict): { main: Partner; sub: Part
 }
 
 export function noPartnerReason(a: Answers, v: Verdict): string {
+  if (a.symptom === 'fine' && a.age === 'lt7') return 'いまは見積もりを取る時期ではありません。';
   if (a.type === 'elec') return '電気温水器に対応する紹介先は、いまはありません。';
   if (a.type === 'eco' && v.mode === 'repair') return 'お住まいの地域でエコキュートの修理に対応する紹介先は、いまはありません。';
   return 'お住まいの地域に対応する紹介先は、いまはありません。';

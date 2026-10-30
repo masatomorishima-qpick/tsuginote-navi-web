@@ -43,6 +43,7 @@ const OPT_ICONS: Record<string, Icon> = {
   'symptom:error': Gauge,
   'symptom:remote': MonitorOff,
   'symptom:leak': Waves,
+  'symptom:fine': CircleCheck,
   'symptom:gas': Flame,
   'type:gas': Flame,
   'type:eco': Zap,
@@ -359,7 +360,10 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
   } else {
     const v = verdictOf(answers);
     const pk = pickPartners(answers, v);
-    const ms = MODE_STYLE[v.mode];
+    // v6：今は使えて7年未満の人には「修理」と出さない（直すものがないため）。
+    const ms = answers.symptom === 'fine' && answers.age === 'lt7'
+      ? { icon: CircleCheck, lcd: '良好', tone: 'text-emerald-700', iconBg: 'bg-emerald-100 text-emerald-700' }
+      : MODE_STYLE[v.mode];
     const VI = ms.icon;
     body = (
       <>
@@ -427,7 +431,9 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
             <Bath size={22} className="mt-0.5 shrink-0 text-slate-400" aria-hidden="true" />
             <div className="grid gap-1">
               <b className="text-slate-900">{noPartnerReason(answers, v)}</b>
-              <span>メーカーの修理窓口か、契約中のガス会社へ。型番と製造年を伝えると早く進みます。</span>
+              <span>{answers.symptom === 'fine' && answers.age === 'lt7'
+                ? '10年が近づいたら、もう一度診断してください。'
+                : 'メーカーの修理窓口か、契約中のガス会社へ。型番と製造年を伝えると早く進みます。'}</span>
             </div>
           </div>
         )}

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  Bath, CalendarClock, Clock, Flame, Gauge, HardHat, Handshake, Leaf, MapPin,
+  Bath, Building2, CalendarClock, ClipboardCheck, Clock, Factory, Flame, Gauge, HardHat, Handshake, Home, Leaf, MapPin,
   PhoneOff, Scale, ShieldCheck, Stethoscope, Tag, Users, Wrench,
 } from 'lucide-react';
 import GuideHeader from '@/components/GuideHeader';
@@ -18,23 +18,31 @@ import PartnerLink from '@/components/kyutoki/PartnerLink';
  *   診断ページ（/kyutoki/oyu-ga-denai）と半々で比べる（docs/kyutoki-pdca.md 4c）。
  *   検索からの自然流入も狙うので、本文はサーバー側で出力し、よくある質問は構造化データにも入れる。
  *
+ * v2（2026-10-31）：検索広告をテールワード（住まい・メーカー・エコジョーズ・見積もりが高い など）で組み直したので、
+ *   それぞれの言葉の答えになる節を足した（#sumai #maker #takai）。広告の行き先はこの節に直接つなぐ。
+ *
  * 数字の出典（2026-10-30 確認）：
  *   費用 … 東京ガス「給湯器交換」の販売価格（工事費込み・税込）と、同社の「選び方」ページの相場
+ *     置き場所の差：16号オート高効率 リンナイ 壁掛 191,510／PS 194,898、ノーリツ 壁掛 193,011／PS 193,011／据置 197,138、
+ *       細身（スリム）はリンナイ 236,280、ノーリツ 228,755（標準より約3.6〜4.5万円高い。PSアルコーブの細身 241,370）
+ *     メーカーの差：16号オート高効率 壁掛 リンナイ 191,510／ノーリツ 193,011、24号暖房付き高効率 壁掛 290,158／295,253
+ *     エコジョーズの差：16号オート 壁掛 リンナイ 163,691→191,510、ノーリツ 173,331→193,011、給湯専用 102,080→122,320／91,426→118,068
  *   寿命 … ノーリツ・リンナイ・パロマの公式（標準使用期間10年）、ノーリツ（修理部品の保有期間 7〜10年）
  *   点検商法 … 国民生活センター 2024-02-21 発表
  *   紹介先 … 各社の公式サイトの記載（GAS-Q：gas-q.jp/ad/kyutou、お湯が出ない.com：oyu-denai.com）
  */
 
 const LP_ID = 'kyutoki-kokan-hiyou';
-const VERSION = 'v1-2026-10-31';
+const VERSION = 'v2-2026-10-31';
 const PAGE_PATH = '/kyutoki/kokan-hiyou';
 const TITLE = 'ガス給湯器の交換費用の目安｜種類・号数別と見積もりの確かめ方';
 const DESCRIPTION =
-  'ガス給湯器の交換費用の目安を、給湯専用・ふろ給湯器・暖房付きの種類別に図で紹介。号数やエコジョーズで変わる点、見積もりの前に見ておくこと、点検商法の注意点もまとめました。';
+  'ガス給湯器の交換費用の目安を、給湯専用・ふろ給湯器・暖房付きの種類別に図で紹介。マンションと戸建て、メーカーやエコジョーズで変わる金額、見積もりが高いと感じたときの確かめ方もまとめました。';
 const DATE_MODIFIED = '2026-10-31';
 
 const TG_HOWTO = 'https://home.tokyo-gas.co.jp/housing/exchange/waterheater/how-to-choose.html';
 const TG_LIST = 'https://home.tokyo-gas.co.jp/replacement/waterheater/rinnai';
+const TG_NORITZ = 'https://home.tokyo-gas.co.jp/replacement/waterheater/noritz';
 const TG_KOJI = 'https://home.tokyo-gas.co.jp/housing/exchange/waterheater/construction.html';
 const KOKUSEN = 'https://www.kokusen.go.jp/news/data/n-20240221_1.html';
 const NORITZ_LIFE = 'https://faq.noritz.co.jp/%E7%B5%A6%E6%B9%AF%E6%A9%9F%E5%99%A8%E3%81%AE%E8%80%90%E7%94%A8%E5%B9%B4%E6%95%B0-64ba5c5c1ec10c001ca546e4';
@@ -84,6 +92,14 @@ const FAQS = [
   {
     q: '見積もりの前に、何を調べておけばいいですか？',
     a: '本体の側面や前面のラベルにある「号数」（16・20・24など）と、今の機能（お湯はりだけか、追いだきもできるか、暖房付きか）です。写真を撮っておくと話が早く進みます。',
+  },
+  {
+    q: 'マンションだと交換費用は高くなりますか？',
+    a: '玄関横の扉の中（パイプシャフト）に置く型でも、同じ機能なら壁に掛ける型との差は数千円ほどです（東京ガスの販売価格）。細身の型が必要な場所だと約4万円高くなります。管理組合への工事の申請が要ることもあります。',
+  },
+  {
+    q: 'メーカーで値段は変わりますか？',
+    a: '同じ号数・同じ機能なら、リンナイとノーリツの差は数千円ほどです（東京ガスの販売価格）。メーカーより、号数と機能をそろえて比べるほうが大事です。',
   },
   {
     q: '賃貸に住んでいます。自分で頼んでいいですか？',
@@ -245,6 +261,102 @@ export default function KokanHiyouPage() {
           <p className={SRC}>
             出典：<a href={TG_KOJI} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">東京ガス「工事について」</a>（基本工事費 税込40,700〜69,300円）
           </p>
+        </section>
+
+        {/* マンションと戸建て（広告「住まい」の行き先） */}
+        <section className={SECTION} aria-labelledby="sumai">
+          <div className="flex flex-col gap-1.5">
+            <h2 id="sumai" className={H2}>マンションと戸建て</h2>
+            <p className="text-[15px] text-slate-600">差が出るのは「置き場所」です。</p>
+          </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            {[
+              {
+                icon: Building2, h: 'マンション', rows: [
+                  { k: '扉の中に置く型', v: '＋0〜3千円' },
+                  { k: '細身の型', v: '＋約4万円' },
+                ], d: '管理組合への申請が要ることも',
+              },
+              {
+                icon: Home, h: '戸建て', rows: [
+                  { k: '壁に掛ける型', v: '基本の値段' },
+                  { k: '床に置く型', v: '＋約4千円' },
+                ], d: '暖房付きの細身の台は＋約4〜6万円',
+              },
+            ].map(({ icon: I, h, rows, d }) => (
+              <div key={h} className="flex flex-col gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
+                <span className="flex items-center gap-2">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700"><I size={20} aria-hidden="true" /></span>
+                  <span className="text-[16px] font-black text-slate-900">{h}</span>
+                </span>
+                <ul className="flex flex-col gap-2">
+                  {rows.map(({ k, v }) => (
+                    <li key={k} className="flex flex-col">
+                      <span className="text-[11px] text-slate-500">{k}</span>
+                      <span className="text-[16px] font-black text-orange-600">{v}</span>
+                    </li>
+                  ))}
+                </ul>
+                <span className="text-[11px] leading-snug text-slate-500">{d}</span>
+              </div>
+            ))}
+          </div>
+          <p className="rounded-2xl bg-slate-50 px-4 py-3 text-[14px] text-slate-700">今と<b>同じ置き場所・同じ形</b>なら工事が簡単</p>
+          <p className={SRC}>
+            同じ16号オートで比べた差。出典：<a href={TG_LIST} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">東京ガスの販売価格（リンナイ）</a>・
+            <a href={TG_NORITZ} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">（ノーリツ）</a>（工事費込み・税込、2026年10月確認）
+          </p>
+        </section>
+
+        {/* メーカーとエコジョーズ（広告「メーカー」「種類」の行き先） */}
+        <section className={SECTION} aria-labelledby="maker">
+          <h2 id="maker" className={H2}>メーカーとエコジョーズ</h2>
+          <ul className="grid grid-cols-2 gap-2.5">
+            {[
+              { icon: Factory, h: 'メーカーの差', v: '数千円', d: 'リンナイとノーリツ、同じ号数・機能で' },
+              { icon: Leaf, h: 'エコジョーズ', v: '＋2〜3万円', d: '従来の型より。そのぶんガス代が減る' },
+            ].map(({ icon: I, h, v, d }) => (
+              <li key={h} className="flex flex-col items-center gap-1.5 rounded-2xl bg-white px-2 py-4 text-center ring-1 ring-slate-200">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-50 text-sky-700"><I size={22} aria-hidden="true" /></span>
+                <span className="text-[13px] font-bold text-slate-700">{h}</span>
+                <span className="text-[22px] font-black text-orange-600">{v}</span>
+                <span className="text-[11px] leading-snug text-slate-500">{d}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="rounded-2xl bg-slate-50 px-4 py-3 text-[14px] text-slate-700">メーカーより、<b>号数と機能をそろえて</b>比べるのが近道です</p>
+          <p className={SRC}>
+            例：16号オートのエコジョーズ リンナイ191,510円・ノーリツ193,011円。従来の型はリンナイ163,691円・ノーリツ173,331円。
+            出典：<a href={TG_LIST} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">東京ガスの販売価格（リンナイ）</a>・
+            <a href={TG_NORITZ} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">（ノーリツ）</a>（工事費込み・税込、2026年10月確認）
+          </p>
+        </section>
+
+        {/* 見積もりが高いと感じたら（広告「見積もり」の行き先） */}
+        <section className={SECTION} aria-labelledby="takai">
+          <div className="flex flex-col gap-1.5">
+            <h2 id="takai" className={H2}>見積もりが高いと感じたら</h2>
+            <p className="text-[15px] text-slate-600">この3つを見比べます。</p>
+          </div>
+          <ul className="grid grid-cols-3 gap-2.5">
+            {[
+              { icon: Tag, h: '本体', d: '号数・機能は今と同じか' },
+              { icon: HardHat, h: '工事費', d: '取り外しと処分は込みか' },
+              { icon: Wrench, h: '追加の費用', d: '台・配管・リモコン' },
+            ].map(({ icon: I, h, d }) => (
+              <li key={h} className="flex flex-col items-center gap-2 rounded-2xl bg-white px-2 py-4 text-center ring-1 ring-slate-200">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-50 text-sky-700"><I size={22} aria-hidden="true" /></span>
+                <span className="text-[15px] font-black text-slate-900">{h}</span>
+                <span className="text-[11px] leading-snug text-slate-500">{d}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
+            <p className="flex items-center gap-2 text-[15px] font-bold text-slate-800">
+              <ClipboardCheck size={20} className="shrink-0 text-orange-600" aria-hidden="true" />もう1社の見積もりと並べると、高いかどうかが分かります
+            </p>
+            <PartnerLink lpId={LP_ID} partner="gasq" position="takai" label="無料で見積もりを頼む" note="GAS-Q（ガスキュー）のサイトに移動します" />
+          </div>
         </section>
 
         {/* 見積もりを頼める2社 */}

@@ -4,8 +4,8 @@ import {
   Bath, Building2, CalendarClock, ClipboardCheck, Clock, Factory, Flame, Gauge, HardHat, Handshake, Home, Leaf, MapPin,
   PhoneOff, Scale, ShieldCheck, Stethoscope, Tag, Users, Wrench,
 } from 'lucide-react';
-import GuideHeader from '@/components/GuideHeader';
-import SiteFooter from '@/components/SiteFooter';
+import LpHeader from '@/components/lp/LpHeader';
+import LpFooter from '@/components/lp/LpFooter';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import PartnerLink from '@/components/kyutoki/PartnerLink';
@@ -166,7 +166,7 @@ export default function KokanHiyouPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[#f6f8fa]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <GuideHeader />
+      <LpHeader />
       <LpViewTracker lpId={LP_ID} version={VERSION} />
 
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-32 sm:pb-16">
@@ -508,7 +508,7 @@ export default function KokanHiyouPage() {
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))] backdrop-blur sm:hidden">
         <PartnerLink lpId={LP_ID} partner="gasq" position="sticky" label="無料で見積もりを頼む" />
       </div>
-      <SiteFooter />
+      <LpFooter />
     </div>
   );
 }

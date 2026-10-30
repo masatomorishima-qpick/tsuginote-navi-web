@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CalendarClock, Calculator, Handshake, RefreshCw, Store, TrendingUp, UserRoundX, Wrench } from 'lucide-react';
-import GuideHeader from '@/components/GuideHeader';
-import SiteFooter from '@/components/SiteFooter';
+import LpHeader from '@/components/lp/LpHeader';
+import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import TrendCheck from '@/components/trend/TrendCheck';
@@ -85,7 +85,7 @@ export default function DenkiCheckPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[#f6f8fa]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <GuideHeader />
+      <LpHeader />
       <LpViewTracker lpId={DENKI.lpId} version={DENKI.version} />
 
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-28 sm:pb-16">
@@ -197,7 +197,7 @@ export default function DenkiCheckPage() {
           補助の金額と期間は政府の正式な発表で確定します。最終更新：2026年10月30日
         </p>
       </main>
-      <SiteFooter />
+      <LpFooter />
     </div>
   );
 }

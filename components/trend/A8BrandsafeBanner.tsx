@@ -75,7 +75,7 @@ export default function A8BrandsafeBanner({ spec, onClick }: { spec: A8BannerSpe
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <div ref={ref} id={divId} onClickCapture={onClick} className="flex min-h-[60px] w-full justify-center [&_img]:h-auto [&_img]:max-w-full" />
+      <div ref={ref} id={divId} onClickCapture={onClick} className="flex min-h-[60px] w-full justify-center [&_img]:h-auto [&_img]:w-full [&_img]:max-w-[320px]" />
       {/* A8 の表示計測（1×1の画像）。広告リンクと一緒に置く決まり。 */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={`https://${spec.beaconHost ?? 'www19'}.a8.net/0.gif?a8mat=${spec.a8mat}`} width={1} height={1} alt="" className="absolute h-px w-px opacity-0" />

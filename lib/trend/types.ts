@@ -66,4 +66,9 @@ export type TrendConfig = {
   fallback: { h: string; d: string; href: string; label: string };
   /** 結果画面の注意書き */
   disclaimer: string;
+  /**
+   * 結果画面の見出し（省略時は診断型の文言）。計算型・比較型の波で差し替える。
+   * score: 判定の上の小見出し / gaps: 一覧の見出し / partner: 紹介先の枠の見出し / next: 次にやることの見出し
+   */
+  labels?: Partial<{ score: string; gaps: string; partner: string; next: string; resume: string }>;
 };

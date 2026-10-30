@@ -5,8 +5,8 @@
  * 画面（OyuDiagnosis.tsx）はこのファイルを読むだけにして、PDCAで変える場所を1か所にまとめる。
  *
  * ★PDCAで触る場所（ほぼここだけ）
- *   1. PARTNERS の href …… A8 で発行された広告リンクを貼る。空文字のあいだは送客ボタンを出さない（安全側）。
- *   2. PARTNERS の areas …… 案件の成果対象地域。A8 のプログラム詳細の「成果条件」と一致させる。
+ *   1. PARTNERS の href …… A8・レントラックスで発行された広告リンクを貼る。空文字のあいだは送客ボタンを出さない（安全側）。
+ *   2. PARTNERS の areas …… 案件の成果対象地域。各ASPのプログラム詳細の「成果条件」・広告主の対応地域と一致させる。
  *   3. verdictOf の文言 …… 結果画面のコピー。変えたら VERDICT_VERSION を上げる（計測で版を見分けるため）。
  *
  * 2026-10-28 作成。案件の条件は A8 のプログラム詳細（同日閲覧）による。
@@ -14,7 +14,7 @@
 
 export const LP_ID = 'kyutoki-oyu-ga-denai';
 /** 診断の文言・分岐を変えたら上げる。GA4 と lp_event_logs に毎回送るので、版ごとの成績を比べられる。 */
-export const VERDICT_VERSION = 'v5b-2026-10-30';
+export const VERDICT_VERSION = 'v5c-2026-10-30';
 
 export type Area =
   | 'tokyo' | 'kanagawa' | 'chiba' | 'saitama' | 'aichi' | 'shizuoka'
@@ -184,16 +184,18 @@ export function selfCheck(a: Answers): string[] {
  * href が空文字のあいだは「紹介先なし」として扱う（A8 の提携承認前に本番に出しても、
  * 壊れたリンクや提携前のリンクを踏ませないため）。
  * areas は A8 プログラム詳細の「成果条件」の対象地域。 */
-export type PartnerKey = 'oyu' | 'kyutto' | 'cools';
+export type PartnerKey = 'oyu' | 'gasq' | 'kyutto' | 'cools';
 export type Partner = {
   key: PartnerKey;
   name: string;
   who: string;
   points: string[];
   href: string;
-  /** A8 の表示計測用の1×1画像（広告リンクと一緒に発行されるもの）。リンクの近くに置く。 */
+  /** 表示計測用の1×1画像（広告リンクと一緒に発行されるもの）。リンクの近くに置く。 */
   beacon?: string;
-  a8ProgramId: string;
+  asp: 'a8' | 'rentracks';
+  /** ASP のプログラムID（A8 は s000…、レントラックスはプロダクト番号） */
+  programId: string;
   /** 報酬（税抜・円）。粗利の試算に使う。 */
   reward: number;
   heater: HeaterType;
@@ -210,22 +212,32 @@ export const PARTNERS: Record<PartnerKey, Partner> = {
     points: ['見積もり無料', '最短即日（各社公表）', '東京・神奈川'],
     href: 'https://px.a8.net/svt/ejp?a8mat=4BEQI6+4DRWUY+3EMG+5MFT42', // 2026-10-29 承認（株式会社GRACE）
     beacon: 'https://www17.a8.net/0.gif?a8mat=4BEQI6+4DRWUY+3EMG+5MFT42',
-    a8ProgramId: 's00000015892034', reward: 2500, heater: 'gas', acceptsRepair: true,
+    asp: 'a8', programId: 's00000015892034', reward: 2500, heater: 'gas', acceptsRepair: true,
     areas: ['tokyo', 'kanagawa'],
+  },
+  gasq: {
+    key: 'gasq', name: 'GAS-Q（ガスキュー）', who: 'ガス給湯器の交換',
+    points: ['見積もり無料', '本体・工事10年保証（各社公表）', '1都3県'],
+    // 2026-10-30 レントラックスで提携中を確認（嶺岡設備株式会社、成果＝問い合わせ後の面談完了、承認率67%）。
+    // 対応地域は広告主サイトの「対応地域」：東京・神奈川・千葉・埼玉（ほかに大阪・京都・兵庫。診断の選択肢に無いので出さない）。
+    href: 'https://www.rentracks.jp/adx/r.html?idx=0.75552.390675.10253.14642&dna=167499',
+    beacon: 'https://www.rentracks.jp/adx/p.gifx?idx=0.75552.390675.10253.14642&dna=167499',
+    asp: 'rentracks', programId: '14642', reward: 5280, heater: 'gas', acceptsRepair: false,
+    areas: ['tokyo', 'kanagawa', 'chiba', 'saitama'],
   },
   kyutto: {
     key: 'kyutto', name: 'きゅっと', who: 'エコキュートの修理・交換',
     points: ['見積もり無料', '最短即日（各社公表）', '1都3県・愛知・静岡'],
     href: 'https://px.a8.net/svt/ejp?a8mat=4BEQI6+4QA0KA+3EMG+5GHH2A', // 2026-10-29 承認（株式会社GRACE）
     beacon: 'https://www11.a8.net/0.gif?a8mat=4BEQI6+4QA0KA+3EMG+5GHH2A',
-    a8ProgramId: 's00000015892033', reward: 5500, heater: 'eco', acceptsRepair: true,
+    asp: 'a8', programId: 's00000015892033', reward: 5500, heater: 'eco', acceptsRepair: true,
     areas: SIX,
   },
   cools: {
     key: 'cools', name: 'Cools', who: 'エコキュートの交換',
     points: ['見積もり無料', '10年保証（各社公表）', '45都府県'],
     href: '', // ★A8 承認後に広告リンクを貼る（s00000027639001）
-    a8ProgramId: 's00000027639001', reward: 6000, heater: 'eco', acceptsRepair: false,
+    asp: 'a8', programId: 's00000027639001', reward: 6000, heater: 'eco', acceptsRepair: false,
     // ★リンクを貼るときに、成果対象外の地域が「ng」の選択肢（北海道・青森・岩手・秋田・新潟・沖縄）と一致するか確かめる
     areas: [...SIX, 'other'],
   },
@@ -241,7 +253,10 @@ function serves(p: Partner, a: Answers, mode: Mode): boolean {
 
 /** 送客先は1つに絞る（main）。交換寄りで、別の交換先もあれば控えめに sub を出す。 */
 export function pickPartners(a: Answers, v: Verdict): { main: Partner; sub: Partner | null } | null {
-  const order: PartnerKey[] = a.type === 'gas' ? ['oyu'] : ['kyutto', 'cools'];
+  // ガス：交換寄り（10年以上）は交換専門の GAS-Q を先に。迷う・修理寄りは修理もできるお湯が出ない.com を先に。
+  const order: PartnerKey[] = a.type === 'gas'
+    ? (v.mode === 'replace' ? ['gasq', 'oyu'] : ['oyu', 'gasq'])
+    : ['kyutto', 'cools'];
   const candidates = order.map((k) => PARTNERS[k]).filter((p) => serves(p, a, v.mode));
   if (candidates.length === 0) return null;
   const [main, ...rest] = candidates;

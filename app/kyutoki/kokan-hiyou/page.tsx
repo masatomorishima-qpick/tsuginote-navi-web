@@ -24,9 +24,14 @@ import PartnerLink from '@/components/kyutoki/PartnerLink';
  *   なぜ今（10年で部品の供給が終わる→壊れると直せない→お湯なしで待つ）、なぜこの会社（現地調査でその日に金額が決まる・
  *   後払い・補助金の申請代行）、なぜここ経由（見積もりの持ち物メモ）。ボタンは成果地点（面談＝現地調査）に合わせて
  *   「無料の現地調査を頼む」に。2社の並びは GAS-Q を主役に、お湯が出ない.com は修理の可能性を残したい人向けに下へ。
- *   GAS-Q の記載は公式サイト gas-q.jp/ad/kyutou（2026-10-31 確認）：税込88,000円〜（一部機種を除く）、見積もり無料・
- *   現地調査費用なし、在庫があればその場で工事日を決定、工事後の後払い・クレジットカード可、本体保証10年・工事保証10年、
- *   補助金申請の代行（無料）、年中無休 9〜20時、対応地域は東京・神奈川・千葉・埼玉。
+ *   GAS-Q の記載は公式サイト gas-q.jp/ad/kyutou（2026-10-31 Chrome で画像まで確認）：
+ *     交換 79,800円（税込）〜（石油給湯器など一部製品を除く。画像の記載。画像の代替文は古い「88,000円」のまま）、
+ *     機種別の工事込み価格：16号給湯専用 79,800円（台所リモコン別売）／24号フルオート エコジョーズ 188,000円（本体・リモコン・工事）／
+ *     24号暖房付きオート 248,000円、無料見積り・即日対応・365日営業、「電話1本で即日見積、最短即日工事」、
+ *     「当日にお湯が出るようにします（在庫のレンタル機器を仮付け）」、「他社より1円でも安くします（相見積り大歓迎）」、
+ *     見積もり無料・現地調査費用なし、在庫があればその場で工事日を決定、工事後の後払い・クレジットカード・QR決済可、
+ *     本体保証10年・工事保証10年、メーカー認定施工店、補助金申請の代行（無料。掲載は2025年度の制度名）、
+ *     年中無休 9〜20時、対応地域は東京・神奈川・千葉・埼玉。
  *
  * 数字の出典（2026-10-30 確認）：
  *   費用 … 東京ガス「給湯器交換」の販売価格（工事費込み・税込）と、同社の「選び方」ページの相場
@@ -210,7 +215,7 @@ export default function KokanHiyouPage() {
             {[
               { icon: PackageX, h: '部品は10年まで', d: '修理部品の保有は7〜10年' },
               { icon: Wrench, h: '壊れたら直せない', d: '部品がなければ交換だけ' },
-              { icon: Hourglass, h: 'お湯なしで待つ', d: '壊れてから探すと日数がかかる' },
+              { icon: Hourglass, h: 'お湯なしで待つ', d: '壊れてから探すと順番待ち' },
             ].map(({ icon: I, h, d }) => (
               <li key={h} className="flex flex-col items-center gap-1.5 rounded-2xl bg-white px-2 py-3 text-center ring-1 ring-slate-200">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-50 text-orange-600"><I size={20} aria-hidden="true" /></span>
@@ -224,10 +229,10 @@ export default function KokanHiyouPage() {
           <div className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
             <ul className="grid grid-cols-2 gap-2">
               {[
-                { icon: CalendarCheck, t: '現地調査で金額が決まる' },
+                { icon: Tag, t: '交換 7.98万円〜（工事込み）' },
+                { icon: CalendarCheck, t: '最短即日。当日お湯が出る仮付けも' },
                 { icon: CreditCard, t: '工事後の後払い可' },
                 { icon: ShieldCheck, t: '本体・工事とも10年保証' },
-                { icon: MapPin, t: '1都3県に対応' },
               ].map(({ icon: I, t }) => (
                 <li key={t} className="flex items-center gap-2 rounded-xl bg-white px-2.5 py-2 text-[12px] font-bold leading-tight text-slate-700 ring-1 ring-orange-200">
                   <I size={16} className="shrink-0 text-orange-600" aria-hidden="true" />{t}
@@ -387,7 +392,7 @@ export default function KokanHiyouPage() {
           </ul>
           <div className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
             <p className="flex items-center gap-2 text-[15px] font-bold text-slate-800">
-              <ClipboardCheck size={20} className="shrink-0 text-orange-600" aria-hidden="true" />もう1社の見積もりと並べると、高いかどうかが分かります
+              <ClipboardCheck size={20} className="shrink-0 text-orange-600" aria-hidden="true" />今の見積もりを見せて比べる。GAS-Qは「他社より1円でも安くします」と公表
             </p>
             <PartnerLink lpId={LP_ID} partner="gasq" position="takai" label="無料の現地調査を頼む" note="断っても費用はかかりません。GAS-Q（ガスキュー）のサイトに移動します" />
           </div>
@@ -429,16 +434,21 @@ export default function KokanHiyouPage() {
                 <span className="text-[18px] font-black leading-tight text-slate-900">GAS-Q</span>
                 <span className="text-[11px] text-slate-500">ガス給湯器の交換専門</span>
               </span>
-              <span className="text-[15px] font-black text-orange-600">交換 8.8万円〜</span>
+              <span className="text-[15px] font-black text-orange-600">交換 7.98万円〜</span>
             </div>
+            <p className="rounded-xl bg-orange-50 px-3 py-2 text-[13px] text-slate-700">
+              24号フルオートのエコジョーズが<b className="text-slate-900">18.8万円</b>（本体・リモコン・工事込み）。東京ガスの同等品は約22.7万円
+            </p>
             <ul className="grid grid-cols-2 gap-x-3 gap-y-2">
               {[
                 { icon: CalendarCheck, t: '現地調査・見積もり無料' },
+                { icon: Clock, t: '最短即日工事。当日お湯が出る仮付けも' },
+                { icon: Scale, t: '他社より1円でも安く（相見積もり歓迎）' },
                 { icon: CreditCard, t: '工事後の後払い・カード可' },
-                { icon: ShieldCheck, t: '本体・工事10年保証' },
+                { icon: ShieldCheck, t: '本体・工事10年保証・認定施工店' },
                 { icon: Handshake, t: '補助金の申請を無料で代行' },
-                { icon: Clock, t: '年中無休 9〜20時' },
                 { icon: MapPin, t: '東京・神奈川・千葉・埼玉' },
+                { icon: Building2, t: 'マンション・狭い場所も対応' },
               ].map(({ icon: I, t }) => (
                 <li key={t} className="flex items-start gap-1.5 text-[12px] leading-snug text-slate-700">
                   <I size={14} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />{t}
@@ -457,7 +467,7 @@ export default function KokanHiyouPage() {
             </div>
           </div>
           <p className={SRC}>
-            各社の公式サイトの記載です（2026年10月確認）。GAS-Qの「8.8万円〜」は一部の機種を除く価格で、料金の内訳は本体・基本工事・取り外し・リモコンと公表しています。補助金は対象の制度と機種によります。
+            各社の公式サイトの記載です（2026年10月31日確認）。GAS-Qの「7.98万円〜」は16号給湯専用の本体＋工事（台所リモコン別売）で、石油給湯器など一部製品を除きます。「当日お湯が出る仮付け」はレンタル機器の在庫がある場合。補助金は対象の制度と機種によります。東京ガスの同等品の価格は販売価格（工事費込み・税込）の記載。
           </p>
         </section>
 

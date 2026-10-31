@@ -32,6 +32,9 @@ import {
  *
  * 2026-10-28 v2：文字を減らし、選択肢をアイコン付きのカードにした。画面下に固定の開始ボタンを追加。
  * 2026-10-29 v4：開始ボタンをなくし、最初の質問を最初の画面に出す。kyutoki_diag_start は最初の回答の時点で出す。
+ * 2026-10-31 v8：入口ごとに答えを先に入れておける（preset）。/jumyo は「今は使える」を入れた状態で始めるので、
+ *   最初の質問が「使い始めて何年ですか？」になる（寿命で検索した人に症状を聞いていた不一致の直し）。
+ *   送客ボタンの文言は紹介先の cta（成果地点に合わせた言葉）を使う。
  */
 
 type Icon = ComponentType<LucideProps>;
@@ -137,12 +140,15 @@ function Nav({ onBack, onRestart }: { onBack: () => void; onRestart?: () => void
   );
 }
 
-/** 最初の質問（開始ボタンを挟まず、最初の画面から答えられるようにする。2026-10-29 v4） */
-const FIRST_STEP = activeSteps({})[0];
+/** 最初の質問（開始ボタンを挟まず、最初の画面から答えられるようにする。2026-10-29 v4）。preset で答え済みの設問は飛ばす。 */
+function firstStepOf(preset: Answers): Step {
+  return activeSteps(preset).find((s) => !(s.id in preset)) ?? activeSteps({})[0];
+}
 
-export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string }) {
+export default function OyuDiagnosis({ lcdFontClass, preset = {} }: { lcdFontClass: string; preset?: Answers }) {
+  const FIRST_STEP = firstStepOf(preset);
   const [view, setView] = useState<View>({ kind: 'step', step: FIRST_STEP });
-  const [answers, setAnswers] = useState<Answers>({});
+  const [answers, setAnswers] = useState<Answers>(preset);
   const [history, setHistory] = useState<StepId[]>([]);
   const [panelVisible, setPanelVisible] = useState(true);
   const attr = useRef<Attribution>({});
@@ -219,7 +225,7 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
   };
 
   const restart = () => {
-    setAnswers({});
+    setAnswers(preset);
     setHistory([]);
     setView({ kind: 'step', step: FIRST_STEP });
   };
@@ -267,14 +273,15 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
   };
 
   /* ===== 表示 ===== */
-  const steps = activeSteps(answers);
+  // 入口で答え済みの設問は、進み具合の表示に数えない
+  const steps = activeSteps(answers).filter((s) => !(s.id in preset));
   const primaryBtn = 'flex min-h-[60px] w-full items-center justify-center gap-2 rounded-2xl bg-orange-600 px-5 text-lg font-bold text-white shadow-[0_8px_20px_-10px_rgba(234,88,12,.8)] transition hover:bg-orange-700 active:scale-[.99]';
 
   let body: React.ReactNode;
 
   if (view.kind === 'step') {
     const step = view.step;
-    const idx = steps.findIndex((s) => s.id === step.id);
+    const idx = Math.max(0, steps.findIndex((s) => s.id === step.id));
     const withIcons = step.opts.some((o) => OPT_ICONS[`${step.id}:${o.v}`]);
     const cols = step.id === 'type' || step.id === 'cold' ? 'grid-cols-3' : 'grid-cols-2';
     body = (
@@ -409,10 +416,10 @@ export default function OyuDiagnosis({ lcdFontClass }: { lcdFontClass: string })
               onClick={() => onPartnerClick(pk.main, 'main')}
               className={primaryBtn}
             >
-              <span className="whitespace-nowrap">無料で見積もりを頼む</span> <ArrowRight size={20} aria-hidden="true" />
+              <span className="whitespace-nowrap">{pk.main.cta}</span> <ArrowRight size={20} aria-hidden="true" />
             </a>
             <p className="text-center text-[11px] text-slate-500">
-              {pk.main.name}のサイトに移動します
+              断っても費用はかかりません。{pk.main.name}のサイトに移動します
               {answers.type === 'gas' && v.mode !== 'repair' && <><br />費用の目安：東京ガスの公表相場（2026年10月）</>}
             </p>
             {pk.main.beacon && (

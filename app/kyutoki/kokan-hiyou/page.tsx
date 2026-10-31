@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  Bath, Building2, CalendarClock, ClipboardCheck, Clock, Factory, Flame, Gauge, HardHat, Handshake, Home, Leaf, MapPin,
-  PhoneOff, Scale, ShieldCheck, Stethoscope, Tag, Users, Wrench,
+  Bath, Building2, CalendarClock, CalendarCheck, CircleCheck, ClipboardCheck, Clock, CreditCard, Factory, Flame, Gauge, HardHat, Handshake, Home, Hourglass, Leaf, MapPin,
+  PackageX, PhoneOff, Scale, ShieldCheck, Stethoscope, Tag, Users, Wrench,
 } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
@@ -20,6 +20,13 @@ import PartnerLink from '@/components/kyutoki/PartnerLink';
  *
  * v2（2026-10-31）：検索広告をテールワード（住まい・メーカー・エコジョーズ・見積もりが高い など）で組み直したので、
  *   それぞれの言葉の答えになる節を足した（#sumai #maker #takai）。広告の行き先はこの節に直接つなぐ。
+ * v3（2026-10-31）：紹介先を使う理由（大義名分）を3段で入れた。
+ *   なぜ今（10年で部品の供給が終わる→壊れると直せない→お湯なしで待つ）、なぜこの会社（現地調査でその日に金額が決まる・
+ *   後払い・補助金の申請代行）、なぜここ経由（見積もりの持ち物メモ）。ボタンは成果地点（面談＝現地調査）に合わせて
+ *   「無料の現地調査を頼む」に。2社の並びは GAS-Q を主役に、お湯が出ない.com は修理の可能性を残したい人向けに下へ。
+ *   GAS-Q の記載は公式サイト gas-q.jp/ad/kyutou（2026-10-31 確認）：税込88,000円〜（一部機種を除く）、見積もり無料・
+ *   現地調査費用なし、在庫があればその場で工事日を決定、工事後の後払い・クレジットカード可、本体保証10年・工事保証10年、
+ *   補助金申請の代行（無料）、年中無休 9〜20時、対応地域は東京・神奈川・千葉・埼玉。
  *
  * 数字の出典（2026-10-30 確認）：
  *   費用 … 東京ガス「給湯器交換」の販売価格（工事費込み・税込）と、同社の「選び方」ページの相場
@@ -33,7 +40,7 @@ import PartnerLink from '@/components/kyutoki/PartnerLink';
  */
 
 const LP_ID = 'kyutoki-kokan-hiyou';
-const VERSION = 'v2-2026-10-31';
+const VERSION = 'v3-2026-10-31';
 const PAGE_PATH = '/kyutoki/kokan-hiyou';
 const TITLE = 'ガス給湯器の交換費用の目安｜種類・号数別と見積もりの確かめ方';
 const DESCRIPTION =
@@ -100,6 +107,10 @@ const FAQS = [
   {
     q: 'メーカーで値段は変わりますか？',
     a: '同じ号数・同じ機能なら、リンナイとノーリツの差は数千円ほどです（東京ガスの販売価格）。メーカーより、号数と機能をそろえて比べるほうが大事です。',
+  },
+  {
+    q: '現地調査を頼んだあと、断ってもいいですか？',
+    a: 'はい。GAS-Qは見積もりと現地調査を無料と公表しており、見積もりを見てから頼まなくても費用はかかりません。自分から頼む現地調査は、飛び込みの「点検します」の訪問とは別のものです。',
   },
   {
     q: '賃貸に住んでいます。自分で頼んでいいですか？',
@@ -194,15 +205,38 @@ export default function KokanHiyouPage() {
             </div>
           </div>
 
+          {/* v3：なぜ今か。10年で部品の供給が終わる → 壊れると直せない → お湯なしで待つ */}
+          <ul className="grid grid-cols-3 gap-2">
+            {[
+              { icon: PackageX, h: '部品は10年まで', d: '修理部品の保有は7〜10年' },
+              { icon: Wrench, h: '壊れたら直せない', d: '部品がなければ交換だけ' },
+              { icon: Hourglass, h: 'お湯なしで待つ', d: '壊れてから探すと日数がかかる' },
+            ].map(({ icon: I, h, d }) => (
+              <li key={h} className="flex flex-col items-center gap-1.5 rounded-2xl bg-white px-2 py-3 text-center ring-1 ring-slate-200">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-50 text-orange-600"><I size={20} aria-hidden="true" /></span>
+                <span className="text-[13px] font-black leading-tight text-slate-900">{h}</span>
+                <span className="text-[10px] leading-snug text-slate-500">{d}</span>
+              </li>
+            ))}
+          </ul>
+
+          {/* v3：なぜこの会社か。GAS-Q の公式の記載だけ（冒頭の注釈に出典） */}
           <div className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
-            <ul className="flex flex-wrap gap-1.5">
-              {['見積もり無料', '本体・工事10年保証', '東京・神奈川・千葉・埼玉'].map((t) => (
-                <li key={t} className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700 ring-1 ring-orange-200">{t}</li>
+            <ul className="grid grid-cols-2 gap-2">
+              {[
+                { icon: CalendarCheck, t: '現地調査で金額が決まる' },
+                { icon: CreditCard, t: '工事後の後払い可' },
+                { icon: ShieldCheck, t: '本体・工事とも10年保証' },
+                { icon: MapPin, t: '1都3県に対応' },
+              ].map(({ icon: I, t }) => (
+                <li key={t} className="flex items-center gap-2 rounded-xl bg-white px-2.5 py-2 text-[12px] font-bold leading-tight text-slate-700 ring-1 ring-orange-200">
+                  <I size={16} className="shrink-0 text-orange-600" aria-hidden="true" />{t}
+                </li>
               ))}
             </ul>
-            <PartnerLink lpId={LP_ID} partner="gasq" position="hero" label="無料で見積もりを頼む" note="GAS-Q（ガスキュー）のサイトに移動します" beacon />
+            <PartnerLink lpId={LP_ID} partner="gasq" position="hero" label="無料の現地調査を頼む" note="断っても費用はかかりません。GAS-Q（ガスキュー）のサイトに移動します" beacon />
           </div>
-          <p className={SRC}>目安は工事費込み・税込。東京ガスの公表している相場です（2026年10月確認）。</p>
+          <p className={SRC}>費用の目安は工事費込み・税込。東京ガスの公表している相場です（2026年10月確認）。会社の記載は GAS-Q の公式サイトによります。</p>
         </section>
 
         {/* 種類別の目安：横の帯で見せる */}
@@ -355,55 +389,75 @@ export default function KokanHiyouPage() {
             <p className="flex items-center gap-2 text-[15px] font-bold text-slate-800">
               <ClipboardCheck size={20} className="shrink-0 text-orange-600" aria-hidden="true" />もう1社の見積もりと並べると、高いかどうかが分かります
             </p>
-            <PartnerLink lpId={LP_ID} partner="gasq" position="takai" label="無料で見積もりを頼む" note="GAS-Q（ガスキュー）のサイトに移動します" />
+            <PartnerLink lpId={LP_ID} partner="gasq" position="takai" label="無料の現地調査を頼む" note="断っても費用はかかりません。GAS-Q（ガスキュー）のサイトに移動します" />
           </div>
         </section>
 
-        {/* 見積もりを頼める2社 */}
+        {/* v3：見積もりの持ち物メモ（なぜここ経由か：ページで整理した3つを持って行くと現地調査が早い） */}
+        <section className={SECTION} aria-labelledby="memo">
+          <div className="flex flex-col gap-1.5">
+            <h2 id="memo" className={H2}>現地調査の前に3つ</h2>
+            <p className="text-[15px] text-slate-600">本体のラベルを写真に撮れば足ります。</p>
+          </div>
+          <ul className="grid grid-cols-3 gap-2.5">
+            {[
+              { icon: Bath, h: '機能', d: '給湯だけ／オート／フルオート' },
+              { icon: Gauge, h: '号数', d: 'ラベルの16・20・24' },
+              { icon: CalendarClock, h: '製造年', d: 'ラベルの年。10年超なら交換' },
+            ].map(({ icon: I, h, d }) => (
+              <li key={h} className="flex flex-col items-center gap-2 rounded-2xl bg-white px-2 py-4 text-center ring-1 ring-slate-200">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-50 text-sky-700"><I size={22} aria-hidden="true" /></span>
+                <span className="text-[15px] font-black text-slate-900">{h}</span>
+                <span className="text-[11px] leading-snug text-slate-500">{d}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-[14px] text-slate-700">
+            <CircleCheck size={22} className="shrink-0 text-emerald-600" aria-hidden="true" />この3つを伝えると、見積もりの話が早く進みます
+          </p>
+        </section>
+
+        {/* 見積もりを頼める会社（v3：交換は GAS-Q を主役に。修理の可能性を残したい人はお湯が出ない.com） */}
         <section className={SECTION} aria-labelledby="hikaku">
           <div className="flex flex-col gap-1.5">
-            <h2 id="hikaku" className={H2}>見積もりを頼める2社</h2>
-            <p className="text-[15px] text-slate-600">交換なら左、修理もあり得るなら右。</p>
+            <h2 id="hikaku" className={H2}>見積もりを頼める会社</h2>
+            <p className="text-[15px] text-slate-600">交換と決めているなら、まず1社で十分です。</p>
           </div>
-          <div className="grid grid-cols-2 gap-2.5">
-            {[
-              {
-                key: 'gasq' as const, name: 'GAS-Q', sub: 'ガス給湯器の交換',
-                rows: [
-                  { icon: Tag, t: '給湯器 8.8万円〜' },
-                  { icon: ShieldCheck, t: '本体・工事10年保証' },
-                  { icon: Clock, t: '年中無休 9〜20時' },
-                  { icon: MapPin, t: '東京・神奈川・千葉・埼玉' },
-                ],
-              },
-              {
-                key: 'oyu' as const, name: 'お湯が出ない.com', sub: '修理・交換',
-                rows: [
-                  { icon: Wrench, t: '修理 2.2万円〜' },
-                  { icon: ShieldCheck, t: '工事10年保証' },
-                  { icon: Clock, t: '年中無休 9〜21時' },
-                  { icon: MapPin, t: '東京・神奈川' },
-                ],
-              },
-            ].map((c) => (
-              <div key={c.key} className="flex flex-col gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
-                <div className="flex flex-col">
-                  <span className="text-[16px] font-black leading-tight text-slate-900">{c.name}</span>
-                  <span className="text-[11px] text-slate-500">{c.sub}</span>
-                </div>
-                <ul className="flex flex-1 flex-col gap-2">
-                  {c.rows.map(({ icon: I, t }) => (
-                    <li key={t} className="flex items-start gap-1.5 text-[12px] leading-snug text-slate-700">
-                      <I size={14} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />{t}
-                    </li>
-                  ))}
-                </ul>
-                <PartnerLink lpId={LP_ID} partner={c.key} position="table" label="見積もり" variant="secondary" beacon={c.key === 'oyu'} />
-              </div>
-            ))}
+          <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 ring-2 ring-orange-300">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="flex flex-col">
+                <span className="text-[18px] font-black leading-tight text-slate-900">GAS-Q</span>
+                <span className="text-[11px] text-slate-500">ガス給湯器の交換専門</span>
+              </span>
+              <span className="text-[15px] font-black text-orange-600">交換 8.8万円〜</span>
+            </div>
+            <ul className="grid grid-cols-2 gap-x-3 gap-y-2">
+              {[
+                { icon: CalendarCheck, t: '現地調査・見積もり無料' },
+                { icon: CreditCard, t: '工事後の後払い・カード可' },
+                { icon: ShieldCheck, t: '本体・工事10年保証' },
+                { icon: Handshake, t: '補助金の申請を無料で代行' },
+                { icon: Clock, t: '年中無休 9〜20時' },
+                { icon: MapPin, t: '東京・神奈川・千葉・埼玉' },
+              ].map(({ icon: I, t }) => (
+                <li key={t} className="flex items-start gap-1.5 text-[12px] leading-snug text-slate-700">
+                  <I size={14} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />{t}
+                </li>
+              ))}
+            </ul>
+            <PartnerLink lpId={LP_ID} partner="gasq" position="table" label="無料の現地調査を頼む" note="断っても費用はかかりません" />
+          </div>
+          <div className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
+            <span className="flex flex-1 flex-col">
+              <span className="text-[14px] font-black leading-tight text-slate-900">お湯が出ない.com</span>
+              <span className="text-[11px] text-slate-500">修理の可能性も残したいなら。修理2.2万円〜・東京・神奈川</span>
+            </span>
+            <div className="w-[120px] shrink-0">
+              <PartnerLink lpId={LP_ID} partner="oyu" position="table" label="見積もり" variant="secondary" beacon />
+            </div>
           </div>
           <p className={SRC}>
-            各社の公式サイトの記載です（2026年10月確認）。GAS-Qの「8.8万円〜」は一部の機種を除く給湯器の価格で、工事費を含むかは見積もりで確かめてください。見積もり・出張・現地調査はどちらも無料と公表しています。
+            各社の公式サイトの記載です（2026年10月確認）。GAS-Qの「8.8万円〜」は一部の機種を除く価格で、料金の内訳は本体・基本工事・取り外し・リモコンと公表しています。補助金は対象の制度と機種によります。
           </p>
         </section>
 
@@ -434,7 +488,7 @@ export default function KokanHiyouPage() {
         <section className={SECTION} aria-labelledby="chui">
           <div className="flex flex-col gap-1.5">
             <h2 id="chui" className={H2}>「点検します」の電話に注意</h2>
-            <p className="text-[15px] text-slate-600">給湯器の点検をめぐる相談が急増しています。</p>
+            <p className="text-[15px] text-slate-600">自分から頼む現地調査とは別物です。向こうから来る「点検」の相談が急増しています。</p>
           </div>
           <div className="flex items-center gap-4 rounded-2xl bg-red-50 p-4">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600"><Users size={24} aria-hidden="true" /></span>
@@ -495,8 +549,8 @@ export default function KokanHiyouPage() {
         </section>
 
         <section className="flex flex-col gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
-          <p className="text-center text-[16px] font-black text-slate-900">号数と機能が分かれば、見積もりは早い</p>
-          <PartnerLink lpId={LP_ID} partner="gasq" position="bottom" label="無料で見積もりを頼む" note="GAS-Q（ガスキュー）のサイトに移動します" />
+          <p className="text-center text-[16px] font-black text-slate-900">壊れる前なら、工事日を選べる</p>
+          <PartnerLink lpId={LP_ID} partner="gasq" position="bottom" label="無料の現地調査を頼む" note="断っても費用はかかりません。GAS-Q（ガスキュー）のサイトに移動します" />
         </section>
 
         <p className="text-[11px] leading-relaxed text-slate-400">
@@ -506,7 +560,7 @@ export default function KokanHiyouPage() {
 
       {/* スマホの画面下に固定する見積もりボタン */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))] backdrop-blur sm:hidden">
-        <PartnerLink lpId={LP_ID} partner="gasq" position="sticky" label="無料で見積もりを頼む" />
+        <PartnerLink lpId={LP_ID} partner="gasq" position="sticky" label="無料の現地調査を頼む" />
       </div>
       <LpFooter />
     </div>

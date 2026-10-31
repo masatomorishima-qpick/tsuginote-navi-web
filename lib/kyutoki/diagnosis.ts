@@ -14,7 +14,7 @@
 
 export const LP_ID = 'kyutoki-oyu-ga-denai';
 /** 診断の文言・分岐を変えたら上げる。GA4 と lp_event_logs に毎回送るので、版ごとの成績を比べられる。 */
-export const VERDICT_VERSION = 'v7-2026-10-31';
+export const VERDICT_VERSION = 'v8-2026-10-31';
 
 export type Area =
   | 'tokyo' | 'kanagawa' | 'chiba' | 'saitama' | 'aichi' | 'shizuoka'
@@ -108,7 +108,14 @@ export const STEPS: Step[] = [
 ];
 
 export function activeSteps(a: Answers): Step[] {
-  return STEPS.filter((s) => !s.when || s.when(a));
+  const steps = STEPS.filter((s) => !s.when || s.when(a));
+  // v8：今は使える人（寿命・替えどきの広告から来る人）は、症状より先に年数を聞く。
+  // /jumyo の入口は symptom を fine に固定して始めるので、最初の画面の質問が「使い始めて何年ですか？」になる。
+  if (a.symptom === 'fine') {
+    const age = steps.find((s) => s.id === 'age');
+    return age ? [age, ...steps.filter((s) => s.id !== 'age')] : steps;
+  }
+  return steps;
 }
 
 /* ===== 途中で止める案内（送客しない） ===== */
@@ -132,8 +139,8 @@ export function verdictOf(a: Answers): Verdict {
     switch (a.age) {
       case 'gt10':
         return {
-          mode: 'replace', label: '10年以上', h: '交換を考える時期です',
-          why: '壊れる前なら、急がずに見積もりを比べられます。修理部品がない年数でもあります。',
+          mode: 'replace', label: '10年以上', h: '交換の時期です',
+          why: '10年を過ぎると修理部品の供給が終わり、壊れると直せません。壊れる前なら、金額と工事日を落ち着いて決められます。',
         };
       case '7to10':
         return {
@@ -155,8 +162,8 @@ export function verdictOf(a: Answers): Verdict {
   switch (a.age) {
     case 'gt10':
       return {
-        mode: 'replace', label: '10年以上', h: '交換を考える時期です',
-        why: '修理部品が手に入らないことがある年数です。',
+        mode: 'replace', label: '10年以上', h: '交換の時期です',
+        why: '修理部品が手に入らないことがある年数です。壊れたままにせず、先に交換の金額を確かめましょう。',
       };
     case '7to10':
       return {
@@ -224,6 +231,8 @@ export type Partner = {
   name: string;
   who: string;
   points: string[];
+  /** 送客ボタンの文言。成果地点に合わせる（GAS-Q は面談完了なので「現地調査」）。 */
+  cta: string;
   href: string;
   /** 表示計測用の1×1画像（広告リンクと一緒に発行されるもの）。リンクの近くに置く。 */
   beacon?: string;
@@ -243,7 +252,8 @@ const SIX: Area[] = ['tokyo', 'kanagawa', 'chiba', 'saitama', 'aichi', 'shizuoka
 export const PARTNERS: Record<PartnerKey, Partner> = {
   oyu: {
     key: 'oyu', name: 'お湯が出ない.com', who: 'ガス給湯器の修理・交換',
-    points: ['見積もり無料', '最短即日（各社公表）', '東京・神奈川'],
+    points: ['出張・見積もり無料', '最短即日（各社公表）', '東京・神奈川'],
+    cta: '無料で見積もりを頼む',
     href: 'https://px.a8.net/svt/ejp?a8mat=4BEQI6+4DRWUY+3EMG+5MFT42', // 2026-10-29 承認（株式会社GRACE）
     beacon: 'https://www17.a8.net/0.gif?a8mat=4BEQI6+4DRWUY+3EMG+5MFT42',
     asp: 'a8', programId: 's00000015892034', reward: 2500, heater: 'gas', acceptsRepair: true,
@@ -251,8 +261,12 @@ export const PARTNERS: Record<PartnerKey, Partner> = {
   },
   gasq: {
     key: 'gasq', name: 'GAS-Q（ガスキュー）', who: 'ガス給湯器の交換',
-    points: ['見積もり無料', '本体・工事10年保証（各社公表）', '1都3県'],
+    // v8（10/31）：公式サイト gas-q.jp/ad/kyutou の記載（2026-10-31 確認）：見積もり無料・現地調査費用なし・
+    // 在庫があればその場で工事日を決定・工事後の後払い・クレジットカード可・本体保証10年/工事保証10年・補助金申請の代行（無料）。
+    points: ['現地調査・見積もり無料', '工事後の後払い可', '本体・工事10年保証', '1都3県'],
+    cta: '無料の現地調査を頼む',
     // 2026-10-30 レントラックスで提携中を確認（嶺岡設備株式会社、成果＝問い合わせ後の面談完了、承認率67%）。
+    // 10/31 条件を再確認：成果地点は「新規問い合わせ後の面談完了」。検索広告は社名・サービス名の商標キーワードNG。
     // 対応地域は広告主サイトの「対応地域」：東京・神奈川・千葉・埼玉（ほかに大阪・京都・兵庫。診断の選択肢に無いので出さない）。
     href: 'https://www.rentracks.jp/adx/r.html?idx=0.75552.390675.10253.14642&dna=167499',
     beacon: 'https://www.rentracks.jp/adx/p.gifx?idx=0.75552.390675.10253.14642&dna=167499',
@@ -262,6 +276,7 @@ export const PARTNERS: Record<PartnerKey, Partner> = {
   kyutto: {
     key: 'kyutto', name: 'きゅっと', who: 'エコキュートの修理・交換',
     points: ['見積もり無料', '最短即日（各社公表）', '1都3県・愛知・静岡'],
+    cta: '無料で見積もりを頼む',
     href: 'https://px.a8.net/svt/ejp?a8mat=4BEQI6+4QA0KA+3EMG+5GHH2A', // 2026-10-29 承認（株式会社GRACE）
     beacon: 'https://www11.a8.net/0.gif?a8mat=4BEQI6+4QA0KA+3EMG+5GHH2A',
     asp: 'a8', programId: 's00000015892033', reward: 5500, heater: 'eco', acceptsRepair: true,
@@ -270,6 +285,7 @@ export const PARTNERS: Record<PartnerKey, Partner> = {
   cools: {
     key: 'cools', name: 'Cools', who: 'エコキュートの交換',
     points: ['見積もり無料', '10年保証（各社公表）', '45都府県'],
+    cta: '無料で見積もりを頼む',
     href: '', // ★A8 承認後に広告リンクを貼る（s00000027639001）
     asp: 'a8', programId: 's00000027639001', reward: 6000, heater: 'eco', acceptsRepair: false,
     // ★リンクを貼るときに、成果対象外の地域が「ng」の選択肢（北海道・青森・岩手・秋田・新潟・沖縄）と一致するか確かめる

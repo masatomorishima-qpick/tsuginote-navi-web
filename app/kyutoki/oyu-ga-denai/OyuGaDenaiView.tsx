@@ -153,7 +153,8 @@ export default function OyuGaDenaiView({ hero = 'default' }: { hero?: Hero }) {
             <span>ガスのにおいがしたら、診断より先に<span className="whitespace-nowrap">ガス会社へ</span></span>
           </p>
 
-          <OyuDiagnosis lcdFontClass={lcdFont.className} />
+          {/* v8：寿命の入口（/jumyo）は「今は使える」を先に入れ、最初の質問を使用年数にする */}
+          <OyuDiagnosis lcdFontClass={lcdFont.className} preset={hero === 'jumyo' ? { symptom: 'fine' } : undefined} />
         </section>
 
         {/* 使用年数の目安：表ではなく色分けの帯で見せる */}

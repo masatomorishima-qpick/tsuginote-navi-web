@@ -8,7 +8,9 @@ import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import LpViewTracker from '@/components/lp/LpViewTracker';
-import PartnerLink from '@/components/kyutoki/PartnerLink';
+import PartnerLink, { PartnerValueCards } from '@/components/kyutoki/PartnerLink';
+import KokanHeroTitle from '@/components/kyutoki/KokanHeroTitle';
+import { Suspense } from 'react';
 
 /**
  * ガス給湯器の交換費用（記事型の着地ページ。2026-10-31 新設）。
@@ -45,7 +47,7 @@ import PartnerLink from '@/components/kyutoki/PartnerLink';
  */
 
 const LP_ID = 'kyutoki-kokan-hiyou';
-const VERSION = 'v3-2026-10-31';
+const VERSION = 'v4-2026-11-01';
 const PAGE_PATH = '/kyutoki/kokan-hiyou';
 const TITLE = 'ガス給湯器の交換費用の目安｜種類・号数別と見積もりの確かめ方';
 const DESCRIPTION =
@@ -197,13 +199,10 @@ export default function KokanHiyouPage() {
         <section className="flex flex-col gap-5">
           <div className="grid grid-cols-[1fr_auto] items-center gap-3">
             <div className="flex flex-col gap-3">
-              <span className="self-start rounded-full bg-white px-3 py-1 text-xs font-bold text-sky-800 ring-1 ring-sky-200">給湯器の交換</span>
-              <h1 className="text-[32px] font-black leading-[1.15] tracking-tight text-slate-900 min-[380px]:text-[36px]">
-                <span className="whitespace-nowrap">ガス給湯器の</span><br /><span className="whitespace-nowrap">交換費用</span>
-              </h1>
-              <p className="text-[17px] font-bold leading-snug text-slate-700">
-                ふろ給湯器なら<br /><span className="text-[24px] text-orange-600">15〜20万円</span>が目安
-              </p>
+              {/* v4：見出しは広告の意図で切り替える（?hero=kokan は交換を決めた人向け）。KokanHeroTitle 参照 */}
+              <Suspense fallback={null}>
+                <KokanHeroTitle />
+              </Suspense>
             </div>
             <div className="w-[128px] sm:w-[176px]">
               <HeroIllustration />
@@ -227,18 +226,18 @@ export default function KokanHiyouPage() {
 
           {/* v3：なぜこの会社か。GAS-Q の公式の記載だけ（冒頭の注釈に出典） */}
           <div className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
-            <ul className="grid grid-cols-2 gap-2">
-              {[
-                { icon: Tag, t: '交換 7.98万円〜（工事込み）' },
-                { icon: CalendarCheck, t: '最短即日。当日お湯が出る仮付けも' },
-                { icon: CreditCard, t: '工事後の後払い可' },
-                { icon: ShieldCheck, t: '本体・工事とも10年保証' },
-              ].map(({ icon: I, t }) => (
-                <li key={t} className="flex items-center gap-2 rounded-xl bg-white px-2.5 py-2 text-[12px] font-bold leading-tight text-slate-700 ring-1 ring-orange-200">
-                  <I size={16} className="shrink-0 text-orange-600" aria-hidden="true" />{t}
-                </li>
-              ))}
-            </ul>
+            {/* v4：カードごと紹介先へ（Clarity：押せないカードが一番タップされていた） */}
+            <PartnerValueCards
+              lpId={LP_ID}
+              partner="gasq"
+              position="hero-card"
+              items={[
+                { icon: 'tag', t: '交換 7.98万円〜（工事込み）' },
+                { icon: 'calendar', t: '最短即日。当日お湯が出る仮付けも' },
+                { icon: 'card', t: '工事後の後払い可' },
+                { icon: 'shield', t: '本体・工事とも10年保証' },
+              ]}
+            />
             <PartnerLink lpId={LP_ID} partner="gasq" position="hero" label="無料の現地調査を頼む" note="断っても費用はかかりません。GAS-Q（ガスキュー）のサイトに移動します" beacon />
           </div>
           <p className={SRC}>費用の目安は工事費込み・税込。東京ガスの公表している相場です（2026年10月確認）。会社の記載は GAS-Q の公式サイトによります。</p>

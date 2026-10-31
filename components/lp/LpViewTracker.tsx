@@ -11,6 +11,10 @@ import { trackEvent } from '@/lib/trackEvent';
  * - lp_fv_pass   … 最初の画面の半分以上を下にスクロールした（＝最初の画面を越えた）
  * - lp_scroll    … ページ全体の 25 / 50 / 75 / 100% に届いた
  * - lp_leave     … ページを離れた・裏に回した（初回だけ）。滞在秒数、最大の深さ、越えたか、操作したか
+ * - lp_section_view … 節（main の section[aria-labelledby]）の半分が画面に入った（節ごとに初回だけ）。section_id と秒数
+ * - lp_internal_click … ページ内の同じサイトへのリンク（診断へ、など）を押した。href と、押した節
+ *   （2026-11-01 追加。「給湯器 交換」のクリックが、どの節まで読んで、どこへ動いたかを切り分けるため）
+ * - lp_view の hash … 広告の行き先が #hikaku のような節のときに、どの節に着地したか
  *
  * GA4 と lp_event_logs の両方に、ページごとの lp_id で送る。
  * 画面には何も描かない。
@@ -56,7 +60,37 @@ export default function LpViewTracker({ lpId, version }: { lpId: string; version
       doc_h: document.documentElement.scrollHeight,
       cta_top: ctaTop,
       cta_in_fv: ctaTop >= 0 && ctaTop + 40 <= window.innerHeight ? 1 : 0,
+      hash: (window.location.hash || '').slice(1, 40),
     });
+
+    // 節ごとの到達（初回だけ）。節の印は section の aria-labelledby（見出しの id）
+    const sections = Array.from(document.querySelectorAll<HTMLElement>('main section[aria-labelledby]'));
+    const seenSections = new Set<string>();
+    const io = typeof IntersectionObserver !== 'undefined'
+      ? new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (!en.isIntersecting) return;
+          const id = (en.target as HTMLElement).getAttribute('aria-labelledby') || '';
+          if (!id || seenSections.has(id)) return;
+          seenSections.add(id);
+          sendGAEvent('event', 'lp_section_view', { ...base, section_id: id, sec: secs() });
+          void trackEvent({ lp_id: lpId, event_name: 'lp_section_view', section_id: id, metadata: { sec: secs(), ...attr, ...(version ? { version } : {}) } });
+        });
+      }, { threshold: 0.5 })
+      : null;
+    sections.forEach((el) => io?.observe(el));
+
+    // ページ内の同じサイトへのリンク（紹介先の外部リンクは別の記録があるので除く）
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as HTMLElement | null)?.closest?.('a');
+      if (!a) return;
+      const href = a.getAttribute('href') || '';
+      if (!href.startsWith('/') && !href.startsWith('#')) return;
+      const sec = a.closest('section[aria-labelledby]')?.getAttribute('aria-labelledby') || '';
+      sendGAEvent('event', 'lp_internal_click', { ...base, href: href.slice(0, 80), section_id: sec, sec: secs() });
+      void trackEvent({ lp_id: lpId, event_name: 'lp_internal_click', section_id: sec, cta_id: href.slice(0, 80), metadata: { href: href.slice(0, 80), sec: secs(), ...attr, ...(version ? { version } : {}) } });
+    };
+    document.addEventListener('click', onClick, { capture: true });
 
     let maxDepth = depth();
     let fvPassed = false;
@@ -99,6 +133,8 @@ export default function LpViewTracker({ lpId, version }: { lpId: string; version
     document.addEventListener('visibilitychange', onLeave);
     window.addEventListener('pagehide', onLeave);
     return () => {
+      io?.disconnect();
+      document.removeEventListener('click', onClick, { capture: true });
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('pointerdown', onInteract);
       window.removeEventListener('keydown', onInteract);

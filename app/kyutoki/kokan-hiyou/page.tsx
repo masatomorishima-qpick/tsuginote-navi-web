@@ -48,6 +48,7 @@ import { Suspense } from 'react';
 
 const LP_ID = 'kyutoki-kokan-hiyou';
 const VERSION = 'v4-2026-11-01';
+const VERSION_BRIDGE = 'v5b-2026-11-01';
 const PAGE_PATH = '/kyutoki/kokan-hiyou';
 const TITLE = 'ガス給湯器の交換費用の目安｜種類・号数別と見積もりの確かめ方';
 const DESCRIPTION =
@@ -180,12 +181,22 @@ const SECTION = 'flex flex-col gap-5';
 const H2 = 'text-[22px] font-black leading-snug text-slate-900';
 const SRC = 'text-[11px] leading-relaxed text-slate-500';
 
-export default function KokanHiyouPage() {
+/**
+ * v5（2026-11-01）：?v=bridge で「橋型」。S段の広告から来た人に記事を読ませず、紹介先へ渡すだけの短い形。
+ * 出すもの：最初の画面（売り4枚＋ボタン）、現地調査の前に3つ、会社カード（GAS-Q だけ）、よくある質問2つ、ボタン。
+ * 出さないもの：種類別の目安・号数・住まい別・メーカー別・見積もりが高い・交換時期・点検商法・この記事について・2社目のカード・診断への案内。
+ * オーナー指示：到達→送客 50% 必達。1案ごとに到達30件で判定（記録は docs/kyutoki-pdca.md）。
+ * searchParams を読むのでこのページは動的に描画される（静的キャッシュなし）。
+ */
+export default async function KokanHiyouPage({ searchParams }: { searchParams: Promise<{ v?: string | string[] }> }) {
+  const sp = await searchParams;
+  const bridge = (Array.isArray(sp.v) ? sp.v[0] : sp.v) === 'bridge';
+  const faqs = bridge ? FAQS.filter((f) => /断って|調べておけば/.test(f.q)) : FAQS;
   return (
     <div className="flex min-h-screen flex-col bg-[#f6f8fa]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <LpHeader />
-      <LpViewTracker lpId={LP_ID} version={VERSION} />
+      <LpViewTracker lpId={LP_ID} version={bridge ? VERSION_BRIDGE : VERSION} />
 
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-32 sm:pb-16">
         {/* 広告であることの表示（ASP の条件：最初の画面に置く） */}
@@ -244,6 +255,7 @@ export default function KokanHiyouPage() {
         </section>
 
         {/* 種類別の目安：横の帯で見せる */}
+        {!bridge && (
         <section className={SECTION} aria-labelledby="meyasu">
           <div className="flex flex-col gap-1.5">
             <h2 id="meyasu" className={H2}>種類別の費用の目安</h2>
@@ -275,8 +287,10 @@ export default function KokanHiyouPage() {
             <a href={TG_LIST} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">東京ガスの販売価格</a>（工事費込み・税込、2026年10月確認）。同じ号数で替える場合。
           </p>
         </section>
+        )}
 
         {/* 値段が変わる3つ */}
+        {!bridge && (
         <section className={SECTION} aria-labelledby="kawaru">
           <h2 id="kawaru" className={H2}>値段が変わる3つ</h2>
           <ul className="grid grid-cols-3 gap-2.5">
@@ -300,8 +314,10 @@ export default function KokanHiyouPage() {
             出典：<a href={TG_KOJI} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">東京ガス「工事について」</a>（基本工事費 税込40,700〜69,300円）
           </p>
         </section>
+        )}
 
         {/* マンションと戸建て（広告「住まい」の行き先） */}
+        {!bridge && (
         <section className={SECTION} aria-labelledby="sumai">
           <div className="flex flex-col gap-1.5">
             <h2 id="sumai" className={H2}>マンションと戸建て</h2>
@@ -345,8 +361,10 @@ export default function KokanHiyouPage() {
             <a href={TG_NORITZ} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">（ノーリツ）</a>（工事費込み・税込、2026年10月確認）
           </p>
         </section>
+        )}
 
         {/* メーカーとエコジョーズ（広告「メーカー」「種類」の行き先） */}
+        {!bridge && (
         <section className={SECTION} aria-labelledby="maker">
           <h2 id="maker" className={H2}>メーカーとエコジョーズ</h2>
           <ul className="grid grid-cols-2 gap-2.5">
@@ -369,8 +387,10 @@ export default function KokanHiyouPage() {
             <a href={TG_NORITZ} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">（ノーリツ）</a>（工事費込み・税込、2026年10月確認）
           </p>
         </section>
+        )}
 
         {/* 見積もりが高いと感じたら（広告「見積もり」の行き先） */}
+        {!bridge && (
         <section className={SECTION} aria-labelledby="takai">
           <div className="flex flex-col gap-1.5">
             <h2 id="takai" className={H2}>見積もりが高いと感じたら</h2>
@@ -396,6 +416,7 @@ export default function KokanHiyouPage() {
             <PartnerLink lpId={LP_ID} partner="gasq" position="takai" label="無料の現地調査を頼む" note="断っても費用はかかりません。GAS-Q（ガスキュー）のサイトに移動します" />
           </div>
         </section>
+        )}
 
         {/* v3：見積もりの持ち物メモ（なぜここ経由か：ページで整理した3つを持って行くと現地調査が早い） */}
         <section className={SECTION} aria-labelledby="memo">
@@ -456,7 +477,7 @@ export default function KokanHiyouPage() {
             </ul>
             <PartnerLink lpId={LP_ID} partner="gasq" position="table" label="無料の現地調査を頼む" note="断っても費用はかかりません" />
           </div>
-          <div className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
+          {!bridge && <div className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
             <span className="flex flex-1 flex-col">
               <span className="text-[14px] font-black leading-tight text-slate-900">お湯が出ない.com</span>
               <span className="text-[11px] text-slate-500">修理の可能性も残したいなら。修理2.2万円〜・東京・神奈川</span>
@@ -464,13 +485,14 @@ export default function KokanHiyouPage() {
             <div className="w-[120px] shrink-0">
               <PartnerLink lpId={LP_ID} partner="oyu" position="table" label="見積もり" variant="secondary" beacon />
             </div>
-          </div>
+          </div>}
           <p className={SRC}>
             各社の公式サイトの記載です（2026年10月31日確認）。GAS-Qの「7.98万円〜」は16号給湯専用の本体＋工事（台所リモコン別売）で、石油給湯器など一部製品を除きます。「当日お湯が出る仮付け」はレンタル機器の在庫がある場合。補助金は対象の制度と機種によります。東京ガスの同等品の価格は販売価格（工事費込み・税込）の記載。
           </p>
         </section>
 
         {/* 交換の目安 */}
+        {!bridge && (
         <section className={SECTION} aria-labelledby="jiki">
           <h2 id="jiki" className={H2}>替えどきは10年</h2>
           <ul className="grid grid-cols-2 gap-2.5">
@@ -492,8 +514,10 @@ export default function KokanHiyouPage() {
             出典：<a href={NORITZ_LIFE} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">ノーリツ「給湯機器の耐用年数」</a>、リンナイ・パロマの公式資料（標準使用期間10年）
           </p>
         </section>
+        )}
 
         {/* 点検商法 */}
+        {!bridge && (
         <section className={SECTION} aria-labelledby="chui">
           <div className="flex flex-col gap-1.5">
             <h2 id="chui" className={H2}>「点検します」の電話に注意</h2>
@@ -521,8 +545,10 @@ export default function KokanHiyouPage() {
             出典：<a href={KOKUSEN} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">国民生活センター「給湯器の点検にご注意ください」</a>（2024年2月21日）
           </p>
         </section>
+        )}
 
         {/* このページについて */}
+        {!bridge && (
         <section className={SECTION} aria-labelledby="about">
           <h2 id="about" className={H2}>このページについて</h2>
           <ul className="grid gap-3">
@@ -540,10 +566,11 @@ export default function KokanHiyouPage() {
             ))}
           </ul>
         </section>
+        )}
 
         <section className="flex flex-col gap-2" aria-labelledby="faq">
           <h2 id="faq" className={`${H2} mb-2`}>よくある質問</h2>
-          {FAQS.map((f) => (
+          {faqs.map((f) => (
             <details key={f.q} className="group rounded-2xl bg-white px-4 py-4 ring-1 ring-slate-200">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-[15px] font-bold text-slate-900">
                 {f.q}
@@ -552,9 +579,9 @@ export default function KokanHiyouPage() {
               <p className="mt-3 text-[14px] leading-relaxed text-slate-600">{f.a}</p>
             </details>
           ))}
-          <p className={`${SRC} mt-1`}>
+          {!bridge && <p className={`${SRC} mt-1`}>
             888の表示：<a href={NORITZ_888} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">ノーリツ「点検時期のお知らせ」</a>。リンナイ・パロマも同じ扱いです。
-          </p>
+          </p>}
         </section>
 
         <section className="flex flex-col gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">

@@ -28,7 +28,24 @@ create table if not exists public.kyutoki_leads (
   scheduled_at timestamptz,
   done_at timestamptz,
   vendors text[],
-  note text
+  note text,
+  -- 受付メールの返信で聞くもの
+  city text,
+  availability text,
+  photo_received boolean not null default false,
+  -- 候補日のメールの返信で聞くもの（日程が決まってから業者に渡す）
+  customer_name text,
+  customer_address text,
+  customer_phone text,
+  -- 2社と、決まった日時（自由記入）
+  vendor_a text,
+  vendor_b text,
+  schedule_a text,
+  schedule_b text,
+  -- 完了確認の結果（済んだ・延期・取りやめ・無断キャンセル、成約の見込み）
+  result_a text,
+  result_b text,
+  updated_at timestamptz not null default now()
 );
 
 create index if not exists kyutoki_leads_created_idx on public.kyutoki_leads (created_at desc);

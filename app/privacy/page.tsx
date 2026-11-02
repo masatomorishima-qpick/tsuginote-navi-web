@@ -523,6 +523,53 @@ export default function PrivacyPage() {
                 ご本人であることが確認できたのち、速やかに対応します。
               </p>
             </section>
+
+            <section id="kyutoki" className="scroll-mt-20">
+              <h2 className="text-xl font-semibold text-slate-900">
+                16. 給湯器の見積もりの取り次ぎ（/kyutoki/mitsumori）における情報の取扱い
+              </h2>
+              <p className="mt-3">
+                給湯器の交換の見積もりを希望された方について、工事会社への取り次ぎのために、以下の情報を取得します。
+                第1条〜第10条で「取得・保存しない」「第三者に提供しない」旨が記載されている箇所は、
+                候補案内機能を前提としており、本機能については本条が優先します。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">16-1. 取得する情報</h3>
+              <ul className="mt-3 list-none space-y-1">
+                <li>・メールアドレス</li>
+                <li>・条件チェックの回答（給湯器の種類、住まいの種類、都県、使用年数、機能、号数、交換したい時期）</li>
+                <li>・メールでお伝えいただいた内容（市区町村、給湯器の写真、ご都合のよい日など）</li>
+                <li>・日程が決まった後にお伺いする、お名前・ご住所・電話番号</li>
+                <li>・同意の日時、広告の計測情報（どの広告から来られたか）</li>
+              </ul>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">16-2. 利用目的</h3>
+              <ul className="mt-3 list-none space-y-1">
+                <li>・条件に合う工事会社の選定と、現地での見積もりの日程の調整</li>
+                <li>・取り次ぎに関するご連絡（日程の確認、見積もりが済んだかの確認など）</li>
+                <li>・工事会社との紹介料の精算（見積もりが済んだかの確認に限ります）</li>
+                <li>・サービスの改善（個人を識別しない形での集計）</li>
+              </ul>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">16-3. 工事会社への提供</h3>
+              <p className="mt-3">
+                入力画面での同意に基づき、ご紹介する工事会社（原則2社）に、16-1 の情報を提供します。
+                お名前・ご住所・電話番号は、見積もりの日程が決まってから提供します。
+                提供を受けた工事会社は、見積もりと工事のご提案のためだけに情報を使います。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">16-4. 保存期間と配信の停止</h3>
+              <p className="mt-3">
+                取り次ぎが終わってから1年以内に削除します。ただし、法令により保存が必要な取引の記録については、この限りではありません。
+                当サイトからのメールが不要になった場合は、メールに返信して「停止」とお伝えください。以後、お送りしません。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">16-5. 保管先・外部委託</h3>
+              <p className="mt-3">
+                取得した情報は、Supabase（Supabase Inc. 提供）の東京リージョンのデータベースに、アクセス制御を施したうえで保管します。
+                メールの送信に Resend（米国）を、ホスティングに Vercel を利用しています。
+              </p>
+              <h3 className="mt-6 text-base font-semibold text-slate-900">16-6. 開示・訂正・削除等の請求</h3>
+              <p className="mt-3">
+                お問い合わせ窓口（support@tsuginotenavi.jp）へご連絡ください。ご入力のメールアドレス宛にご本人の確認をしたうえで、速やかに対応します。
+                すでに工事会社に提供した情報については、その会社にも削除を依頼します。
+              </p>
+            </section>
           </div>
         </div>
         </section>

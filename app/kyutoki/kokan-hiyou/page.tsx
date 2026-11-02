@@ -8,7 +8,7 @@ import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import LpViewTracker from '@/components/lp/LpViewTracker';
-import PartnerLink, { PartnerValueCards } from '@/components/kyutoki/PartnerLink';
+import PartnerLink, { PartnerPriceCards, PartnerValueCards } from '@/components/kyutoki/PartnerLink';
 import KokanHeroTitle from '@/components/kyutoki/KokanHeroTitle';
 import { Suspense } from 'react';
 
@@ -47,8 +47,8 @@ import { Suspense } from 'react';
  */
 
 const LP_ID = 'kyutoki-kokan-hiyou';
-const VERSION = 'v6-2026-11-01';
-const VERSION_BRIDGE = 'v6b-2026-11-01';
+const VERSION = 'v7-2026-11-02';
+const VERSION_BRIDGE = 'v7b-2026-11-02';
 const PAGE_PATH = '/kyutoki/kokan-hiyou';
 const TITLE = 'ガス給湯器の交換費用の目安｜種類・号数別と見積もりの確かめ方';
 const DESCRIPTION =
@@ -221,15 +221,17 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
           </div>
 
           {/* v6：本体込みの総額を最初の画面で先に見せる（3C：業者一覧サイトは工事費だけの表示が多く、総額が分からない人が価格語で来る）。橋型でも出す */}
-          <ul className="grid grid-cols-3 gap-2" aria-label="本体込みの総額の目安">
-            {PRICE.map(({ icon: I, h, label }) => (
-              <li key={h} className="flex flex-col items-center gap-1 rounded-2xl bg-white px-2 py-3 text-center ring-1 ring-slate-200">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-50 text-sky-700"><I size={18} aria-hidden="true" /></span>
-                <span className="text-[12px] font-bold text-slate-600">{h}</span>
-                <span className="text-[15px] font-black leading-tight text-orange-600">{label}</span>
-              </li>
-            ))}
-          </ul>
+          {/* v7：金額は押される（Clarity 11/2）ので、カードごと紹介先の機種別の値段へ */}
+          <PartnerPriceCards
+            lpId={LP_ID}
+            partner="gasq"
+            position="price-card"
+            items={[
+              { icon: 'flame', h: '給湯専用', label: '15万円以下' },
+              { icon: 'bath', h: 'ふろ給湯器', label: '15〜20万円' },
+              { icon: 'gauge', h: '暖房付き', label: '30〜35万円' },
+            ]}
+          />
           <p className="-mt-2 text-[12px] text-slate-500">本体＋工事＋税込の総額。業者一覧サイトの金額は工事費だけのことが多いので、総額で比べてください</p>
 
           {/* v3：なぜ今か。10年で部品の供給が終わる → 壊れると直せない → お湯なしで待つ */}

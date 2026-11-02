@@ -1,11 +1,11 @@
 'use client';
 
-import { ArrowRight, CalendarCheck, ChevronRight, Clock, CreditCard, Handshake, ShieldCheck, Tag } from 'lucide-react';
+import { ArrowRight, Bath, CalendarCheck, ChevronRight, Clock, CreditCard, Flame, Gauge, Handshake, ShieldCheck, Tag } from 'lucide-react';
 import { sendGAEvent } from '@next/third-parties/google';
 import { trackEvent } from '@/lib/trackEvent';
 import { PARTNERS, type PartnerKey } from '@/lib/kyutoki/diagnosis';
 
-function sendPartnerClick(lpId: string, partner: PartnerKey, position: string, extra?: Record<string, string>) {
+export function sendPartnerClick(lpId: string, partner: PartnerKey, position: string, extra?: Record<string, string>) {
   const p = PARTNERS[partner];
   sendGAEvent('event', 'affiliate_click', { lp_name: lpId, position, program_name: p.name });
   void trackEvent({
@@ -53,6 +53,59 @@ export function PartnerValueCards({
               <span className="flex-1">{t}</span>
               <ChevronRight size={14} className="shrink-0 text-orange-400" aria-hidden="true" />
             </a>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+const PRICE_ICONS = { flame: Flame, bath: Bath, gauge: Gauge } as const;
+export type PriceCardIcon = keyof typeof PRICE_ICONS;
+
+/**
+ * 本体込みの総額の目安（種類別3つ）を、押せるカードにする（v7、2026-11-02）。
+ * Clarity：交換を決めた人が「工事込み○万円〜」や号数の金額を何度も押したが何も起きず（押しても反応しない所）、
+ * 現地調査のボタンは押さずに離れた。金額を押したい人を、紹介先の価格表（本体・工事込みの機種別の値段）へ渡す。
+ * 記録は PartnerValueCards と同じ形。metadata.item に押された種類を入れる。
+ */
+export function PartnerPriceCards({
+  lpId, partner, position, items,
+}: {
+  lpId: string;
+  partner: PartnerKey;
+  position: string;
+  items: { icon: PriceCardIcon; h: string; label: string }[];
+}) {
+  const p = PARTNERS[partner];
+  return (
+    <ul className="grid grid-cols-3 gap-2" aria-label="本体込みの総額の目安">
+      {items.map(({ icon, h, label }) => {
+        const I = PRICE_ICONS[icon];
+        const inner = (
+          <>
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-50 text-sky-700"><I size={18} aria-hidden="true" /></span>
+            <span className="text-[12px] font-bold text-slate-600">{h}</span>
+            <span className="text-[15px] font-black leading-tight text-orange-600">{label}</span>
+            {p.href && <span className="mt-0.5 flex items-center text-[10px] font-bold text-sky-700">機種別の値段<ChevronRight size={12} aria-hidden="true" /></span>}
+          </>
+        );
+        const cls = 'flex h-full flex-col items-center gap-1 rounded-2xl bg-white px-2 py-3 text-center ring-1 ring-slate-200';
+        return (
+          <li key={h}>
+            {p.href ? (
+              <a
+                href={p.href}
+                target="_blank"
+                rel="sponsored noopener"
+                onClick={() => sendPartnerClick(lpId, partner, position, { item: h })}
+                className={`${cls} transition hover:bg-sky-50 active:scale-[.99]`}
+              >
+                {inner}
+              </a>
+            ) : (
+              <div className={cls}>{inner}</div>
+            )}
           </li>
         );
       })}

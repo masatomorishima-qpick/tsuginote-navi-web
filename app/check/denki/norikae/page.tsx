@@ -24,7 +24,7 @@ import { DENKI } from '@/lib/trend/denki';
  */
 
 const PAGE_PATH = '/check/denki/norikae';
-const VERSION = 'bridge-v1-2026-11-01';
+const VERSION = 'bridge-v2-2026-11-02';
 const TITLE = '11月から電気代が上がりました。関東なら切り替えで月500円以上の差';
 const DESCRIPTION = '2026年11月1日の託送料金改定で大手の基本料金が上がりました。関東のご家庭向けに、改定後の料金を世帯別に比べ、切り替えの手順をまとめています。';
 

@@ -3,14 +3,14 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react';
 import { sendGAEvent } from '@next/third-parties/google';
 import {
-  Bath, Building, Building2, CalendarClock, CircleCheck, Flame, House, MapPin,
+  ArrowRight, Bath, Building, Building2, CircleCheck, Flame, House, MapPin,
   Plug, Snowflake, Thermometer, Zap, type LucideProps,
 } from 'lucide-react';
 import { trackEvent } from '@/lib/trackEvent';
-import QuoteRequestForm from '@/components/kyutoki/QuoteRequestForm';
+import WaitlistPanel from '@/components/kyutoki/WaitlistPanel';
 import {
-  LP_ID, VERSION, M_STEPS, mStopFor, priceOf, lcdOf, canRequest, PRICE_SRC_URL, labelOf,
-  type MAnswers, type MStep, type MStepId, type MStopKey,
+  LP_ID, VERSION, M_STEPS, mStopFor, priceOf, lcdOf, canRequest, PRICE_SRC_URL, labelOf, CTAS,
+  type Cta, type MAnswers, type MStep, type MStepId, type MStopKey,
 } from '@/lib/kyutoki/mitsumori';
 
 /**
@@ -19,8 +19,12 @@ import {
  * 計測（GA4 と lp_event_logs の両方。lp_id = kyutoki-mitsumori、metadata に utm_* / gclid / 版）
  *   kyutoki_m_start   … 最初の回答
  *   kyutoki_m_answer  … 各設問の回答（step, answer, n＝何問目）。段ごとの離脱はこれで見る
- *   kyutoki_m_stop    … 入力欄を出さずに止めた（reason：eco / rent / area）
- *   kyutoki_m_result  … 結果表示（kino, go, jiki, area, home, age）
+ *   kyutoki_m_stop    … 入力欄を出さずに止めた（b2 では reason：rent だけ）
+ *   kyutoki_m_result  … 結果表示（kino, home。form＝shown なら対象＝ニーズの分母）
+ *   kyutoki_cta_click … 「2社から見積もり（quotes）」か「手元の見積もりが妥当か（check）」を押した＝主の数字
+ *   kyutoki_need_select … いちばん知りたいこと（price / fast / trust / repair）
+ *   kyutoki_waitlist_submit … 準備中と知ったうえで、お知らせ用のメールアドレスを入れた＝信頼の目安
+ * 2026-11-03 b2：質問を2問に絞り、結果の画面を「ボタン2つ → 準備中のお知らせ」に変えた（ニーズの計測。docs/kyutoki-b/measure.md）。
  *   kyutoki_lead_consent / kyutoki_lead_submit / kyutoki_lead_error … 入力欄
  *   GA4 には送信成功で generate_lead も送る（Google 広告のコンバージョンに取り込む用）。メールアドレスは送らない。
  */
@@ -71,6 +75,11 @@ export default function MitsumoriDiagnosis({ lcdFontClass, entry = 'mitsumori' }
   const attr = useRef<Record<string, string>>({});
   const panelRef = useRef<HTMLDivElement>(null);
   const started = useRef(false);
+  const [cta, setCta] = useState<Cta | null>(null);
+  const pickCta = (k: Cta) => {
+    setCta(k);
+    log('kyutoki_cta_click', { cta: k, kino: answers.kino ?? '', home: answers.home ?? '' }, { cta_id: k, section_id: 'result' });
+  };
 
   useEffect(() => { attr.current = readAttribution(); }, []);
 
@@ -101,6 +110,7 @@ export default function MitsumoriDiagnosis({ lcdFontClass, entry = 'mitsumori' }
   };
 
   const back = () => {
+    setCta(null);
     const h = [...history];
     const last = h.pop();
     if (!last) return;
@@ -112,7 +122,7 @@ export default function MitsumoriDiagnosis({ lcdFontClass, entry = 'mitsumori' }
     if (step) setView({ kind: 'step', step });
   };
 
-  const restart = () => { setAnswers({}); setHistory([]); setView({ kind: 'step', step: M_STEPS[0] }); };
+  const restart = () => { setCta(null); setAnswers({}); setHistory([]); setView({ kind: 'step', step: M_STEPS[0] }); };
 
   const resultLogged = useRef(false);
   useEffect(() => {
@@ -171,7 +181,7 @@ export default function MitsumoriDiagnosis({ lcdFontClass, entry = 'mitsumori' }
         </div>
         {history.length > 0
           ? navRow
-          : <p className="text-center text-xs text-slate-500">30秒・名前や電話番号の入力なし</p>}
+          : <p className="text-center text-xs text-slate-500">2問・10秒。名前や電話番号の入力なし</p>}
       </>
     );
   } else if (view.kind === 'stop') {
@@ -212,25 +222,41 @@ export default function MitsumoriDiagnosis({ lcdFontClass, entry = 'mitsumori' }
           </li>
         </ul>
 
-        {answers.jiki === 'now' && ok && (
-          <p className="flex items-start gap-2 rounded-xl bg-sky-50 px-4 py-3 text-[13px] text-sky-900">
-            <CalendarClock size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
-            <span>現地での見積もりは、早くて翌日〜2日後です。今日中に直したいときは、契約中のガス会社のほうが早いこともあります。</span>
-          </p>
+        {ok && !cta && (
+          <>
+            <p className="text-center text-[15px] font-bold text-slate-800">この金額が妥当か、<span className="whitespace-nowrap">見積もりで確かめられます</span></p>
+            <div className="grid gap-2.5">
+              {(Object.keys(CTAS) as Cta[]).map((k, i) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => pickCta(k)}
+                  className={i === 0
+                    ? 'flex min-h-[64px] w-full flex-col items-center justify-center rounded-2xl bg-orange-600 px-5 text-white shadow-[0_8px_20px_-10px_rgba(234,88,12,.8)] transition hover:bg-orange-700 active:scale-[.99]'
+                    : 'flex min-h-[64px] w-full flex-col items-center justify-center rounded-2xl border-2 border-orange-300 bg-white px-5 text-orange-800 transition hover:border-orange-500 active:scale-[.99]'}
+                >
+                  <span className="flex items-center gap-1.5 text-[17px] font-bold">{CTAS[k].label}<ArrowRight size={18} aria-hidden="true" /></span>
+                  <span className={`text-[12px] ${i === 0 ? 'text-orange-100' : 'text-slate-500'}`}>{CTAS[k].sub}</span>
+                </button>
+              ))}
+            </div>
+            <p className="text-center text-[11px] text-slate-500">無料・名前や電話番号の入力なし</p>
+          </>
         )}
-
-        {ok ? (
-          <QuoteRequestForm
+        {ok && cta && (
+          <WaitlistPanel
+            cta={cta}
             answers={answers as Record<string, string | undefined>}
             entry={entry}
             version={VERSION}
             getAttribution={() => attr.current}
             onEvent={(ev, params = {}) => {
               log(ev, params, { section_id: 'lead' });
-              if (ev === 'kyutoki_lead_submit') sendGAEvent('event', 'generate_lead', { lp_name: LP_ID, version: VERSION });
+              if (ev === 'kyutoki_waitlist_submit') sendGAEvent('event', 'generate_lead', { lp_name: LP_ID, version: VERSION, cta });
             }}
           />
-        ) : (
+        )}
+        {!ok && (
           <p className="flex items-center gap-2 rounded-xl bg-slate-50 px-4 py-3 text-[14px] text-slate-700">
             <CircleCheck size={18} className="shrink-0 text-slate-400" aria-hidden="true" />この条件では、いまは見積もりを取り次げません。
           </p>

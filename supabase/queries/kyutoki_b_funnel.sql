@@ -1,27 +1,28 @@
--- 給湯器 B：見積もりの条件チェック（/kyutoki/mitsumori）の段ごとの数（日別・広告経由のみ）。SELECT だけ。
--- 段：着地 → 開始 → 各設問 → 結果 → 入力欄を出した → 同意 → 送信
--- 合格線（docs/kyutoki-b/page-design.md）：クリック→結果 25%／結果→入力 40%
+-- 給湯器 B：ニーズの計測（/kyutoki/mitsumori b2、2026-11-03〜）。段ごとの数を、入口（言葉の組）ごとに。SELECT だけ。
+-- 段：①着地 → ②開始 → 結果（対象＝form shown）→ ③ボタン押下（主の数字）→ ④メール入力（信頼の目安）
+-- 判定：docs/kyutoki-b/measure.md（対象の結果30人、または広告費1.5万円の早い方）
 with e as (
-  select (created_at at time zone 'Asia/Tokyo')::date as d, event_name, visit_id, metadata
+  select event_name, visit_id, metadata,
+         coalesce(metadata->>'entry', 'mitsumori') as entry
   from public.lp_event_logs
   where lp_id = 'kyutoki-mitsumori'
-    and created_at >= now() - interval '30 days'
+    and created_at >= '2026-11-03'
+    and coalesce(metadata->>'version', '') like 'b2%'
     and coalesce(metadata->>'gclid', metadata->>'utm_source', '') <> ''
 )
 select
-  d,
-  count(distinct visit_id) filter (where event_name = 'lp_view')            as 着地,
-  count(distinct visit_id) filter (where event_name = 'kyutoki_m_start')    as 開始,
-  count(distinct visit_id) filter (where event_name = 'kyutoki_m_answer' and metadata->>'n' = '3') as 地域まで,
-  count(distinct visit_id) filter (where event_name = 'kyutoki_m_answer' and metadata->>'n' = '5') as 機能まで,
-  count(distinct visit_id) filter (where event_name = 'kyutoki_m_stop')     as 対象外,
-  count(distinct visit_id) filter (where event_name = 'kyutoki_m_result')   as 結果,
-  count(distinct visit_id) filter (where event_name = 'kyutoki_m_result' and metadata->>'form' = 'shown') as 入力欄,
-  count(distinct visit_id) filter (where event_name = 'kyutoki_lead_consent') as 同意,
-  count(distinct visit_id) filter (where event_name = 'kyutoki_lead_submit')  as 送信
+  entry as 入口,
+  count(distinct visit_id) filter (where event_name = 'lp_view')                 as 着地,
+  count(distinct visit_id) filter (where event_name = 'kyutoki_m_start')         as 開始,
+  count(distinct visit_id) filter (where event_name = 'kyutoki_m_result' and metadata->>'form' = 'shown') as 対象の結果,
+  count(distinct visit_id) filter (where event_name = 'kyutoki_cta_click')       as ボタン押下,
+  count(distinct visit_id) filter (where event_name = 'kyutoki_cta_click' and metadata->>'cta' = 'quotes') as 押下_2社の見積もり,
+  count(distinct visit_id) filter (where event_name = 'kyutoki_cta_click' and metadata->>'cta' = 'check')  as 押下_妥当か確かめる,
+  count(distinct visit_id) filter (where event_name = 'kyutoki_waitlist_submit') as メール入力
 from e
-group by d
-order by d desc;
+group by entry
+order by entry;
 
--- 受付の段（kyutoki_leads）：入力 → 受付メール → 要件がそろう → 業者へ打診 → 日程確定 → 面談完了
--- select status, count(*) from public.kyutoki_leads group by status;
+-- いちばん知りたいこと（4択）の内訳
+-- select metadata->>'need' as need, count(distinct visit_id) from public.lp_event_logs
+--  where lp_id = 'kyutoki-mitsumori' and event_name = 'kyutoki_need_select' and created_at >= '2026-11-03' group by 1;

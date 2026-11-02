@@ -26,9 +26,11 @@ export default function DenkiBridgeCta({ position, version }: { position: string
   };
   return (
     <div className="flex flex-col gap-2 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
-      <p className="text-center text-[15px] font-black text-slate-900">申し込みは公式サイトで（5分ほど）</p>
+      {/* 11/2：バナーの絵柄は「東急線沿線なら」。沿線でない人が自分は対象外と思って離れないよう、対象を先に言い切る */}
+      <p className="text-center text-[15px] font-black leading-snug text-slate-900">沿線でなくても大丈夫<br /><span className="text-[13px] font-bold text-slate-700">関東7都県のご家庭なら申し込めます</span></p>
       <A8BrandsafeBanner spec={p.a8Banner} onClick={onClick} />
-      <p className="text-center text-[11px] text-slate-500">バナーを押すと {p.name} の公式サイトに移動します。工事・立ち会いはありません</p>
+      <p className="text-center text-[12px] font-bold text-slate-700">↑ この画像から公式サイトへ（申し込み5分ほど）</p>
+      <p className="text-center text-[11px] text-slate-500">工事・立ち会いはありません。東京・神奈川・千葉・埼玉・茨城・栃木・群馬が対象（一部の市区町村を除く）</p>
     </div>
   );
 }

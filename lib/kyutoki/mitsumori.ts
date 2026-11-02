@@ -15,7 +15,7 @@
  */
 
 export const LP_ID = 'kyutoki-mitsumori';
-export const VERSION = 'b1-2026-11-02';
+export const VERSION = 'b2-2026-11-03';
 
 export type MType = 'gas' | 'eco' | 'elec';
 export type MHome = 'house' | 'mansion' | 'rent';
@@ -39,7 +39,8 @@ export type MStepId = keyof MAnswers;
 export type MOption = { v: string; t: string; s?: string };
 export type MStep = { id: MStepId; lcd: string; q: string; hint?: string; cols: 2 | 3; opts: MOption[] };
 
-export const M_STEPS: MStep[] = [
+/** 選択肢の一覧（表示名を引くため。業者に渡す条件を聞くときにも使う） */
+export const ALL_STEPS: MStep[] = [
   {
     id: 'type', lcd: '機種', q: '給湯器の種類は？', cols: 3,
     opts: [
@@ -75,7 +76,7 @@ export const M_STEPS: MStep[] = [
     id: 'kino', lcd: '機能', q: '今の給湯器でできることは？', cols: 2,
     opts: [
       { v: 'kyuto', t: 'お湯を出すだけ', s: '給湯専用' },
-      { v: 'furo', t: 'お湯はり・追いだき', s: 'ふろ給湯器' },
+      { v: 'furo', t: '追いだきもできる', s: 'ふろ給湯器' },
       { v: 'danbo', t: '床暖房にも使う', s: '暖房付き' },
       { v: 'unknown', t: 'わからない' },
     ],
@@ -96,10 +97,18 @@ export const M_STEPS: MStep[] = [
   },
 ];
 
+/**
+ * 画面で聞く質問（b2 で2問に絞った。2026-11-03）。
+ * ニーズを測る段では業者に渡す条件は要らない。総額の目安を決める「機能」と、賃貸を外す「住まい」だけ聞く。
+ * 地域は広告を1都3県に絞るので聞かない。種類はページの見出しで「ガス給湯器」と示す。
+ */
+export const M_STEPS: MStep[] = ALL_STEPS.filter((s) => s.id === 'kino' || s.id === 'home')
+  .sort((a, b) => (a.id === 'kino' ? -1 : b.id === 'kino' ? 1 : 0));
+
 /** 業者に渡す・オーナーへの通知に使う日本語の表示 */
 export function labelOf(id: MStepId, v: string | undefined): string {
   if (!v) return '';
-  const step = M_STEPS.find((s) => s.id === id);
+  const step = ALL_STEPS.find((s) => s.id === id);
   const o = step?.opts.find((x) => x.v === v);
   return o ? (o.s && id !== 'type' ? `${o.t}（${o.s}）` : o.t) : v;
 }
@@ -140,5 +149,20 @@ export function lcdOf(a: MAnswers, fallback: string): string {
 
 /** 入力欄を出してよいか（止める案内に当たらず、最後まで答えた） */
 export function canRequest(a: MAnswers): boolean {
-  return a.type === 'gas' && !!a.home && a.home !== 'rent' && !!a.area && TORITSUGI_AREAS.includes(a.area) && !!a.jiki;
+  return !!a.kino && !!a.home && a.home !== 'rent';
 }
+
+/** 結果の画面に並べる2つの入口（どちらのニーズが強いかを比べる。2026-11-03） */
+export type Cta = 'quotes' | 'check';
+export const CTAS: Record<Cta, { label: string; sub: string }> = {
+  quotes: { label: '2社から見積もりを受け取る', sub: '本体込みの総額で比べる' },
+  check: { label: '手元の見積もりは妥当？', sub: 'もらった見積もりを送るだけ' },
+};
+
+/** 待っている間に聞く1問（お客さま側の調べの困りごとの上位4つ） */
+export const NEEDS: { v: string; t: string }[] = [
+  { v: 'price', t: '金額が妥当か' },
+  { v: 'fast', t: '早く来る会社' },
+  { v: 'trust', t: '信頼できる会社' },
+  { v: 'repair', t: '修理か交換か' },
+];

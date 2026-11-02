@@ -8,7 +8,11 @@ export const CONSENT_TEXT =
   '条件チェックの回答と、このあとメールでお伝えいただく内容を、ご紹介する工事会社（2社）に伝えることに同意します。';
 
 /** 回答として受け付けるキー（それ以外は捨てる） */
-export const ANSWER_KEYS = ['type', 'home', 'area', 'age', 'kino', 'go', 'jiki', 'symptom', 'cold'] as const;
+export const ANSWER_KEYS = ['type', 'home', 'area', 'age', 'kino', 'go', 'jiki', 'symptom', 'cold', 'cta', 'need'] as const;
+
+/** 準備中の期間のお知らせ用（工事会社には渡さない） */
+export const WAITLIST_CONSENT_VERSION = 'w1-2026-11-03';
+export const WAITLIST_CONSENT_TEXT = '受付が始まったことをお知らせするためだけに、メールアドレスを使います。工事会社には渡しません。';
 
 export function isEmail(s: string): boolean {
   return s.length <= 254 && /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[^\s@<>()",;:]{2,}$/.test(s);

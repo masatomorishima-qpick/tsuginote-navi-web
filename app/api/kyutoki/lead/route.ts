@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendEmail } from '@/lib/email/client';
-import { ANSWER_KEYS, CONSENT_TEXT, CONSENT_VERSION, isEmail } from '@/lib/kyutoki/lead';
-import { labelOf, M_STEPS, type MStepId } from '@/lib/kyutoki/mitsumori';
+import { ANSWER_KEYS, CONSENT_TEXT, CONSENT_VERSION, isEmail, WAITLIST_CONSENT_TEXT, WAITLIST_CONSENT_VERSION } from '@/lib/kyutoki/lead';
+import { labelOf, M_STEPS, NEEDS, type MStepId } from '@/lib/kyutoki/mitsumori';
 import { userDrafts, type Lead } from '@/lib/kyutoki/drafts';
 
 /**
@@ -58,12 +58,15 @@ export async function POST(req: NextRequest) {
   if (!isEmail(email)) return NextResponse.json({ ok: false, error: 'email' }, { status: 400 });
   if (body.consent !== true) return NextResponse.json({ ok: false, error: 'consent' }, { status: 400 });
 
+  // mode=waitlist：準備中の期間のお知らせ登録（工事会社には渡さない。2026-11-03）
+  const waitlist = body.mode === 'waitlist';
   const answers = pickAnswers(body.answers);
   const attribution = pickAttr(body.attribution);
   const row = {
     email,
     consent_at: new Date().toISOString(),
-    consent_text: `${CONSENT_TEXT}（${CONSENT_VERSION}）`,
+    consent_text: waitlist ? `${WAITLIST_CONSENT_TEXT}（${WAITLIST_CONSENT_VERSION}）` : `${CONSENT_TEXT}（${CONSENT_VERSION}）`,
+    status: waitlist ? 'waitlist' : 'new',
     answers,
     verdict: str(body.verdict, 40) || null,
     entry: str(body.entry, 40) || null,
@@ -90,13 +93,23 @@ export async function POST(req: NextRequest) {
 
   const notifyTo = process.env.KYUTOKI_LEAD_NOTIFY_TO || 'support@tsuginotenavi.jp';
   const lines = M_STEPS.filter((s) => answers[s.id]).map((s) => `${s.lcd}：${labelOf(s.id as MStepId, answers[s.id])}`);
+  if (answers.cta) lines.push(`押したボタン：${answers.cta === 'check' ? '手元の見積もりが妥当か確かめる' : '2社から見積もりを受け取る'}`);
+  if (answers.need) lines.push(`いちばん知りたいこと：${NEEDS.find((n) => n.v === answers.need)?.t ?? answers.need}`);
   const draft = userDrafts({
     id: id ?? 0, created_at: row.consent_at, email, answers, status: 'new',
     city: null, availability: null, photo_received: false, customer_name: null, customer_address: null,
     customer_phone: null, vendor_a: null, vendor_b: null, schedule_a: null, schedule_b: null,
     result_a: null, result_b: null, note: null,
   } satisfies Lead)[0];
-  const text = [
+  const text = waitlist ? [
+    `給湯器：準備中のお知らせ登録がありました（受付番号 ${id ?? '未保存'}）。返信は不要です（工事会社の受付が始まったらお知らせ）。`,
+    saveError ? `※保存できませんでした（${saveError}）。このメールが唯一の記録です。` : '',
+    '',
+    `メール：${email}`,
+    ...lines,
+    '',
+    `入口：${row.entry ?? ''}／版：${row.version ?? ''}／広告の言葉：${attribution.utm_term ?? '（なし）'}`,
+  ].join('\n') : [
     `給湯器の見積もり希望が届きました（受付番号 ${id ?? '未保存'}）。`,
     saveError ? `※保存できませんでした（${saveError}）。このメールが唯一の記録です。` : '',
     '',
@@ -116,7 +129,7 @@ export async function POST(req: NextRequest) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
   const r = await sendEmail({
     to: notifyTo,
-    subject: `[給湯器] 見積もり希望 #${id ?? '未保存'}`,
+    subject: waitlist ? `[給湯器] お知らせ登録 #${id ?? '未保存'}` : `[給湯器] 見積もり希望 #${id ?? '未保存'}`,
     text,
     html,
     fromDisplayName: 'つぎの手ナビ 給湯器',

@@ -13,23 +13,14 @@ export default function SiteFooter() {
                 残っていると、機微なデータを預ける利用者が生まれてしまうため。
                 /digital・/login への直接アクセスは従来どおり可能（noindex と
                 robots.txt の Disallow も維持）。 */}
-            {/* 2026-07-29 追加：/loan 配下がサイト内のどこからもHTMLのリンクで辿れない状態
-                （/shisan 側の導線はJSで描画されるためクローラーに見えない）だったため、
-                共通フッターに入口を置く。サーバー出力のHTMLに href="/loan" が必ず含まれる。 */}
-            {/* 2026-11-04 追加：トップの作り直し（入口4つ）にあわせ、住まいの設備（給湯器）の入口を先頭に置く。 */}
+            {/* 2026-11-04 削除：「住宅ローンの判断」「退職金・年金の判断」。お金の判断の記事とツールは
+                売上がなく検索のクリックも3か月で12だったため、ページごと外す（オーナー判断、docs/site-top.md）。 */}
+            {/* 2026-11-04 追加：トップの作り直し（入口3つ）にあわせ、住まいの設備（給湯器）の入口を先頭に置く。 */}
             <Link href="/kyutoki/kokan-hiyou" className="hover:text-slate-700">
               給湯器の交換
             </Link>
-            <Link href="/loan" className="hover:text-slate-700">
-              住宅ローンの判断
-            </Link>
-            {/* 2026-08-03 追加：退職金・年金セクション（駅1）の入口。/loan と同じく、
-                サーバー出力HTMLから /retirement へ辿れるようにする。 */}
-            <Link href="/retirement" className="hover:text-slate-700">
-              退職金・年金の判断
-            </Link>
             <Link href="/guide" className="hover:text-slate-700">
-              役立ちガイド
+              暮らしの整理
             </Link>
             <Link href="/privacy" className="hover:text-slate-700">
               プライバシーポリシー

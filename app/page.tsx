@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  ArrowRight, Calculator, FileSpreadsheet, Flame, HeartHandshake, KeyRound, Smartphone, Users,
+  ArrowRight, FileSpreadsheet, Flame, HeartHandshake, KeyRound, Smartphone, Users,
 } from 'lucide-react';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
@@ -14,8 +14,9 @@ import { SITE_URL, ORG_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
  * 2026-11-04 作り直し（オーナー指示「あらゆるジャンルの『つぎの手』を伝える。整理整頓」）：
  *   それまでのトップは「住宅ローンが主軸」の作りだったが、Search Console（8/2〜11/1）では
  *   検索からのクリック286のうち262（92%）が暮らしの整理の3ページ、住宅ローンは9、退職金は3、家計診断は0。
- *   主題を「迷ったときの、つぎの手」に広げ、入口を4つに絞った（docs/site-top.md、枝 docs/listing-rules）。
- *   並び：売上が立つもの（住まいの設備＝給湯器）→ 人が来ているもの（暮らしの整理）→ 計算ツール → 相続・もしもの備え。
+ *   主題を「迷ったときの、つぎの手」に広げ、入口を3つに絞った（docs/site-top.md、枝 docs/listing-rules）。
+ *   並び：売上が立つもの（住まいの設備＝給湯器）→ 人が来ているもの（暮らしの整理）→ 相続・もしもの備え。
+ *   お金の判断（住宅ローン・退職金・家計診断）は、売上がなく検索のクリックも3か月で12だったので外した（オーナー判断 11/4）。
  *
  * 見せ方：文字を減らし、アイコン・余白で見せる。見出しは名詞にして、文章にしない。
  * 技術要件：本文はすべてサーバー側でHTMLとして出力する（クローラーとAI検索から読めるように）。
@@ -23,11 +24,11 @@ import { SITE_URL, ORG_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
  */
 
 const LP_ID = 'top';
-const VERSION = 'v2-2026-11-04';
+const VERSION = 'v2b-2026-11-04';
 
 const PAGE_TITLE = 'つぎの手ナビ｜迷ったときの、つぎの手を';
 const PAGE_DESCRIPTION =
-  '給湯器の交換費用、パスワードや保険の整理、住宅ローンや退職金の試算。暮らしで迷ったときに、次にやることが分かるところまでまとめています。';
+  '給湯器の交換費用と見積もりの見方、パスワードや保険の整理、相続ともしもの備え。暮らしで迷ったときに、次にやることが分かるところまでまとめています。';
 const OG_IMAGE = ogImageUrl(PAGE_TITLE);
 
 export const metadata: Metadata = {
@@ -52,14 +53,14 @@ export const metadata: Metadata = {
   },
 };
 
-/** 4つの入口。見出しは名詞、一言は訪問者の言葉で。 */
+/** 3つの入口。見出しは名詞、一言は訪問者の言葉で。 */
 const AREAS = [
   {
     id: 'setsubi',
     icon: Flame,
     color: 'bg-orange-50 text-orange-600',
     h: '住まいの設備',
-    s: '給湯器の交換費用と、見積もりの見方',
+    s: '給湯器の交換費用と見積もり',
     href: '/kyutoki/kokan-hiyou',
     links: [
       { label: '交換費用の目安', href: '/kyutoki/kokan-hiyou' },
@@ -79,24 +80,11 @@ const AREAS = [
     ],
   },
   {
-    id: 'okane',
-    icon: Calculator,
-    color: 'bg-emerald-50 text-emerald-600',
-    h: 'お金の判断',
-    s: '住宅ローン・退職金・家計を試算',
-    href: '/loan',
-    links: [
-      { label: '住宅ローン', href: '/loan' },
-      { label: '退職金・年金', href: '/retirement' },
-      { label: '家計の診断', href: '/shisan' },
-    ],
-  },
-  {
     id: 'sonae',
     icon: HeartHandshake,
     color: 'bg-violet-50 text-violet-600',
     h: '相続・もしもの備え',
-    s: 'スマホやネットの口座を、家族に引き継ぐ',
+    s: '家族に引き継ぐための準備',
     href: '/guide/ihinseiri',
     links: [
       { label: 'デジタル遺品', href: '/guide/ihinseiri' },
@@ -110,7 +98,7 @@ const POPULAR = [
   { icon: FileSpreadsheet, label: '保険の一覧表をエクセルで作る', note: '無料の表つき', href: '/guide/shisan-kanri/hoken-ichiran-excel' },
   { icon: Smartphone, label: 'スマホのパスワードの管理', note: '忘れっぽくても安全に', href: '/guide/password-kanri/sumaho-password' },
   { icon: Users, label: '家族とのパスワードの共有', note: 'どこまで共有するか', href: '/guide/kazoku-kyoyu/password-account-kyoyu' },
-  { icon: FileSpreadsheet, label: '住宅ローンの返済予定表をエクセルで', note: '無料の表つき', href: '/loan/hensai-yoteihyo-excel' },
+  { icon: HeartHandshake, label: '急な入院に備えて、家族に伝えておくこと', note: '持ち物だけでは足りない', href: '/guide/moshimo-sonae/kyu-nyuin-sonae' },
   { icon: Smartphone, label: 'デジタル断捨離のやり方', note: 'スマホと契約をすっきり', href: '/guide/digital-seiri/digital-dansyari' },
 ] as const;
 
@@ -143,21 +131,21 @@ export default function HomePage() {
             迷ったときの、つぎの手を
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-slate-600 sm:text-[17px]">
-            給湯器、パスワード、住宅ローン。
+            給湯器の交換、パスワードの整理、もしもの備え。
             <br />
             次にやることが分かるところまで。
           </p>
         </section>
 
-        {/* 4つの入口 */}
+        {/* 3つの入口 */}
         <section aria-labelledby="areas">
           <h2 id="areas" className="sr-only">カテゴリ</h2>
-          <ul className="grid gap-4 sm:grid-cols-2">
+          <ul className="grid gap-4 sm:grid-cols-3">
             {AREAS.map((a) => {
               const Icon = a.icon;
               return (
                 <li key={a.id} className="rounded-2xl border border-slate-200 p-5 transition hover:border-slate-300 hover:shadow-sm">
-                  <Link href={a.href} className="flex items-start gap-4">
+                  <Link href={a.href} className="flex items-start gap-4 sm:flex-col sm:gap-3">
                     <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${a.color}`}>
                       <Icon className="h-6 w-6" aria-hidden="true" />
                     </span>
@@ -166,7 +154,7 @@ export default function HomePage() {
                       <span className="mt-1 block text-[14px] text-slate-600">{a.s}</span>
                     </span>
                   </Link>
-                  <div className="mt-4 flex flex-wrap gap-2 pl-16">
+                  <div className="mt-4 flex flex-wrap gap-2 pl-16 sm:pl-0">
                     {a.links.map((l) => (
                       <Link
                         key={l.href}

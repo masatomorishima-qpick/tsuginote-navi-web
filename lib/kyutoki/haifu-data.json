@@ -36,6 +36,14 @@
     "oyuDenai": {
       "name": "お湯が出ない.com（株式会社GRACE）公式サイト",
       "url": "https://oyu-denai.com/"
+    },
+    "kokusenCooling": {
+      "name": "国民生活センター「クーリング・オフ」",
+      "url": "https://www.kokusen.go.jp/soudan_now/data/coolingoff.html"
+    },
+    "mlitKiyaku": {
+      "name": "国土交通省「マンション標準管理規約及び同コメント」第17条（専有部分の修繕等）",
+      "url": "https://www.mlit.go.jp/common/001228530.pdf"
     }
   },
   "souba": [
@@ -452,5 +460,10 @@
       "d": "修理できないときは即日で交換"
     }
   ],
-  "oyuKari": "部品の取り寄せで当日に直らないときは、貸出機を応急で取り付けることもできる"
+  "oyuKari": "部品の取り寄せで当日に直らないときは、貸出機を応急で取り付けることもできる",
+  "oyuPay": [
+    "かかるのは作業費と材料費だけ。出張料や処分費は取らない",
+    "見積もりで決めた金額で工事する",
+    "払い方は選べる（くわしくは見積もりのときに）"
+  ]
 }

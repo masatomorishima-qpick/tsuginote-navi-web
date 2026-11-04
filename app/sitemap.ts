@@ -1,6 +1,4 @@
 import type { MetadataRoute } from "next";
-import { LOAN_ARTICLES } from "@/lib/loan/articles";
-import { RETIREMENT_ARTICLES } from "@/lib/retirement/articles";
 
 /**
  * sitemap.xml — Phase 1 ローンチ準備にあわせて刷新
@@ -36,27 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1.0,
     },
-    {
-      url: `${baseUrl}/shisan`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    // 住宅ローン（2026-07-28 新設 → 07-29 レジストリ参照に変更）。
-    // 記事は lib/loan/articles.ts に1件足すだけでここにも自動で載る。
-    // 中カテゴリ /loan/karikae は 2026-07-29 に廃止（middleware で /loan へ301）。
-    {
-      url: `${baseUrl}/loan`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    ...LOAN_ARTICLES.map((a) => ({
-      url: `${baseUrl}${a.path}`,
-      lastModified: new Date(`${a.dateModified}T09:00:00+09:00`),
-      changeFrequency: "monthly" as const,
-      priority: 0.9,
-    })),
+    // 2026-11-04 削除：家計診断・住宅ローン・退職金・ジム・トレンド速攻（売上がなく検索も少ないためページごと削除。docs/site-top.md）。
     // 給湯器の交換費用（記事型、2026-10-31 新設）。2026-11-04 に検索からの集客の親ページとして載せる
     // （docs/kyutoki-seo/plan.md の P1。それまで sitemap に載っていなかった）。
     {
@@ -73,49 +51,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
-    // パーソナルジム相性診断（2026-10-28 新設）。ソーシャルメディア広告の着地ページ。
-    {
-      url: `${baseUrl}/gym/aisho`,
-      lastModified: new Date("2026-10-28T09:00:00+09:00"),
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    // トレンド速攻ページ（2026-10-29 新設）。設定は lib/trend/、画面は components/trend/TrendCheck.tsx。
-    {
-      url: `${baseUrl}/check/scs`,
-      lastModified: new Date("2026-10-29T09:00:00+09:00"),
-      changeFrequency: "weekly",
-      priority: 0.6,
-    },
-    // 退職金・年金（2026-08-03 新設・駅1）。/loan と同じくレジストリ参照。
-    // 記事は lib/retirement/articles.ts に1件足すだけでここにも自動で載る。
-    {
-      url: `${baseUrl}/retirement`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    // 受け取りシミュレーション（無料版・2026-08-31 新設。★2026-09-15 にサービス名が変わりました・決め1261）。
-    // /retirement/pro/result と /retirement/pro/buy は載せない（どちらも noindex）。
-    {
-      url: `${baseUrl}/retirement/pro`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    // 特定商取引法に基づく表記（有料版・2026-09-02 新設）。/terms と同じ扱い（monthly・0.3）。
-    {
-      url: `${baseUrl}/retirement/pro/tokushoho`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.3,
-    },
-    ...RETIREMENT_ARTICLES.map((a) => ({
-      url: `${baseUrl}${a.path}`,
-      lastModified: new Date(`${a.dateModified}T09:00:00+09:00`),
-      changeFrequency: "monthly" as const,
-      priority: 0.9,
-    })),
     {
       url: `${baseUrl}/privacy`,
       lastModified: now,
@@ -136,7 +71,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       // 2026-07-30 追加：中立性ポリシー（広告掲載と運営の方針）。ASP広告の掲載開始前に
-      // 公開する静的ページ。記事ではないためレジストリ（lib/loan/articles.ts）には載せず、
+      // 公開する静的ページ。記事ではないため、
       // 他の静的ページ（/privacy 等）と同じ扱いにする。
       url: `${baseUrl}/policy`,
       lastModified: now,

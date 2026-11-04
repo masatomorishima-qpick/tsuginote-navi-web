@@ -3,6 +3,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
+import LpViewTracker from '@/components/lp/LpViewTracker';
+import HokenSoudanBox, { HOKEN_LP_ID } from '@/components/guide/HokenSoudanBox';
+
+/*
+ * 2026-11-05 v2：出口を1つ置いた（保険見直し本舗の無料相談、レントラックス 7502）。
+ * 検索からの流入がすでにある唯一のページ（Search Console 3か月で158クリック）。docs/haifu-plan.md の「優先の順番」1。
+ * 置き場所：「年1回の見直し」の直後と、まとめの直後（同じ紹介先の同じボタン）。広告であることの表示は最初の画面。
+ */
 
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 const PAGE_PATH = '/guide/shisan-kanri/hoken-ichiran-excel';
@@ -163,6 +171,7 @@ export default function HokenIchiranExcelPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <GuideHeader />
+      <LpViewTracker lpId={HOKEN_LP_ID} version="v2-2026-11-05" />
 
       <div className="mx-auto max-w-3xl px-5 pb-20 pt-8 sm:px-8">
         <nav className="text-sm text-slate-500">
@@ -189,7 +198,12 @@ export default function HokenIchiranExcelPage() {
           </ol>
         </nav>
 
-        <p className="mt-10 text-xs font-medium uppercase tracking-wide text-slate-500">
+        <p className="mt-6 flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">
+          <span className="rounded border border-slate-300 px-1.5 tracking-widest">PR</span>
+          <span>当サイトは紹介料を受け取っています</span>
+          <Link href="/policy" className="text-blue-600 underline underline-offset-2">中立性ポリシー</Link>
+        </p>
+        <p className="mt-6 text-xs font-medium uppercase tracking-wide text-slate-500">
           役立ち情報｜資産・お金の管理
         </p>
         <h1 className="mt-3 text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
@@ -335,6 +349,7 @@ export default function HokenIchiranExcelPage() {
               ]}
             />
           </div>
+          <HokenSoudanBox position="review" lead="見直しを、無料でプロに相談する" beacon />
         </Section>
 
         <Section id="blindspot" title="その一覧表、家族は「在りか」を知っていますか？">
@@ -401,6 +416,7 @@ export default function HokenIchiranExcelPage() {
             </Link>
             もどうぞ。
           </p>
+          <HokenSoudanBox position="summary" lead="一覧表ができたら、無料で見直し相談" />
         </Section>
         <section className="mt-14">
           <h2 className="border-b border-slate-200 pb-3 text-xl font-semibold text-slate-900">

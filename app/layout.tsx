@@ -48,7 +48,7 @@ const siteJsonLd = {
       //   ★★`info@blueadventures.jp` は**止めていません**（★両方が届く形・決め1298）。
       email: "support@tsuginotenavi.jp",
       description:
-        "住宅ローン・資産づくり・お金の管理について、あなたが入力した数字にもとづく試算と、中立的な情報を提供するサイト。特定の金融商品・金融機関の推奨は行いません。運営：BlueAdventures。",
+        "住まいの設備（給湯器の交換）、暮らしの整理（パスワード・保険・家族との共有）、相続・もしもの備えについて、次にやることが分かる情報を提供するサイト。運営：BlueAdventures。",
       sameAs: ["https://blueadventures.jp/"],
       parentOrganization: {
         "@type": "Organization",
@@ -70,17 +70,18 @@ const siteJsonLd = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.tsuginotenavi.jp"),
   // 2026-07-29：サイト全体の既定を、デジタル資産に特化しない表現に変更。
+  // 2026-11-04：トップの作り直しにあわせ「迷ったときの、つぎの手を」に変更（docs/site-top.md）。
   // 各ページが metadata を上書きするので、ここは上書きしないページの受け皿になる。
-  title: "つぎの手ナビ｜住宅ローンとお金の判断を、あなたの数字で",
+  title: "つぎの手ナビ｜迷ったときの、つぎの手を",
   description:
-    "住宅ローンの借り換えや変動と固定の比較、資産づくりの見通しを、あなたが入力した数字で試算できます。特定の金融商品・金融機関の推奨は行いません。",
+    "給湯器の交換費用と見積もりの見方、パスワードや保険の整理、相続ともしもの備え。暮らしで迷ったときに、次にやることが分かるところまでまとめています。",
   openGraph: {
     siteName: "つぎの手ナビ",
     type: "website",
     locale: "ja_JP",
-    title: "つぎの手ナビ｜住宅ローンとお金の判断を、あなたの数字で",
+    title: "つぎの手ナビ｜迷ったときの、つぎの手を",
     description:
-      "住宅ローンの借り換えや変動と固定の比較、資産づくりの見通しを、あなたが入力した数字で試算できます。特定の金融商品・金融機関の推奨は行いません。",
+      "給湯器の交換費用と見積もりの見方、パスワードや保険の整理、相続ともしもの備え。暮らしで迷ったときに、次にやることが分かるところまでまとめています。",
   },
   twitter: {
     card: "summary_large_image",

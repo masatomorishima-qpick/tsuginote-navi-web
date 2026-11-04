@@ -43,6 +43,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 給湯器の配布物のページ（2026-11-04 新設、docs/kyutoki-seo/plan.md の P2・P3）。
+    {
+      url: `${baseUrl}/kyutoki/mitsumori-mikata`,
+      lastModified: new Date("2026-11-04T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/kyutoki/gosu-erabikata`,
+      lastModified: new Date("2026-11-04T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 給湯器「お湯が出ない」診断（2026-10-28 新設）。検索広告の着地ページだが、
     // 本文（目安表・FAQ）はサーバー出力なので自然検索にも載せる。
     {

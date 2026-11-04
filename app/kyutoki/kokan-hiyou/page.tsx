@@ -10,6 +10,7 @@ import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import PartnerLink, { PartnerPriceCards, PartnerValueCards } from '@/components/kyutoki/PartnerLink';
 import KokanHeroTitle from '@/components/kyutoki/KokanHeroTitle';
+import { HaifuDownload, ToMitsumori } from '@/components/kyutoki/Haifu';
 import { Suspense } from 'react';
 
 /**
@@ -35,7 +36,10 @@ import { Suspense } from 'react';
  *     本体保証10年・工事保証10年、メーカー認定施工店、補助金申請の代行（無料。掲載は2025年度の制度名）、
  *     年中無休 9〜20時、対応地域は東京・神奈川・千葉・埼玉。
  *
- * 数字の出典（2026-10-30 確認）：
+ * v8（2026-11-04）：東京ガスの相場が更新されていた（給湯専用 15万円以下→20万円以下、ふろ給湯器 15〜20万円→17〜24万円）ので直した。
+ *   配布物（費用の目安表）の節 #hyou と、B の受け皿 /kyutoki/mitsumori への入口を足した。数字の元は lib/kyutoki/haifu-data.json。
+ *
+ * 数字の出典（2026-10-30 確認、11-04 に相場を確認し直し）：
  *   費用 … 東京ガス「給湯器交換」の販売価格（工事費込み・税込）と、同社の「選び方」ページの相場
  *     置き場所の差：16号オート高効率 リンナイ 壁掛 191,510／PS 194,898、ノーリツ 壁掛 193,011／PS 193,011／据置 197,138、
  *       細身（スリム）はリンナイ 236,280、ノーリツ 228,755（標準より約3.6〜4.5万円高い。PSアルコーブの細身 241,370）
@@ -47,15 +51,15 @@ import { Suspense } from 'react';
  */
 
 const LP_ID = 'kyutoki-kokan-hiyou';
-const VERSION = 'v7-2026-11-02';
-const VERSION_BRIDGE = 'v7b-2026-11-02';
+const VERSION = 'v8-2026-11-04';
+const VERSION_BRIDGE = 'v8b-2026-11-04';
 const PAGE_PATH = '/kyutoki/kokan-hiyou';
 const TITLE = 'ガス給湯器の交換費用の目安｜種類・号数別と見積もりの確かめ方';
 const DESCRIPTION =
   'ガス給湯器の交換費用の目安を、給湯専用・ふろ給湯器・暖房付きの種類別に図で紹介。マンションと戸建て、メーカーやエコジョーズで変わる金額、見積もりが高いと感じたときの確かめ方もまとめました。';
-const DATE_MODIFIED = '2026-10-31';
+const DATE_MODIFIED = '2026-11-04';
 
-const TG_HOWTO = 'https://home.tokyo-gas.co.jp/housing/exchange/waterheater/how-to-choose.html';
+const TG_HOWTO = 'https://home.tokyo-gas.co.jp/replacement/waterheater/articles/how-to-choose';
 const TG_LIST = 'https://home.tokyo-gas.co.jp/replacement/waterheater/rinnai';
 const TG_NORITZ = 'https://home.tokyo-gas.co.jp/replacement/waterheater/noritz';
 const TG_KOJI = 'https://home.tokyo-gas.co.jp/housing/exchange/waterheater/construction.html';
@@ -81,16 +85,16 @@ export const metadata: Metadata = {
 
 /** 種類別の費用の目安（東京ガスの相場と販売価格。工事費込み・税込、万円） */
 const PRICE = [
-  { icon: Flame, h: '給湯専用', s: 'お湯を出すだけ', min: 10, max: 15, label: '15万円以下', ex: '16号で約10.2万〜12.2万円' },
-  { icon: Bath, h: 'ふろ給湯器', s: 'お湯はり・追いだき', min: 15, max: 20, label: '15〜20万円', ex: '24号フルオートのエコジョーズで約22.7万円' },
-  { icon: Gauge, h: '暖房付き', s: '床暖房などにも使う', min: 30, max: 35, label: '30〜35万円', ex: '24号オートで約29.0万円' },
+  { icon: Flame, h: '給湯専用', s: 'お湯を出すだけ', min: 9, max: 20, label: '20万円以下', ex: '16号で約9.1万〜13.9万円（細身の型を除く）' },
+  { icon: Bath, h: 'ふろ給湯器', s: 'お湯はり・追いだき', min: 17, max: 24, label: '17〜24万円', ex: '16号オートで約16.4万〜19.7万円（細身の型を除く）' },
+  { icon: Gauge, h: '暖房付き', s: '床暖房などにも使う', min: 30, max: 35, label: '30〜35万円', ex: '24号オートで約28.5万〜29.9万円' },
 ];
 const SCALE_MAX = 36;
 
 const FAQS = [
   {
     q: 'ガス給湯器の交換費用はいくらくらいですか？',
-    a: '工事費込みで、給湯専用は15万円以下、ふろ給湯器は15〜20万円程度、暖房付きは30〜35万円程度が目安です（東京ガスの公表している相場）。号数が大きいほど、またエコジョーズ（高効率タイプ）ほど高くなります。',
+    a: '工事費込みで、給湯専用は20万円以下、ふろ給湯器は17〜24万円程度、暖房付きは30〜35万円程度が目安です（東京ガスの公表している相場）。号数が大きいほど、またエコジョーズ（高効率タイプ）ほど高くなります。',
   },
   {
     q: '工事費はどのくらいかかりますか？',
@@ -227,8 +231,8 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
             partner="gasq"
             position="price-card"
             items={[
-              { icon: 'flame', h: '給湯専用', label: '15万円以下' },
-              { icon: 'bath', h: 'ふろ給湯器', label: '15〜20万円' },
+              { icon: 'flame', h: '給湯専用', label: '20万円以下' },
+              { icon: 'bath', h: 'ふろ給湯器', label: '17〜24万円' },
               { icon: 'gauge', h: '暖房付き', label: '30〜35万円' },
             ]}
           />
@@ -265,7 +269,7 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
             />
             <PartnerLink lpId={LP_ID} partner="gasq" position="hero" label="無料の現地調査を頼む" note="断っても費用はかかりません。GAS-Q（ガスキュー）のサイトに移動します" beacon />
           </div>
-          <p className={SRC}>費用の目安は工事費込み・税込。東京ガスの公表している相場です（2026年10月確認）。会社の記載は GAS-Q の公式サイトによります。</p>
+          <p className={SRC}>費用の目安は工事費込み・税込。東京ガスの公表している相場です（2026年11月確認）。会社の記載は GAS-Q の公式サイトによります。</p>
         </section>
 
         {/* 種類別の目安：横の帯で見せる */}
@@ -298,8 +302,16 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
           </ul>
           <p className={SRC}>
             出典：<a href={TG_HOWTO} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">東京ガス「給湯器の選び方」</a>の相場、
-            <a href={TG_LIST} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">東京ガスの販売価格</a>（工事費込み・税込、2026年10月確認）。同じ号数で替える場合。
+            <a href={TG_LIST} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">東京ガスの販売価格</a>（工事費込み・税込、2026年11月確認）。同じ号数で替える場合。
           </p>
+        </section>
+        )}
+
+        {/* v8（2026-11-04）：配布物。検索で上がっている型（エクセルの表）に合わせ、種類別の目安のすぐ下に置く（docs/kyutoki-seo/plan.md P1） */}
+        {!bridge && (
+        <section className={SECTION} aria-labelledby="hyou">
+          <h2 id="hyou" className={H2}>費用の目安表（無料）</h2>
+          <HaifuDownload main="hiyou" others={['check', 'gosu']} />
         </section>
         )}
 
@@ -372,7 +384,7 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
           <p className="rounded-2xl bg-slate-50 px-4 py-3 text-[14px] text-slate-700">今と<b>同じ置き場所・同じ形</b>なら工事が簡単</p>
           <p className={SRC}>
             同じ16号オートで比べた差。出典：<a href={TG_LIST} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">東京ガスの販売価格（リンナイ）</a>・
-            <a href={TG_NORITZ} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">（ノーリツ）</a>（工事費込み・税込、2026年10月確認）
+            <a href={TG_NORITZ} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">（ノーリツ）</a>（工事費込み・税込、2026年11月確認）
           </p>
         </section>
         )}
@@ -398,7 +410,7 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
           <p className={SRC}>
             例：16号オートのエコジョーズ リンナイ191,510円・ノーリツ193,011円。従来の型はリンナイ163,691円・ノーリツ173,331円。
             出典：<a href={TG_LIST} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">東京ガスの販売価格（リンナイ）</a>・
-            <a href={TG_NORITZ} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">（ノーリツ）</a>（工事費込み・税込、2026年10月確認）
+            <a href={TG_NORITZ} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">（ノーリツ）</a>（工事費込み・税込、2026年11月確認）
           </p>
         </section>
         )}
@@ -429,6 +441,13 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
             </p>
             <PartnerLink lpId={LP_ID} partner="gasq" position="takai" label="無料の現地調査を頼む" note="断っても費用はかかりません。GAS-Q（ガスキュー）のサイトに移動します" />
           </div>
+        </section>
+        )}
+
+        {/* v8：B の受け皿（見積もりの総額の確かめ）への入口。見積もりが高いと感じた人に */}
+        {!bridge && (
+        <section aria-label="見積もりの総額を確かめる">
+          <ToMitsumori note="手元の見積もりの条件を入れると、目安と比べられます" />
         </section>
         )}
 
@@ -604,7 +623,7 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
         </section>
 
         <p className="text-[11px] leading-relaxed text-slate-400">
-          費用は一般的な目安で、設置場所や配管の状態で変わります。各社の価格・保証・受付時間は各社の公表内容によります。最終更新：2026年10月31日
+          費用は一般的な目安で、設置場所や配管の状態で変わります。各社の価格・保証・受付時間は各社の公表内容によります。最終更新：2026年11月4日
         </p>
       </main>
 

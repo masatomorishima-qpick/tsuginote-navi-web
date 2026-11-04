@@ -32,7 +32,7 @@ export default function KokanHeroTitle() {
         <span className="whitespace-nowrap">ガス給湯器の</span><br /><span className="whitespace-nowrap">交換費用</span>
       </h1>
       <p className="text-[17px] font-bold leading-snug text-slate-700">
-        ふろ給湯器なら<br /><span className="text-[24px] text-orange-600">15〜20万円</span>が目安
+        ふろ給湯器なら<br /><span className="text-[24px] text-orange-600">17〜24万円</span>が目安
       </p>
     </>
   );

@@ -1,8 +1,7 @@
 <!-- WordPress の「カスタムHTML」ブロックにそのまま貼る -->
 <style>
 .ba-h{--ink:#1f2a37;--sub:#5b6573;--line:#e3e7ec;--bg:#f7f9fb;--ok:#1f7a4d;--okb:#e6f4ec;--mid:#9a6400;--midb:#fdf3e1;--ng:#b42318;--ngb:#fdecea;color:var(--ink);font-size:16px;line-height:1.8;max-width:960px;margin:0 auto;padding:0 16px}
-.ba-h h1{font-size:28px;line-height:1.4;margin:48px 0 8px}
-.ba-h .meta{color:var(--sub);font-size:14px;margin-bottom:40px}
+.ba-h .meta{color:var(--sub);font-size:14px;margin:8px 0 32px}
 .ba-h h2{font-size:20px;margin:56px 0 16px;padding-left:12px;border-left:4px solid var(--ink)}
 .ba-h .items{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:0;padding:0;list-style:none}
 .ba-h .items li{background:var(--bg);border-radius:10px;padding:16px}
@@ -10,7 +9,7 @@
 .ba-h .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:14px;margin:0 0 12px}
 .ba-h .m{display:inline-block;min-width:32px;font-size:17px;line-height:1.6;text-align:center;font-weight:700;border-radius:6px;padding:0 6px}
 .ba-h .ok{color:var(--ok);background:var(--okb)}.ba-h .mid{color:var(--mid);background:var(--midb)}.ba-h .ng{color:var(--ng);background:var(--ngb)}
-.ba-h .wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ba-h .ba-scroll{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .ba-h table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
 .ba-h th,.ba-h td{border-bottom:1px solid var(--line);padding:12px 10px;text-align:left;vertical-align:top}
 .ba-h th{background:var(--bg);font-weight:600;white-space:nowrap}
@@ -20,7 +19,7 @@
 .ba-h .pts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;list-style:none;padding:0}
 .ba-h .pts li{border:1px solid var(--line);border-radius:12px;padding:20px}
 .ba-h .pts .n{font-size:28px;font-weight:700;color:var(--sub);line-height:1}
-.ba-h .pts h3{font-size:16px;margin:8px 0 4px}
+.ba-h .pts .t{display:block;font-size:16px;font-weight:700;margin:8px 0 4px}
 .ba-h .cta{background:var(--bg);border-radius:14px;padding:32px 24px;text-align:center;margin:56px 0}
 .ba-h .cta a{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;border-radius:8px;padding:14px 28px;font-weight:600;margin-top:12px}
 .ba-h .src{font-size:12px;color:var(--sub);word-break:break-all}
@@ -28,7 +27,6 @@
 </style>
 
 <div class="ba-h">
-<h1>生成AI利活用計画書<br>根拠欄の早見表</h1>
 <p class="meta">発注者確認チェックリスト 6-3・6-4・7-3・7-4 ／ 確認日 2026年11月5日</p>
 
 <h2>対象の欄</h2>
@@ -45,7 +43,7 @@
 <span><span class="m mid">△</span> 条件つき</span>
 <span><span class="m ng">×</span> 満たしにくい</span>
 </div>
-<div class="wrap">
+<div class="ba-scroll">
 <table>
 <thead><tr><th>サービス・版</th><th>6-3・6-4<br>学習させない</th><th>7-3・7-4<br>履歴の保存</th><th>ひとこと</th></tr></thead>
 <tbody>
@@ -80,9 +78,9 @@
 
 <h2>つまずきやすい3点</h2>
 <ul class="pts">
-<li><span class="n">1</span><h3>個人向けの版</h3>学習の停止が各自の設定任せ。会社として根拠を示しにくい</li>
-<li><span class="n">2</span><h3>安い法人向けの版</h3>学習の欄は満たせても、履歴の保存の欄で詰まりやすい</li>
-<li><span class="n">3</span><h3>再委託先</h3>再委託先ごとに同じ記載が求められる（チェックリスト 9-1・9-2 ほか）</li>
+<li><span class="n">1</span><span class="t">個人向けの版</span>学習の停止が各自の設定任せ。会社として根拠を示しにくい</li>
+<li><span class="n">2</span><span class="t">安い法人向けの版</span>学習の欄は満たせても、履歴の保存の欄で詰まりやすい</li>
+<li><span class="n">3</span><span class="t">再委託先</span>再委託先ごとに同じ記載が求められる（チェックリスト 9-1・9-2 ほか）</li>
 </ul>
 
 <div class="cta">

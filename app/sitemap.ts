@@ -57,6 +57,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.9,
     })),
+    // 給湯器の交換費用（記事型、2026-10-31 新設）。2026-11-04 に検索からの集客の親ページとして載せる
+    // （docs/kyutoki-seo/plan.md の P1。それまで sitemap に載っていなかった）。
+    {
+      url: `${baseUrl}/kyutoki/kokan-hiyou`,
+      lastModified: new Date("2026-11-04T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 給湯器「お湯が出ない」診断（2026-10-28 新設）。検索広告の着地ページだが、
     // 本文（目安表・FAQ）はサーバー出力なので自然検索にも載せる。
     {

@@ -16,6 +16,10 @@ export default function SiteFooter() {
             {/* 2026-07-29 追加：/loan 配下がサイト内のどこからもHTMLのリンクで辿れない状態
                 （/shisan 側の導線はJSで描画されるためクローラーに見えない）だったため、
                 共通フッターに入口を置く。サーバー出力のHTMLに href="/loan" が必ず含まれる。 */}
+            {/* 2026-11-04 追加：トップの作り直し（入口4つ）にあわせ、住まいの設備（給湯器）の入口を先頭に置く。 */}
+            <Link href="/kyutoki/kokan-hiyou" className="hover:text-slate-700">
+              給湯器の交換
+            </Link>
             <Link href="/loan" className="hover:text-slate-700">
               住宅ローンの判断
             </Link>

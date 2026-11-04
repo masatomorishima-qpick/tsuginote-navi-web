@@ -1,39 +1,34 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import {
+  ArrowRight, Calculator, FileSpreadsheet, Flame, HeartHandshake, KeyRound, Smartphone, Users,
+} from 'lucide-react';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
-import { SITE_URL, ORG_NAME, formatJaDate, toIsoJst, ogImageUrl } from '@/components/loan/LoanArticle';
-import { LOAN_ARTICLES } from '@/lib/loan/articles';
-import { RETIREMENT_ARTICLES } from '@/lib/retirement/articles';
+import LpViewTracker from '@/components/lp/LpViewTracker';
+import { SITE_URL, ORG_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 
 /**
- * / — サイトのトップページ（2026-07-29 に実体化）
+ * / — サイトのトップページ
  *
- * 経緯：2026-07-15 のピボット以降、"/" は middleware で /shisan にリダイレクトされ、
- * サイトの顔が「老後資金の診断ツール」になっていた。主軸である /loan（記事5本＋
- * 計算ツール）にトップから辿れず、旧URLもすべて "/" 経由の二段転送になっていた。
- * 入口を正しい形に戻すため、リダイレクトを廃止してこのページを置いた。
+ * 2026-11-04 作り直し（オーナー指示「あらゆるジャンルの『つぎの手』を伝える。整理整頓」）：
+ *   それまでのトップは「住宅ローンが主軸」の作りだったが、Search Console（8/2〜11/1）では
+ *   検索からのクリック286のうち262（92%）が暮らしの整理の3ページ、住宅ローンは9、退職金は3、家計診断は0。
+ *   主題を「迷ったときの、つぎの手」に広げ、入口を4つに絞った（docs/site-top.md、枝 docs/listing-rules）。
+ *   並び：売上が立つもの（住まいの設備＝給湯器）→ 人が来ているもの（暮らしの整理）→ 計算ツール → 相続・もしもの備え。
  *
- * 構成の意図：
- *   1. 導入 — **中立であることを最初に明示する**（このサイトのブランドの核）
- *   2. 住宅ローン（最も大きく・最も上に。レジストリから自動生成）
- *   3. 退職金・年金（2026-08-03 新設・駅1。レジストリから自動生成）
- *   4. 家計・老後資金の診断
- *   5. 役立ちガイド
- *   6. 運営者情報
- *
- * 技術要件：**すべてサーバー側でHTMLとして出力する。** トップはサイトで最も重要な
- * ページで、クローラーとAI検索から確実に読める必要がある（/shisan がJS依存で
- * ほぼ空に見えていた反省）。クライアントコンポーネントは使わない。
+ * 見せ方：文字を減らし、アイコン・余白で見せる。見出しは名詞にして、文章にしない。
+ * 技術要件：本文はすべてサーバー側でHTMLとして出力する（クローラーとAI検索から読めるように）。
+ *   LpViewTracker は画面に何も描かない計測だけの部品（どの入口が押されたかを lp_internal_click で取る）。
  */
 
-const PAGE_TITLE = 'つぎの手ナビ｜住宅ローンとお金の判断を、あなたの数字で';
-const PAGE_DESCRIPTION =
-  '住宅ローンの借り換え・変動と固定の比較、老後資金の見通しを、あなたが入力した数字で試算できます。記事も計算ツールも同じ計算式を使っています。特定の金融機関・金融商品の推奨は行いません。';
-const OG_IMAGE = ogImageUrl(PAGE_TITLE);
+const LP_ID = 'top';
+const VERSION = 'v2-2026-11-04';
 
-/** /guide の記事数。sitemap の実数に合わせて手で更新する（レジストリ化していないため）。 */
-const GUIDE_ARTICLE_COUNT = 40;
+const PAGE_TITLE = 'つぎの手ナビ｜迷ったときの、つぎの手を';
+const PAGE_DESCRIPTION =
+  '給湯器の交換費用、パスワードや保険の整理、住宅ローンや退職金の試算。暮らしで迷ったときに、次にやることが分かるところまでまとめています。';
+const OG_IMAGE = ogImageUrl(PAGE_TITLE);
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -57,128 +52,170 @@ export const metadata: Metadata = {
   },
 };
 
-/* 構造化データ：WebSite と Organization は app/layout.tsx が出しているので、
- * ここでは住宅ローン記事の一覧（ItemList）だけを足す。/loan ハブと同じ形。 */
+/** 4つの入口。見出しは名詞、一言は訪問者の言葉で。 */
+const AREAS = [
+  {
+    id: 'setsubi',
+    icon: Flame,
+    color: 'bg-orange-50 text-orange-600',
+    h: '住まいの設備',
+    s: '給湯器の交換費用と、見積もりの見方',
+    href: '/kyutoki/kokan-hiyou',
+    links: [
+      { label: '交換費用の目安', href: '/kyutoki/kokan-hiyou' },
+      { label: 'お湯が出ないとき', href: '/kyutoki/oyu-ga-denai' },
+    ],
+  },
+  {
+    id: 'seiri',
+    icon: KeyRound,
+    color: 'bg-sky-50 text-sky-600',
+    h: '暮らしの整理',
+    s: 'パスワード・保険・家族との共有',
+    href: '/guide',
+    links: [
+      { label: 'スマホのパスワード', href: '/guide/password-kanri/sumaho-password' },
+      { label: '保険の一覧表', href: '/guide/shisan-kanri/hoken-ichiran-excel' },
+    ],
+  },
+  {
+    id: 'okane',
+    icon: Calculator,
+    color: 'bg-emerald-50 text-emerald-600',
+    h: 'お金の判断',
+    s: '住宅ローン・退職金・家計を試算',
+    href: '/loan',
+    links: [
+      { label: '住宅ローン', href: '/loan' },
+      { label: '退職金・年金', href: '/retirement' },
+      { label: '家計の診断', href: '/shisan' },
+    ],
+  },
+  {
+    id: 'sonae',
+    icon: HeartHandshake,
+    color: 'bg-violet-50 text-violet-600',
+    h: '相続・もしもの備え',
+    s: 'スマホやネットの口座を、家族に引き継ぐ',
+    href: '/guide/ihinseiri',
+    links: [
+      { label: 'デジタル遺品', href: '/guide/ihinseiri' },
+      { label: '急な入院の備え', href: '/guide/moshimo-sonae/kyu-nyuin-sonae' },
+    ],
+  },
+] as const;
+
+/** よく読まれている記事（Search Console 8/2〜11/1 のクリック上位。入れ替えたら日付も直す） */
+const POPULAR = [
+  { icon: FileSpreadsheet, label: '保険の一覧表をエクセルで作る', note: '無料の表つき', href: '/guide/shisan-kanri/hoken-ichiran-excel' },
+  { icon: Smartphone, label: 'スマホのパスワードの管理', note: '忘れっぽくても安全に', href: '/guide/password-kanri/sumaho-password' },
+  { icon: Users, label: '家族とのパスワードの共有', note: 'どこまで共有するか', href: '/guide/kazoku-kyoyu/password-account-kyoyu' },
+  { icon: FileSpreadsheet, label: '住宅ローンの返済予定表をエクセルで', note: '無料の表つき', href: '/loan/hensai-yoteihyo-excel' },
+  { icon: Smartphone, label: 'デジタル断捨離のやり方', note: 'スマホと契約をすっきり', href: '/guide/digital-seiri/digital-dansyari' },
+] as const;
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     {
       '@type': 'ItemList',
-      name: '住宅ローンの記事',
-      itemListElement: LOAN_ARTICLES.map((a, i) => ({
+      name: 'つぎの手ナビのカテゴリ',
+      itemListElement: AREAS.map((a, i) => ({
         '@type': 'ListItem',
         position: i + 1,
-        name: a.title,
-        url: `${SITE_URL}${a.path}`,
+        name: a.h,
+        url: `${SITE_URL}${a.href}`,
       })),
     },
   ],
 };
 
-const h2 = 'text-[20px] font-bold text-slate-900 sm:text-[22px]';
-const lead = 'mt-2 text-[15px] leading-relaxed text-slate-700';
-const linkCls = 'text-blue-700 underline hover:no-underline';
-
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <LpViewTracker lpId={LP_ID} version={VERSION} />
       <GuideHeader />
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6">
-        {/* 1. 導入 */}
-        <h1 className="text-[26px] font-bold leading-tight text-slate-900 sm:text-[32px]">
-          お金の判断を、あなたの数字で
-        </h1>
-        <div className="mt-4 space-y-3 text-[15px] leading-relaxed text-slate-700">
-          <p>
-            金利や制度のニュースは毎日流れてきますが、それが自分にとってどういう意味を持つのかは分かりません。
-          </p>
-          <p>
-            ここでは、<strong>あなたの数字を入れると答えが出る形</strong>で、お金の判断を整理しています。残高・残りの返済年数・いまの金利を入れれば、借り換えで元が取れるのかどうかがその場で分かります。
-          </p>
-          <p>
-            <strong>特定の金融機関や金融商品を勧めることはしません。</strong>試算はすべて目安で、根拠にした前提と出典は各記事に明記しています。
-          </p>
-        </div>
-
-        {/* 2. 住宅ローン（主軸） */}
-        <section className="mt-12">
-          <h2 className={h2}>住宅ローンの判断</h2>
-          <p className={lead}>
-            変動と固定のどちらにするか、借り換えで元が取れるか、いつ動くべきか。残高と残りの返済年数によって答えが変わる問いを、記事と計算ツールの両方で扱っています。
-          </p>
-          <div className="mt-5 space-y-4">
-            {LOAN_ARTICLES.map((a) => (
-              <article key={a.path} className="rounded-xl border border-slate-200 p-4">
-                <h3 className="text-[17px] font-bold leading-snug text-slate-900">
-                  <Link href={a.path} className="text-blue-700 hover:underline">{a.title}</Link>
-                </h3>
-                <p className="mt-1.5 text-[14px] leading-relaxed text-slate-700">{a.summary}</p>
-                <p className="mt-2 text-[12px] text-slate-500">
-                  最終更新：<time dateTime={toIsoJst(a.dateModified)}>{formatJaDate(a.dateModified)}</time>
-                </p>
-              </article>
-            ))}
-          </div>
-          <p className="mt-5 text-[15px]">
-            → <Link href="/loan" className={linkCls}>住宅ローンの記事一覧と計算ツール</Link>
+      <main className="mx-auto w-full max-w-4xl flex-1 px-4 pb-16 sm:px-6">
+        {/* 最初の画面 */}
+        <section aria-labelledby="hero" className="py-12 text-center sm:py-16">
+          <h1 id="hero" className="text-[28px] font-bold leading-tight text-slate-900 sm:text-[40px]">
+            迷ったときの、つぎの手を
+          </h1>
+          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-slate-600 sm:text-[17px]">
+            給湯器、パスワード、住宅ローン。
+            <br />
+            次にやることが分かるところまで。
           </p>
         </section>
 
-        {/* 3. 退職金・年金（2026-08-03 新設・駅1。住宅ローンと家計診断のあいだに置く） */}
-        <section className="mt-12">
-          <h2 className={h2}>退職金・年金の受け取り方</h2>
-          <p className={lead}>
-            退職金や年金は、受け取り方で税金と社会保険料が変わり、手元に残る金額そのものが動きます。会社の案内は税引き前の額面で、手取りで比べると結論が入れ替わることがあります。記事と計算ツールの両方で扱っています。
-          </p>
-          <div className="mt-5 space-y-4">
-            {RETIREMENT_ARTICLES.map((a) => (
-              <article key={a.path} className="rounded-xl border border-slate-200 p-4">
-                <h3 className="text-[17px] font-bold leading-snug text-slate-900">
-                  <Link href={a.path} className="text-blue-700 hover:underline">{a.title}</Link>
-                </h3>
-                <p className="mt-1.5 text-[14px] leading-relaxed text-slate-700">{a.summary}</p>
-                <p className="mt-2 text-[12px] text-slate-500">
-                  最終更新：<time dateTime={toIsoJst(a.dateModified)}>{formatJaDate(a.dateModified)}</time>
-                </p>
-              </article>
-            ))}
-          </div>
-          <p className="mt-5 text-[15px]">
-            → <Link href="/retirement" className={linkCls}>退職金・年金の記事一覧</Link>
-          </p>
+        {/* 4つの入口 */}
+        <section aria-labelledby="areas">
+          <h2 id="areas" className="sr-only">カテゴリ</h2>
+          <ul className="grid gap-4 sm:grid-cols-2">
+            {AREAS.map((a) => {
+              const Icon = a.icon;
+              return (
+                <li key={a.id} className="rounded-2xl border border-slate-200 p-5 transition hover:border-slate-300 hover:shadow-sm">
+                  <Link href={a.href} className="flex items-start gap-4">
+                    <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${a.color}`}>
+                      <Icon className="h-6 w-6" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[18px] font-bold text-slate-900">{a.h}</span>
+                      <span className="mt-1 block text-[14px] text-slate-600">{a.s}</span>
+                    </span>
+                  </Link>
+                  <div className="mt-4 flex flex-wrap gap-2 pl-16">
+                    {a.links.map((l) => (
+                      <Link
+                        key={l.href}
+                        href={l.href}
+                        className="rounded-full bg-slate-100 px-3 py-1 text-[13px] text-slate-700 hover:bg-slate-200"
+                      >
+                        {l.label}
+                      </Link>
+                    ))}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         </section>
 
-        {/* 4. 家計・老後資金の診断 */}
-        <section className="mt-12">
-          <h2 className={h2}>家計・老後資金の診断</h2>
-          <p className={lead}>
-            年齢・年収・資産・毎月の余力・住宅ローンを入力すると、<strong>65歳時点でいくらになる見込みか</strong>が分かります。目標額から逆算して毎月いくら必要かも計算できます。登録は不要で、入力した内容はお使いの端末に保存されます。
-          </p>
-          <p className="mt-4 text-[15px]">
-            → <Link href="/shisan" className={linkCls}>家計診断をはじめる</Link>
-          </p>
+        {/* よく読まれている記事 */}
+        <section aria-labelledby="popular" className="mt-16">
+          <h2 id="popular" className="text-[18px] font-bold text-slate-900 sm:text-[20px]">よく読まれている記事</h2>
+          <ul className="mt-4 divide-y divide-slate-100 border-y border-slate-100">
+            {POPULAR.map((p) => {
+              const Icon = p.icon;
+              return (
+                <li key={p.href}>
+                  <Link href={p.href} className="flex items-center gap-3 py-4 hover:bg-slate-50">
+                    <Icon className="h-5 w-5 shrink-0 text-slate-400" aria-hidden="true" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[15px] font-medium text-slate-900">{p.label}</span>
+                      <span className="block text-[13px] text-slate-500">{p.note}</span>
+                    </span>
+                    <ArrowRight className="h-4 w-4 shrink-0 text-slate-300" aria-hidden="true" />
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         </section>
 
-        {/* 5. 役立ちガイド */}
-        <section className="mt-12">
-          <h2 className={h2}>役立ちガイド</h2>
-          <p className={lead}>
-            デジタルの整理、パスワードや認証の管理、家族との情報共有、もしものときの備え。暮らしまわりの手順を{GUIDE_ARTICLE_COUNT}本の記事で解説しています。
-          </p>
-          <p className="mt-4 text-[15px]">
-            → <Link href="/guide" className={linkCls}>役立ちガイドを見る</Link>
-          </p>
-        </section>
-
-        {/* 6. 運営者情報 */}
-        <section className="mt-12 rounded-xl border border-slate-200 bg-slate-50 p-5">
-          <h2 className="text-[17px] font-bold text-slate-900">このサイトについて</h2>
-          <p className="mt-2 text-[14px] leading-relaxed text-slate-700">
-            運営：{ORG_NAME}。金融機関からの手数料や広告掲載によって内容が変わることはありません。試算に使っている前提（返済方法・費用の内訳・金利の水準）は各記事に明記し、金利が動いたときは記事とツールの両方を同時に更新しています。
-          </p>
-          <p className="mt-3 text-[14px]">
-            <Link href="/company" className={linkCls}>運営会社・お問い合わせ</Link>
+        {/* このサイトについて */}
+        <section aria-labelledby="about" className="mt-16 rounded-2xl bg-slate-50 p-6">
+          <h2 id="about" className="text-[16px] font-bold text-slate-900">このサイトについて</h2>
+          <ul className="mt-3 space-y-1.5 text-[14px] leading-relaxed text-slate-700">
+            <li>・金額や制度は、公式の発表や販売価格をもとにし、出典を記事に書いています</li>
+            <li>・紹介料を受け取るリンクには、その旨を表示しています</li>
+            <li>・運営：{ORG_NAME}</li>
+          </ul>
+          <p className="mt-4 flex gap-4 text-[14px]">
+            <Link href="/policy" className="text-blue-700 underline hover:no-underline">中立性ポリシー</Link>
+            <Link href="/company" className="text-blue-700 underline hover:no-underline">運営会社・お問い合わせ</Link>
           </p>
         </section>
       </main>

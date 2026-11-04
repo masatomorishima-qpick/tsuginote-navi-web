@@ -406,7 +406,7 @@ export default function OyuDiagnosis({ lcdFontClass, preset = {} }: { lcdFontCla
             {answers.type === 'gas' && v.mode !== 'repair' && (
               <p className="flex flex-col items-center gap-0.5 rounded-xl bg-white px-4 py-3 text-center ring-1 ring-orange-200">
                 <span className="text-[12px] text-slate-500">交換の目安（工事費込み）</span>
-                <span className="text-[14px] text-slate-700">ふろ給湯器で<b className="ml-1 text-[22px] font-black text-slate-900">15〜20万円</b></span>
+                <span className="text-[14px] text-slate-700">ふろ給湯器で<b className="ml-1 text-[22px] font-black text-slate-900">17〜24万円</b></span>
               </p>
             )}
             <a
@@ -420,7 +420,7 @@ export default function OyuDiagnosis({ lcdFontClass, preset = {} }: { lcdFontCla
             </a>
             <p className="text-center text-[11px] text-slate-500">
               断っても費用はかかりません。{pk.main.name}のサイトに移動します
-              {answers.type === 'gas' && v.mode !== 'repair' && <><br />費用の目安：東京ガスの公表相場（2026年10月）</>}
+              {answers.type === 'gas' && v.mode !== 'repair' && <><br />費用の目安：東京ガスの公表相場（2026年11月確認）</>}
             </p>
             {pk.main.beacon && (
               // A8 の表示計測（1×1の画像）。広告リンクと一緒に置く決まり。

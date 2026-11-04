@@ -56,6 +56,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 相続の配布物のページ（2026-11-05 新設、docs/haifu-plan.md）。
+    {
+      url: `${baseUrl}/guide/souzoku/isan-bunkatsu-kyogisho`,
+      lastModified: new Date("2026-11-05T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/guide/souzoku/souzoku-kankei-setsumeizu`,
+      lastModified: new Date("2026-11-05T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/guide/souzoku/zaisan-mokuroku`,
+      lastModified: new Date("2026-11-05T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/guide/souzoku/jikka-akiya-tokurei`,
+      lastModified: new Date("2026-11-05T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 給湯器の事情ごとのページ（2026-11-05 公開、docs/kyutoki-seo/schedule.md の P11・P15）。
     {
       url: `${baseUrl}/kyutoki/mitsumori-takai`,

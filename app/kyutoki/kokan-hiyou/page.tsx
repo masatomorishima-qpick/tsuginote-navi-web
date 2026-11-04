@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   Bath, Building2, CalendarClock, CalendarCheck, CircleCheck, ClipboardCheck, Clock, CreditCard, Factory, Flame, Gauge, HardHat, Handshake, Home, Hourglass, Leaf, MapPin,
-  PackageX, PhoneOff, Scale, ShieldCheck, Stethoscope, Tag, Users, Wrench,
+  PackageX, PhoneOff, Scale, ShieldCheck, Tag, Users, Wrench,
 } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
@@ -10,7 +10,7 @@ import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import PartnerLink, { PartnerPriceCards, PartnerValueCards } from '@/components/kyutoki/PartnerLink';
 import KokanHeroTitle from '@/components/kyutoki/KokanHeroTitle';
-import { HaifuDownload, ToMitsumori } from '@/components/kyutoki/Haifu';
+import { HaifuDownload } from '@/components/kyutoki/Haifu';
 import { Suspense } from 'react';
 
 /**
@@ -37,7 +37,9 @@ import { Suspense } from 'react';
  *     年中無休 9〜20時、対応地域は東京・神奈川・千葉・埼玉。
  *
  * v8（2026-11-04）：東京ガスの相場が更新されていた（給湯専用 15万円以下→20万円以下、ふろ給湯器 15〜20万円→17〜24万円）ので直した。
- *   配布物（費用の目安表）の節 #hyou と、B の受け皿 /kyutoki/mitsumori への入口を足した。数字の元は lib/kyutoki/haifu-data.json。
+ *   配布物（費用の目安表）の節 #hyou を足した。数字の元は lib/kyutoki/haifu-data.json。
+ * v9（2026-11-04 夕方）：出口を GAS-Q の1つに絞った（オーナー指示「訪問者が迷う設計はやめる」）。B の入口・お湯が出ない.com の札・診断への案内を外した。
+ *   出典を確かめられなかった「東京ガスの同等品は約22.7万円」の比較を外した。
  *
  * 数字の出典（2026-10-30 確認、11-04 に相場を確認し直し）：
  *   費用 … 東京ガス「給湯器交換」の販売価格（工事費込み・税込）と、同社の「選び方」ページの相場
@@ -51,8 +53,8 @@ import { Suspense } from 'react';
  */
 
 const LP_ID = 'kyutoki-kokan-hiyou';
-const VERSION = 'v8-2026-11-04';
-const VERSION_BRIDGE = 'v8b-2026-11-04';
+const VERSION = 'v9-2026-11-04';
+const VERSION_BRIDGE = 'v9b-2026-11-04';
 const PAGE_PATH = '/kyutoki/kokan-hiyou';
 const TITLE = 'ガス給湯器の交換費用の目安｜種類・号数別と見積もりの確かめ方';
 const DESCRIPTION =
@@ -444,12 +446,6 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
         </section>
         )}
 
-        {/* v8：B の受け皿（見積もりの総額の確かめ）への入口。見積もりが高いと感じた人に */}
-        {!bridge && (
-        <section aria-label="見積もりの総額を確かめる">
-          <ToMitsumori note="手元の見積もりの条件を入れると、目安と比べられます" />
-        </section>
-        )}
 
         {/* v3：見積もりの持ち物メモ（なぜここ経由か：ページで整理した3つを持って行くと現地調査が早い） */}
         <section className={SECTION} aria-labelledby="memo">
@@ -490,7 +486,7 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
               <span className="text-[15px] font-black text-orange-600">交換 7.98万円〜</span>
             </div>
             <p className="rounded-xl bg-orange-50 px-3 py-2 text-[13px] text-slate-700">
-              24号フルオートのエコジョーズが<b className="text-slate-900">18.8万円</b>（本体・リモコン・工事込み）。東京ガスの同等品は約22.7万円
+              24号フルオートのエコジョーズが<b className="text-slate-900">18.8万円</b>（本体・リモコン・工事込み）
             </p>
             <ul className="grid grid-cols-2 gap-x-3 gap-y-2">
               {[
@@ -510,17 +506,8 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
             </ul>
             <PartnerLink lpId={LP_ID} partner="gasq" position="table" label="無料の現地調査を頼む" note="断っても費用はかかりません" />
           </div>
-          {!bridge && <div className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
-            <span className="flex flex-1 flex-col">
-              <span className="text-[14px] font-black leading-tight text-slate-900">お湯が出ない.com</span>
-              <span className="text-[11px] text-slate-500">修理の可能性も残したいなら。修理2.2万円〜・東京・神奈川</span>
-            </span>
-            <div className="w-[120px] shrink-0">
-              <PartnerLink lpId={LP_ID} partner="oyu" position="table" label="見積もり" variant="secondary" beacon />
-            </div>
-          </div>}
           <p className={SRC}>
-            各社の公式サイトの記載です（2026年10月31日確認）。GAS-Qの「7.98万円〜」は16号給湯専用の本体＋工事（台所リモコン別売）で、石油給湯器など一部製品を除きます。「当日お湯が出る仮付け」はレンタル機器の在庫がある場合。補助金は対象の制度と機種によります。東京ガスの同等品の価格は販売価格（工事費込み・税込）の記載。
+            各社の公式サイトの記載です（2026年10月31日確認）。GAS-Qの「7.98万円〜」は16号給湯専用の本体＋工事（台所リモコン別売）で、石油給湯器など一部製品を除きます。「当日お湯が出る仮付け」はレンタル機器の在庫がある場合。補助金は対象の制度と機種によります。
           </p>
         </section>
 
@@ -540,9 +527,6 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
               </li>
             ))}
           </ul>
-          <Link href="/kyutoki/oyu-ga-denai" className="flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-white px-5 text-[15px] font-bold text-sky-800 ring-1 ring-sky-200 hover:bg-sky-50">
-            <Stethoscope size={18} aria-hidden="true" />修理か交換か迷うなら30秒診断
-          </Link>
           <p className={SRC}>
             出典：<a href={NORITZ_LIFE} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">ノーリツ「給湯機器の耐用年数」</a>、リンナイ・パロマの公式資料（標準使用期間10年）
           </p>

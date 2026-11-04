@@ -1,8 +1,10 @@
 import Link from 'next/link';
-import { ClipboardCheck, Download, FileSpreadsheet, FileText, Gauge, Receipt } from 'lucide-react';
+import { Check, ClipboardCheck, Download, FileSpreadsheet, FileText, Gauge, Receipt } from 'lucide-react';
+import PartnerLink from '@/components/kyutoki/PartnerLink';
 
 /**
- * 給湯器の配布物（無料の表）と、B の受け皿（/kyutoki/mitsumori）への入口。2026-11-04 新設。
+ * 給湯器の配布物（無料の表）と、記事の出口（紹介先）。2026-11-04 新設。
+ * 11/4 夕方：B の受け皿への入口は外した（B は業者が決まるまで売上が立たず、出口が2つあると訪問者が迷うため）。
  *
  * 配布物の中身は lib/kyutoki/haifu-data.json が唯一の元。ファイルは scripts/kyutoki/make_haifu.py で作る。
  * 検索で上がっている型（保険の一覧表のエクセル）に合わせ、ページの上の方にダウンロードを置く（docs/kyutoki-seo/plan.md）。
@@ -93,21 +95,44 @@ export function HaifuDownload({ main, others = [] }: { main: HaifuKey; others?: 
   );
 }
 
-/** B の受け皿への入口。見積もりの総額が妥当かを確かめる（/kyutoki/mitsumori の主題に合わせた言葉） */
-export function ToMitsumori({ note }: { note?: string }) {
+/** 広告であることの表示（ASP の条件：最初の画面に置く。docs/listing-rules.md） */
+export function PrNote() {
   return (
-    <Link
-      href="/kyutoki/mitsumori"
-      className="flex items-center gap-3 rounded-2xl bg-slate-900 p-4 text-white hover:bg-slate-800"
-    >
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10">
-        <ClipboardCheck size={24} aria-hidden="true" />
-      </span>
-      <span className="flex flex-1 flex-col">
-        <span className="text-[16px] font-black">見積もりの総額、妥当か確かめる</span>
-        <span className="text-[12px] text-slate-300">{note ?? '10秒で、条件に合う目安と比べられます'}</span>
-      </span>
-      <span aria-hidden="true" className="text-[20px]">›</span>
-    </Link>
+    <p className="flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">
+      <span className="rounded border border-slate-300 px-1.5 tracking-widest">PR</span>
+      <span>当サイトは紹介料を受け取っています<span className="whitespace-nowrap">（工事は行いません）</span></span>
+      <Link href="/policy" className="text-sky-800 underline underline-offset-2">中立性ポリシー</Link>
+    </p>
+  );
+}
+
+/**
+ * 記事の出口（1ページに1つ）。2026-11-04 オーナー指示「訪問者が迷う設計はやめる」により、
+ * 記事ごとに出口を1つに絞る。交換を考えている人の記事は GAS-Q（面談完了 5,280円）。
+ * 書いてある売りは GAS-Q の公式サイト gas-q.jp/ad/kyutou の記載（2026-10-31 確認。lib/kyutoki/diagnosis.ts の注記）。
+ */
+export function GasqBox({ lpId, position, lead, points }: { lpId: string; position: string; lead: string; points: string[] }) {
+  return (
+    <div className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
+      <p className="text-[16px] font-black text-slate-900">{lead}</p>
+      <ul className="flex flex-col gap-1.5">
+        {points.map((t) => (
+          <li key={t} className="flex items-start gap-2 text-[14px] text-slate-800">
+            <Check size={18} className="mt-0.5 shrink-0 text-orange-600" aria-hidden="true" />{t}
+          </li>
+        ))}
+      </ul>
+      <PartnerLink lpId={lpId} partner="gasq" position={position} label="無料の現地調査を頼む" note="断っても費用はかかりません。GAS-Q（ガスキュー）のサイトに移動します" beacon />
+      <p className="text-[11px] text-slate-500">対応地域：東京・神奈川・千葉・埼玉ほか。各社の公式サイトの記載です（2026年10月31日確認）。</p>
+    </div>
+  );
+}
+
+/** スマホの画面下に固定するボタン（出口と同じ紹介先） */
+export function GasqSticky({ lpId }: { lpId: string }) {
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))] backdrop-blur sm:hidden">
+      <PartnerLink lpId={lpId} partner="gasq" position="sticky" label="無料の現地調査を頼む" />
+    </div>
   );
 }

@@ -5,7 +5,7 @@ import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
-import { HaifuDownload, ToMitsumori } from '@/components/kyutoki/Haifu';
+import { GasqBox, GasqSticky, HaifuDownload, PrNote } from '@/components/kyutoki/Haifu';
 import DATA from '@/lib/kyutoki/haifu-data.json';
 
 /**
@@ -17,7 +17,7 @@ import DATA from '@/lib/kyutoki/haifu-data.json';
  */
 
 const LP_ID = 'kyutoki-gosu-erabikata';
-const VERSION = 'v1-2026-11-04';
+const VERSION = 'v2-2026-11-04';
 const PAGE_PATH = '/kyutoki/gosu-erabikata';
 const TITLE = '給湯器の号数の選び方｜16号・20号・24号の目安と費用の差【表つき】';
 const DESCRIPTION =
@@ -92,7 +92,8 @@ export default function GosuErabikataPage() {
       <LpHeader />
       <LpViewTracker lpId={LP_ID} version={VERSION} />
 
-      <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-6 pb-16">
+      <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-32 sm:pb-16">
+        <div className="-mb-10"><PrNote /></div>
         {/* 最初の画面：3つの号数 */}
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
@@ -180,7 +181,12 @@ export default function GosuErabikataPage() {
             リンナイのふろ給湯器（オート、RUF-E シリーズ）の希望小売価格（税込、本体のみ）。実際の販売価格は値引きがあり、店ごとに違います。出典：<a href={S.rinnaiRufe.url} target="_blank" rel="noopener noreferrer" className={A}>{S.rinnaiRufe.name}</a>
           </p>
           <p className="text-[14px] text-slate-700">工事費込みの総額の目安は<Link href="/kyutoki/kokan-hiyou#hyou" className={`${A} text-sky-800`}>費用の目安表</Link>にあります。</p>
-          <ToMitsumori note="号数と機能を入れると、総額の目安と比べられます" />
+          <GasqBox
+            lpId={LP_ID}
+            position="sa"
+            lead="号数が分かれば、見積もりは早い"
+            points={['現地調査・見積もり無料', '在庫があれば、その場で工事日が決まる', '本体・工事とも10年保証']}
+          />
         </section>
 
         <section className="flex flex-col gap-2" aria-labelledby="faq">
@@ -200,6 +206,7 @@ export default function GosuErabikataPage() {
           号数の目安は一般的なもので、配管の長さや水圧で変わります。最終更新：2026年11月4日
         </p>
       </main>
+      <GasqSticky lpId={LP_ID} />
       <LpFooter />
     </div>
   );

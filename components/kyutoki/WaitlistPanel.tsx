@@ -86,7 +86,7 @@ export default function WaitlistPanel({ cta, answers, entry, version, getAttribu
         </span>
         <div className="flex flex-col gap-1">
           <p className="text-[18px] font-black leading-snug text-slate-900">ただいま準備中です</p>
-          <p className="text-[14px] leading-relaxed text-slate-700">提携する工事会社の受付を準備しています。始まったら、最初にお知らせします。</p>
+          <p className="text-[14px] leading-relaxed text-slate-700">{cta === 'check' ? '見積もりを見る受付' : '確かめた工事会社の紹介'}を準備しています。始まったら、最初にお知らせします。</p>
         </div>
       </div>
 

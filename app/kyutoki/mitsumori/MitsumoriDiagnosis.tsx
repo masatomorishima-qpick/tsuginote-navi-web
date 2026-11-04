@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react';
 import { sendGAEvent } from '@next/third-parties/google';
-import { ArrowRight, Bath, Building, Building2, House, Snowflake, Thermometer, type LucideProps } from 'lucide-react';
+import { ArrowRight, Bath, Building, Building2, CircleCheck, House, Snowflake, Thermometer, type LucideProps } from 'lucide-react';
 import { trackEvent } from '@/lib/trackEvent';
 import WaitlistPanel from '@/components/kyutoki/WaitlistPanel';
 import {
-  LP_ID, VERSION, PRICE, PRICE_ROWS, PRICE_SRC_URL, HOME_STEP, CTAS,
+  LP_ID, VERSION, PRICE, PRICE_ROWS, PRICE_SRC_URL, HOME_STEP, CTAS, HELP,
   type Cta, type MHome,
 } from '@/lib/kyutoki/mitsumori';
 
@@ -18,7 +18,7 @@ import {
  *
  * 計測（GA4 と lp_event_logs の両方。lp_id = kyutoki-mitsumori、metadata に utm_* / gclid / 版 / 入口）
  *   kyutoki_m_result  … 総額の一覧とボタンが画面に半分以上入った（form＝shown。ニーズの分母）
- *   kyutoki_cta_click … 「2社から見積もり（quotes）」か「手元の見積もりは妥当？（check）」を押した＝主の数字
+ *   kyutoki_cta_click … 「確かめた会社に見積もりを頼む（quotes）」か「手元の見積もりを見てもらう（check）」を押した＝主の数字
  *   kyutoki_m_answer  … 押したあとのお住まい（step＝home）
  *   kyutoki_m_stop    … 賃貸で止めた（reason＝rent。押した数からは外して読む）
  *   kyutoki_need_select / kyutoki_waitlist_submit … WaitlistPanel（いちばん知りたいこと／お知らせ用のメール）
@@ -90,10 +90,26 @@ export default function MitsumoriDiagnosis({ entry = 'mitsumori' }: { entry?: st
 
   const reset = () => { setCta(null); setHome(null); };
 
+  const help = cta ? HELP[cta] : null;
+  const helpCard = help && (
+    <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
+      <p className="text-[18px] font-black text-slate-900">{help.title}</p>
+      <ul className="flex flex-col gap-2">
+        {help.items.map((t) => (
+          <li key={t} className="flex items-start gap-2 text-[14px] leading-snug text-slate-800">
+            <CircleCheck size={18} className="mt-px shrink-0 text-emerald-600" aria-hidden="true" />{t}
+          </li>
+        ))}
+      </ul>
+      <p className="text-[12px] leading-relaxed text-slate-500">{help.note}</p>
+    </div>
+  );
+
   let after: React.ReactNode = null;
   if (cta && !home) {
     after = (
       <div className="flex flex-col gap-3 rounded-2xl border-2 border-sky-200 bg-sky-50/60 p-4">
+        <p className="text-[15px] font-bold text-slate-700">{cta === 'check' ? '見積もりを見る受付' : '工事会社の紹介'}は準備中です。始まったらお知らせできます</p>
         <p className="text-[18px] font-black text-slate-900">{HOME_STEP.q}</p>
         <div className="grid grid-cols-3 gap-2">
           {HOME_STEP.opts.map((o) => {
@@ -166,6 +182,7 @@ export default function MitsumoriDiagnosis({ entry = 'mitsumori' }: { entry?: st
             );
           })}
         </ul>
+        <p className="-mt-1 text-[11px] leading-snug text-slate-500">号数・省エネ型か・置き場所でも変わります</p>
 
         <p className="text-center text-[15px] font-bold text-slate-800">妥当か、見積もりで確かめる</p>
         <div className="grid gap-2.5">
@@ -188,7 +205,8 @@ export default function MitsumoriDiagnosis({ entry = 'mitsumori' }: { entry?: st
       </div>
 
       {after && (
-        <div ref={panelRef} aria-live="polite" className="flex scroll-mt-20 flex-col gap-2">
+        <div ref={panelRef} aria-live="polite" className="flex scroll-mt-20 flex-col gap-3">
+          {helpCard}
           {after}
           <button type="button" onClick={reset} className="self-start py-2 text-sm text-slate-500 underline-offset-4 hover:underline">← ボタンを選び直す</button>
         </div>

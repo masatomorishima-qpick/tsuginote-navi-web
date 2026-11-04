@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendEmail } from '@/lib/email/client';
 import { ANSWER_KEYS, CONSENT_TEXT, CONSENT_VERSION, isEmail, WAITLIST_CONSENT_TEXT, WAITLIST_CONSENT_VERSION } from '@/lib/kyutoki/lead';
-import { labelOf, M_STEPS, NEEDS, type MStepId } from '@/lib/kyutoki/mitsumori';
+import { CTAS, labelOf, M_STEPS, NEEDS, type Cta, type MStepId } from '@/lib/kyutoki/mitsumori';
 import { userDrafts, type Lead } from '@/lib/kyutoki/drafts';
 
 /**
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
 
   const notifyTo = process.env.KYUTOKI_LEAD_NOTIFY_TO || 'support@tsuginotenavi.jp';
   const lines = M_STEPS.filter((s) => answers[s.id]).map((s) => `${s.lcd}：${labelOf(s.id as MStepId, answers[s.id])}`);
-  if (answers.cta) lines.push(`押したボタン：${answers.cta === 'check' ? '手元の見積もりが妥当か確かめる' : '2社から見積もりを受け取る'}`);
+  if (answers.cta) lines.push(`押したボタン：${CTAS[answers.cta as Cta]?.label ?? answers.cta}`);
   if (answers.need) lines.push(`いちばん知りたいこと：${NEEDS.find((n) => n.v === answers.need)?.t ?? answers.need}`);
   const draft = userDrafts({
     id: id ?? 0, created_at: row.consent_at, email, answers, status: 'new',

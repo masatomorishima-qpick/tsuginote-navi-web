@@ -136,3 +136,34 @@ export function GasqSticky({ lpId }: { lpId: string }) {
     </div>
   );
 }
+
+/**
+ * 故障・急ぎの記事の出口（1ページに1つ）。お湯が出ない.com（A8 提携中、新規見積もり2,500円、
+ * 成果＝申込後30日以内の現地見積もり完了、対象地域は東京都・神奈川県＝A8 の成果条件。2026-11-04 確認）。
+ * 書いてある売りは公式サイト oyu-denai.com の記載（2026-11-04 Chrome で確認）。
+ */
+export function OyuBox({ lpId, position, lead, points, beacon = true }: { lpId: string; position: string; lead: string; points: string[]; /** 表示計測の画像。1ページに1か所だけ true */ beacon?: boolean }) {
+  return (
+    <div className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
+      <p className="text-[16px] font-black text-slate-900">{lead}</p>
+      <ul className="flex flex-col gap-1.5">
+        {points.map((t) => (
+          <li key={t} className="flex items-start gap-2 text-[14px] text-slate-800">
+            <Check size={18} className="mt-0.5 shrink-0 text-orange-600" aria-hidden="true" />{t}
+          </li>
+        ))}
+      </ul>
+      <PartnerLink lpId={lpId} partner="oyu" position={position} label="無料で来てもらう" note="見積もりで断っても費用はかかりません。お湯が出ない.com のサイトに移動します" beacon={beacon} />
+      <p className="text-[11px] text-slate-500">対象：東京都・神奈川県。電話の受付は9時〜21時・年中無休。公式サイトの記載です（2026年11月4日確認）。</p>
+    </div>
+  );
+}
+
+/** スマホの画面下に固定するボタン（お湯が出ない.com） */
+export function OyuSticky({ lpId }: { lpId: string }) {
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))] backdrop-blur sm:hidden">
+      <PartnerLink lpId={lpId} partner="oyu" position="sticky" label="無料で来てもらう" />
+    </div>
+  );
+}

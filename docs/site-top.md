@@ -76,3 +76,8 @@
 - #70 を更新：入口を3つ（住まいの設備／暮らしの整理／相続・もしもの備え）、フッターから住宅ローン・退職金を外す、説明文を変更。
 - #71（枝 chore/remove-unused-pages、#70 の上）：ページ・裏側の処理・使わない部品・sitemap・llms.txt・転送・案内を削除。データベースの中身は触らない。取り込みは #70 → #71 の順。
 - 残課題（オーナー）：Stripe の送り先 /api/retirement/pro/billing/webhook の停止、プライバシーポリシー・利用規約の /retirement/pro の記載を直すか。
+
+## 取り込み後（2026-11-04 13:10）
+- 本番を Chrome で確認：トップは入口3つ、フッターは 給湯器の交換／暮らしの整理／法務。/loan /shisan /retirement/pro /gym/aisho /check/scs は 404、/tokyo/souzoku-houki は転送、/kyutoki/kokan-hiyou は 200。sitemap は47件で交換費用を含み住宅ローンを含まない。
+- Search Console：/kyutoki/kokan-hiyou は「Google に登録されていません」→ 登録をリクエスト済み。トップ（登録済み）は内容が変わったので再クロールをリクエスト済み。
+- 変更依頼 #72：プライバシーポリシー・利用規約・中立性ポリシー・運営会社を、提供終了した機能と今のサイトに合わせて修正（第14・15条は提供終了の明記つきで残す）。取り込みはオーナー。

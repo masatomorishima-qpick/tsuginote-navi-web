@@ -15,7 +15,13 @@
  */
 
 export const LP_ID = 'kyutoki-mitsumori';
-export const VERSION = 'b2-2026-11-03';
+export const VERSION = 'b3-2026-11-04';
+/*
+ * b3（2026-11-04）：質問をやめ、最初の画面に「種類別の総額の一覧」と2つのボタンを置いた。
+ *   理由：b2 は1問目に答えると総額が出てしまい、ボタンのある結果画面まで進んだのはクリックの18%（11人中2人）。
+ *   答えなかった6人のうち5人はページの下まで総額を探して去った。採算の基準はクリックあたりなので、
+ *   ボタンを見る人を増やす（docs/kyutoki-b/measure.md）。賃貸かどうかはボタンを押したあとに聞く。
+ */
 
 export type MType = 'gas' | 'eco' | 'elec';
 export type MHome = 'house' | 'mansion' | 'rent';
@@ -104,6 +110,16 @@ export const ALL_STEPS: MStep[] = [
  */
 export const M_STEPS: MStep[] = ALL_STEPS.filter((s) => s.id === 'kino' || s.id === 'home')
   .sort((a, b) => (a.id === 'kino' ? -1 : b.id === 'kino' ? 1 : 0));
+
+/** b3：ボタンを押したあとに聞く1問（賃貸を外す） */
+export const HOME_STEP: MStep = ALL_STEPS.find((s) => s.id === 'home')!;
+
+/** b3：最初の画面に並べる総額の一覧（機能ごと） */
+export const PRICE_ROWS: { kino: Exclude<MKino, 'unknown'>; t: string; s: string }[] = [
+  { kino: 'kyuto', t: 'お湯を出すだけ', s: '給湯専用' },
+  { kino: 'furo', t: '追いだきもできる', s: 'ふろ給湯器' },
+  { kino: 'danbo', t: '床暖房にも使う', s: '暖房付き' },
+];
 
 /** 業者に渡す・オーナーへの通知に使う日本語の表示 */
 export function labelOf(id: MStepId, v: string | undefined): string {

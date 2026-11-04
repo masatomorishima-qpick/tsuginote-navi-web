@@ -36,10 +36,11 @@ function readAttr(): Record<string, string> {
   return out;
 }
 
-export default function LpViewTracker({ lpId, version }: { lpId: string; version?: string }) {
+export default function LpViewTracker({ lpId, version, entry }: { lpId: string; version?: string; entry?: string }) {
   useEffect(() => {
     const t0 = performance.now();
-    const attr = readAttr();
+    // entry：同じ中身で入口（見出し）だけ違うページを分けて数えるための印（2026-11-04 追加、給湯器 B）
+    const attr: Record<string, string> = { ...readAttr(), ...(entry ? { entry } : {}) };
     const base = { lp_name: lpId, ...(version ? { version } : {}) };
     const send = (event: string, params: Record<string, string | number>) => {
       sendGAEvent('event', event, { ...base, ...params });
@@ -141,7 +142,7 @@ export default function LpViewTracker({ lpId, version }: { lpId: string; version
       document.removeEventListener('visibilitychange', onLeave);
       window.removeEventListener('pagehide', onLeave);
     };
-  }, [lpId, version]);
+  }, [lpId, version, entry]);
 
   return null;
 }

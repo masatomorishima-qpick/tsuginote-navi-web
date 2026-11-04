@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { DotGothic16 } from 'next/font/google';
 import { CalendarCheck, ClipboardList, HardHat, Mail, Receipt, Scale, ShieldCheck } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
@@ -12,8 +11,7 @@ import { LP_ID, VERSION } from '@/lib/kyutoki/mitsumori';
  * 給湯器 B（自社の取り次ぎ）の着地ページ「見積もりの条件チェック」。2026-11-02 新設。
  *
  * 役割：交換を決めて見積もりを探している人（相見積もり・見積もり比較・交換・寿命の言葉）の着地。
- *   7問の条件チェックで「本体込みの総額の目安」を出し、1都3県のガス給湯器なら
- *   「2社から総額の見積もり（メールアドレスだけ）」を受け付ける。
+ *   b3（2026-11-04）：最初の画面に種類別の総額の一覧と2つのボタン。押した人に準備中を伝え、お知らせ用のメールを受け付ける。
  * お湯が出ない（急ぎ）の人は /kyutoki/oyu-ga-denai のまま。A（記事型 /kyutoki/kokan-hiyou）とも混ぜない。
  * 設計の根拠：docs/kyutoki-b/page-design.md
  */
@@ -21,9 +19,7 @@ import { LP_ID, VERSION } from '@/lib/kyutoki/mitsumori';
 export const PAGE_PATH = '/kyutoki/mitsumori';
 export const TITLE = '給湯器の交換の総額、妥当か10秒で確かめる｜ガス給湯器';
 export const DESCRIPTION =
-  'ガス給湯器の交換で、本体込みの総額の目安が2問・10秒でわかります。手元の見積もりが妥当か、2社の見積もりで確かめられます。';
-
-const lcdFont = DotGothic16({ weight: '400', subsets: ['latin'], display: 'swap', preload: false });
+  'ガス給湯器の交換で、本体・工事込みの総額の目安を種類別に一覧で。手元の見積もりが妥当か、2社の見積もりで確かめられます。';
 
 
 const FAQS = [
@@ -37,7 +33,7 @@ const jsonLd = {
   '@graph': [
     {
       '@type': 'WebPage', '@id': `${SITE_URL}${PAGE_PATH}#webpage`, url: `${SITE_URL}${PAGE_PATH}`,
-      name: TITLE, description: DESCRIPTION, inLanguage: 'ja', dateModified: '2026-11-03T09:00:00+09:00',
+      name: TITLE, description: DESCRIPTION, inLanguage: 'ja', dateModified: '2026-11-04T15:00:00+09:00',
       isPartOf: { '@id': `${SITE_URL}/#website` }, publisher: { '@id': `${SITE_URL}/#organization` },
     },
     {
@@ -52,8 +48,8 @@ const H2 = 'text-[22px] font-black leading-snug text-slate-900';
 
 export type Hero = 'default' | 'jumyo' | 'hiyou';
 const HEROS: Record<Hero, { tag: string; h1: [string, string]; sub: [string, string, string] }> = {
-  default: { tag: 'ガス給湯器の交換', h1: ['交換の総額', '妥当？'], sub: ['2問・10秒で', '総額の目安', '。'] },
-  jumyo: { tag: 'ガス給湯器の替えどき', h1: ['替えるなら', 'いくら？'], sub: ['2問・10秒で', '総額の目安', '。'] },
+  default: { tag: 'ガス給湯器の交換', h1: ['交換の総額', '妥当？'], sub: ['本体・工事込みの', '総額', 'を一覧で。'] },
+  jumyo: { tag: 'ガス給湯器の替えどき', h1: ['替えるなら', 'いくら？'], sub: ['本体・工事込みの', '総額', 'を一覧で。'] },
   hiyou: { tag: 'ガス給湯器の交換費用', h1: ['その見積もり', '妥当？'], sub: ['相場の', '総額', 'と比べる。'] },
 };
 
@@ -63,7 +59,7 @@ export function MitsumoriView({ hero = 'default' }: { hero?: Hero }) {
     <div className="flex min-h-screen flex-col bg-[#f6f8fa]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <LpHeader />
-      <LpViewTracker lpId={LP_ID} version={VERSION} />
+      <LpViewTracker lpId={LP_ID} version={VERSION} entry={hero === 'default' ? 'mitsumori' : hero} />
 
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-16">
         <p className="-mb-10 flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">
@@ -82,14 +78,14 @@ export function MitsumoriView({ hero = 'default' }: { hero?: Hero }) {
               {h.sub[0]}<span className="text-orange-600">{h.sub[1]}</span>{h.sub[2]}
             </p>
           </div>
-          <MitsumoriDiagnosis lcdFontClass={lcdFont.className} entry={hero === 'default' ? 'mitsumori' : hero} />
+          <MitsumoriDiagnosis entry={hero === 'default' ? 'mitsumori' : hero} />
         </section>
 
         <section className={SECTION} aria-labelledby="nagare">
           <h2 id="nagare" className={H2}>見積もりまでの流れ</h2>
           <ol className="grid gap-3">
             {[
-              { icon: ClipboardList, h: '2問に答える', d: '10秒。総額の目安が出ます' },
+              { icon: ClipboardList, h: 'ボタンを押す', d: '名前や電話番号の入力なし' },
               { icon: Mail, h: '写真を送る', d: '本体と、ラベルの2枚' },
               { icon: CalendarCheck, h: '見積もりが届く', d: '本体込みの総額で' },
               { icon: Receipt, h: '妥当かを確かめる', d: '相場と並べて比べる' },
@@ -140,7 +136,7 @@ export function MitsumoriView({ hero = 'default' }: { hero?: Hero }) {
         </section>
 
         <p className="text-[11px] leading-relaxed text-slate-400">
-          総額の目安は一般的な相場で、実際の金額は現地で確かめます。工事の契約は、お客さまと工事会社の間で結びます。最終更新：2026年11月3日
+          総額の目安は一般的な相場で、実際の金額は現地で確かめます。工事の契約は、お客さまと工事会社の間で結びます。最終更新：2026年11月4日
         </p>
       </main>
       <LpFooter />

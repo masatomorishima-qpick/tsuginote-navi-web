@@ -1,6 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "regions": ["hnd1"],
+  "regions": [
+    "hnd1"
+  ],
   "crons": [
     {
       "path": "/api/cron/trial-reminders",
@@ -22,5 +24,11 @@
       "path": "/api/cron/login-reminders",
       "schedule": "0 23 * * *"
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "docs/listing-rules": false
+    }
+  },
+  "ignoreCommand": "bash -c '[ \"$VERCEL_GIT_COMMIT_REF\" = \"main\" ] && exit 1; PREV=\"${VERCEL_GIT_PREVIOUS_SHA:-HEAD^}\"; git diff --quiet \"$PREV\" HEAD -- . \":(exclude)docs\" \":(exclude)*.md\" \":(exclude)supabase/queries\"'"
 }

@@ -17,17 +17,7 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // --- 中カテゴリ /loan/karikae の廃止（2026-07-29）---
-  // 記事と中カテゴリが同じ粒度で並ぶ構造をやめ、/loan を唯一のハブにした。
-  // 記事URL（/loan/karikae/hiyou など）は変更していないので、ここでは
-  // 「/loan/karikae ちょうど」だけを 301 で /loan に寄せる。
-  // ※ matcher に '/loan/karikae' のみを登録しているため、配下の記事は素通りする。
-  // ※ Supabase の処理に入る前に返すので、既存の認証まわりには一切影響しない。
-  if (pathname === '/loan/karikae') {
-    const hubUrl = request.nextUrl.clone();
-    hubUrl.pathname = '/loan';
-    return NextResponse.redirect(hubUrl, 301);
-  }
+  // 2026-11-04：/loan/karikae の 301 を削除（住宅ローンのページごと削除したため）。
 
   /* --- TOP（"/"）のリダイレクトは 2026-07-29 に廃止 ---
    *
@@ -106,8 +96,6 @@ export const config = {
     // 2026-07-29：'/' を除外した。TOP のリダイレクトを廃止したため middleware で
     // 行う処理がなくなり、残したままだと毎回 Supabase の getUser() が走って
     // トップの初期表示が遅くなる（広告流入はほぼ未ログインで、その通信は無駄）。
-    // 中カテゴリ廃止に伴う 301（配下の記事 /loan/karikae/* は含まないので素通りする）
-    '/loan/karikae',
     '/digital/:path*',
     '/login',
     '/auth/callback',

@@ -7,20 +7,20 @@ import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
-import { GasqBox, GasqSticky, HaifuDownload, PrNote } from '@/components/kyutoki/Haifu';
+import { OyuBox, OyuSticky, HaifuDownload, PrNote } from '@/components/kyutoki/Haifu';
 import DATA from '@/lib/kyutoki/haifu-data.json';
 
 /**
  * 給湯器の見積もりが高いと感じたとき。2026-11-05 公開。
  * 設計：docs/kyutoki-seo/schedule.md の P11（枝 docs/listing-rules）。
  *   受ける言葉：見積もり 高い／妥当／高すぎ、15万〜60万 相場、相見積もり、交渉／値引き、ぼったくり など148語。
- *   出口：GAS-Q だけ（1ページに1つ。docs/kyutoki-seo/pdca.md の「出口の決まり」）。
+ *   出口：お湯が出ない.com だけ（11/5 に GAS-Q から変更。1クリックの稼ぎ 53円→858円）（1ページに1つ。docs/kyutoki-seo/pdca.md の「出口の決まり」）。
  * 数字の元：lib/kyutoki/haifu-data.json（東京ガスの販売価格・相場・工事、リンナイの希望小売価格、国民生活センター）。
  *   差額は、同じ号数・同じメーカーの東京ガスの販売価格（工事費込み・税込）どうしの差。
  */
 
 const LP_ID = 'kyutoki-mitsumori-takai';
-const VERSION = 'v1-2026-11-05';
+const VERSION = 'v2-2026-11-05';
 const PAGE_PATH = '/kyutoki/mitsumori-takai';
 const TITLE = '給湯器の見積もりが高い？｜金額の目安と、高くなる理由【相場の図つき】';
 const DESCRIPTION =
@@ -201,12 +201,7 @@ export default function MitsumoriTakaiPage() {
           <p className="text-[14px] text-slate-700">
             型番・号数・置き場所をそろえて、もう1社に出してもらいます。見積書で確かめる10か所は<Link href="/kyutoki/mitsumori-mikata" className={`${A} text-sky-800`}>見積もりの見方</Link>にあります。
           </p>
-          <GasqBox
-            lpId={LP_ID}
-            position="hikaku"
-            lead="今の見積もりを見せて、2社目を無料で"
-            points={['他社より1円でも安く（相見積もり歓迎）', '現地調査・見積もり無料', '本体・工事とも10年保証']}
-          />
+          <OyuBox lpId={LP_ID} position="hikaku" lead="今の見積もりと比べる2社目を、無料で" points={['出張料・見積もり・キャンセル料は無料', '最短30分で来てくれる', '工事は10年保証']} />
         </section>
 
         {/* 急がされたとき */}
@@ -242,7 +237,7 @@ export default function MitsumoriTakaiPage() {
           金額は設置の状況で変わります。最終的な金額は見積書で確かめてください。最終更新：2026年11月5日
         </p>
       </main>
-      <GasqSticky lpId={LP_ID} />
+      <OyuSticky lpId={LP_ID} />
       <LpFooter />
     </div>
   );

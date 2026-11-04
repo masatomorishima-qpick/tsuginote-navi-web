@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  Bath, Building2, CalendarClock, CalendarCheck, CircleCheck, ClipboardCheck, Clock, CreditCard, Factory, Flame, Gauge, HardHat, Handshake, Home, Hourglass, Leaf, MapPin,
+  Bath, Building2, CalendarClock, CalendarCheck, CircleCheck, ClipboardCheck, Clock, Factory, Flame, Gauge, HardHat, Handshake, Home, Hourglass, Leaf, MapPin,
   PackageX, PhoneOff, Scale, ShieldCheck, Tag, Users, Wrench,
 } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
@@ -40,6 +40,9 @@ import { Suspense } from 'react';
  *   配布物（費用の目安表）の節 #hyou を足した。数字の元は lib/kyutoki/haifu-data.json。
  * v9（2026-11-04 夕方）：出口を GAS-Q の1つに絞った（オーナー指示「訪問者が迷う設計はやめる」）。B の入口・お湯が出ない.com の札・診断への案内を外した。
  *   出典を確かめられなかった「東京ガスの同等品は約22.7万円」の比較を外した。
+ * v10（2026-11-05）：出口を GAS-Q から お湯が出ない.com に替えた（1クリックの稼ぎ：GAS-Q 53円〔レントラックス〕、
+ *   お湯が出ない.com 858円〔A8〕。docs/haifu-plan.md「レントラックスの紹介先」）。売りの文言は oyu-denai.com の記載（2026-11-04 確認）。
+ *   広告（いまは止めている）の着地 ?v=bridge も同じ紹介先になる。
  *
  * 数字の出典（2026-10-30 確認、11-04 に相場を確認し直し）：
  *   費用 … 東京ガス「給湯器交換」の販売価格（工事費込み・税込）と、同社の「選び方」ページの相場
@@ -53,8 +56,8 @@ import { Suspense } from 'react';
  */
 
 const LP_ID = 'kyutoki-kokan-hiyou';
-const VERSION = 'v9-2026-11-04';
-const VERSION_BRIDGE = 'v9b-2026-11-04';
+const VERSION = 'v10-2026-11-05';
+const VERSION_BRIDGE = 'v10b-2026-11-05';
 const PAGE_PATH = '/kyutoki/kokan-hiyou';
 const TITLE = 'ガス給湯器の交換費用の目安｜種類・号数別と見積もりの確かめ方';
 const DESCRIPTION =
@@ -124,7 +127,7 @@ const FAQS = [
   },
   {
     q: '現地調査を頼んだあと、断ってもいいですか？',
-    a: 'はい。GAS-Qは見積もりと現地調査を無料と公表しており、見積もりを見てから頼まなくても費用はかかりません。自分から頼む現地調査は、飛び込みの「点検します」の訪問とは別のものです。',
+    a: 'はい。お湯が出ない.com は、見積もり料・キャンセル料・出張費はかからないと公表しており、見積もりを見てから頼まなくても費用はかかりません。自分から頼む現地調査は、飛び込みの「点検します」の訪問とは別のものです。',
   },
   {
     q: '賃貸に住んでいます。自分で頼んでいいですか？',
@@ -230,7 +233,7 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
           {/* v7：金額は押される（Clarity 11/2）ので、カードごと紹介先の機種別の値段へ */}
           <PartnerPriceCards
             lpId={LP_ID}
-            partner="gasq"
+            partner="oyu"
             position="price-card"
             items={[
               { icon: 'flame', h: '給湯専用', label: '20万円以下' },
@@ -255,23 +258,23 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
             ))}
           </ul>
 
-          {/* v3：なぜこの会社か。GAS-Q の公式の記載だけ（冒頭の注釈に出典） */}
+          {/* v3：なぜこの会社か。v10 から お湯が出ない.com の公式の記載だけ（冒頭の注釈に出典） */}
           <div className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
             {/* v4：カードごと紹介先へ（Clarity：押せないカードが一番タップされていた） */}
             <PartnerValueCards
               lpId={LP_ID}
-              partner="gasq"
+              partner="oyu"
               position="hero-card"
               items={[
-                { icon: 'tag', t: '交換 7.98万円〜（工事込み）' },
-                { icon: 'calendar', t: '最短即日。当日お湯が出る仮付けも' },
-                { icon: 'card', t: '工事後の後払い可' },
-                { icon: 'shield', t: '本体・工事とも10年保証' },
+                { icon: 'tag', t: '出張料・見積もり・キャンセル料0円' },
+                { icon: 'clock', t: '最短30分で来てくれる' },
+                { icon: 'calendar', t: '直らない日は、その日に交換' },
+                { icon: 'shield', t: '工事は10年保証' },
               ]}
             />
-            <PartnerLink lpId={LP_ID} partner="gasq" position="hero" label="無料の現地調査を頼む" note="断っても費用はかかりません。GAS-Q（ガスキュー）のサイトに移動します" beacon />
+            <PartnerLink lpId={LP_ID} partner="oyu" position="hero" label="無料で見積もりを頼む" note="見積もりで断っても費用はかかりません。お湯が出ない.com のサイトに移動します" beacon />
           </div>
-          <p className={SRC}>費用の目安は工事費込み・税込。東京ガスの公表している相場です（2026年11月確認）。会社の記載は GAS-Q の公式サイトによります。</p>
+          <p className={SRC}>費用の目安は工事費込み・税込。東京ガスの公表している相場です（2026年11月確認）。会社の記載は お湯が出ない.com の公式サイトによります（対象は東京都・神奈川県）。</p>
         </section>
 
         {/* 種類別の目安：横の帯で見せる */}
@@ -439,9 +442,9 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
           </ul>
           <div className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
             <p className="flex items-center gap-2 text-[15px] font-bold text-slate-800">
-              <ClipboardCheck size={20} className="shrink-0 text-orange-600" aria-hidden="true" />今の見積もりを見せて比べる。GAS-Qは「他社より1円でも安くします」と公表
+              <ClipboardCheck size={20} className="shrink-0 text-orange-600" aria-hidden="true" />今の見積もりと比べる。2社目の見積もりも無料で、断ってもキャンセル料はかかりません
             </p>
-            <PartnerLink lpId={LP_ID} partner="gasq" position="takai" label="無料の現地調査を頼む" note="断っても費用はかかりません。GAS-Q（ガスキュー）のサイトに移動します" />
+            <PartnerLink lpId={LP_ID} partner="oyu" position="takai" label="無料で見積もりを頼む" note="見積もりで断っても費用はかかりません。お湯が出ない.com のサイトに移動します" />
           </div>
         </section>
         )}
@@ -471,7 +474,7 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
           </p>
         </section>
 
-        {/* 見積もりを頼める会社（v3：交換は GAS-Q を主役に。修理の可能性を残したい人はお湯が出ない.com） */}
+        {/* 見積もりを頼める会社（v10：お湯が出ない.com だけ。記載は oyu-denai.com、2026-11-04 確認） */}
         <section className={SECTION} aria-labelledby="hikaku">
           <div className="flex flex-col gap-1.5">
             <h2 id="hikaku" className={H2}>見積もりを頼める会社</h2>
@@ -480,34 +483,34 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
           <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 ring-2 ring-orange-300">
             <div className="flex items-baseline justify-between gap-2">
               <span className="flex flex-col">
-                <span className="text-[18px] font-black leading-tight text-slate-900">GAS-Q</span>
-                <span className="text-[11px] text-slate-500">ガス給湯器の交換専門</span>
+                <span className="text-[18px] font-black leading-tight text-slate-900">お湯が出ない.com</span>
+                <span className="text-[11px] text-slate-500">ガス給湯器の修理・交換</span>
               </span>
-              <span className="text-[15px] font-black text-orange-600">交換 7.98万円〜</span>
+              <span className="text-[15px] font-black text-orange-600">見積もり無料</span>
             </div>
             <p className="rounded-xl bg-orange-50 px-3 py-2 text-[13px] text-slate-700">
-              24号フルオートのエコジョーズが<b className="text-slate-900">18.8万円</b>（本体・リモコン・工事込み）
+              直るなら修理（目安<b className="text-slate-900">2.2万円〜</b>）、直らなければその日に交換
             </p>
             <ul className="grid grid-cols-2 gap-x-3 gap-y-2">
               {[
-                { icon: CalendarCheck, t: '現地調査・見積もり無料' },
-                { icon: Clock, t: '最短即日工事。当日お湯が出る仮付けも' },
-                { icon: Scale, t: '他社より1円でも安く（相見積もり歓迎）' },
-                { icon: CreditCard, t: '工事後の後払い・カード可' },
-                { icon: ShieldCheck, t: '本体・工事10年保証・認定施工店' },
-                { icon: Handshake, t: '補助金の申請を無料で代行' },
-                { icon: MapPin, t: '東京・神奈川・千葉・埼玉' },
-                { icon: Building2, t: 'マンション・狭い場所も対応' },
+                { icon: CalendarCheck, t: '出張料・見積もり・キャンセル料0円' },
+                { icon: Clock, t: '最短30分で到着' },
+                { icon: Wrench, t: '修理は最短45分、交換は最短80分' },
+                { icon: Hourglass, t: '部品がない日は貸出機を付ける' },
+                { icon: ShieldCheck, t: '工事は10年保証' },
+                { icon: HardHat, t: '資格を持つ人が作業' },
+                { icon: CalendarClock, t: '電話の受付は9〜21時・年中無休' },
+                { icon: MapPin, t: '東京・神奈川' },
               ].map(({ icon: I, t }) => (
                 <li key={t} className="flex items-start gap-1.5 text-[12px] leading-snug text-slate-700">
                   <I size={14} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />{t}
                 </li>
               ))}
             </ul>
-            <PartnerLink lpId={LP_ID} partner="gasq" position="table" label="無料の現地調査を頼む" note="断っても費用はかかりません" />
+            <PartnerLink lpId={LP_ID} partner="oyu" position="table" label="無料で見積もりを頼む" note="見積もりで断っても費用はかかりません" />
           </div>
           <p className={SRC}>
-            各社の公式サイトの記載です（2026年10月31日確認）。GAS-Qの「7.98万円〜」は16号給湯専用の本体＋工事（台所リモコン別売）で、石油給湯器など一部製品を除きます。「当日お湯が出る仮付け」はレンタル機器の在庫がある場合。補助金は対象の制度と機種によります。
+            お湯が出ない.com（株式会社GRACE）の公式サイトの記載です（2026年11月4日確認）。修理の目安は税込。時間は最短の目安で、状況によって変わります。電話の受付は9時〜21時・年中無休。
           </p>
         </section>
 
@@ -603,7 +606,7 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
 
         <section className="flex flex-col gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
           <p className="text-center text-[16px] font-black text-slate-900">壊れる前なら、工事日を選べる</p>
-          <PartnerLink lpId={LP_ID} partner="gasq" position="bottom" label="無料の現地調査を頼む" note="断っても費用はかかりません。GAS-Q（ガスキュー）のサイトに移動します" />
+          <PartnerLink lpId={LP_ID} partner="oyu" position="bottom" label="無料で見積もりを頼む" note="見積もりで断っても費用はかかりません。お湯が出ない.com のサイトに移動します" />
         </section>
 
         <p className="text-[11px] leading-relaxed text-slate-400">
@@ -613,7 +616,7 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
 
       {/* スマホの画面下に固定する見積もりボタン */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))] backdrop-blur sm:hidden">
-        <PartnerLink lpId={LP_ID} partner="gasq" position="sticky" label="無料の現地調査を頼む" />
+        <PartnerLink lpId={LP_ID} partner="oyu" position="sticky" label="無料で見積もりを頼む" />
       </div>
       <LpFooter />
     </div>

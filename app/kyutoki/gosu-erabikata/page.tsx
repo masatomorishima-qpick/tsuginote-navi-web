@@ -5,7 +5,7 @@ import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
-import { GasqBox, GasqSticky, HaifuDownload, PrNote } from '@/components/kyutoki/Haifu';
+import { OyuBox, OyuSticky, HaifuDownload, PrNote } from '@/components/kyutoki/Haifu';
 import DATA from '@/lib/kyutoki/haifu-data.json';
 
 /**
@@ -17,7 +17,7 @@ import DATA from '@/lib/kyutoki/haifu-data.json';
  */
 
 const LP_ID = 'kyutoki-gosu-erabikata';
-const VERSION = 'v2-2026-11-04';
+const VERSION = 'v3-2026-11-05';
 const PAGE_PATH = '/kyutoki/gosu-erabikata';
 const TITLE = '給湯器の号数の選び方｜16号・20号・24号の目安と費用の差【表つき】';
 const DESCRIPTION =
@@ -181,12 +181,7 @@ export default function GosuErabikataPage() {
             リンナイのふろ給湯器（オート、RUF-E シリーズ）の希望小売価格（税込、本体のみ）。実際の販売価格は値引きがあり、店ごとに違います。出典：<a href={S.rinnaiRufe.url} target="_blank" rel="noopener noreferrer" className={A}>{S.rinnaiRufe.name}</a>
           </p>
           <p className="text-[14px] text-slate-700">工事費込みの総額の目安は<Link href="/kyutoki/kokan-hiyou#hyou" className={`${A} text-sky-800`}>費用の目安表</Link>にあります。</p>
-          <GasqBox
-            lpId={LP_ID}
-            position="sa"
-            lead="号数が分かれば、見積もりは早い"
-            points={['現地調査・見積もり無料', '在庫があれば、その場で工事日が決まる', '本体・工事とも10年保証']}
-          />
+          <OyuBox lpId={LP_ID} position="sa" lead="号数が分かれば、見積もりは早い" points={['出張料・見積もり・キャンセル料は無料', '最短30分で来てくれる', '工事は10年保証']} />
         </section>
 
         <section className="flex flex-col gap-2" aria-labelledby="faq">
@@ -206,7 +201,7 @@ export default function GosuErabikataPage() {
           号数の目安は一般的なもので、配管の長さや水圧で変わります。最終更新：2026年11月4日
         </p>
       </main>
-      <GasqSticky lpId={LP_ID} />
+      <OyuSticky lpId={LP_ID} />
       <LpFooter />
     </div>
   );

@@ -7,7 +7,7 @@ import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
-import { GasqBox, GasqSticky, HaifuDownload, PrNote } from '@/components/kyutoki/Haifu';
+import { OyuBox, OyuSticky, HaifuDownload, PrNote } from '@/components/kyutoki/Haifu';
 import DATA from '@/lib/kyutoki/haifu-data.json';
 
 /**
@@ -19,7 +19,7 @@ import DATA from '@/lib/kyutoki/haifu-data.json';
  */
 
 const LP_ID = 'kyutoki-mitsumori-mikata';
-const VERSION = 'v2-2026-11-04';
+const VERSION = 'v3-2026-11-05';
 const PAGE_PATH = '/kyutoki/mitsumori-mikata';
 const TITLE = '給湯器の見積もりの見方｜内訳で確かめる10か所【チェック表つき】';
 const DESCRIPTION =
@@ -174,12 +174,7 @@ export default function MitsumoriMikataPage() {
             ))}
           </ul>
           <p className="text-[14px] text-slate-700">条件をそろえてから、総額（税込）で比べます。目安の金額は<Link href="/kyutoki/kokan-hiyou#hyou" className={`${A} text-sky-800`}>費用の目安表</Link>にあります。</p>
-          <GasqBox
-            lpId={LP_ID}
-            position="hikaku"
-            lead="2社目の見積もりを無料で"
-            points={['他社より1円でも安く（相見積もり歓迎）', '現地調査・見積もり無料', '本体・工事とも10年保証']}
-          />
+          <OyuBox lpId={LP_ID} position="hikaku" lead="2社目の見積もりを無料で" points={['出張料・見積もり・キャンセル料は無料', '最短30分で来てくれる', '工事は10年保証']} />
         </section>
 
         {/* 点検商法 */}
@@ -215,7 +210,7 @@ export default function MitsumoriMikataPage() {
           金額は設置の状況で変わります。最終的な金額は見積書で確かめてください。最終更新：2026年11月4日
         </p>
       </main>
-      <GasqSticky lpId={LP_ID} />
+      <OyuSticky lpId={LP_ID} />
       <LpFooter />
     </div>
   );

@@ -50,3 +50,17 @@
 - 製造業：ストックマークの調査（MONOist、2026/9/9）https://monoist.itmedia.co.jp/mn/spv/2609/09/news047.html ／三菱ふそうの取引先向け約款 https://mftbc.supplier.daimlertruck.com/fileadmin/user_upload/2025__Information_Security_Terms_and_Conditions_JPMFBM.pdf ／評価制度の概要 https://www.ipa.go.jp/security/scs/rcu1hd0000007ajp-att/SCS-overview.pdf ／発注元の要請（IPA 中小企業調査）https://www.ipa.go.jp/security/reports/sme/sme-survey2024.html
 - 学校：文部科学省 指針 Ver.2.0 本文 https://www.mext.go.jp/content/000332373.pdf ／実証校の報告（2026/3/17）https://www.mext.go.jp/content/20260304-mxt_shuukyo01-000041839_15.pdf ／令和9年度概算要求 https://www.mext.go.jp/content/20260930-mxt_shuukyo01-000052309_7.pdf ／MM総研の教育委員会調査 https://news.mynavi.jp/article/newsinsight-428/ ／拡張機能の強制配布 https://support.google.com/chrome/a/answer/6306504?hl=ja ／Gemini for Education https://knowledge.workspace.google.com/admin/getting-started/editions/quickstart-guide-to-gemini-and-notebooklm-for-education?hl=ja ／端末の OS 比率 https://pc.watch.impress.co.jp/docs/news/2035547.html ／学校数・教員数 https://www.mext.go.jp/content/20260327-mxt_chousa01-000048552_10.pdf ／Microsoft の情報保護 https://learn.microsoft.com/en-us/purview/dlp-browser-dlp-learn
 - 医療：厚労科研（177病院）https://mhlw-grants.niph.go.jp/system/files/report_pdf/202503005A-buntan5.pdf ／リハビリ職の調査 https://www.pt-ot-st.net/index.php/topics/detail/1954 ／日本医師会の答申 https://www.med.or.jp/dl-med/teireikaiken/20260415_3.pdf ／名古屋医療センター https://dempa-digital.com/article/701285 ／病院数 https://www.mhlw.go.jp/toukei/saikin/hw/iryosd/m26/dl/is2608.pdf
+
+## 追記（11/4夜）：Google の標準機能との重なり
+
+きっかけ：Forbes JAPAN（2026/11/4）。Google が米国の小中高向けに AI 機能を初期設定で切り、オンにするかどうかを学校の管理画面で選ばせる方針（検索と一体で、すべて使うか使わないかの二択）。
+
+確かめた事実（Google の公式資料）：
+- Vault で Gemini アプリの会話（指示文と応答）を検索・書き出しできる。教育向けの無料版（Education Fundamentals）も対象。2026/6から保存の規則も設定できる。Gmail・ドキュメント内の Gemini は対象外。
+- Gemini 向けの情報漏えい防止（DLP for Gemini）が教育向けの無料版にもある。利用者の入力文と参照元を規則で調べ、「使わせない」か「記録だけ」を選べ、記録が残る。標準の検出は決まった形の番号が中心（日本の学校情報向けの検出は記載なし）。
+- 組織単位で Gemini のオン・オフができる。
+
+判断：
+- 入力を調べて記録する「道具」は、Google が無料で持っている。道具を単体で売る余地は小さい。11/11の確認項目（記録を取り出せるか）は Google 側では「できる」で確定。
+- 余地が残るのは、①日本の学校の情報（児童の氏名・成績・指導の記録・家庭の事情）に合わせた検出規則の作成と設定、②Vault と DLP の記録を毎月読み、国の点検項目に沿った報告書にする運用、③研修とルール。売る物は「道具」から「Google の標準機能を使った設定と点検の代行」に変える。
+- 次に確かめること：Microsoft 側（Copilot の情報保護は上位の契約が要る）で同じ穴があるか。教育委員会が DLP を実際に設定できているか（調達10件・販売店5社の確認で合わせて見る）。

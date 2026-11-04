@@ -1,0 +1,104 @@
+<!-- WordPress の「カスタムHTML」ブロックにそのまま貼る -->
+<style>
+.ba-h{--ink:#1f2a37;--sub:#5b6573;--line:#e3e7ec;--bg:#f7f9fb;--ok:#1f7a4d;--okb:#e6f4ec;--mid:#9a6400;--midb:#fdf3e1;--ng:#b42318;--ngb:#fdecea;color:var(--ink);font-size:16px;line-height:1.8;max-width:960px;margin:0 auto;padding:0 16px}
+.ba-h h1{font-size:28px;line-height:1.4;margin:48px 0 8px}
+.ba-h .meta{color:var(--sub);font-size:14px;margin-bottom:40px}
+.ba-h h2{font-size:20px;margin:56px 0 16px;padding-left:12px;border-left:4px solid var(--ink)}
+.ba-h .items{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:0;padding:0;list-style:none}
+.ba-h .items li{background:var(--bg);border-radius:10px;padding:16px}
+.ba-h .items b{display:block;font-size:13px;color:var(--sub)}
+.ba-h .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:14px;margin:0 0 12px}
+.ba-h .m{display:inline-block;min-width:32px;font-size:17px;line-height:1.6;text-align:center;font-weight:700;border-radius:6px;padding:0 6px}
+.ba-h .ok{color:var(--ok);background:var(--okb)}.ba-h .mid{color:var(--mid);background:var(--midb)}.ba-h .ng{color:var(--ng);background:var(--ngb)}
+.ba-h .wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ba-h table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+.ba-h th,.ba-h td{border-bottom:1px solid var(--line);padding:12px 10px;text-align:left;vertical-align:top}
+.ba-h th{background:var(--bg);font-weight:600;white-space:nowrap}
+.ba-h td.c{text-align:center;white-space:nowrap}
+.ba-h tr.grp td{background:#fff;font-weight:700;padding-top:20px;border-bottom:2px solid var(--ink)}
+.ba-h .note{font-size:13px;color:var(--sub)}
+.ba-h .pts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;list-style:none;padding:0}
+.ba-h .pts li{border:1px solid var(--line);border-radius:12px;padding:20px}
+.ba-h .pts .n{font-size:28px;font-weight:700;color:var(--sub);line-height:1}
+.ba-h .pts h3{font-size:16px;margin:8px 0 4px}
+.ba-h .cta{background:var(--bg);border-radius:14px;padding:32px 24px;text-align:center;margin:56px 0}
+.ba-h .cta a{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;border-radius:8px;padding:14px 28px;font-weight:600;margin-top:12px}
+.ba-h .src{font-size:12px;color:var(--sub);word-break:break-all}
+.ba-h .src li{margin-bottom:4px}
+</style>
+
+<div class="ba-h">
+<h1>生成AI利活用計画書<br>根拠欄の早見表</h1>
+<p class="meta">発注者確認チェックリスト 6-3・6-4・7-3・7-4 ／ 確認日 2026年11月5日</p>
+
+<h2>対象の欄</h2>
+<ul class="items">
+<li><b>6-3</b>学習させない措置</li>
+<li><b>6-4</b>その根拠（設定・約款）</li>
+<li><b>7-3</b>利用履歴の保存方法（保存期間・削除方針）</li>
+<li><b>7-4</b>その根拠（社内規定・約款）</li>
+</ul>
+
+<h2>早見表</h2>
+<div class="legend">
+<span><span class="m ok">○</span> 契約と設定で満たせる</span>
+<span><span class="m mid">△</span> 条件つき</span>
+<span><span class="m ng">×</span> 満たしにくい</span>
+</div>
+<div class="wrap">
+<table>
+<thead><tr><th>サービス・版</th><th>6-3・6-4<br>学習させない</th><th>7-3・7-4<br>履歴の保存</th><th>ひとこと</th></tr></thead>
+<tbody>
+<tr class="grp"><td colspan="4">ChatGPT</td></tr>
+<tr><td>無料・Plus・Pro</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習の停止は各自の設定。会社で管理できない</td></tr>
+<tr><td>Business（旧 Team）</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ng">×</span></td><td>学習には使われない。保存期間を決められず、書き出しもできない</td></tr>
+<tr><td>Enterprise</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>保存期間を会社で設定（最短90日）。会話の記録を取り出せる</td></tr>
+
+<tr class="grp"><td colspan="4">Microsoft</td></tr>
+<tr><td>個人アカウントの Copilot</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習の停止は各自の設定。会社で管理できない</td></tr>
+<tr><td>職場アカウントの Copilot Chat</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>学習には使われない。保存の規則を当てられるかは契約次第で要確認</td></tr>
+<tr><td>Microsoft 365 Copilot Business</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>操作の記録は残る。保存期間を会社で決められるかは要確認</td></tr>
+<tr><td>Microsoft 365 Copilot（E3・E5 と組み合わせ）</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>会話に保存の規則を当てられ、検索・書き出しもできる</td></tr>
+
+<tr class="grp"><td colspan="4">Google Gemini</td></tr>
+<tr><td>個人の Gemini</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習の停止は各自の設定。一部の会話は人が確認することがある</td></tr>
+<tr><td>Workspace Business Starter・Standard</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>保存期間は管理者が決められる。会話の検索・書き出しの機能はない</td></tr>
+<tr><td>Workspace Business Plus・Enterprise</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>管理機能（Vault）で会話の保存規則・検索・書き出しができる</td></tr>
+
+<tr class="grp"><td colspan="4">Claude</td></tr>
+<tr><td>無料・Pro・Max</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習の扱いは各自の設定。会社で管理できない</td></tr>
+<tr><td>Team</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>会話の書き出しはできる。保存期間は会社で決められない</td></tr>
+<tr><td>Enterprise</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>保存期間を会社で設定（最短30日）。会話の記録を取り出せる</td></tr>
+
+<tr class="grp"><td colspan="4">国内のサービス</td></tr>
+<tr><td>GaiXer</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習に使わないと案内あり。約款の条文と履歴の仕様は提供元に確認が必要</td></tr>
+<tr><td>exaBase 生成AI</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m mid">△</span></td><td>学習に使わないと案内あり。保存期間と書き出しの今の仕様は提供元に確認が必要</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">△・× でも、7-4 は社内規定を根拠にできます。ただしその場合、サービス側で保存を強制できないため、運用の実効性まで問われます（チェックリスト 7-2・7-6）。</p>
+
+<h2>つまずきやすい3点</h2>
+<ul class="pts">
+<li><span class="n">1</span><h3>個人向けの版</h3>学習の停止が各自の設定任せ。会社として根拠を示しにくい</li>
+<li><span class="n">2</span><h3>安い法人向けの版</h3>学習の欄は満たせても、履歴の保存の欄で詰まりやすい</li>
+<li><span class="n">3</span><h3>再委託先</h3>再委託先ごとに同じ記載が求められる（チェックリスト 9-1・9-2 ほか）</li>
+</ul>
+
+<div class="cta">
+<strong>手間取っている欄はありますか</strong><br>
+欄の番号だけお送りいただければ、根拠つきでお返しします。
+<br><a href="mailto:masato.morishima@blueadventures.jp?subject=%E6%A0%B9%E6%8B%A0%E6%AC%84%E3%81%AE%E7%9B%B8%E8%AB%87">欄の番号を送る</a>
+</div>
+
+<h2>出典</h2>
+<ul class="src">
+<li>国土交通省 関東地方整備局「生成AI利活用計画書 発注者確認チェックリスト」 https://www.ktr.mlit.go.jp/ktr_content/content/000955102.pdf</li>
+<li>OpenAI「Business data privacy, security, and compliance」 https://openai.com/business-data/ ／「Enterprise privacy」 https://openai.com/enterprise-privacy/ ／ChatGPT Business のよくある質問 https://help.openai.com/en/articles/8542115 ／データの管理 https://help.openai.com/en/articles/7730893 ／Compliance API https://help.openai.com/articles/9261474</li>
+<li>Microsoft「Microsoft 365 Copilot と Copilot Chat のエンタープライズデータ保護」 https://learn.microsoft.com/ja-jp/copilot/microsoft-365/enterprise-data-protection ／Copilot の保持ポリシー https://learn.microsoft.com/en-us/purview/retention-policies-copilot ／Microsoft Purview サービスの説明 https://learn.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-purview-service-description ／個人向け Copilot のプライバシー https://support.microsoft.com/en-us/topic/privacy-faq-for-microsoft-copilot-27b3a435-8dc9-4b55-9a4b-58eeb9647a7f</li>
+<li>Google「Google Workspace の生成 AI に関するプライバシー ハブ」 https://knowledge.workspace.google.com/admin/generative-ai/generative-ai-in-google-workspace-privacy-hub ／Vault による Gemini アプリの保持 https://knowledge.workspace.google.com/vault/retention/retain-gemini-app-messages-with-vault?hl=ja ／Gemini アプリのプライバシー ハブ https://support.google.com/gemini/answer/13594961?hl=ja</li>
+<li>Anthropic 法人向けのデータの扱い https://privacy.claude.com/en/articles/7996885-is-my-data-used-for-model-training ／個人向け https://privacy.claude.com/en/articles/10023580-is-my-data-used-for-model-training ／組織データの書き出し https://support.claude.com/en/articles/13346720-export-your-organization-s-data ／保存期間の設定（Enterprise） https://support.claude.com/en/articles/10440198-configure-custom-data-retention-controls-for-enterprise-plans</li>
+<li>GaiXer https://www.ntt.com/business/dx/smart/generative-ai/package/gaixer.html ／exaBase 生成AI https://exawizards.com/exabase/gpt/</li>
+</ul>
+<p class="note">各社の公式資料（ヘルプ・プライバシーの説明）をもとに整理したものです。計画書に約款の条番号まで書く場合は、各社の約款の本文でご確認ください。仕様は変わることがあります。本資料は国土交通省および各サービスの提供元とは関係ありません。<br>作成：BlueAdventures合同会社</p>
+</div>

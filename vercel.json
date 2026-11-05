@@ -27,7 +27,9 @@
   ],
   "git": {
     "deploymentEnabled": {
-      "docs/listing-rules": false
+      "docs/listing-rules": false,
+      "docs/**": false,
+      "dependabot/**": false
     }
   },
   "ignoreCommand": "bash -c '[ \"$VERCEL_GIT_COMMIT_REF\" = \"main\" ] && exit 1; PREV=\"${VERCEL_GIT_PREVIOUS_SHA:-HEAD^}\"; git diff --quiet \"$PREV\" HEAD -- . \":(exclude)docs\" \":(exclude)*.md\" \":(exclude)supabase/queries\"'"

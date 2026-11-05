@@ -1,140 +1,164 @@
 <!-- WordPress の「カスタムHTML」ブロックにそのまま貼る -->
 <style>
-.ba-h{--ink:#1f2a37;--sub:#5b6573;--line:#e3e7ec;--bg:#f7f9fb;--ok:#1f7a4d;--okb:#e6f4ec;--mid:#9a6400;--midb:#fdf3e1;--ng:#b42318;--ngb:#fdecea;color:var(--ink);font-size:16px;line-height:1.8;max-width:960px;margin:0 auto;padding:0 16px}
-.ba-h .meta{color:var(--sub);font-size:13px;margin:0 0 20px}
-.ba-h h2{font-size:20px;margin:56px 0 16px;padding-left:12px;border-left:4px solid var(--ink)}
-.ba-h .items{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:0;padding:0;list-style:none}
-.ba-h .items li{background:var(--bg);border-radius:10px;padding:16px}
-.ba-h .items b{display:block;font-size:13px;color:var(--sub)}
-.ba-h .items li{font-size:14px;line-height:1.7}
-.ba-h .sub{font-size:13px;color:var(--sub);margin:-4px 0 16px}
-.ba-h td small{display:block;font-size:12px;color:var(--sub);font-weight:400}
-.ba-h .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:14px;margin:0 0 12px}
-.ba-h .m{display:inline-block;min-width:32px;font-size:17px;line-height:1.6;text-align:center;font-weight:700;border-radius:6px;padding:0 6px}
-.ba-h .ok{color:var(--ok);background:var(--okb)}.ba-h .mid{color:var(--mid);background:var(--midb)}.ba-h .ng{color:var(--ng);background:var(--ngb)}
-.ba-h .ba-scroll{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.ba-h table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
-.ba-h th,.ba-h td{border-bottom:1px solid var(--line);padding:12px 10px;text-align:left;vertical-align:top}
-.ba-h th{background:var(--bg);font-weight:600;white-space:nowrap}
-.ba-h td.c{text-align:center;white-space:nowrap}
-.ba-h tr.grp td{background:#fff;font-weight:700;padding-top:20px;border-bottom:2px solid var(--ink)}
-.ba-h .note{font-size:13px;color:var(--sub)}
-.ba-h .pts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;list-style:none;padding:0}
-.ba-h .pts li{border:1px solid var(--line);border-radius:12px;padding:20px}
-.ba-h .pts .n{font-size:28px;font-weight:700;color:var(--sub);line-height:1}
-.ba-h .pts .t{display:block;font-size:16px;font-weight:700;margin:8px 0 4px}
-.ba-h .cta{background:var(--bg);border-radius:14px;padding:32px 24px;text-align:center;margin:56px 0}
-.ba-h .cta a{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;border-radius:8px;padding:14px 28px;font-weight:600;margin-top:12px}
-.ba-h .src{font-size:12px;color:var(--sub);word-break:break-all}
-.ba-h .src li{margin-bottom:4px}
-
 html.ba-on body>*:not(#ba-site){display:none!important}
 html.ba-on,html.ba-on body{margin:0!important;padding:0!important;background:#fff!important}
-#ba-site{background:#fff;font-family:"Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
+#ba-site{background:#fff;color:#1f2a37;font-family:"Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
 #ba-site *,#ba-site *::before,#ba-site *::after{box-sizing:border-box}
 #ba-site .external-icon,#ba-site .internal-icon{display:none!important}
 #ba-site a{color:inherit}
-#ba-site .ba-h .cta a{color:#fff}
-.ba-top{display:flex;justify-content:space-between;align-items:center;max-width:960px;margin:0 auto;padding:20px 16px;font-size:14px}
-.ba-top .logo{font-weight:800;text-decoration:none;letter-spacing:.01em}
-.ba-top a{text-decoration:none}
-.ba-h .ttl{font-size:clamp(26px,4.4vw,40px);line-height:1.3;margin:40px 0 12px}
-.ba-h .lead{font-size:16px;margin:0 0 24px}
-.ba-h .know{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;list-style:none;padding:0;margin:0 0 8px}
-.ba-h .know li{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:12px;padding:16px;font-size:14px;line-height:1.5;font-weight:600}
-.ba-h .know svg{width:28px;height:28px;flex:none;color:var(--ink)}
-@media(max-width:600px){.ba-h .know{grid-template-columns:1fr}}
-.ba-bottom{border-top:1px solid #e3e7ec;margin-top:40px}
+.ba-top{max-width:960px;margin:0 auto;padding:20px 16px;font-size:14px}
+.ba-top .logo{font-weight:800;text-decoration:none}
+.ba-h{--ink:#1f2a37;--sub:#5b6573;--line:#e3e7ec;--bg:#f7f9fb;--ok:#1f7a4d;--okb:#e6f4ec;--mid:#9a6400;--midb:#fdf3e1;--ng:#b42318;--ngb:#fdecea;font-size:16px;line-height:1.8;max-width:960px;margin:0 auto;padding:0 16px}
+.ba-h .ttl{font-size:clamp(26px,4.4vw,40px);line-height:1.3;margin:32px 0 8px}
+.ba-h .meta{color:var(--sub);font-size:13px;margin:0 0 16px}
+.ba-h .lead{margin:0 0 24px}
+.ba-h h2{font-size:20px;margin:56px 0 16px;padding-left:12px;border-left:4px solid var(--ink)}
+.ba-h .sub{font-size:13px;color:var(--sub);margin:-4px 0 16px}
+.ba-h .m{display:inline-block;min-width:30px;font-size:16px;line-height:1.6;text-align:center;font-weight:700;border-radius:6px;padding:0 6px}
+.ba-h .ok{color:var(--ok);background:var(--okb)}.ba-h .mid{color:var(--mid);background:var(--midb)}.ba-h .ng{color:var(--ng);background:var(--ngb)}
+.ba-h .tiers{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.ba-h .tiers li{display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+.ba-h .tiers .k{font-weight:700}
+.ba-h .tiers .k small{display:block;font-weight:400;font-size:12px;color:var(--sub)}
+.ba-h .tiers .v{font-size:13px;color:var(--sub);white-space:nowrap}
+.ba-h .by{font-size:13px;color:var(--sub);background:var(--bg);border-radius:10px;padding:12px 16px;margin:16px 0 0}
+.ba-h .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;list-style:none;padding:0;margin:0}
+.ba-h .facts li{background:var(--bg);border-radius:10px;padding:16px;font-size:14px;line-height:1.7}
+.ba-h .facts b{display:block;font-size:13px;color:var(--sub)}
+.ba-h .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:14px;margin:0 0 12px}
+.ba-h table{border-collapse:collapse;width:100%;font-size:14px}
+.ba-h th,.ba-h td{border-bottom:1px solid var(--line);padding:12px 10px;text-align:left;vertical-align:top}
+.ba-h th{background:var(--bg);font-weight:600}
+.ba-h td.c{text-align:center;white-space:nowrap}
+.ba-h td small{display:block;font-size:12px;color:var(--sub)}
+.ba-h tr.grp td{font-weight:700;padding-top:20px;border-bottom:2px solid var(--ink)}
+.ba-h .note{font-size:13px;color:var(--sub)}
+.ba-h .acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;list-style:none;padding:0;margin:0}
+.ba-h .acts li{border:1px solid var(--line);border-radius:12px;padding:20px;font-size:14px}
+.ba-h .acts svg{width:28px;height:28px;display:block;margin-bottom:8px}
+.ba-h .acts .t{display:block;font-size:16px;font-weight:700;margin-bottom:4px}
+.ba-h .ex{border-left:4px solid var(--line);background:var(--bg);border-radius:0 10px 10px 0;padding:14px 18px;margin:0 0 12px;font-size:15px}
+.ba-h .ex b{display:block;font-size:13px;color:var(--sub)}
+.ba-h .ex span{background:#fff;border:1px dashed #b8c0cc;border-radius:4px;padding:0 6px}
+.ba-h .cta{background:var(--bg);border-radius:14px;padding:32px 24px;text-align:center;margin:56px 0}
+.ba-h .cta .h{font-size:20px;font-weight:700;margin:0 0 8px}
+#ba-site .ba-h .cta a.btn{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;border-radius:8px;padding:14px 28px;font-weight:600;margin:16px 0 8px}
+.ba-h .cta .safe{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 20px;font-size:13px;color:var(--sub);list-style:none;padding:0;margin:8px 0}
+.ba-h .cta .addr{font-size:13px;color:var(--sub)}
+.ba-h details{font-size:12px;color:var(--sub);margin-top:40px}
+.ba-h summary{cursor:pointer;font-size:14px;color:var(--ink)}
+.ba-h details li{margin-bottom:4px}
+.ba-bottom{border-top:1px solid var(--line,#e3e7ec);margin-top:40px}
 .ba-bottom .in{max-width:960px;margin:0 auto;padding:28px 16px 40px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;font-size:13px;color:#5b6573}
 .ba-bottom .co b{display:block;color:#1f2a37;font-size:14px;margin-bottom:4px}
-.ba-bottom nav{display:flex;gap:20px;align-items:flex-start}
-.ba-bottom nav a{text-decoration:none;color:#1f2a37}
-.ba-bottom .cp{width:100%;margin:8px 0 0}
+.ba-bottom a{text-decoration:none;color:#1f2a37}
+@media(max-width:600px){
+.ba-h .tiers li{grid-template-columns:1fr auto;gap:6px 12px}
+.ba-h .tiers .k{grid-column:1/-1}
+.ba-h table thead{display:none}
+.ba-h table,.ba-h tbody,.ba-h tr,.ba-h td{display:block;width:100%}
+.ba-h tr{border-bottom:1px solid var(--line);padding:12px 0}
+.ba-h tr.grp{border-bottom:2px solid var(--ink);padding:16px 0 4px}
+.ba-h td{border:0;padding:2px 0}
+.ba-h tr.grp td{border:0;padding:0}
+.ba-h td.c{display:inline-block;width:auto;text-align:left;margin-right:16px}
+.ba-h td.c::before{content:attr(data-l);font-size:12px;color:var(--sub);margin-right:6px}
+.ba-h td.r{font-size:13px;color:var(--sub)}
+}
 </style>
 <div id="ba-site">
-<header class="ba-top"><a class="logo" href="https://blueadventures.jp/">BlueAdventures</a><a href="https://blueadventures.jp/contact-2/">お問い合わせ</a></header>
+<header class="ba-top"><a class="logo" href="https://blueadventures.jp/">BlueAdventures</a></header>
 <main class="ba-h">
 <h1 class="ttl">生成AI利活用計画書<br>サービス別 根拠の早見表</h1>
 <p class="meta">確認日：2026年11月5日</p>
-<p class="lead">国土交通省の直轄業務で提出する「生成AI利活用計画書」は、発注者がチェックリストを使って内容を確認します。そのうち根拠まで確認される4項目について、主な生成AIサービスの契約ごとに記載できるかを整理しました。</p>
-<ul class="know">
-<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>ご利用中の契約で<br>記載できるか</span></li>
-<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 16H3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4M12 17v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>記載できない場合の<br>理由</span></li>
-<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z M14 3v4h4 M10 12h5 M10 16h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>根拠になる<br>各社の資料</span></li>
+<p class="lead">国土交通省の業務で出す「生成AI利活用計画書」のうち、根拠まで確認される項目について、お使いの生成AIの契約で記載できるかをまとめました。</p>
+
+<ul class="tiers">
+<li><span class="k">社員が個人で契約<small>ChatGPT・Gemini・Claude の無料／個人向け有料プラン など</small></span><span class="v">学習 <span class="m mid">△</span></span><span class="v">履歴 <span class="m ng">×</span></span></li>
+<li><span class="k">法人向けの基本プラン<small>ChatGPT Business、Claude Team、Google Workspace Business Standard など</small></span><span class="v">学習 <span class="m ok">○</span></span><span class="v">履歴 <span class="m mid">△</span> <span class="m ng">×</span></span></li>
+<li><span class="k">法人向けの上位プラン<small>ChatGPT Enterprise、Claude Enterprise、Google Workspace Business Plus など</small></span><span class="v">学習 <span class="m ok">○</span></span><span class="v">履歴 <span class="m ok">○</span></span></li>
 </ul>
+<p class="by">生成AIの安全な使い方の整理と導入を支援する BlueAdventures合同会社（横浜）が、国土交通省の通知と各社の公開資料を突き合わせて作成しました。国土交通省・各サービスの提供元とは関係ありません。誤りがあればご指摘ください。</p>
+
+<h2>計画書の基本</h2>
+<ul class="facts">
+<li><b>対象</b>測量・土木の建設コンサルタント・地質調査の業務のうち、生成AIで成果をまとめるもの</li>
+<li><b>出す人</b>業務の受注者</li>
+<li><b>出し方</b>業務計画書と一緒に提出。様式（ひな型）は発注者が電子データで示します</li>
+<li><b>いつから</b>2026年7月29日の国土交通省の通知以降の業務（契約済みの業務も、対応できるものから）</li>
+</ul>
+<p class="note">通知は国土交通省から全国の地方整備局などに出されています。</p>
 
 <h2>根拠まで確認される4項目</h2>
 <p class="sub">番号は、国土交通省の「生成AI利活用計画書 発注者確認チェックリスト」の項目番号です。</p>
-<ul class="items">
+<ul class="facts">
 <li><b>6-3</b>入力した情報が生成AIの学習に使われない措置が書かれているか</li>
 <li><b>6-4</b>その措置の根拠（サービスの設定・約款など）が具体的に示されているか</li>
 <li><b>7-3</b>利用履歴の保存方法（保存期間・削除の方針など）が書かれているか</li>
-<li><b>7-4</b>保存・管理の根拠（社内規定・契約サービスの約款など）が示されているか</li>
+<li><b>7-4</b>保存・管理の根拠（社内規程・契約サービスの約款など）が示されているか</li>
 </ul>
 
 <h2>サービス・契約ごとの早見表</h2>
 <div class="legend">
 <span><span class="m ok">○</span> 契約と設定で記載できる</span>
 <span><span class="m mid">△</span> 条件によって記載できる</span>
-<span><span class="m ng">×</span> 記載が難しい</span>
+<span><span class="m ng">×</span> サービスの機能だけでは難しい（社内規程で補う）</span>
 </div>
-<div class="ba-scroll">
 <table>
 <thead><tr><th>サービス・契約</th><th>学習に使われない措置<br>（6-3・6-4）</th><th>利用履歴の保存<br>（7-3・7-4）</th><th>判定の理由</th></tr></thead>
 <tbody>
 <tr class="grp"><td colspan="4">ChatGPT</td></tr>
-<tr><td>無料・Plus・Pro<br><small>個人で契約するプラン</small></td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習に使わない設定は利用者ごとに行うため、会社として根拠を示せません</td></tr>
-<tr><td>Business（旧 Team）</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ng">×</span></td><td>学習には使われません。保存期間を会社で決められず、履歴の書き出しもできません</td></tr>
-<tr><td>Enterprise</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>保存期間を会社で設定でき（最短90日）、利用履歴を取り出せます</td></tr>
-
+<tr><td>無料・Plus・Pro<small>個人で契約するプラン</small></td><td class="c" data-l="学習"><span class="m mid">△</span></td><td class="c" data-l="履歴"><span class="m ng">×</span></td><td class="r">学習を止める設定は社員ごとに行い、その設定画面を根拠にする必要があります。履歴を会社で保存する機能はありません</td></tr>
+<tr><td>Business（旧 Team）</td><td class="c" data-l="学習"><span class="m ok">○</span></td><td class="c" data-l="履歴"><span class="m ng">×</span></td><td class="r">学習には使われません。保存期間を会社で決められず、履歴の書き出しもできません</td></tr>
+<tr><td>Enterprise</td><td class="c" data-l="学習"><span class="m ok">○</span></td><td class="c" data-l="履歴"><span class="m ok">○</span></td><td class="r">保存期間を会社で設定でき（最短90日）、利用履歴を取り出せます</td></tr>
 <tr class="grp"><td colspan="4">Microsoft</td></tr>
-<tr><td>Copilot<br><small>個人の Microsoft アカウントで利用</small></td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習に使わない設定は利用者ごとに行うため、会社として根拠を示せません</td></tr>
-<tr><td>Copilot Chat<br><small>会社の Microsoft 365 アカウントで利用</small></td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>学習には使われません。保存の規則を適用できるかは契約内容によるため、確認が必要です</td></tr>
-<tr><td>Microsoft 365 Copilot Business</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>操作の記録は残ります。保存期間を会社で決められるかは確認が必要です</td></tr>
-<tr><td>Microsoft 365 Copilot（E3・E5 と組み合わせ）</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>利用履歴に保存の規則を適用でき、検索・書き出しもできます</td></tr>
-
+<tr><td>Copilot<small>個人の Microsoft アカウントで利用</small></td><td class="c" data-l="学習"><span class="m mid">△</span></td><td class="c" data-l="履歴"><span class="m ng">×</span></td><td class="r">学習を止める設定は社員ごとに行い、その設定画面を根拠にする必要があります。履歴を会社で保存する機能はありません</td></tr>
+<tr><td>Copilot Chat<small>会社の Microsoft 365 アカウントで利用</small></td><td class="c" data-l="学習"><span class="m ok">○</span></td><td class="c" data-l="履歴"><span class="m mid">△</span></td><td class="r">学習には使われません。保存の規則を適用できるかは契約内容によるため、確認が必要です</td></tr>
+<tr><td>Microsoft 365 Copilot Business</td><td class="c" data-l="学習"><span class="m ok">○</span></td><td class="c" data-l="履歴"><span class="m mid">△</span></td><td class="r">操作の記録は残ります。保存期間を会社で決められるかは確認が必要です</td></tr>
+<tr><td>Microsoft 365 Copilot<small>E3・E5 と組み合わせ</small></td><td class="c" data-l="学習"><span class="m ok">○</span></td><td class="c" data-l="履歴"><span class="m ok">○</span></td><td class="r">利用履歴に保存の規則を適用でき、検索・書き出しもできます</td></tr>
 <tr class="grp"><td colspan="4">Google Gemini</td></tr>
-<tr><td>Gemini<br><small>個人の Google アカウントで利用</small></td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習に使わない設定は利用者ごとに行います。一部の会話は提供元の担当者が確認することがあります</td></tr>
-<tr><td>Workspace Business Starter・Standard</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>保存期間は管理者が決められますが、利用履歴を検索・書き出しする機能がありません</td></tr>
-<tr><td>Workspace Business Plus・Enterprise</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>管理機能（Vault）で、利用履歴の保存の規則・検索・書き出しができます</td></tr>
-
+<tr><td>Gemini<small>個人の Google アカウントで利用</small></td><td class="c" data-l="学習"><span class="m mid">△</span></td><td class="c" data-l="履歴"><span class="m ng">×</span></td><td class="r">学習を止める設定は社員ごとに行います。一部の会話は提供元の担当者が確認することがあります</td></tr>
+<tr><td>Workspace Business Starter・Standard</td><td class="c" data-l="学習"><span class="m ok">○</span></td><td class="c" data-l="履歴"><span class="m mid">△</span></td><td class="r">保存期間は管理者が決められますが、利用履歴を検索・書き出しする機能がありません</td></tr>
+<tr><td>Workspace Business Plus・Enterprise</td><td class="c" data-l="学習"><span class="m ok">○</span></td><td class="c" data-l="履歴"><span class="m ok">○</span></td><td class="r">管理画面の保存機能（Vault）で、利用履歴の保存期間の設定・検索・書き出しができます</td></tr>
 <tr class="grp"><td colspan="4">Claude</td></tr>
-<tr><td>無料・Pro・Max<br><small>個人で契約するプラン</small></td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習に使うかどうかは利用者ごとの設定のため、会社として根拠を示せません</td></tr>
-<tr><td>Team</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>利用履歴の書き出しはできますが、保存期間を会社で決められません</td></tr>
-<tr><td>Enterprise</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>保存期間を会社で設定でき（最短30日）、利用履歴を取り出せます</td></tr>
-
-<tr class="grp"><td colspan="4">国内のサービス</td></tr>
-<tr><td>GaiXer</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習に使わないと案内されています。約款の条文と履歴の仕様は提供元への確認が必要です</td></tr>
-<tr><td>exaBase 生成AI</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m mid">△</span></td><td>学習に使わないと案内されています。保存期間と書き出しの現在の仕様は提供元への確認が必要です</td></tr>
+<tr><td>無料・Pro・Max<small>個人で契約するプラン</small></td><td class="c" data-l="学習"><span class="m mid">△</span></td><td class="c" data-l="履歴"><span class="m ng">×</span></td><td class="r">学習に使うかどうかは社員ごとの設定で、その設定画面を根拠にする必要があります。履歴を会社で保存する機能はありません</td></tr>
+<tr><td>Team</td><td class="c" data-l="学習"><span class="m ok">○</span></td><td class="c" data-l="履歴"><span class="m mid">△</span></td><td class="r">利用履歴の書き出しはできますが、保存期間を会社で決められません</td></tr>
+<tr><td>Enterprise</td><td class="c" data-l="学習"><span class="m ok">○</span></td><td class="c" data-l="履歴"><span class="m ok">○</span></td><td class="r">保存期間を会社で設定でき（最短30日）、利用履歴を取り出せます</td></tr>
 </tbody>
 </table>
-</div>
-<p class="note">△・×の契約でも、7-4は社内規定を根拠にできます。ただしサービス側で保存を強制できないため、規定どおりに運用されているか（実効性）まで確認されます（チェックリスト 7-2・7-6）。</p>
 
-<h2>記載で迷いやすい3つの点</h2>
-<ul class="pts">
-<li><span class="n">1</span><span class="t">社員が個人で契約したサービス</span>学習に使わない設定が社員一人ひとりに任されるため、会社として根拠を示せません。</li>
-<li><span class="n">2</span><span class="t">法人向けの基本プラン</span>学習の項目は記載できても、利用履歴の保存の項目で根拠が足りないことがあります。</li>
-<li><span class="n">3</span><span class="t">再委託先での利用</span>再委託先ごとに、同じ内容の記載が求められます（チェックリスト 9-1・9-2 ほか）。</li>
+<h2>△・×のときの対処</h2>
+<ul class="acts">
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="t">上位の契約に切り替える</span>サービスの機能で保存期間や書き出しを示せるようになります</li>
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z M14 3v4h4 M10 12h5 M10 16h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="t">社内規程で補う</span>保存の方法を規程で定め、規程どおりに運用した記録を残します</li>
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 17L17 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="t">対象の業務では使わない</span>計画書が必要な業務では生成AIを使わないと決め、業務計画書の情報流出対策の欄に記載します</li>
 </ul>
+
+<h2>記入例</h2>
+<p class="sub">点線の部分を、お使いのサービスと社内の決まりに合わせて書き換えてください。</p>
+<div class="ex"><b>6-4 学習に使われない措置の根拠</b><span>（提供元）</span>の「<span>（文書名）</span>」（<span>（確認日）</span>確認）に、法人契約で入力した情報を学習に使わない旨が記載されている。</div>
+<div class="ex"><b>7-4 利用履歴の保存・管理の根拠</b>当社「<span>（規程名）</span>」第<span>（条）</span>条、および<span>（サービス名）</span>の管理画面での保存期間の設定（設定画面の写しを添付）。</div>
 
 <div class="cta">
-<strong>記載で迷っている項目はありますか</strong><br>
-項目番号（例：7-3）をお送りいただければ、根拠となる資料とあわせて記載の考え方をお返しします。
-<br><a href="mailto:masato.morishima@blueadventures.jp?subject=%E6%A0%B9%E6%8B%A0%E6%AC%84%E3%81%AE%E7%9B%B8%E8%AB%87">項目番号を送る</a>
+<p class="h">サービス別の記入例をお送りします（無料）</p>
+お使いのサービスと契約を書いて送っていただければ、6-3〜7-4 の記入例と根拠になる資料をお返しします。
+<br><a class="btn" href="mailto:masato.morishima@blueadventures.jp?subject=%E8%A8%88%E7%94%BB%E6%9B%B8%E3%81%AE%E8%A8%98%E5%85%A5%E4%BE%8B%E3%81%AE%E4%BE%9D%E9%A0%BC&amp;body=%E5%88%A9%E7%94%A8%E4%B8%AD%E3%81%AE%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%A8%E5%A5%91%E7%B4%84%EF%BC%9A%0A%E8%BF%B7%E3%81%A3%E3%81%A6%E3%81%84%E3%82%8B%E9%A0%85%E7%9B%AE%EF%BC%88%E4%BB%BB%E6%84%8F%EF%BC%89%EF%BC%9A%0A">サービス名を書いて受け取る</a>
+<ul class="safe"><li>社名なしでも構いません</li><li>お電話はしません</li><li>3営業日以内にお返しします</li></ul>
+<p class="addr">宛先：masato.morishima@blueadventures.jp</p>
 </div>
 
-<h2>出典</h2>
-<ul class="src">
-<li>国土交通省 関東地方整備局「生成AI利活用計画書 発注者確認チェックリスト」 https://www.ktr.mlit.go.jp/ktr_content/content/000955102.pdf</li>
-<li>OpenAI「Business data privacy, security, and compliance」 https://openai.com/business-data/ ／「Enterprise privacy」 https://openai.com/enterprise-privacy/ ／ChatGPT Business のよくある質問 https://help.openai.com/en/articles/8542115 ／データの管理 https://help.openai.com/en/articles/7730893 ／Compliance API https://help.openai.com/articles/9261474</li>
-<li>Microsoft「Microsoft 365 Copilot と Copilot Chat のエンタープライズデータ保護」 https://learn.microsoft.com/ja-jp/copilot/microsoft-365/enterprise-data-protection ／Copilot の保持ポリシー https://learn.microsoft.com/en-us/purview/retention-policies-copilot ／Microsoft Purview サービスの説明 https://learn.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-purview-service-description ／個人向け Copilot のプライバシー https://support.microsoft.com/en-us/topic/privacy-faq-for-microsoft-copilot-27b3a435-8dc9-4b55-9a4b-58eeb9647a7f</li>
+<details>
+<summary>出典を見る</summary>
+<ul>
+<li>国土交通省「建設コンサルタント業務等における生成AI利活用等について（依頼）」（2026年7月29日）、同 関東地方整備局掲載の「生成AI利活用計画書（ひな型）」「発注者確認チェックリスト」 https://www.ktr.mlit.go.jp/ktr_content/content/000955102.pdf</li>
+<li>OpenAI「Business data privacy, security, and compliance」 https://openai.com/business-data/ ／「Enterprise privacy」 https://openai.com/enterprise-privacy/ ／ChatGPT Business のよくある質問 https://help.openai.com/en/articles/8542115 ／データの管理 https://help.openai.com/en/articles/7730893</li>
+<li>Microsoft「Microsoft 365 Copilot と Copilot Chat のエンタープライズデータ保護」 https://learn.microsoft.com/ja-jp/copilot/microsoft-365/enterprise-data-protection ／Copilot の保持ポリシー https://learn.microsoft.com/en-us/purview/retention-policies-copilot ／個人向け Copilot のプライバシー https://support.microsoft.com/en-us/topic/privacy-faq-for-microsoft-copilot-27b3a435-8dc9-4b55-9a4b-58eeb9647a7f</li>
 <li>Google「Google Workspace の生成 AI に関するプライバシー ハブ」 https://knowledge.workspace.google.com/admin/generative-ai/generative-ai-in-google-workspace-privacy-hub ／Vault による Gemini アプリの保持 https://knowledge.workspace.google.com/vault/retention/retain-gemini-app-messages-with-vault?hl=ja ／Gemini アプリのプライバシー ハブ https://support.google.com/gemini/answer/13594961?hl=ja</li>
 <li>Anthropic 法人向けのデータの扱い https://privacy.claude.com/en/articles/7996885-is-my-data-used-for-model-training ／個人向け https://privacy.claude.com/en/articles/10023580-is-my-data-used-for-model-training ／組織データの書き出し https://support.claude.com/en/articles/13346720-export-your-organization-s-data ／保存期間の設定（Enterprise） https://support.claude.com/en/articles/10440198-configure-custom-data-retention-controls-for-enterprise-plans</li>
-<li>GaiXer https://www.ntt.com/business/dx/smart/generative-ai/package/gaixer.html ／exaBase 生成AI https://exawizards.com/exabase/gpt/</li>
 </ul>
-<p class="note">各社の公式資料（ヘルプ・プライバシーの説明）をもとに整理したものです。計画書に約款の条番号まで書く場合は、各社の約款の本文でご確認ください。仕様は変わることがあります。本資料は国土交通省および各サービスの提供元とは関係ありません。<br>作成：BlueAdventures合同会社</p>
+<p>各社の公式資料（ヘルプ・プライバシーの説明）をもとに整理したものです。計画書に約款の条番号まで書く場合は、各社の約款の本文でご確認ください。仕様は変わることがあります。</p>
+</details>
 </main>
-<footer class="ba-bottom"><div class="in"><div class="co"><b>BlueAdventures合同会社</b>〒220-0072 神奈川県横浜市西区浅間町1丁目4番3号 ウィザードビル402</div><nav><a href="https://blueadventures.jp/contact-2/">お問い合わせ</a><a href="https://blueadventures.jp/privacy-policy/">プライバシーポリシー</a></nav><p class="cp">© 2026 BlueAdventures合同会社</p></div></footer>
+<footer class="ba-bottom"><div class="in"><div class="co"><b>BlueAdventures合同会社</b>〒220-0072 神奈川県横浜市西区浅間町1丁目4番3号 ウィザードビル402</div><a href="https://blueadventures.jp/privacy-policy/">プライバシーポリシー</a></div></footer>
 </div>
 <script>(function(){var e=document.getElementById('ba-site');if(!e)return;document.body.appendChild(e);document.documentElement.classList.add('ba-on');})();</script>

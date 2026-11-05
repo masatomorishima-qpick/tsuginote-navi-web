@@ -1,5 +1,6 @@
 -- 給湯器 B：ニーズの計測（/kyutoki/mitsumori）。版ごと・入口ごとの段の数。SELECT だけ。
--- b2（2026-11-03〜11-04）：2問 → 結果画面にボタン。b3（2026-11-04〜）：最初の画面に総額の一覧とボタン、押したあとにお住まい。
+-- b2（2026-11-03〜11-04）：2問 → 結果画面にボタン。b3-2026-11-04：最初の画面に総額の一覧とボタン、押したあとにお住まい。
+-- b3-2026-11-06：ボタンの下の一行を「写真を送るだけ・無料」「やりとりはメールだけ」に。
 -- 段：着地 → 総額とボタンを見た（kyutoki_m_result の form＝shown。ニーズの分母）→ ボタン押下（主の数字）
 --     → 賃貸で止まった（押下から外して読む）→ メール入力（信頼の目安）
 -- 入口：b3 から lp_view にも entry が入る。b2 の着地は entry が無いので、広告の組の番号（utm_content）で分ける
@@ -17,7 +18,7 @@ with e as (
     and coalesce(metadata->>'gclid', metadata->>'utm_source', '') <> ''
 )
 select
-  left(ver, 2) as 版,
+  ver as 版,
   grp as 広告の組,
   max(entry) filter (where entry <> 'mitsumori') as 入口,
   count(distinct visit_id) filter (where event_name = 'lp_view')                 as 着地,

@@ -1,7 +1,7 @@
 <!-- WordPress の「カスタムHTML」ブロックにそのまま貼る -->
 <style>
 .ba-h{--ink:#1f2a37;--sub:#5b6573;--line:#e3e7ec;--bg:#f7f9fb;--ok:#1f7a4d;--okb:#e6f4ec;--mid:#9a6400;--midb:#fdf3e1;--ng:#b42318;--ngb:#fdecea;color:var(--ink);font-size:16px;line-height:1.8;max-width:960px;margin:0 auto;padding:0 16px}
-.ba-h .meta{color:var(--sub);font-size:14px;margin:8px 0 32px}
+.ba-h .meta{color:var(--sub);font-size:13px;margin:0 0 20px}
 .ba-h h2{font-size:20px;margin:56px 0 16px;padding-left:12px;border-left:4px solid var(--ink)}
 .ba-h .items{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:0;padding:0;list-style:none}
 .ba-h .items li{background:var(--bg);border-radius:10px;padding:16px}
@@ -24,10 +24,41 @@
 .ba-h .cta a{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;border-radius:8px;padding:14px 28px;font-weight:600;margin-top:12px}
 .ba-h .src{font-size:12px;color:var(--sub);word-break:break-all}
 .ba-h .src li{margin-bottom:4px}
-</style>
 
-<div class="ba-h">
+html.ba-on body>*:not(#ba-site){display:none!important}
+html.ba-on,html.ba-on body{margin:0!important;padding:0!important;background:#fff!important}
+#ba-site{background:#fff;font-family:"Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
+#ba-site *,#ba-site *::before,#ba-site *::after{box-sizing:border-box}
+#ba-site .external-icon,#ba-site .internal-icon{display:none!important}
+#ba-site a{color:inherit}
+#ba-site .ba-h .cta a{color:#fff}
+.ba-top{display:flex;justify-content:space-between;align-items:center;max-width:960px;margin:0 auto;padding:20px 16px;font-size:14px}
+.ba-top .logo{font-weight:800;text-decoration:none;letter-spacing:.01em}
+.ba-top a{text-decoration:none}
+.ba-h .ttl{font-size:clamp(26px,4.4vw,40px);line-height:1.3;margin:40px 0 12px}
+.ba-h .lead{font-size:16px;margin:0 0 24px}
+.ba-h .know{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;list-style:none;padding:0;margin:0 0 8px}
+.ba-h .know li{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:12px;padding:16px;font-size:14px;line-height:1.5;font-weight:600}
+.ba-h .know svg{width:28px;height:28px;flex:none;color:var(--ink)}
+@media(max-width:600px){.ba-h .know{grid-template-columns:1fr}}
+.ba-bottom{border-top:1px solid #e3e7ec;margin-top:40px}
+.ba-bottom .in{max-width:960px;margin:0 auto;padding:28px 16px 40px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;font-size:13px;color:#5b6573}
+.ba-bottom .co b{display:block;color:#1f2a37;font-size:14px;margin-bottom:4px}
+.ba-bottom nav{display:flex;gap:20px;align-items:flex-start}
+.ba-bottom nav a{text-decoration:none;color:#1f2a37}
+.ba-bottom .cp{width:100%;margin:8px 0 0}
+</style>
+<div id="ba-site">
+<header class="ba-top"><a class="logo" href="https://blueadventures.jp/">BlueAdventures</a><a href="https://blueadventures.jp/contact-2/">お問い合わせ</a></header>
+<main class="ba-h">
+<h1 class="ttl">生成AI利活用計画書<br>根拠欄の早見表</h1>
 <p class="meta">発注者確認チェックリスト 6-3・6-4・7-3・7-4 ／ 確認日 2026年11月5日</p>
+<p class="lead">使っている生成AIの版で、根拠欄を満たせるかを一目で確かめられます。</p>
+<ul class="know">
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>その版で<br>満たせるか</span></li>
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 16H3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4M12 17v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>足りないとき<br>何が要るか</span></li>
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z M14 3v4h4 M10 12h5 M10 16h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>根拠になる<br>各社の資料</span></li>
+</ul>
 
 <h2>対象の欄</h2>
 <ul class="items">
@@ -99,4 +130,7 @@
 <li>GaiXer https://www.ntt.com/business/dx/smart/generative-ai/package/gaixer.html ／exaBase 生成AI https://exawizards.com/exabase/gpt/</li>
 </ul>
 <p class="note">各社の公式資料（ヘルプ・プライバシーの説明）をもとに整理したものです。計画書に約款の条番号まで書く場合は、各社の約款の本文でご確認ください。仕様は変わることがあります。本資料は国土交通省および各サービスの提供元とは関係ありません。<br>作成：BlueAdventures合同会社</p>
+</main>
+<footer class="ba-bottom"><div class="in"><div class="co"><b>BlueAdventures合同会社</b>〒220-0072 神奈川県横浜市西区浅間町1丁目4番3号 ウィザードビル402</div><nav><a href="https://blueadventures.jp/contact-2/">お問い合わせ</a><a href="https://blueadventures.jp/privacy-policy/">プライバシーポリシー</a></nav><p class="cp">© 2026 BlueAdventures合同会社</p></div></footer>
 </div>
+<script>(function(){var e=document.getElementById('ba-site');if(!e)return;document.body.appendChild(e);document.documentElement.classList.add('ba-on');})();</script>

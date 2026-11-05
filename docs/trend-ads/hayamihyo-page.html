@@ -6,6 +6,9 @@
 .ba-h .items{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:0;padding:0;list-style:none}
 .ba-h .items li{background:var(--bg);border-radius:10px;padding:16px}
 .ba-h .items b{display:block;font-size:13px;color:var(--sub)}
+.ba-h .items li{font-size:14px;line-height:1.7}
+.ba-h .sub{font-size:13px;color:var(--sub);margin:-4px 0 16px}
+.ba-h td small{display:block;font-size:12px;color:var(--sub);font-weight:400}
 .ba-h .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:14px;margin:0 0 12px}
 .ba-h .m{display:inline-block;min-width:32px;font-size:17px;line-height:1.6;text-align:center;font-weight:700;border-radius:6px;padding:0 6px}
 .ba-h .ok{color:var(--ok);background:var(--okb)}.ba-h .mid{color:var(--mid);background:var(--midb)}.ba-h .ng{color:var(--ng);background:var(--ngb)}
@@ -51,73 +54,74 @@ html.ba-on,html.ba-on body{margin:0!important;padding:0!important;background:#ff
 <div id="ba-site">
 <header class="ba-top"><a class="logo" href="https://blueadventures.jp/">BlueAdventures</a><a href="https://blueadventures.jp/contact-2/">お問い合わせ</a></header>
 <main class="ba-h">
-<h1 class="ttl">生成AI利活用計画書<br>根拠欄の早見表</h1>
-<p class="meta">発注者確認チェックリスト 6-3・6-4・7-3・7-4 ／ 確認日 2026年11月5日</p>
-<p class="lead">使っている生成AIの版で、根拠欄を満たせるかを一目で確かめられます。</p>
+<h1 class="ttl">生成AI利活用計画書<br>サービス別 根拠の早見表</h1>
+<p class="meta">確認日：2026年11月5日</p>
+<p class="lead">国土交通省の直轄業務で提出する「生成AI利活用計画書」は、発注者がチェックリストを使って内容を確認します。そのうち根拠まで確認される4項目について、主な生成AIサービスの契約ごとに記載できるかを整理しました。</p>
 <ul class="know">
-<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>その版で<br>満たせるか</span></li>
-<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 16H3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4M12 17v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>足りないとき<br>何が要るか</span></li>
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>ご利用中の契約で<br>記載できるか</span></li>
+<li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 16H3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4M12 17v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>記載できない場合の<br>理由</span></li>
 <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z M14 3v4h4 M10 12h5 M10 16h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>根拠になる<br>各社の資料</span></li>
 </ul>
 
-<h2>対象の欄</h2>
+<h2>根拠まで確認される4項目</h2>
+<p class="sub">番号は、国土交通省の「生成AI利活用計画書 発注者確認チェックリスト」の項目番号です。</p>
 <ul class="items">
-<li><b>6-3</b>学習させない措置</li>
-<li><b>6-4</b>その根拠（設定・約款）</li>
-<li><b>7-3</b>利用履歴の保存方法（保存期間・削除方針）</li>
-<li><b>7-4</b>その根拠（社内規定・約款）</li>
+<li><b>6-3</b>入力した情報が生成AIの学習に使われない措置が書かれているか</li>
+<li><b>6-4</b>その措置の根拠（サービスの設定・約款など）が具体的に示されているか</li>
+<li><b>7-3</b>利用履歴の保存方法（保存期間・削除の方針など）が書かれているか</li>
+<li><b>7-4</b>保存・管理の根拠（社内規定・契約サービスの約款など）が示されているか</li>
 </ul>
 
-<h2>早見表</h2>
+<h2>サービス・契約ごとの早見表</h2>
 <div class="legend">
-<span><span class="m ok">○</span> 契約と設定で満たせる</span>
-<span><span class="m mid">△</span> 条件つき</span>
-<span><span class="m ng">×</span> 満たしにくい</span>
+<span><span class="m ok">○</span> 契約と設定で記載できる</span>
+<span><span class="m mid">△</span> 条件によって記載できる</span>
+<span><span class="m ng">×</span> 記載が難しい</span>
 </div>
 <div class="ba-scroll">
 <table>
-<thead><tr><th>サービス・版</th><th>6-3・6-4<br>学習させない</th><th>7-3・7-4<br>履歴の保存</th><th>ひとこと</th></tr></thead>
+<thead><tr><th>サービス・契約</th><th>学習に使われない措置<br>（6-3・6-4）</th><th>利用履歴の保存<br>（7-3・7-4）</th><th>判定の理由</th></tr></thead>
 <tbody>
 <tr class="grp"><td colspan="4">ChatGPT</td></tr>
-<tr><td>無料・Plus・Pro</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習の停止は各自の設定。会社で管理できない</td></tr>
-<tr><td>Business（旧 Team）</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ng">×</span></td><td>学習には使われない。保存期間を決められず、書き出しもできない</td></tr>
-<tr><td>Enterprise</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>保存期間を会社で設定（最短90日）。会話の記録を取り出せる</td></tr>
+<tr><td>無料・Plus・Pro<br><small>個人で契約するプラン</small></td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習に使わない設定は利用者ごとに行うため、会社として根拠を示せません</td></tr>
+<tr><td>Business（旧 Team）</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ng">×</span></td><td>学習には使われません。保存期間を会社で決められず、履歴の書き出しもできません</td></tr>
+<tr><td>Enterprise</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>保存期間を会社で設定でき（最短90日）、利用履歴を取り出せます</td></tr>
 
 <tr class="grp"><td colspan="4">Microsoft</td></tr>
-<tr><td>個人アカウントの Copilot</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習の停止は各自の設定。会社で管理できない</td></tr>
-<tr><td>職場アカウントの Copilot Chat</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>学習には使われない。保存の規則を当てられるかは契約次第で要確認</td></tr>
-<tr><td>Microsoft 365 Copilot Business</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>操作の記録は残る。保存期間を会社で決められるかは要確認</td></tr>
-<tr><td>Microsoft 365 Copilot（E3・E5 と組み合わせ）</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>会話に保存の規則を当てられ、検索・書き出しもできる</td></tr>
+<tr><td>Copilot<br><small>個人の Microsoft アカウントで利用</small></td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習に使わない設定は利用者ごとに行うため、会社として根拠を示せません</td></tr>
+<tr><td>Copilot Chat<br><small>会社の Microsoft 365 アカウントで利用</small></td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>学習には使われません。保存の規則を適用できるかは契約内容によるため、確認が必要です</td></tr>
+<tr><td>Microsoft 365 Copilot Business</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>操作の記録は残ります。保存期間を会社で決められるかは確認が必要です</td></tr>
+<tr><td>Microsoft 365 Copilot（E3・E5 と組み合わせ）</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>利用履歴に保存の規則を適用でき、検索・書き出しもできます</td></tr>
 
 <tr class="grp"><td colspan="4">Google Gemini</td></tr>
-<tr><td>個人の Gemini</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習の停止は各自の設定。一部の会話は人が確認することがある</td></tr>
-<tr><td>Workspace Business Starter・Standard</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>保存期間は管理者が決められる。会話の検索・書き出しの機能はない</td></tr>
-<tr><td>Workspace Business Plus・Enterprise</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>管理機能（Vault）で会話の保存規則・検索・書き出しができる</td></tr>
+<tr><td>Gemini<br><small>個人の Google アカウントで利用</small></td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習に使わない設定は利用者ごとに行います。一部の会話は提供元の担当者が確認することがあります</td></tr>
+<tr><td>Workspace Business Starter・Standard</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>保存期間は管理者が決められますが、利用履歴を検索・書き出しする機能がありません</td></tr>
+<tr><td>Workspace Business Plus・Enterprise</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>管理機能（Vault）で、利用履歴の保存の規則・検索・書き出しができます</td></tr>
 
 <tr class="grp"><td colspan="4">Claude</td></tr>
-<tr><td>無料・Pro・Max</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習の扱いは各自の設定。会社で管理できない</td></tr>
-<tr><td>Team</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>会話の書き出しはできる。保存期間は会社で決められない</td></tr>
-<tr><td>Enterprise</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>保存期間を会社で設定（最短30日）。会話の記録を取り出せる</td></tr>
+<tr><td>無料・Pro・Max<br><small>個人で契約するプラン</small></td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習に使うかどうかは利用者ごとの設定のため、会社として根拠を示せません</td></tr>
+<tr><td>Team</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m mid">△</span></td><td>利用履歴の書き出しはできますが、保存期間を会社で決められません</td></tr>
+<tr><td>Enterprise</td><td class="c"><span class="m ok">○</span></td><td class="c"><span class="m ok">○</span></td><td>保存期間を会社で設定でき（最短30日）、利用履歴を取り出せます</td></tr>
 
 <tr class="grp"><td colspan="4">国内のサービス</td></tr>
-<tr><td>GaiXer</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習に使わないと案内あり。約款の条文と履歴の仕様は提供元に確認が必要</td></tr>
-<tr><td>exaBase 生成AI</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m mid">△</span></td><td>学習に使わないと案内あり。保存期間と書き出しの今の仕様は提供元に確認が必要</td></tr>
+<tr><td>GaiXer</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m ng">×</span></td><td>学習に使わないと案内されています。約款の条文と履歴の仕様は提供元への確認が必要です</td></tr>
+<tr><td>exaBase 生成AI</td><td class="c"><span class="m mid">△</span></td><td class="c"><span class="m mid">△</span></td><td>学習に使わないと案内されています。保存期間と書き出しの現在の仕様は提供元への確認が必要です</td></tr>
 </tbody>
 </table>
 </div>
-<p class="note">△・× でも、7-4 は社内規定を根拠にできます。ただしその場合、サービス側で保存を強制できないため、運用の実効性まで問われます（チェックリスト 7-2・7-6）。</p>
+<p class="note">△・×の契約でも、7-4は社内規定を根拠にできます。ただしサービス側で保存を強制できないため、規定どおりに運用されているか（実効性）まで確認されます（チェックリスト 7-2・7-6）。</p>
 
-<h2>つまずきやすい3点</h2>
+<h2>記載で迷いやすい3つの点</h2>
 <ul class="pts">
-<li><span class="n">1</span><span class="t">個人向けの版</span>学習の停止が各自の設定任せ。会社として根拠を示しにくい</li>
-<li><span class="n">2</span><span class="t">安い法人向けの版</span>学習の欄は満たせても、履歴の保存の欄で詰まりやすい</li>
-<li><span class="n">3</span><span class="t">再委託先</span>再委託先ごとに同じ記載が求められる（チェックリスト 9-1・9-2 ほか）</li>
+<li><span class="n">1</span><span class="t">社員が個人で契約したサービス</span>学習に使わない設定が社員一人ひとりに任されるため、会社として根拠を示せません。</li>
+<li><span class="n">2</span><span class="t">法人向けの基本プラン</span>学習の項目は記載できても、利用履歴の保存の項目で根拠が足りないことがあります。</li>
+<li><span class="n">3</span><span class="t">再委託先での利用</span>再委託先ごとに、同じ内容の記載が求められます（チェックリスト 9-1・9-2 ほか）。</li>
 </ul>
 
 <div class="cta">
-<strong>手間取っている欄はありますか</strong><br>
-欄の番号だけお送りいただければ、根拠つきでお返しします。
-<br><a href="mailto:masato.morishima@blueadventures.jp?subject=%E6%A0%B9%E6%8B%A0%E6%AC%84%E3%81%AE%E7%9B%B8%E8%AB%87">欄の番号を送る</a>
+<strong>記載で迷っている項目はありますか</strong><br>
+項目番号（例：7-3）をお送りいただければ、根拠となる資料とあわせて記載の考え方をお返しします。
+<br><a href="mailto:masato.morishima@blueadventures.jp?subject=%E6%A0%B9%E6%8B%A0%E6%AC%84%E3%81%AE%E7%9B%B8%E8%AB%87">項目番号を送る</a>
 </div>
 
 <h2>出典</h2>

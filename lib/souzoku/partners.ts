@@ -29,12 +29,22 @@ export const SOUZOKU_PARTNERS: Record<SouzokuPartnerKey, SouzokuPartner> = {
   // レントラックス 15468（提携中）。成果＝新規申込完了、13,200円。
   souzokuAssist: {
     key: 'souzokuAssist', name: '相続アシスト', cta: '相続税の申告をまとめて頼む',
-    points: [], checkedAt: '', href: '', asp: 'rentracks', programId: '15468', reward: 13200,
+    // 公式 swats.or.jp/service/sozoku の記載（2026-11-05 確認）。対応は東京・神奈川・大阪・京都・兵庫の案件。
+    points: ['戸籍集めから申告まで代行。こちらはサインと面談だけ', '税理士・弁護士・司法書士が連携', '対象：東京・神奈川・大阪・京都・兵庫'],
+    checkedAt: '2026年11月5日',
+    href: 'https://www.rentracks.jp/adx/r.html?idx=0.75552.390675.10832.15468&dna=175712',
+    beacon: 'https://www.rentracks.jp/adx/p.gifx?idx=0.75552.390675.10832.15468&dna=175712',
+    asp: 'rentracks', programId: '15468', reward: 13200,
   },
   // レントラックス 15882（提携中）。成果＝新規申込完了、16,000円。ラクウル（13857）の承認までのつなぎ。
   akiyaHonpo: {
     key: 'akiyaHonpo', name: '空き家買取本舗', cta: '実家の買い取り額を無料で聞く',
-    points: [], checkedAt: '', href: '', asp: 'rentracks', programId: '15882', reward: 16000,
+    // 公式 lp.akiyakaitorihonpo.com/af の記載（2026-11-05 確認）。
+    points: ['相続した家も、荷物ごとそのまま買い取る（解体も不要）', '仲介ではないので、仲介手数料がない', '全国対応。断ってもよく、営業電話もない'],
+    checkedAt: '2026年11月5日',
+    href: 'https://www.rentracks.jp/adx/r.html?idx=0.75552.390675.11107.15882&dna=185106',
+    beacon: 'https://www.rentracks.jp/adx/p.gifx?idx=0.75552.390675.11107.15882&dna=185106',
+    asp: 'rentracks', programId: '15882', reward: 16000,
   },
   // レントラックス 13857（クローズド、11/5 申請中）。成果＝問い合わせ後30日以内に相続人と確認できた時点、11,440円。
   // 却下条件：「複数社へ見積もりを出す相見積もりを推奨する文言」。このページでは相見積もりをすすめない。

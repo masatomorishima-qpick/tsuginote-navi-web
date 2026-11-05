@@ -123,7 +123,7 @@ ChatGPT 広告に詳しい専門家の視点で設計。他事業の検証（202
 - 解説：Lapis https://trylapis.com/resources/chatgpt-ads-manager-self-serve-setup-guide ／ https://www.trylapis.com/resources/how-to-write-chatgpt-ads-context-hints ／ spaceads https://www.spaceads.agency/blog/chatgpt-ad-formats-character-limits-creative-specs ／ 97th Floor https://97thfloor.com/articles/chatgpt-ads-heres-what-we-know-and-what-were-still-guessing-at/
 
 ## 9. 管理画面の設定（11/5 23時台 下書き保存済み・公開はオーナー）
-- キャンペーン「生成AI計画書_早見表_PC_1108-1115」：クリック／パソコンのウェブのみ／日本／日予算2,500円／11/8 9:00〜11/15 8:59（日本時間）／クリエイティブの強化オフ／経路の印 utm_source=chatgpt&utm_medium=cpc&utm_campaign=ai-plan&from=gpt／成果の目印 consult_click（lead_created。前回の事業と同じ計測タグを使い回し。新しいタグの作成は規約への同意が要るため見送り）
+- キャンペーン「生成AI計画書_早見表_PC_1108-1115」：クリック／パソコンのウェブのみ／日本／日予算2,500円／11/6 9:00〜11/13 8:59（日本時間。11/6 オーナー判断で平日の金曜を取るため2日前倒し。判断日は3日目 11/9、最終 11/13）／クリエイティブの強化オフ／経路の印 utm_source=chatgpt&utm_medium=cpc&utm_campaign=ai-plan&from=gpt／成果の目印 consult_click（lead_created。前回の事業と同じ計測タグを使い回し。新しいタグの作成は規約への同意が要るため見送り）
 - 広告グループ「A_計画書の学習履歴欄を記入中」：上限450円。11/6 に下げられるか確認：449円以下はすべて「配信されない可能性あり」、450円以上は「強」で、中間の段階はない。450円がこの話題で安定して出せる最低額のため据え置き／話題の指定10本（何を4・誰に2・いつ4）／飛び先 https://blueadventures.jp/ai-plan-hayamihyo/
 - 広告：この画面では見出し32字・説明文54字が上限だったため、広告1の説明文を53字に短縮
   - ad1：生成AI利活用計画書の記入例／建設コンサル・測量・地質の受注者向けに、学習・履歴の欄（6-3〜7-4）の記入例と根拠の早見表を無料で公開（utm_content=ad1）

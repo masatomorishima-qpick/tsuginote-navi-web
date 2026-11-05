@@ -201,7 +201,7 @@ export default function MitsumoriDiagnosis({ entry = 'mitsumori' }: { entry?: st
             </button>
           ))}
         </div>
-        <p className="text-center text-[11px] text-slate-500">無料・名前や電話番号の入力なし</p>
+        <p className="text-center text-[11px] text-slate-500">やりとりはメールだけ・名前や電話番号の入力なし</p>
       </div>
 
       {after && (

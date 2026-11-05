@@ -87,3 +87,5 @@
 - 済み：#82（docs/** と dependabot/** の枝はプレビューを作らない）。オーナーが GitHub の「取り込んだ枝を自動で消す」を有効にした。
 - 未了：取り込み済みの枝58本の削除（オーナー許可済み。この環境からは削除の操作が止められて実行できず、オーナーの手元で行う）。Vercel の古いプレビューの削除（オーナー）。
 - 残す枝：main・docs/listing-rules・開いている変更依頼の枝。feat/kyutoki-diagnosis-intent は取り込みのあとに新しいコミットがあるので消さない。
+- 11/5 11:55 原因の本体：記録の枝 docs/listing-rules の中の vercel.json が古く、記録のコミットのたびにプレビューが作られていた（Vercel は配信する枝の vercel.json を読む）。記録の枝の vercel.json を main と同じにした（508f3b1。以後、記録のコミットでは配信なし）。
+- 11/5 13:33 オーナーが Vercel の Deployment Retention Policy を変更：取り消し・失敗・確認用（Pre-Production）を最短に、本番は30日のまま。11/8 に容量の数字を確かめる。

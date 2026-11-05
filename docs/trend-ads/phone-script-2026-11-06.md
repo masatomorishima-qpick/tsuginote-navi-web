@@ -146,7 +146,7 @@
 >
 > お約束の早見表をお送りします。
 > 生成AI利活用計画書 サービス別 根拠の早見表（2026年11月5日確認）
-> https://blueadventures.jp/ai-plan-hayamihyo/
+> https://blueadventures.jp/ai-plan-hayamihyo/?from=tel-（会社の略称。例：daiki）
 >
 > ・発注者の確認チェックリストで、根拠まで見られる4項目（6-3・6-4・7-3・7-4）
 > ・ChatGPT・Copilot・Gemini・Claude の契約プランごとに、記載できるかの判定と出典

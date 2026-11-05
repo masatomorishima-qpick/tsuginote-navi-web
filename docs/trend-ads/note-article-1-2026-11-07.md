@@ -126,7 +126,7 @@ Claude は Team と Enterprise で学習の扱いは同じですが、保存期�
 
 4社・13の契約について、判定・理由・各社の公式資料の出典（URL つき）を1ページにまとめています。お使いのプランを1行で確認でき、社内の打ち合わせにもそのまま使えます。
 
-https://blueadventures.jp/ai-plan-hayamihyo/
+https://blueadventures.jp/ai-plan-hayamihyo/?utm_source=note&utm_medium=article&utm_campaign=ai-plan
 
 お使いのプランに合わせた記入例が必要な方は、ページの最後から無料で依頼できます。
 
@@ -153,6 +153,6 @@ https://blueadventures.jp/ai-plan-hayamihyo/
 #生成AI利活用計画書 #建設コンサルタント #測量 #地質調査 #生成AI #国土交通省
 
 ## X の告知（https://x.com/mm_simori）
-案1（推奨）：生成AI利活用計画書の6-4・7-4は、学習させない措置と履歴の保存の「根拠」まで確認されます。書ける根拠は契約プランで変わるため、ChatGPT・Copilot・Gemini・Claude をプラン別に出典つきで整理しました。（記事のリンク）
+案1（推奨）：生成AI利活用計画書の6-4・7-4は、学習させない措置と履歴の保存の「根拠」まで確認されます。書ける根拠は契約プランで変わるため、ChatGPT・Copilot・Gemini・Claude をプラン別に出典つきで整理しました。（記事のリンク。記事のURLの末尾に ?utm_source=x&utm_medium=social&utm_campaign=ai-plan を付ける）
 
-案2：同じ ChatGPT でも、Business と Enterprise では生成AI利活用計画書の「履歴の保存」欄に書ける根拠が違います。4社・13の契約を公式資料の出典つきで整理しました。社内の確認にどうぞ。（記事のリンク）
+案2：同じ ChatGPT でも、Business と Enterprise では生成AI利活用計画書の「履歴の保存」欄に書ける根拠が違います。4社・13の契約を公式資料の出典つきで整理しました。社内の確認にどうぞ。（記事のリンク。記事のURLの末尾に ?utm_source=x&utm_medium=social&utm_campaign=ai-plan を付ける）

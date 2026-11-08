@@ -52,6 +52,10 @@
     "plCenter": {
       "name": "ガス石油機器PLセンター「インフォメーション」（2023年9月）",
       "url": "https://www.jgka.or.jp/pl/information/202309.pdf"
+    },
+    "tgKojiArticle": {
+      "name": "東京ガス「工事について」（給湯器の交換）",
+      "url": "https://home.tokyo-gas.co.jp/replacement/waterheater/articles/construction"
     }
   },
   "souba": [
@@ -527,5 +531,141 @@
     "buhin": "修理用の部品を持っている期間は、製造をやめてから7年ほどが一般的（メーカーごとに決める）",
     "tenken": "10年ほど使った給湯器の点検は有料",
     "hyoji": "使い始めて10年ほどで、リモコンに「88」「888」が出る。故障ではなく点検の時期のお知らせ"
+  },
+  "ecojozu": {
+    "checkedAt": "2026-11-07",
+    "gas": "従来型からエコジョーズに替えると、ガスの使用量を約13%抑えられる（東京ガス。リンナイの24号の従来型 RUF-A2400AW とエコジョーズ RUF-E2406AW(A) の比較、リンナイより）",
+    "gasPct": 13,
+    "how": "湯をわかしたあとの排気の熱を、もう一度使ってお湯をあたためる",
+    "osusume": "お湯をたくさん使う家に向いている。本体は高いが、ガス代が下がるので長い目で見ると得になる（東京ガス）",
+    "mark": [
+      {
+        "maker": "リンナイ・パロマ",
+        "s": "E"
+      },
+      {
+        "maker": "ノーリツ",
+        "s": "C"
+      }
+    ],
+    "markNote": "本体のエコジョーズの表示か、型番のハイフンのあとの文字で分かる（東京ガス）",
+    "drain": "マンションの扉の中（パイプシャフト）で、従来型からエコジョーズに替えるときは、エコジョーズから出る水（ドレン水）を浴室の排水口へ流す工事が要る（東京ガス「工事について」）",
+    "kojiSa": 4400,
+    "src": [
+      "tgHowto",
+      "tgRinnai",
+      "tgNoritz",
+      "tgKojiArticle"
+    ]
+  },
+  "danbo": {
+    "checkedAt": "2026-11-07",
+    "what": "給湯・お湯はり・追いだきに加えて、床暖房や浴室暖房などの温水の暖房に使える（東京ガス）",
+    "souba": "30〜35万円ほど（東京ガス）",
+    "share": [
+      {
+        "h": "30万円以下",
+        "pct": 41
+      },
+      {
+        "h": "30〜35万円",
+        "pct": 52
+      }
+    ],
+    "shareNote": "東京ガスで売れた暖房付きの値段の割合（2024年4月9日〜11月30日）",
+    "notes": [
+      "置き場所の型は変えられないので、今と同じ型で替える（東京ガス）",
+      "パロマは暖房付きの型を東京ガスで扱っていない（東京ガス「給湯器の選び方」）",
+      "床暖房のリモコンの付け替えは基本工事に入る（浴室・台所と合わせて3台まで）。新しいリモコンの代金は別（東京ガス）"
+    ],
+    "prices": [
+      {
+        "place": "壁掛け",
+        "eff": "従来型",
+        "maker": "リンナイ",
+        "model": "RUFH-A2400SAW2-3(A)",
+        "yen": 285461,
+        "src": "tgRinnai"
+      },
+      {
+        "place": "壁掛け",
+        "eff": "従来型",
+        "maker": "ノーリツ",
+        "model": "GTH-2454SAW3HBL",
+        "yen": 290458,
+        "src": "tgNoritz"
+      },
+      {
+        "place": "壁掛け",
+        "eff": "エコジョーズ",
+        "maker": "リンナイ",
+        "model": "RUFH-E2407SAW2-3(A)",
+        "yen": 290158,
+        "src": "tgRinnai"
+      },
+      {
+        "place": "壁掛け",
+        "eff": "エコジョーズ",
+        "maker": "ノーリツ",
+        "model": "GTH-C2470SAW3HBL",
+        "yen": 295253,
+        "src": "tgNoritz"
+      },
+      {
+        "place": "扉の中",
+        "eff": "従来型",
+        "maker": "リンナイ",
+        "model": "RUFH-A2400SAA2-3(A)",
+        "yen": 289817,
+        "src": "tgRinnai"
+      },
+      {
+        "place": "扉の中",
+        "eff": "従来型",
+        "maker": "ノーリツ",
+        "model": "GTH-2454SAW3H-TBL",
+        "yen": 294616,
+        "src": "tgNoritz"
+      },
+      {
+        "place": "扉の中",
+        "eff": "エコジョーズ",
+        "maker": "リンナイ",
+        "model": "RUFH-E2407SAH2-3(A)",
+        "yen": 290158,
+        "src": "tgRinnai"
+      },
+      {
+        "place": "扉の中",
+        "eff": "エコジョーズ",
+        "maker": "ノーリツ",
+        "model": "GTH-C2470SAW3H-LBL",
+        "yen": 299411,
+        "src": "tgNoritz"
+      },
+      {
+        "place": "細身（据え置き台）",
+        "eff": "エコジョーズ",
+        "maker": "リンナイ",
+        "model": "RUFH-SE2408SAW2-3",
+        "yen": 349492,
+        "src": "tgRinnai"
+      },
+      {
+        "place": "細身（据え置き台）",
+        "eff": "エコジョーズ",
+        "maker": "ノーリツ",
+        "model": "GTH-C2463SAW3HBL",
+        "yen": 331229,
+        "src": "tgNoritz"
+      }
+    ],
+    "pricesNote": "24号オート、東京ガスの販売価格（工事費込み・税込）",
+    "src": [
+      "tgHowto",
+      "tgRinnai",
+      "tgNoritz",
+      "tgKojiArticle"
+    ]
   }
 }

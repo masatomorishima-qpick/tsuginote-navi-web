@@ -89,3 +89,4 @@
 - 残す枝：main・docs/listing-rules・開いている変更依頼の枝。feat/kyutoki-diagnosis-intent は取り込みのあとに新しいコミットがあるので消さない。
 - 11/5 11:55 原因の本体：記録の枝 docs/listing-rules の中の vercel.json が古く、記録のコミットのたびにプレビューが作られていた（Vercel は配信する枝の vercel.json を読む）。記録の枝の vercel.json を main と同じにした（508f3b1。以後、記録のコミットでは配信なし）。
 - 11/5 13:33 オーナーが Vercel の Deployment Retention Policy を変更：取り消し・失敗・確認用（Pre-Production）を最短に、本番は30日のまま。11/8 に容量の数字を確かめる。
+- 11/8 10:10 容量の確認（Vercel の Usage）：Functions Storage は 11/7 時点で 8.06GB／10GB（81%）。ほぼ全部が tsuginote-navi-web（qpick-web は 3.42MB）。10/27 の約0.7GB から 11/5 にかけて増え、11/5〜11/7 は横ばい（増えるのは止まった）。11/8 の 0B は当日の数字がまだ出ていないためと見る。保持の期間を短くしても下がっていない。推測：消したプレビューも30日は戻せる状態で残り、その間は数えられている（Vercel の掲示板の報告と同じ）。下がり始めるのは早くて12月上旬。

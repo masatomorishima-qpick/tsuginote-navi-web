@@ -72,6 +72,24 @@ const nextConfig: NextConfig = {
         destination: "/guide/ihinseiri",
         permanent: true,
       },
+      // 7. 給湯器 B（自社の取り次ぎ）の終了（2026-11-09、オーナー決定）。
+      //    見積もりのページは「準備中」のボタンが残るため、内容の近い記事へ一時的に転送する。
+      //    ページのファイルは残す（再開するときはこの3行を消す）。経緯は docs/kyutoki-b/measure.md（枝 docs/listing-rules）。
+      {
+        source: "/kyutoki/mitsumori",
+        destination: "/kyutoki/kokan-hiyou",
+        permanent: false,
+      },
+      {
+        source: "/kyutoki/mitsumori/hiyou",
+        destination: "/kyutoki/kokan-hiyou",
+        permanent: false,
+      },
+      {
+        source: "/kyutoki/mitsumori/jumyo",
+        destination: "/kyutoki/nensu",
+        permanent: false,
+      },
       // ※ /guide/ihinseiri/digitalihin-* は残置（リダイレクトしない）
       // ※ /digital/*, /login, /auth/*, /privacy, /terms, /company も残置
     ];

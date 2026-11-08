@@ -154,7 +154,7 @@ export function OyuBox({ lpId, position, lead, points, beacon = true }: { lpId: 
         ))}
       </ul>
       <PartnerLink lpId={lpId} partner="oyu" position={position} label="無料で来てもらう" note="見積もりで断っても費用はかかりません。お湯が出ない.com のサイトに移動します" beacon={beacon} />
-      <p className="text-[11px] text-slate-500">対象：東京都・神奈川県。電話の受付は9時〜21時・年中無休。公式サイトの記載です（2026年11月4日確認）。</p>
+      <p className="text-[11px] text-slate-500">対象：東京都・神奈川県。電話の受付は9時〜21時・年中無休。公式サイトの記載です（2026年11月8日確認）。</p>
     </div>
   );
 }

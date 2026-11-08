@@ -510,7 +510,7 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
             <PartnerLink lpId={LP_ID} partner="oyu" position="table" label="無料で見積もりを頼む" note="見積もりで断っても費用はかかりません" />
           </div>
           <p className={SRC}>
-            お湯が出ない.com（株式会社GRACE）の公式サイトの記載です（2026年11月4日確認）。修理の目安は税込。時間は最短の目安で、状況によって変わります。電話の受付は9時〜21時・年中無休。
+            お湯が出ない.com の公式サイトの記載です（2026年11月4日確認）。修理の目安は税込。時間は最短の目安で、状況によって変わります。電話の受付は9時〜21時・年中無休。
           </p>
         </section>
 

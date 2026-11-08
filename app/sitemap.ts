@@ -143,6 +143,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    // 給湯器のエラー番号の早見（2026-11-08 作成、docs/seisaku-queue.md の P17）。
+    {
+      url: `${baseUrl}/kyutoki/error`,
+      lastModified: new Date("2026-11-08T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    // 給湯器の型番の見方（2026-11-08 作成、docs/seisaku-queue.md の P10）。
+    {
+      url: `${baseUrl}/kyutoki/kataban`,
+      lastModified: new Date("2026-11-08T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    // 給湯器の頼み先（2026-11-08 作成、docs/seisaku-queue.md の P12）。
+    {
+      url: `${baseUrl}/kyutoki/tanomisaki`,
+      lastModified: new Date("2026-11-08T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    // 給湯器の凍結（2026-11-08 作成、docs/seisaku-queue.md の P18）。
+    {
+      url: `${baseUrl}/kyutoki/touketsu`,
+      lastModified: new Date("2026-11-08T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // 給湯器「お湯が出ない」診断（2026-10-28 新設）。検索広告の着地ページだが、
     // 本文（目安表・FAQ）はサーバー出力なので自然検索にも載せる。
     {

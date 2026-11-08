@@ -143,6 +143,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    // 給湯器のエラー番号の早見（2026-11-08 作成、docs/seisaku-queue.md の P17）。
+    {
+      url: `${baseUrl}/kyutoki/error`,
+      lastModified: new Date("2026-11-08T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // 給湯器「お湯が出ない」診断（2026-10-28 新設）。検索広告の着地ページだが、
     // 本文（目安表・FAQ）はサーバー出力なので自然検索にも載せる。
     {

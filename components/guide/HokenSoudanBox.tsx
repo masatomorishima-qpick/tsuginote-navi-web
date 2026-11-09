@@ -15,11 +15,16 @@ const BEACON = 'https://www.rentracks.jp/adx/p.gifx?idx=0.75552.390675.5121.7502
 
 export const HOKEN_LP_ID = 'guide-hoken-ichiran';
 
-export default function HokenSoudanBox({ position, lead, beacon = false }: { position: string; lead: string; beacon?: boolean }) {
+const DEFAULT_POINTS = ['相談は無料', 'この一覧表を見せれば、話が早い', '入りすぎ・重なりを、プロと確かめる'];
+
+/** lpId・points を渡せば、保険の一覧表以外のページでも使える（2026-11-10、保険の記事を足すため）。 */
+export default function HokenSoudanBox({
+  position, lead, beacon = false, lpId = HOKEN_LP_ID, points = DEFAULT_POINTS,
+}: { position: string; lead: string; beacon?: boolean; lpId?: string; points?: string[] }) {
   const onClick = () => {
-    sendGAEvent('event', 'affiliate_click', { lp_name: HOKEN_LP_ID, position, program_name: '保険見直し本舗' });
+    sendGAEvent('event', 'affiliate_click', { lp_name: lpId, position, program_name: '保険見直し本舗' });
     void trackEvent({
-      lp_id: HOKEN_LP_ID,
+      lp_id: lpId,
       event_name: 'partner_click',
       cta_id: `hokenhonpo-${position}`,
       partner_category: 'hoken',
@@ -31,7 +36,7 @@ export default function HokenSoudanBox({ position, lead, beacon = false }: { pos
     <div className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-5">
       <p className="text-[17px] font-bold text-slate-900">{lead}</p>
       <ul className="flex flex-col gap-1.5">
-        {['相談は無料', 'この一覧表を見せれば、話が早い', '入りすぎ・重なりを、プロと確かめる'].map((t) => (
+        {points.map((t) => (
           <li key={t} className="flex items-start gap-2 text-[15px] text-slate-800">
             <Check size={18} className="mt-1 shrink-0 text-orange-600" aria-hidden="true" />{t}
           </li>

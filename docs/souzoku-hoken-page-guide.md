@@ -3,6 +3,7 @@
 ## 型
 - **相続税**（/guide/souzoku/…）：手本は app/guide/souzoku/souzokuzei-keisan/page.tsx（S1）。外枠は components/souzoku/SouzokuArticle.tsx（最初の画面に「答え＋無料の道具か配布物」→本文→出口→よくある質問3つ→ほかのひな形）。出口は SouzokuExit の partner="souzokuAssist" だけ。最初の画面の下にも SouzokuExit を1つ（position="hero"、beacon なし。表示計測は末尾の1つだけ）。新しいページは SOUZOKU_PAGES に足す。
 - **保険**（/guide/moshimo-sonae/…）：外枠は給湯器の記事と同じ作り（LpHeader・LpViewTracker・PR 表示・LpFooter）で、出口は components/guide/HokenSoudanBox（lpId にページの LP_ID、points に保険見直し本舗の公式の記載だけ。表示計測 beacon は1つだけ）。手本の見た目は app/guide/shisan-kanri/hoken-ichiran-excel/page.tsx と app/kyutoki/error/page.tsx。
+- LP_ID（計測の名前）は、相続税は guide-souzoku-<短い名前>、保険は guide-hoken-<短い名前> にする（docs/haifu-funnel.sql がこの形で数える）。
 - 数字は lib/souzoku/haifu-data.json（相続税）にまとめる。保険は lib/hoken/haifu-data.json を新しく作ってそこにまとめる。出典の名前と URL を sources に。
 - 道具（計算）を作るときは、使われたら lp_event_logs に1回だけ記録（trackEvent、event_name は道具ごとの名前。入れた数字そのものは送らない）。
 - metadata（タイトル・説明・正規の URL・OG）、JSON-LD（jsonLdFor）、app/sitemap.ts に1行。

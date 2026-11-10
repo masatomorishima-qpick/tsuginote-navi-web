@@ -45,6 +45,13 @@ const articles = [
     description:
       'いまの保険と見直し案を同じ欄で並べ、払う総額と差を自動で計算。乗り換える前に確かめる4つの点も。',
   },
+  {
+    href: '/guide/shisan-kanri/hoken-minaoshi-checklist',
+    category: '保険の見直し',
+    title: '生命保険の見直しチェックリスト（無料・エクセル）｜節目・証券の6項目・更新の時期',
+    description:
+      '見直しで確かめることを1枚に。節目、保険証券で見る6つの項目、次の更新の目安、見直す前の注意まで。',
+  },
 ];
 
 export default function ShisanKanriIndexPage() {

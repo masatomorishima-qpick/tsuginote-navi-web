@@ -29,9 +29,14 @@ export const SOUZOKU_FILES = {
     { label: 'エクセル', href: '/downloads/souzoku-akiya-tokurei-check.xlsx', icon: FileSpreadsheet },
     { label: 'PDF', href: '/downloads/souzoku-akiya-tokurei-check.pdf', icon: FileText },
   ],
+  tetsuzuki: [
+    { label: 'エクセル', href: '/downloads/souzoku-tetsuzuki-checklist.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-tetsuzuki-checklist.pdf', icon: FileText },
+  ],
 } as const;
 
 export const SOUZOKU_PAGES = [
+  { href: '/guide/souzoku/tetsuzuki-checklist', h: '相続の手続きチェックリスト' },
   { href: '/guide/souzoku/souzokuzei-keisan', h: '相続税の計算' },
   { href: '/guide/souzoku/isan-bunkatsu-kyogisho', h: '遺産分割協議書' },
   { href: '/guide/souzoku/souzoku-kankei-setsumeizu', h: '相続関係説明図' },

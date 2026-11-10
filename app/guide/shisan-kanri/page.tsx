@@ -38,6 +38,13 @@ const articles = [
     description:
       'そのまま使える無料テンプレート付き。書くべき項目と書いてはいけないもの、証券や控除証明書からの拾い方まで解説します。',
   },
+  {
+    href: '/guide/shisan-kanri/hoken-hikaku-excel',
+    category: '保険の見直し',
+    title: '保険の比較表（無料・エクセル）｜いまの保険と見直し案を並べて、払う総額を自動計算',
+    description:
+      'いまの保険と見直し案を同じ欄で並べ、払う総額と差を自動で計算。乗り換える前に確かめる4つの点も。',
+  },
 ];
 
 export default function ShisanKanriIndexPage() {

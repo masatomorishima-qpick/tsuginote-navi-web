@@ -24,6 +24,34 @@
     "toyama": {
       "name": "富山市「空き家の譲渡所得の3,000万円特別控除」リーフレット",
       "url": "https://www.city.toyama.lg.jp/_res/projects/default_project/_page_/001/006/661/leaflet_akiya_koujo.pdf"
+    },
+    "nta4152": {
+      "name": "国税庁 タックスアンサー No.4152「相続税の計算」",
+      "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4152.htm"
+    },
+    "nta4155": {
+      "name": "国税庁 タックスアンサー No.4155「相続税の税率」",
+      "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4155.htm"
+    },
+    "nta4158": {
+      "name": "国税庁 タックスアンサー No.4158「配偶者の税額の軽減」",
+      "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4158.htm"
+    },
+    "nta4132": {
+      "name": "国税庁 タックスアンサー No.4132「相続人の範囲と法定相続分」",
+      "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4132.htm"
+    },
+    "nta4114": {
+      "name": "国税庁 タックスアンサー No.4114「相続税の課税対象になる死亡保険金」",
+      "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4114.htm"
+    },
+    "nta4205": {
+      "name": "国税庁 タックスアンサー No.4205「相続税の申告と納税」",
+      "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/sozoku/4205.htm"
+    },
+    "ntaJiseki": {
+      "name": "国税庁「令和6年分 相続税の申告事績の概要」（令和7年12月）",
+      "url": "https://www.nta.go.jp/information/release/kokuzeicho/2025/sozoku_shinkoku/index.htm"
     }
   },
   "kyogisho": {
@@ -162,5 +190,80 @@
       "使えるかどうかの最終の判断は、税務署で確かめる"
     ],
     "deadlineNote": "相続した日から3年を経過する日の属する年の12月31日"
+  },
+  "zei": {
+    "checkedAt": "2026-11-10",
+    "kiso": {
+      "base": 30000000,
+      "per": 6000000
+    },
+    "hayami": [
+      {
+        "upto": 10000000,
+        "rate": 0.1,
+        "kojo": 0
+      },
+      {
+        "upto": 30000000,
+        "rate": 0.15,
+        "kojo": 500000
+      },
+      {
+        "upto": 50000000,
+        "rate": 0.2,
+        "kojo": 2000000
+      },
+      {
+        "upto": 100000000,
+        "rate": 0.3,
+        "kojo": 7000000
+      },
+      {
+        "upto": 200000000,
+        "rate": 0.4,
+        "kojo": 17000000
+      },
+      {
+        "upto": 300000000,
+        "rate": 0.45,
+        "kojo": 27000000
+      },
+      {
+        "upto": 600000000,
+        "rate": 0.5,
+        "kojo": 42000000
+      },
+      {
+        "upto": null,
+        "rate": 0.55,
+        "kojo": 72000000
+      }
+    ],
+    "bun": {
+      "koKo": {
+        "haigusha": 0.5
+      },
+      "oya": {
+        "haigusha": 0.6666666666666666
+      },
+      "kyodai": {
+        "haigusha": 0.75
+      }
+    },
+    "haigushaKeigen": 160000000,
+    "rei": {
+      "isan": 200000000,
+      "kazei": 152000000,
+      "sogaku": 27000000,
+      "note": "配偶者と子2人、課税遺産総額1億5,200万円なら、相続税の総額は2,700万円（国税庁の例）"
+    },
+    "kazeiWariai": {
+      "pct": 10.4,
+      "year": "令和6年分",
+      "shibou": 1605378,
+      "shinkoku": 166730
+    },
+    "kigen": "亡くなったことを知った日（ふつうは亡くなった日）の翌日から10か月以内",
+    "hokenHikazei": 5000000
   }
 }

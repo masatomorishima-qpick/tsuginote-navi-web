@@ -32,6 +32,7 @@ export const SOUZOKU_FILES = {
 } as const;
 
 export const SOUZOKU_PAGES = [
+  { href: '/guide/souzoku/souzokuzei-keisan', h: '相続税の計算' },
   { href: '/guide/souzoku/isan-bunkatsu-kyogisho', h: '遺産分割協議書' },
   { href: '/guide/souzoku/souzoku-kankei-setsumeizu', h: '相続関係説明図' },
   { href: '/guide/souzoku/zaisan-mokuroku', h: '財産目録' },

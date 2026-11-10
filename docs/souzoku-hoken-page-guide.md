@@ -1,5 +1,12 @@
 # 相続税・保険のページの作り方（2026-11-10。毎朝の制作の回が守る決まり）
 
+## 作る前の3つの確認（11/10 夜の戦略。どれか1つでも外れたら作らず、順番表に「見送り（理由）」）
+1. **上位10の顔ぶれ**：Google で受ける言葉を引き、上位10が国税庁・省庁・メガバンク・大手税理士法人・保険会社だけなら作らない。ひな形の配布サイト・小さな事務所・意図違いの結果・知恵袋が混ざっていれば作る。
+2. **評価されている分野とつながるか**：保険の書類の表（保険の一覧表＝3〜6位）、相続のひな形、相続税の計算のどれかから内部リンクでつなげること。
+3. **次の一歩が紹介先か**：表や道具を使った人が次にすることが、相続アシスト（申告・手続きの代行）か保険見直し本舗（見直しの無料相談）であること。
+- 型は「無料の表・ひな形・チェックリスト・計算」。大きな知識の言葉（〜は必要か、〜とは）は作らない。
+- 手本（11/10）：T1 app/guide/souzoku/tetsuzuki-checklist（期限の計算＋エクセル・PDF）、T2 app/guide/shisan-kanri/hoken-hikaku-excel（総額の計算＋エクセル・PDF）。配布物は scripts/souzoku/make_souzoku.py・scripts/hoken/make_hoken.py に関数を足して作る（既存のファイルは作り直さない）。保険の数字は lib/hoken/haifu-data.json。
+
 ## 型
 - **相続税**（/guide/souzoku/…）：手本は app/guide/souzoku/souzokuzei-keisan/page.tsx（S1）。外枠は components/souzoku/SouzokuArticle.tsx（最初の画面に「答え＋無料の道具か配布物」→本文→出口→よくある質問3つ→ほかのひな形）。出口は SouzokuExit の partner="souzokuAssist" だけ。最初の画面の下にも SouzokuExit を1つ（position="hero"、beacon なし。表示計測は末尾の1つだけ）。新しいページは SOUZOKU_PAGES に足す。
 - **保険**（/guide/moshimo-sonae/…）：外枠は給湯器の記事と同じ作り（LpHeader・LpViewTracker・PR 表示・LpFooter）で、出口は components/guide/HokenSoudanBox（lpId にページの LP_ID、points に保険見直し本舗の公式の記載だけ。表示計測 beacon は1つだけ）。手本の見た目は app/guide/shisan-kanri/hoken-ichiran-excel/page.tsx と app/kyutoki/error/page.tsx。

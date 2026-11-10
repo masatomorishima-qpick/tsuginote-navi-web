@@ -52,6 +52,13 @@ const articles = [
     description:
       '見直しで確かめることを1枚に。節目、保険証券で見る6つの項目、次の更新の目安、見直す前の注意まで。',
   },
+  {
+    href: '/guide/shisan-kanri/hoken-shoken-mikata',
+    category: '保険の書類',
+    title: '保険証券の見方｜欄ごとの意味と書き写し表（無料・エクセル）、税の種類も分かる',
+    description:
+      '契約者・被保険者・受取人、主契約と特約、保険期間と更新を1行ずつ。書き写し表と、3人の組み合わせで税の種類が分かる道具付き。',
+  },
 ];
 
 export default function ShisanKanriIndexPage() {

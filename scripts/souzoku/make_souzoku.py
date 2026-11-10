@@ -8,7 +8,9 @@
   souzoku-zaisan-mokuroku.xlsx / .pdf          財産目録（裁判所の遺産目録の欄）＋相続税の基礎控除の判定
   souzoku-akiya-tokurei-check.xlsx / .pdf      相続した実家（空き家）の3,000万円控除のチェック表
   souzoku-tetsuzuki-checklist.xlsx / .pdf      相続の手続きチェックリスト（期限の自動計算つき。2026-11-10）
-  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す
+  souzoku-shinkoku-shorui.xlsx / .pdf         相続税の申告の必要書類チェックリスト（状況に ○ で要る書類が出る。2026-11-11）
+  souzoku-hokenkin-hikazei.xlsx / .pdf        死亡保険金の非課税の計算表（受取人ごとの按分つき。2026-11-11）
+  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei も同じ）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import json
@@ -454,8 +456,208 @@ def make_tetsuzuki_pdf():
         b.close()
 
 
+# ---------- 相続税の申告の必要書類チェックリスト（2026-11-11） ----------
+def _pdf(html_doc, name, path, ck):
+    from playwright.sync_api import sync_playwright
+    url = f"{SITE}{path}"
+    with sync_playwright() as p:
+        b = p.chromium.launch()
+        pg = b.new_page()
+        pg.set_content(html_doc, wait_until="load")
+        ft = (f"<div style=\"font-family:'Noto Sans CJK JP';font-size:7px;color:#94a3b8;width:100%;padding:0 14mm;display:flex;justify-content:space-between\">"
+              f"<span>つぎの手ナビ　{esc(url)}　（{ck} 確認）</span><span><span class='pageNumber'></span> / <span class='totalPages'></span></span></div>")
+        pg.pdf(path=str(OUT / name), format="A4", print_background=True, prefer_css_page_size=True,
+               display_header_footer=True, header_template="<div></div>", footer_template=ft)
+        b.close()
+
+
+def make_shinkoku_xlsx():
+    D = DATA["shorui"]
+    ck = D["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "必要書類"
+    widths(ws, [6, 44, 46, 10])
+    dv = DataValidation(type="list", formula1='"○"', allow_blank=True)
+    dv2 = DataValidation(type="list", formula1='"済"', allow_blank=True)
+    ws.add_data_validation(dv)
+    ws.add_data_validation(dv2)
+    put(ws, 1, 1, "相続税の申告の必要書類チェックリスト", H, border=False)
+    put(ws, 2, 1, "① 当てはまる所に ○ を付けます。② 要る書類の「要る」が自動で出ます。そろえたら「済」を選びます。", S, border=False)
+    r = 4
+    for i, t in enumerate(["当てはまる", "状況", "", ""], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    cell_of = {}
+    jo = [{"key": "yoshi", "h": "亡くなった人に養子がいる"}] + D["jokyo"]
+    for k, j in enumerate(jo):
+        rr = r + 1 + k
+        c = put(ws, rr, 1, None, B, IN_FILL)
+        dv.add(c)
+        cell_of[j["key"]] = c.coordinate
+        put(ws, rr, 2, j["h"], N)
+        ws.merge_cells(start_row=rr, start_column=2, end_row=rr, end_column=4)
+    r = r + len(jo) + 2
+    for i, t in enumerate(["要る", "書類", "メモ", "済"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    r += 1
+    put(ws, r, 1, "誰でも出す書類", B, border=False)
+    r += 1
+    first = r
+    for k in D["kyotsu"]:
+        f = f'=IF({cell_of["yoshi"]}="○","要る","－")' if k["key"] == "yoshi" else "要る"
+        put(ws, r, 1, f, B, OK_FILL)
+        put(ws, r, 2, k["h"], B)
+        put(ws, r, 3, k["d"], N)
+        dv2.add(put(ws, r, 4, None, B, IN_FILL))
+        ws.row_dimensions[r].height = 42
+        r += 1
+    for j in D["jokyo"]:
+        put(ws, r, 1, "特例：" + j["h"].replace("└ ", "（自宅の土地の特例のうち）"), B, border=False)
+        r += 1
+        cond = f'{cell_of[j["key"]]}="○"'
+        if j.get("sub"):
+            cond = f'AND({cell_of["shokibo"]}="○",{cell_of[j["key"]]}="○")'
+        for it in j["items"]:
+            put(ws, r, 1, f'=IF({cond},"要る","－")', B, OK_FILL)
+            put(ws, r, 2, it["h"], B)
+            put(ws, r, 3, it["d"], N)
+            dv2.add(put(ws, r, 4, None, B, IN_FILL))
+            ws.row_dimensions[r].height = 32
+            r += 1
+    last = r - 1
+    put(ws, r, 2, "要る書類の数", B)
+    put(ws, r, 3, f'=COUNTIF(A{first}:A{last},"要る")&"点（済 "&COUNTIF(D{first}:D{last},"済")&"点）"', B, OK_FILL)
+    r += 2
+    put(ws, r, 1, "財産ごとに書く申告書の表", B, border=False)
+    r += 1
+    for i, t in enumerate(["", "財産・特例", "書く表", ""], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    for h in D["hyo"]:
+        r += 1
+        put(ws, r, 1, "")
+        put(ws, r, 2, h["zaisan"], B)
+        put(ws, r, 3, f'{h["hyo"]}　{h["name"]}', N)
+        put(ws, r, 4, "")
+    r += 2
+    put(ws, r, 1, "金額を書くときに手元に置くもの（例）：" + "・".join(D["tegoto"]), N, border=False)
+    put(ws, r + 1, 1, "申告の期限：" + DATA["zei"]["kigen"], B, border=False)
+    put(ws, r + 2, 1, D["note"], S, border=False)
+    put(ws, r + 3, 1, src_text(["ntaShoruiIchiran", "ntaYoshikiR08", "nta4205"]).replace(CHECKED, ck), S, border=False)
+    put(ws, r + 4, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/shinkoku-shorui-checklist　くわしくは税務署か税理士に確かめてください。", S, border=False)
+    ws.page_setup.orientation = "portrait"
+    ws.page_setup.fitToWidth = 1
+    wb.save(OUT / "souzoku-shinkoku-shorui.xlsx")
+
+
+def make_shinkoku_pdf():
+    D = DATA["shorui"]
+    ck = D["checkedAt"].replace("-", "/")
+    ky = "".join(f"<tr><td>☐</td><td><b>{esc(k['h'])}</b><br><small>{esc(k['d'])}</small></td></tr>" for k in D["kyotsu"])
+    jo = ""
+    for j in D["jokyo"]:
+        items = "".join(f"<tr><td>☐</td><td><b>{esc(it['h'])}</b>{('<br><small>' + esc(it['d']) + '</small>') if it['d'] else ''}</td></tr>" for it in j["items"])
+        jo += f"<tr><th colspan='2'>{'　' if j.get('sub') else ''}{esc(j['h'].replace('└ ', '自宅の土地の特例のうち：'))}</th></tr>{items}"
+    hy = "".join(f"<tr><td>{esc(h['zaisan'])}</td><td><b>{esc(h['hyo'])}</b>　<small>{esc(h['name'])}</small></td></tr>" for h in D["hyo"])
+    body = f"""<style>td:first-child{{width:6mm;text-align:center}} small{{color:#64748b;font-size:8pt}} th{{font-size:9.5pt}}</style>
+<h2>誰でも出す書類</h2><table>{ky}</table>
+<h2>特例を使うときに足す書類（当てはまる所だけ）</h2><table>{jo}</table>
+<h2>財産ごとに書く申告書の表</h2><table><tr><th style="width:40mm">財産・特例</th><th>書く表</th></tr>{hy}</table>
+<div class="box"><b>申告の期限</b>：{esc(DATA['zei']['kigen'])}<br>金額を書くときに手元に置くもの（例）：{esc('・'.join(D['tegoto']))}</div>
+<p class="note">{esc(D['note'])}</p>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in ['ntaShoruiIchiran', 'ntaYoshikiR08', 'nta4205']))}（{ck} 確認）</p>"""
+    doc = page("相続税の申告の必要書類チェックリスト", "そろえたら☐に印を付けます。特例を使わないなら、上の表だけで足ります。", body)
+    _pdf(doc, "souzoku-shinkoku-shorui.pdf", "/guide/souzoku/shinkoku-shorui-checklist", ck)
+
+
+# ---------- 死亡保険金の非課税の計算表（2026-11-11） ----------
+def make_hikazei_xlsx():
+    Hk = DATA["hikazei"]
+    ck = Hk["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "非課税の計算"
+    widths(ws, [22, 18, 18, 18, 18])
+    put(ws, 1, 1, "死亡保険金の相続税の非課税の計算表", H, border=False)
+    put(ws, 2, 1, "オレンジの欄に入れると、受取人ごとの非課税の額と相続税の対象になる額が出ます。", S, border=False)
+    put(ws, 4, 1, "① 法定相続人", B, HEAD_FILL)
+    put(ws, 4, 2, "人数", B, HEAD_FILL)
+    labels = [("配偶者（0か1）", 1), ("実の子（子がいなければ親か兄弟姉妹）", 2), ("養子", 0)]
+    for k, (t, v) in enumerate(labels):
+        put(ws, 5 + k, 1, t, N)
+        put(ws, 5 + k, 2, v, B, IN_FILL)
+    put(ws, 8, 1, "数える人数（自動）", B)
+    put(ws, 8, 2, "=B5+B6+MIN(B7,IF(B6>0,1,2))", B, OK_FILL)
+    put(ws, 9, 1, "非課税の限度額（自動）", B)
+    put(ws, 9, 2, f"={Hk['per']}*B8", B, OK_FILL, fmt="#,##0\"円\"")
+    r = 11
+    for i, t in enumerate(["② 受取人", "受け取った額（円）", "相続人か（はい／いいえ）", "非課税（自動）", "相続税の対象（自動）"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    dv = DataValidation(type="list", formula1='"はい,いいえ"', allow_blank=True)
+    ws.add_data_validation(dv)
+    rows = range(r + 1, r + 7)
+    sample = {r + 1: ("配偶者", 30000000, "はい"), r + 2: ("子", 10000000, "はい")}
+    a, b = r + 1, r + 6
+    total = f'SUMIF($C${a}:$C${b},"はい",$B${a}:$B${b})'
+    for rr in rows:
+        nm, km, so = sample.get(rr, (None, None, "はい"))
+        put(ws, rr, 1, nm, N, IN_FILL)
+        put(ws, rr, 2, km, N, IN_FILL, fmt="#,##0")
+        c = put(ws, rr, 3, so, N, IN_FILL)
+        dv.add(c)
+        put(ws, rr, 4, f'=IF(B{rr}="","",IF(C{rr}<>"はい",0,IF({total}>$B$9,ROUNDDOWN($B$9*B{rr}/{total},0),B{rr})))', B, OK_FILL, fmt="#,##0")
+        put(ws, rr, 5, f'=IF(B{rr}="","",B{rr}-D{rr})', B, OK_FILL, fmt="#,##0")
+    put(ws, b + 1, 1, "合計", B)
+    put(ws, b + 1, 2, f"=SUM(B{a}:B{b})", B, OK_FILL, fmt="#,##0")
+    put(ws, b + 1, 4, f"=SUM(D{a}:D{b})", B, OK_FILL, fmt="#,##0")
+    put(ws, b + 1, 5, f"=SUM(E{a}:E{b})", B, OK_FILL, fmt="#,##0")
+    r = b + 3
+    put(ws, r, 1, "きまり", B, border=False)
+    for k, x in enumerate(Hk["rules"], 1):
+        put(ws, r + k, 1, f"・{x['h']}：{x['d']}", N, border=False)
+        ws.merge_cells(start_row=r + k, start_column=1, end_row=r + k, end_column=5)
+    r += len(Hk["rules"]) + 1
+    put(ws, r, 1, "・" + Hk["anbun"], N, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=5)
+    ws.row_dimensions[r].height = 30
+    put(ws, r + 1, 1, "・" + Hk["shinkoku"] + "。1円未満は切り捨てて表示します。", N, border=False)
+    put(ws, r + 2, 1, "入っている例：" + Hk["rei"]["note"], S, border=False)
+    put(ws, r + 3, 1, "出典：" + "／".join(SRC[k]["name"] for k in ["nta4114", "nta1750"]) + f"（{ck} 確認）", S, border=False)
+    put(ws, r + 4, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/shibou-hokenkin-hikazei", S, border=False)
+    ws.page_setup.orientation = "portrait"
+    ws.page_setup.fitToWidth = 1
+    wb.save(OUT / "souzoku-hokenkin-hikazei.xlsx")
+
+
+def make_hikazei_pdf():
+    Hk = DATA["hikazei"]
+    ck = Hk["checkedAt"].replace("-", "/")
+    rules = "".join(f"<li><b>{esc(x['h'])}</b>：{esc(x['d'])}</li>" for x in Hk["rules"])
+    blank = "".join("<tr><td class='w'></td><td></td><td>はい・いいえ</td><td></td><td></td></tr>" for _ in range(4))
+    zm = "".join(f"<tr><td>{esc(z['hihoken'])}</td><td>{esc(z['futan'])}</td><td>{esc(z['uketori'])}</td><td><b>{esc(z['zei'])}</b></td></tr>" for z in Hk["zeimoku"])
+    body = f"""<h2>① 非課税の限度額</h2>
+<p>500万円 × 法定相続人の数（<span class="line" style="min-width:14mm"></span>人）＝ <span class="line"></span>円</p>
+<h2>② 受取人ごとの非課税</h2>
+<table><tr><th>受取人</th><th>受け取った額</th><th>相続人か</th><th>非課税</th><th>相続税の対象</th></tr>{blank}</table>
+<p class="note">{esc(Hk['anbun'])}</p>
+<div class="box"><b>きまり</b><ul style="margin:1mm 0 0;padding-left:5mm">{rules}</ul></div>
+<h2>相続税になる保険金の見分け方</h2>
+<table><tr><th>亡くなった人</th><th>保険料を払った人</th><th>受取人</th><th>税</th></tr>{zm}</table>
+<p class="note">例：{esc(Hk['rei']['note'])} → 非課税 1,125万円・375万円、相続税の対象 1,875万円・625万円。</p>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in ['nta4114', 'nta1750']))}（{ck} 確認）</p>"""
+    doc = page("死亡保険金の非課税の確認表", "相続人の人数と、受取人ごとの金額を書き込みます。", body)
+    _pdf(doc, "souzoku-hokenkin-hikazei.pdf", "/guide/souzoku/shibou-hokenkin-hikazei", ck)
+
+
 if __name__ == "__main__":
     import sys
+    if sys.argv[1:] == ["shinkoku"]:
+        make_shinkoku_xlsx()
+        make_shinkoku_pdf()
+        sys.exit(0)
+    if sys.argv[1:] == ["hikazei"]:
+        make_hikazei_xlsx()
+        make_hikazei_pdf()
+        sys.exit(0)
     if sys.argv[1:] == ["tetsuzuki"]:
         make_tetsuzuki_xlsx()
         make_tetsuzuki_pdf()

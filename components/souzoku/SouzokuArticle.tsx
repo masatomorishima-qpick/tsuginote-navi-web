@@ -33,11 +33,21 @@ export const SOUZOKU_FILES = {
     { label: 'エクセル', href: '/downloads/souzoku-tetsuzuki-checklist.xlsx', icon: FileSpreadsheet },
     { label: 'PDF', href: '/downloads/souzoku-tetsuzuki-checklist.pdf', icon: FileText },
   ],
+  shinkoku: [
+    { label: 'エクセル', href: '/downloads/souzoku-shinkoku-shorui.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-shinkoku-shorui.pdf', icon: FileText },
+  ],
+  hikazei: [
+    { label: 'エクセル', href: '/downloads/souzoku-hokenkin-hikazei.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-hokenkin-hikazei.pdf', icon: FileText },
+  ],
 } as const;
 
 export const SOUZOKU_PAGES = [
   { href: '/guide/souzoku/tetsuzuki-checklist', h: '相続の手続きチェックリスト' },
   { href: '/guide/souzoku/souzokuzei-keisan', h: '相続税の計算' },
+  { href: '/guide/souzoku/shinkoku-shorui-checklist', h: '相続税の申告の必要書類' },
+  { href: '/guide/souzoku/shibou-hokenkin-hikazei', h: '死亡保険金の非課税の計算' },
   { href: '/guide/souzoku/isan-bunkatsu-kyogisho', h: '遺産分割協議書' },
   { href: '/guide/souzoku/souzoku-kankei-setsumeizu', h: '相続関係説明図' },
   { href: '/guide/souzoku/zaisan-mokuroku', h: '財産目録' },

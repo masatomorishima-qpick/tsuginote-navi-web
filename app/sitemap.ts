@@ -76,6 +76,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 相続税の申告の必要書類チェックリスト（2026-11-11 作成、docs/seisaku-queue.md の T4）。
+    {
+      url: `${baseUrl}/guide/souzoku/shinkoku-shorui-checklist`,
+      lastModified: new Date("2026-11-11T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    // 死亡保険金の相続税の非課税の計算（2026-11-11 作成、docs/seisaku-queue.md の T7）。
+    {
+      url: `${baseUrl}/guide/souzoku/shibou-hokenkin-hikazei`,
+      lastModified: new Date("2026-11-11T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 相続税の計算（2026-11-10 作成、docs/seisaku-queue.md の S1）。
     {
       url: `${baseUrl}/guide/souzoku/souzokuzei-keisan`,
@@ -367,6 +381,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date("2026-11-10T21:00:00+09:00"),
       changeFrequency: "monthly",
       priority: 0.7,
+    },
+    // 保険証券の見方（2026-11-11 作成、docs/seisaku-queue.md の T5）。
+    {
+      url: `${baseUrl}/guide/shisan-kanri/hoken-shoken-mikata`,
+      lastModified: new Date("2026-11-11T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
     // 生命保険の見直しチェックリスト（2026-11-10 作成、docs/seisaku-queue.md の T3）。
     {

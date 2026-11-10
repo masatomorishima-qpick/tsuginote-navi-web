@@ -5,7 +5,8 @@
 出力：public/downloads/
   hoken-hikaku.xlsx / .pdf   保険の比較表（いまの保険と見直し案を並べる。払う総額は自動計算）
   hoken-minaoshi-checklist.xlsx / .pdf   生命保険の見直しチェックリスト（節目・証券の6項目・次の更新の年は自動）
-  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す
+  hoken-shoken-kakiutsushi.xlsx / .pdf   保険証券の書き写し表（死亡保険金の税の種類と保険料の合計は自動。2026-11-11）
+  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken も同じ）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import html
@@ -247,12 +248,116 @@ thead th {{ text-align: center; }} small {{ color: #64748b; font-weight: normal;
         b.close()
 
 
+# ---------- 保険証券の書き写し表（2026-11-11） ----------
+SHOKEN_ROWS = [
+    ("保険会社", ""), ("証券番号", ""), ("保険の種類（主契約）", "終身・定期・医療・がん など"),
+    ("契約者", "保険料を払う人"), ("被保険者", "保障の対象の人"), ("死亡保険金の受取人", ""),
+    ("死亡保険金の額（円）", ""), ("入院1日あたり（円）", ""), ("特約", "主契約がなくなると特約もなくなる"),
+    ("保険期間", "何歳まで・一生"), ("保険料の払込期間", "何歳まで・一生"), ("更新型か全期型か", "更新型・全期型"),
+    ("次の更新の日", ""), ("月の保険料（円）", ""),
+]
+
+
+def make_shoken_xlsx():
+    from openpyxl.worksheet.datavalidation import DataValidation
+    K = DATA["shoken"]
+    ck = K["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "証券の書き写し"
+    for i, w in enumerate([24, 22, 16, 16, 16, 16, 16], 1):
+        ws.column_dimensions[get_column_letter(i)].width = w
+    put(ws, 1, 1, "保険証券の書き写し表", H, border=False)
+    put(ws, 2, 1, "証券1枚を1列に。オレンジの欄に書き写すと、死亡保険金の税の種類と保険料の合計が自動で出ます。", S, border=False)
+    r = 4
+    for i, t in enumerate(["証券の欄", "メモ", "保険 1", "保険 2", "保険 3", "保険 4", "保険 5"], 1):
+        put(ws, r, i, t, B, HEAD)
+    dv = DataValidation(type="list", formula1='"更新型,全期型"', allow_blank=True)
+    ws.add_data_validation(dv)
+    row = {}
+    for k, (h, m) in enumerate(SHOKEN_ROWS):
+        rr = r + 1 + k
+        row[h] = rr
+        put(ws, rr, 1, h, B)
+        put(ws, rr, 2, m, S)
+        for c in range(3, 8):
+            fmt = "#,##0" if "円" in h else ("yyyy/m/d" if "日" in h and "1日" not in h else None)
+            cell = put(ws, rr, c, None, N, IN, fmt=fmt)
+            if h == "更新型か全期型か":
+                dv.add(cell)
+    rr = r + len(SHOKEN_ROWS) + 1
+    put(ws, rr, 1, "死亡保険金の税（自動）", B)
+    put(ws, rr, 2, "契約者・被保険者・受取人から", S)
+    ke, hi, uk = row["契約者"], row["被保険者"], row["死亡保険金の受取人"]
+    for c in range(3, 8):
+        L = get_column_letter(c)
+        f = (f'=IF(OR({L}{ke}="",{L}{hi}="",{L}{uk}=""),"",IF({L}{uk}={L}{hi},"受取人を確認",'
+             f'IF({L}{ke}={L}{hi},"相続税",IF({L}{ke}={L}{uk},"所得税","贈与税"))))')
+        put(ws, rr, c, f, B, OK)
+    mo = row["月の保険料（円）"]
+    put(ws, rr + 1, 1, "月の保険料の合計（自動）", B)
+    put(ws, rr + 1, 3, f"=SUM(C{mo}:G{mo})", B, OK, fmt="#,##0")
+    put(ws, rr + 1, 4, "1年では", S)
+    put(ws, rr + 1, 5, f"=C{rr + 1}*12", B, OK, fmt="#,##0")
+    rr += 3
+    notes = [K["zeiNote"], K["koshinNote"], "契約者と被保険者が同じ → 相続税、契約者と受取人が同じ → 所得税（住民税も）、3人とも違う → 贈与税。"]
+    for k, t in enumerate(notes):
+        put(ws, rr + k, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=rr + k, start_column=1, end_row=rr + k, end_column=7)
+    rr += len(notes) + 1
+    keys = ["jiliYougo", "jiliView", "jiliZei", "nta1750"]
+    put(ws, rr, 1, "出典：" + "／".join(SRC[k]["name"] for k in keys) + f"（{ck} 確認）", S, border=False)
+    put(ws, rr + 1, 1, f"つぎの手ナビ　{SITE}/guide/shisan-kanri/hoken-shoken-mikata　欄の名前は保険会社によって少し違います。", S, border=False)
+    ws.page_setup.orientation = "landscape"
+    ws.page_setup.fitToWidth = 1
+    wb.save(OUT / "hoken-shoken-kakiutsushi.xlsx")
+
+
+def make_shoken_pdf():
+    from playwright.sync_api import sync_playwright
+    K = DATA["shoken"]
+    ck = K["checkedAt"].replace("-", "/")
+    rows = "".join(f"<tr><th>{esc(h)}{('<br><small>' + esc(m) + '</small>') if m else ''}</th><td></td><td></td><td></td></tr>" for h, m in SHOKEN_ROWS)
+    ran = "".join(f"<li><b>{esc(x['h'])}</b>：{esc(x['d'])}</li>" for x in K["ran"])
+    zei = "".join(f"<tr><td>{esc(z['keiyaku'])}</td><td>{esc(z['hihoken'])}</td><td>{esc(z['uketori'])}</td><td><b>{esc(z['zei'])}</b></td></tr>" for z in K["zei"])
+    doc = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>
+@page {{ size: A4; margin: 11mm 14mm 14mm; }}
+body {{ font-family: 'Noto Sans CJK JP', sans-serif; color: #0f172a; font-size: 9.5pt; line-height: 1.45; }}
+h1 {{ font-size: 17pt; margin: 0 0 1mm; }} h2 {{ font-size: 11pt; margin: 3.5mm 0 1.5mm; }} .sub {{ color: #475569; margin: 0 0 2mm; font-size: 9pt; }}
+table {{ width: 100%; border-collapse: collapse; font-size: 9pt; }}
+th, td {{ border: 1px solid #94a3b8; padding: 0.8mm 2mm; height: 5.6mm; }} th {{ background: #e0f2fe; text-align: left; width: 48mm; }}
+thead th {{ text-align: center; }} small {{ color: #64748b; font-weight: normal; font-size: 7.5pt; }}
+.box {{ border: 1.5px solid #fdba74; background: #fff7ed; border-radius: 3mm; padding: 1.8mm 4mm; margin-top: 2.5mm; }}
+.box ul {{ margin: 1mm 0 0; padding-left: 5mm; }} .note {{ color: #64748b; font-size: 7.5pt; margin: 1.5mm 0 0; }}
+.z th, .z td {{ width: auto; text-align: center; height: 5mm; }}
+</style></head><body><h1>保険証券の書き写し表</h1><p class="sub">証券1枚を1列に書き写します。</p>
+<table><thead><tr><th>証券の欄</th><th>保険 1</th><th>保険 2</th><th>保険 3</th></tr></thead>{rows}</table>
+<h2>死亡保険金の税の見分け方</h2>
+<table class="z"><tr><th>契約者</th><th>被保険者</th><th>受取人</th><th>税</th></tr>{zei}</table>
+<p class="note">{esc(K['zeiNote'])}</p>
+<div class="box"><b>欄の意味</b><ul>{ran}</ul></div>
+<p class="note">出典：生命保険文化センター（保険商品の見方・用語辞典・保険金などを受け取ったときの税金は？）・国税庁 No.1750（{ck} 確認）</p></body></html>"""
+    url = f"{SITE}/guide/shisan-kanri/hoken-shoken-mikata"
+    with sync_playwright() as p:
+        b = p.chromium.launch()
+        pg = b.new_page()
+        pg.set_content(doc, wait_until="load")
+        ft = (f"<div style=\"font-family:'Noto Sans CJK JP';font-size:7px;color:#94a3b8;width:100%;padding:0 14mm;display:flex;justify-content:space-between\">"
+              f"<span>つぎの手ナビ　{esc(url)}　（{ck} 確認）</span><span><span class='pageNumber'></span> / <span class='totalPages'></span></span></div>")
+        pg.pdf(path=str(OUT / "hoken-shoken-kakiutsushi.pdf"), format="A4", print_background=True, prefer_css_page_size=True,
+               display_header_footer=True, header_template="<div></div>", footer_template=ft)
+        b.close()
+
+
 if __name__ == "__main__":
     import sys
     only = sys.argv[1] if len(sys.argv) > 1 else ""
     if only in ("", "hikaku"):
         make_hikaku_xlsx()
         make_hikaku_pdf()
+    if only in ("", "shoken"):
+        make_shoken_xlsx()
+        make_shoken_pdf()
     if only in ("", "minaoshi"):
         make_minaoshi_xlsx()
         make_minaoshi_pdf()

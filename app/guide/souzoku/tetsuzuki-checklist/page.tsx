@@ -86,7 +86,7 @@ export default function Page() {
                   <Link href={j.href} className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200 hover:ring-slate-300">
                     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-700 text-[13px] font-black text-white">{i + 1}</span>
                     <span className="flex-1 text-[14px] font-bold text-slate-900">{j.h}</span>
-                    <span className="flex items-center gap-1 text-[12px] font-bold text-sky-700">{j.href.includes('keisan') ? '計算' : 'ひな形'}<ArrowRight size={14} aria-hidden="true" /></span>
+                    <span className="flex items-center gap-1 text-[12px] font-bold text-sky-700">{j.href.includes('keisan') ? '計算' : j.href.includes('checklist') ? 'チェック' : 'ひな形'}<ArrowRight size={14} aria-hidden="true" /></span>
                   </Link>
                 ) : (
                   <span className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">

@@ -19,6 +19,30 @@
     "nenkinIzoku": {
       "name": "日本年金機構「遺族年金」",
       "url": "https://www.nenkin.go.jp/service/jukyu/seido/izokunenkin/jukyu-yoken/20150401-03.html"
+    },
+    "jiliView": {
+      "name": "生命保険文化センター「保険商品の見方」",
+      "url": "https://www.jili.or.jp/knows_learns/basic/view.html"
+    },
+    "jiliYougo": {
+      "name": "生命保険文化センター「用語辞典」",
+      "url": "https://jili.or.jp/knows_learns/basic/explanation/index.html"
+    },
+    "jiliShohenkou": {
+      "name": "生命保険文化センター「諸変更と届出」",
+      "url": "https://www.jili.or.jp/knows_learns/basic/continuance/95.html"
+    },
+    "jiliZei": {
+      "name": "生命保険文化センター「保険金などを受け取ったときの税金は？」",
+      "url": "https://www.jili.or.jp/knows_learns/q_a/tax/574.html"
+    },
+    "seihoShokai": {
+      "name": "生命保険協会「生命保険契約照会制度のご案内」",
+      "url": "https://www.seiho.or.jp/contact/inquiry/"
+    },
+    "nta1750": {
+      "name": "国税庁 タックスアンサー No.1750「死亡保険金を受け取ったとき」（令和8年4月1日現在法令等）",
+      "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1750.htm"
     }
   },
   "hikaku": {
@@ -225,5 +249,124 @@
       }
     ],
     "keisanNote": "次の更新は、契約した日から保険期間ごとに数えた目安です。正しい日付は保険証券か、保険会社からのお知らせで確かめてください。"
+  },
+  "shoken": {
+    "checkedAt": "2026-11-11",
+    "ran": [
+      {
+        "key": "keiyakusha",
+        "h": "契約者",
+        "d": "保険会社と契約した人。契約を変える権利と、保険料を払う務めがある",
+        "src": "jiliYougo"
+      },
+      {
+        "key": "hihokensha",
+        "h": "被保険者",
+        "d": "その人の死亡・病気・けがが保険の対象になる人",
+        "src": "jiliYougo"
+      },
+      {
+        "key": "uketorinin",
+        "h": "受取人",
+        "d": "保険金や給付金を受け取る人。入院・手術の給付金は、ふつう被保険者本人",
+        "src": "jiliYougo"
+      },
+      {
+        "key": "shukeiyaku",
+        "h": "主契約",
+        "d": "契約の土台。これだけで契約できる",
+        "src": "jiliView"
+      },
+      {
+        "key": "tokuyaku",
+        "h": "特約",
+        "d": "主契約に付ける上乗せ。主契約が満期や解約でなくなると、特約もなくなる",
+        "src": "jiliView"
+      },
+      {
+        "key": "kikan",
+        "h": "保険期間",
+        "d": "保障が続く期間。この間に起きたことだけが支払いの対象。払込期間と同じとは限らない",
+        "src": "jiliYougo"
+      },
+      {
+        "key": "haraikomi",
+        "h": "保険料の払込期間",
+        "d": "一生の保障でも、60歳までなど決めた年齢まで払う形と、一生払う形がある",
+        "src": "jiliView"
+      },
+      {
+        "key": "koshin",
+        "h": "更新",
+        "d": "10年・15年などで期間が終わると、原則同じ内容で続く。保険料はその時の年齢で計算し直し、ふつう上がる",
+        "src": "jiliYougo"
+      },
+      {
+        "key": "henrei",
+        "h": "解約返戻金",
+        "d": "解約したときに契約者に払い戻されるお金",
+        "src": "jiliYougo"
+      }
+    ],
+    "koshinNote": "更新は自動で行われるのがふつうです。更新しない・保障を減らして更新するときは、申し出が要ります。",
+    "zenki": "全期型は、契約から保障が終わるまでを1つの期間とし、保険料は変わりません。",
+    "zei": [
+      {
+        "keiyaku": "夫",
+        "hihoken": "夫",
+        "uketori": "妻",
+        "zei": "相続税",
+        "memo": "契約者と被保険者が同じ"
+      },
+      {
+        "keiyaku": "夫",
+        "hihoken": "妻",
+        "uketori": "夫",
+        "zei": "所得税",
+        "memo": "契約者と受取人が同じ（住民税も）"
+      },
+      {
+        "keiyaku": "夫",
+        "hihoken": "妻",
+        "uketori": "子",
+        "zei": "贈与税",
+        "memo": "3人とも違う"
+      }
+    ],
+    "zeiNote": "国税庁は「保険料を負担した人」で分けています。契約者と保険料を払った人が違うときは、払った人で見ます。",
+    "nai": [
+      {
+        "h": "保険会社に問い合わせる",
+        "d": "証券の代わりに「契約内容通知書」を出す会社もある",
+        "src": "jiliYougo"
+      },
+      {
+        "h": "家にある手がかりを探す",
+        "d": "保険会社から毎年届くお知らせ、通帳の保険料の引き落とし",
+        "src": "seihoShokai"
+      },
+      {
+        "h": "生命保険協会の契約照会",
+        "d": "亡くなった・判断する力が落ちた・災害で手がかりがないとき、契約の有無を全社に照会できる。答えは「有無」だけで、利用料がかかる",
+        "src": "seihoShokai"
+      }
+    ],
+    "henkou": [
+      {
+        "h": "受取人は変えられる",
+        "d": "保険期間中なら、契約者が原則変えられる。被保険者の同意が要る",
+        "src": "jiliShohenkou"
+      },
+      {
+        "h": "支払いが決まった後は変えられない",
+        "d": "亡くなるなど支払いの理由が起きた後は変更できない",
+        "src": "jiliShohenkou"
+      },
+      {
+        "h": "2人以上にするときは割合を決める",
+        "d": "受取人は何人でもよいが、受け取る割合を決める",
+        "src": "jiliShohenkou"
+      }
+    ]
   }
 }

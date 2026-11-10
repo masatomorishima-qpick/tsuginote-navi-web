@@ -170,6 +170,7 @@ export default function Page() {
               );
             })}
           </ol>
+          <Link href="/guide/shisan-kanri/hoken-shoken-mikata" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">保険証券の欄の意味と書き写し表<ArrowRight size={14} aria-hidden="true" /></Link>
         </section>
 
         <HokenSoudanBox lpId={LP_ID} position="bottom" lead="チェックが済んだら、無料で見直し相談" points={POINTS_BOX} beacon />

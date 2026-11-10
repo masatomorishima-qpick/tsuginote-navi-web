@@ -223,3 +223,4 @@
 - 9:50 #90 をオーナーが取り込み。本番で /guide/souzoku/souzokuzei-keisan を確認（計算：2億円・配偶者＋子2人 → 総額2,700万円・目安1,350万円、紹介先は相続アシストだけ、表示計測1つ、サイトの一覧に掲載）。Search Console で登録を依頼。関門は 3日 11/13・14日 11/24・28日 12/8・56日 1/5・90日 2/8。
 - 22:40 戦略を見直し（docs/sueage-plan.md「戦略の見直し」）。Search Console 28日・キーワードプランナー・Google の上位10を20語以上で確かめ、「評価されている分野×上位が弱い表・ひな形型×紹介先に直結」に絞った。T1 相続の手続きチェックリスト・T2 保険の比較表を変更依頼 #91 に。毎朝の制作の回を1日最大3本に。
 - 22:10 #91 をオーナーが取り込み。本番で /guide/souzoku/tetsuzuki-checklist・/guide/shisan-kanri/hoken-hikaku-excel を確認（表示・紹介先は各1つ・配布物4ファイルとも開ける・サイトの一覧に掲載）。Search Console は Chrome の拡張に使う許可がなく開けなかったので、登録の依頼は明朝8時44分の回に回した。
+- 22:15 Search Console の操作が戻った（オーナーの許可）。/guide/souzoku/tetsuzuki-checklist・/guide/shisan-kanri/hoken-hikaku-excel の登録を依頼した。関門は 3日 11/13・14日 11/24・28日 12/8・56日 1/5。

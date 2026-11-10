@@ -107,7 +107,7 @@ export default function Page() {
               <li key={r.h} className={`rounded-xl px-3 py-2 text-[12px] font-bold ring-1 ${r.kind === 'calc' ? 'bg-emerald-50 text-emerald-800 ring-emerald-200' : 'bg-white text-slate-800 ring-slate-200'}`}>{r.h}</li>
             ))}
           </ul>
-          <p className="text-[14px] text-slate-700">いまの保険がいくつもあるときは、先に<Link href="/guide/shisan-kanri/hoken-ichiran-excel" className={`${A} text-sky-800`}>保険の一覧表</Link>で全部を書き出します。</p>
+          <p className="text-[14px] text-slate-700">いまの保険がいくつもあるときは、先に<Link href="/guide/shisan-kanri/hoken-ichiran-excel" className={`${A} text-sky-800`}>保険の一覧表</Link>で全部を書き出します。見直しどきかは<Link href="/guide/shisan-kanri/hoken-minaoshi-checklist" className={`${A} text-sky-800`}>見直しチェックリスト</Link>で確かめます。</p>
         </section>
 
         <section className={SECTION} aria-labelledby="miru">

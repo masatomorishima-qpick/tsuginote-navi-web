@@ -368,6 +368,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    // 生命保険の見直しチェックリスト（2026-11-10 作成、docs/seisaku-queue.md の T3）。
+    {
+      url: `${baseUrl}/guide/shisan-kanri/hoken-minaoshi-checklist`,
+      lastModified: new Date("2026-11-10T23:30:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     {
       url: `${baseUrl}/guide/shisan-kanri/hoken-ichiran-excel`,
       lastModified: now,

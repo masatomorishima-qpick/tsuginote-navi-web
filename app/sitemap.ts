@@ -69,6 +69,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 相続の手続きチェックリスト（2026-11-10 作成、docs/seisaku-queue.md の T1）。
+    {
+      url: `${baseUrl}/guide/souzoku/tetsuzuki-checklist`,
+      lastModified: new Date("2026-11-10T21:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 相続税の計算（2026-11-10 作成、docs/seisaku-queue.md の S1）。
     {
       url: `${baseUrl}/guide/souzoku/souzokuzei-keisan`,

@@ -7,6 +7,8 @@
   souzoku-kankei-setsumeizu.xlsx / .pdf        相続関係説明図のひな形
   souzoku-zaisan-mokuroku.xlsx / .pdf          財産目録（裁判所の遺産目録の欄）＋相続税の基礎控除の判定
   souzoku-akiya-tokurei-check.xlsx / .pdf      相続した実家（空き家）の3,000万円控除のチェック表
+  souzoku-tetsuzuki-checklist.xlsx / .pdf      相続の手続きチェックリスト（期限の自動計算つき。2026-11-10）
+  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import json
@@ -375,11 +377,95 @@ def make_pdfs():
         b.close()
 
 
+# ---------- 相続の手続きチェックリスト（2026-11-10） ----------
+def make_tetsuzuki_xlsx():
+    T = DATA["tetsuzuki"]
+    ck = T["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "手続きチェック"
+    widths(ws, [5, 30, 34, 14, 16, 40, 8])
+    put(ws, 1, 1, "相続の手続きチェックリスト（期限つき）", H, border=False)
+    put(ws, 2, 1, "亡くなった日を入れると、月・年で決まる期限の目安が出ます。終わったら「済」を選びます。", S, border=False)
+    put(ws, 4, 2, "亡くなった日（例：2026/1/6）", B)
+    d = put(ws, 4, 3, None, B, IN_FILL, fmt="yyyy/m/d").coordinate
+    r = 6
+    for i, t in enumerate(["", "手続き", "期限", "期限の目安（自動）", "出す所", "メモ", "済"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    dv = DataValidation(type="list", formula1='"済"', allow_blank=True)
+    ws.add_data_validation(dv)
+    for k, it in enumerate(T["items"]):
+        rr = r + 1 + k
+        put(ws, rr, 1, k + 1)
+        put(ws, rr, 2, it["h"], B)
+        put(ws, rr, 3, it["kigen"], N)
+        if it["unit"] == "m":
+            f = f'=IF({d}="","",EDATE({d},{it["n"]}))'
+        elif it["unit"] == "y":
+            f = f'=IF({d}="","",EDATE({d},{it["n"] * 12}))'
+        else:
+            f = "日数の期限は出す先で確認" if it["unit"] == "d" else "－"
+        put(ws, rr, 4, f, B, OK_FILL, fmt="yyyy/m/d")
+        put(ws, rr, 5, it["saki"], N)
+        put(ws, rr, 6, it["memo"], N)
+        c = put(ws, rr, 7, None, B, IN_FILL)
+        dv.add(c)
+        ws.row_dimensions[rr].height = 36
+    r = r + 1 + len(T["items"]) + 1
+    put(ws, r, 1, "期限の前にしておくこと", B, border=False)
+    for k, j in enumerate(T["junbi"], 1):
+        put(ws, r + k, 1, f"☐ {j['h']}" + (f"（ひな形：{SITE}{j['href']}）" if j["href"] else ""), N, border=False)
+    r += len(T["junbi"]) + 2
+    put(ws, r, 1, T["keisanNote"], S, border=False)
+    keys = sorted({it["src"] for it in T["items"]})
+    put(ws, r + 1, 1, "出典：" + "／".join(SRC[k]["name"] for k in keys) + f"（{ck} 確認）", S, border=False)
+    put(ws, r + 2, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/tetsuzuki-checklist　期限は目安です。くわしくは各窓口で確かめてください。", S, border=False)
+    ws.page_setup.orientation = "landscape"
+    ws.page_setup.fitToWidth = 1
+    wb.save(OUT / "souzoku-tetsuzuki-checklist.xlsx")
+
+
+def tetsuzuki_html():
+    T = DATA["tetsuzuki"]
+    rows = "".join(f"<tr><td>☐</td><td><b>{esc(it['h'])}</b></td><td>{esc(it['kigen'])}</td><td class='w'></td><td>{esc(it['saki'])}</td><td>{esc(it['memo'])}</td></tr>" for it in T["items"])
+    junbi = "".join(f"<li>☐ {esc(j['h'])}</li>" for j in T["junbi"])
+    keys = sorted({it["src"] for it in T["items"]})
+    ck = T["checkedAt"].replace("-", "/")
+    body = f"""<p>亡くなった日：<span class="line"></span></p>
+<table><tr><th style="width:5mm"></th><th style="width:34mm">手続き</th><th style="width:38mm">期限</th><th style="width:22mm">期限の日</th><th style="width:26mm">出す所</th><th>メモ</th></tr>{rows}</table>
+<div class="box"><b>期限の前にしておくこと</b><ul style="margin:1mm 0 0;padding-left:2mm;list-style:none">{junbi}</ul></div>
+<p class="note">{esc(T['keisanNote'])}</p>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in keys))}（{ck} 確認）</p>"""
+    return page("相続の手続きチェックリスト", "期限のある手続きを、早い順に並べました。終わったら☐に印を付けます。", body)
+
+
+def make_tetsuzuki_pdf():
+    from playwright.sync_api import sync_playwright
+    url = f"{SITE}/guide/souzoku/tetsuzuki-checklist"
+    ck = DATA["tetsuzuki"]["checkedAt"].replace("-", "/")
+    with sync_playwright() as p:
+        b = p.chromium.launch()
+        pg = b.new_page()
+        pg.set_content(tetsuzuki_html(), wait_until="load")
+        ft = (f"<div style=\"font-family:'Noto Sans CJK JP';font-size:7px;color:#94a3b8;width:100%;padding:0 14mm;display:flex;justify-content:space-between\">"
+              f"<span>つぎの手ナビ　{esc(url)}　（{ck} 確認）</span><span><span class='pageNumber'></span> / <span class='totalPages'></span></span></div>")
+        pg.pdf(path=str(OUT / "souzoku-tetsuzuki-checklist.pdf"), format="A4", print_background=True, prefer_css_page_size=True,
+               display_header_footer=True, header_template="<div></div>", footer_template=ft)
+        b.close()
+
+
 if __name__ == "__main__":
+    import sys
+    if sys.argv[1:] == ["tetsuzuki"]:
+        make_tetsuzuki_xlsx()
+        make_tetsuzuki_pdf()
+        sys.exit(0)
     make_kyogisho_docx()
     make_setsumeizu_xlsx()
     make_mokuroku_xlsx()
     make_akiya_xlsx()
+    make_tetsuzuki_xlsx()
     make_pdfs()
+    make_tetsuzuki_pdf()
     for f in sorted(OUT.glob("souzoku-*")):
         print(f.name, f.stat().st_size)

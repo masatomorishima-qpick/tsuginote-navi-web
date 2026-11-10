@@ -52,6 +52,30 @@
     "ntaJiseki": {
       "name": "国税庁「令和6年分 相続税の申告事績の概要」（令和7年12月）",
       "url": "https://www.nta.go.jp/information/release/kokuzeicho/2025/sozoku_shinkoku/index.htm"
+    },
+    "mojShibou": {
+      "name": "法務省「死亡届」",
+      "url": "https://www.moj.go.jp/ONLINE/FAMILYREGISTER/5-4.html"
+    },
+    "nenkinShibou": {
+      "name": "日本年金機構「年金受給者が亡くなりました。何か手続きは必要ですか。」",
+      "url": "https://www.nenkin.go.jp/section/faq/jukyu/jukyushatodoke/kyotsu/shibo/20140421.html"
+    },
+    "nenkinMishikyu": {
+      "name": "日本年金機構「年金を受けている方が亡くなったとき」",
+      "url": "https://www.nenkin.go.jp/service/jukyu/tetsuduki/kyotsu/jukyu/20140731-01.html"
+    },
+    "courtHouki": {
+      "name": "裁判所「相続の放棄の申述」",
+      "url": "https://www.courts.go.jp/saiban/syurui/syurui_kazi/kazi_06_13/index.html"
+    },
+    "nta2022": {
+      "name": "国税庁 タックスアンサー No.2022「納税者が死亡したときの確定申告（準確定申告）」",
+      "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2022.htm"
+    },
+    "mojTouki": {
+      "name": "法務省「相続登記の申請義務化について」",
+      "url": "https://www.moj.go.jp/MINJI/minji05_00599.html"
     }
   },
   "kyogisho": {
@@ -265,5 +289,103 @@
     },
     "kigen": "亡くなったことを知った日（ふつうは亡くなった日）の翌日から10か月以内",
     "hokenHikazei": 5000000
+  },
+  "tetsuzuki": {
+    "checkedAt": "2026-11-10",
+    "items": [
+      {
+        "key": "shibou",
+        "h": "死亡届",
+        "kigen": "亡くなったことを知った日から7日以内",
+        "unit": "d",
+        "n": 7,
+        "saki": "市区町村の役所",
+        "memo": "届け出るのは親族・同居者など",
+        "src": "mojShibou"
+      },
+      {
+        "key": "nenkin",
+        "h": "年金の死亡届",
+        "kigen": "10日以内（国民年金は14日以内）",
+        "unit": "d",
+        "n": 10,
+        "saki": "年金事務所など",
+        "memo": "マイナンバーが年金機構に登録されていれば、原則いらない",
+        "src": "nenkinShibou"
+      },
+      {
+        "key": "mishikyu",
+        "h": "未支給の年金の請求",
+        "kigen": "－",
+        "unit": null,
+        "n": null,
+        "saki": "年金事務所",
+        "memo": "亡くなった月の分までの年金を、生計を同じくしていた遺族が受け取れる",
+        "src": "nenkinMishikyu"
+      },
+      {
+        "key": "houki",
+        "h": "相続放棄・限定承認",
+        "kigen": "相続を知った時から3か月以内",
+        "unit": "m",
+        "n": 3,
+        "saki": "家庭裁判所",
+        "memo": "借金が多いときに。収入印紙800円（1人につき）と郵便切手",
+        "src": "courtHouki"
+      },
+      {
+        "key": "junkakutei",
+        "h": "準確定申告（亡くなった人の所得税）",
+        "kigen": "相続を知った日の翌日から4か月以内",
+        "unit": "m",
+        "n": 4,
+        "saki": "税務署",
+        "memo": "1月1日から亡くなった日までの所得を申告する",
+        "src": "nta2022"
+      },
+      {
+        "key": "souzokuzei",
+        "h": "相続税の申告と納税",
+        "kigen": "亡くなったことを知った日の翌日から10か月以内",
+        "unit": "m",
+        "n": 10,
+        "saki": "税務署",
+        "memo": "遺産が基礎控除（3,000万円＋600万円×相続人の数）を超えるとき",
+        "src": "nta4205"
+      },
+      {
+        "key": "touki",
+        "h": "相続登記（不動産の名義を変える）",
+        "kigen": "不動産を相続で取得したと知った日から3年以内",
+        "unit": "y",
+        "n": 3,
+        "saki": "法務局",
+        "memo": "正当な理由なく怠ると10万円以下の過料",
+        "src": "mojTouki"
+      }
+    ],
+    "junbi": [
+      {
+        "h": "遺言書があるか確かめる",
+        "href": null
+      },
+      {
+        "h": "戸籍を集め、相続人を確定する",
+        "href": "/guide/souzoku/souzoku-kankei-setsumeizu"
+      },
+      {
+        "h": "財産と借金を書き出す",
+        "href": "/guide/souzoku/zaisan-mokuroku"
+      },
+      {
+        "h": "相続税がかかるかを計算する",
+        "href": "/guide/souzoku/souzokuzei-keisan"
+      },
+      {
+        "h": "遺産の分け方を話し合い、協議書にする",
+        "href": "/guide/souzoku/isan-bunkatsu-kyogisho"
+      }
+    ],
+    "keisanNote": "月と年の期限は、亡くなった日（知った日）と同じ日付で数えた目安です（国税庁の例：1月6日に亡くなったら11月6日）。期限が土日・祝日なら翌日になることがあります。日数の期限は数え方が手続きで違うので、出す先で確かめてください。"
   }
 }

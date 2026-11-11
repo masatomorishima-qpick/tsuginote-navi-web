@@ -4,6 +4,7 @@
  * 原則：**費用・金利などの具体的な数値をこのファイルに書かない。**
  *   数値は記事本文（＝更新される場所）に任せ、ここは「どのページが何を扱っているか」の案内に徹する。
  *
+ * 2026-11-11：相続・保険のページ（11/5〜11/11 公開）を足した。計算の式の固定の数（基礎控除・非課税の式）は法令で決まっているので書く。
  * 2026-11-04：トップの作り直し（入口3つ）にあわせて書き直した。
  *   住宅ローン・退職金・家計診断は、売上がなく検索のクリックも少なかったためページごと削除（docs/site-top.md）。
  */
@@ -28,10 +29,19 @@ export function GET() {
 
 - [暮らしの整理（ガイド一覧）](${SITE_URL}/guide): デジタルの整理、パスワード・認証の管理、家族との情報共有、保険・お金の管理の解説記事。
 - [保険契約の一覧表をエクセルで作る方法](${SITE_URL}/guide/shisan-kanri/hoken-ichiran-excel): 無料テンプレート付き。
+- [保険の比較表](${SITE_URL}/guide/shisan-kanri/hoken-hikaku-excel): いまの保険と見直し案を並べ、払う総額（月の保険料×12×年数）と差を自動で計算するエクセル。
+- [生命保険の見直しチェックリスト](${SITE_URL}/guide/shisan-kanri/hoken-minaoshi-checklist): 見直しの節目、保険証券で確かめる6項目、契約した日から次の更新の目安を出す道具。
+- [保険証券の見方](${SITE_URL}/guide/shisan-kanri/hoken-shoken-mikata): 欄ごとの意味、契約者・被保険者・受取人の組み合わせで変わる税の種類、書き写し表。
 - [スマホのパスワード管理](${SITE_URL}/guide/password-kanri/sumaho-password): メモ帳管理の危険と、忘れずに安全に管理する方法。
 
 ## 相続・もしもの備え
 
+- [相続税のかんたん計算](${SITE_URL}/guide/souzoku/souzokuzei-keisan): 遺産の合計と相続人の数から、基礎控除（3,000万円＋600万円×法定相続人の数）と相続税の総額の目安を国税庁の手順で計算。
+- [相続の手続きチェックリスト](${SITE_URL}/guide/souzoku/tetsuzuki-checklist): 亡くなった日を入れると、相続放棄・準確定申告・相続税の申告・相続登記の期限の目安が日付で出る一覧。
+- [相続税の申告の必要書類チェックリスト](${SITE_URL}/guide/souzoku/shinkoku-shorui-checklist): 状況を選ぶと、出す書類だけが一覧になる。
+- [死亡保険金の相続税の非課税](${SITE_URL}/guide/souzoku/shibou-hokenkin-hikazei): 非課税の限度額（500万円×法定相続人の数）を、受取人ごとに分けて自動で計算。
+- [遺産分割協議書のひな形](${SITE_URL}/guide/souzoku/isan-bunkatsu-kyogisho)・[相続関係説明図のひな形](${SITE_URL}/guide/souzoku/souzoku-kankei-setsumeizu)・[財産目録のひな形](${SITE_URL}/guide/souzoku/zaisan-mokuroku): 無料のエクセル・PDF。
+- [相続した実家の3,000万円控除](${SITE_URL}/guide/souzoku/jikka-akiya-tokurei): 使える条件の確かめ方。
 - [デジタル遺品の整理](${SITE_URL}/guide/ihinseiri): スマホやネットの口座を家族に引き継ぐための準備。
 - [急な入院に備えて家族に伝えておく情報](${SITE_URL}/guide/moshimo-sonae/kyu-nyuin-sonae)
 

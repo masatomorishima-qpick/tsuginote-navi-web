@@ -62,6 +62,8 @@ export default function LpViewTracker({ lpId, version, entry }: { lpId: string; 
       cta_top: ctaTop,
       cta_in_fv: ctaTop >= 0 && ctaTop + 40 <= window.innerHeight ? 1 : 0,
       hash: (window.location.hash || '').slice(1, 40),
+      // 来た元のサイト名（2026-11-11）。ChatGPT・Perplexity・Gemini など AI の答えから来た人を数えるため。中身の URL は送らない
+      ref: (() => { try { return document.referrer ? new URL(document.referrer).hostname.slice(0, 60) : ''; } catch { return ''; } })(),
     });
 
     // 節ごとの到達（初回だけ）。節の印は section の aria-labelledby（見出しの id）

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import HenshuNote from '@/components/guide/HenshuNote';
 import { AlertTriangle, ArrowRight, Download, FileSpreadsheet, FileText, HeartPulse, Users } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
@@ -44,7 +45,7 @@ const FAQS = [
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', datePublished: '2026-11-10T23:30:00+09:00', dateModified: '2026-11-10T23:30:00+09:00', mainEntityOfPage: `${SITE_URL}${PAGE_PATH}` },
+    { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', datePublished: '2026-11-10T23:30:00+09:00', dateModified: '2026-11-10T23:30:00+09:00', mainEntityOfPage: `${SITE_URL}${PAGE_PATH}` },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: '生命保険の見直しチェックリスト', item: `${SITE_URL}${PAGE_PATH}` },
@@ -187,6 +188,7 @@ export default function Page() {
             </details>
           ))}
         </section>
+        <HenshuNote />
         <p className="text-[11px] leading-relaxed text-slate-400">チェックリストは見直しの前に確かめるための参考の形です。保障の中身と更新の日は、保険会社の書面で確かめてください。最終更新：2026年11月10日</p>
       </main>
       <LpFooter />

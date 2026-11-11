@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import HenshuNote from '@/components/guide/HenshuNote';
 import { Download, FileSpreadsheet, FileText, type LucideIcon } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
@@ -170,6 +171,7 @@ export default function SouzokuArticle({
           </ul>
         </nav>
 
+        <HenshuNote />
         <p className="text-[11px] leading-relaxed text-slate-400">
           ひな形は公的な記載例をもとにした参考の形です。実際の内容に合わせて直してください。迷うときは専門家に確かめてください。最終更新：{updated}
         </p>
@@ -184,7 +186,7 @@ export function jsonLdFor({ url, title, description, crumb, faqs, date }: { url:
   return {
     '@context': 'https://schema.org',
     '@graph': [
-      { '@type': 'Article', headline: title, description, inLanguage: 'ja', datePublished: `${date}T09:00:00+09:00`, dateModified: `${date}T09:00:00+09:00`, mainEntityOfPage: url },
+      { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: title, description, inLanguage: 'ja', datePublished: `${date}T09:00:00+09:00`, dateModified: `${date}T09:00:00+09:00`, mainEntityOfPage: url },
       {
         '@type': 'BreadcrumbList',
         itemListElement: [

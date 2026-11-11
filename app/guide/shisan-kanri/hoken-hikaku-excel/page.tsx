@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import HenshuNote from '@/components/guide/HenshuNote';
 import { AlertTriangle, CalendarClock, Download, FileSpreadsheet, FileText, Layers, ListChecks, Wallet } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
@@ -41,7 +42,7 @@ const FAQS = [
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', datePublished: '2026-11-10T21:00:00+09:00', dateModified: '2026-11-10T21:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PAGE_PATH}` },
+    { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', datePublished: '2026-11-10T21:00:00+09:00', dateModified: '2026-11-10T21:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PAGE_PATH}` },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: '保険の比較表', item: `${SITE_URL}${PAGE_PATH}` },
@@ -164,6 +165,7 @@ export default function Page() {
             </details>
           ))}
         </section>
+        <HenshuNote />
         <p className="text-[11px] leading-relaxed text-slate-400">比較表は書き写して比べるための参考の形です。保障の中身は保険会社の書面で確かめてください。最終更新：2026年11月10日</p>
       </main>
       <LpFooter />

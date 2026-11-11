@@ -168,7 +168,7 @@ export default function PolicyPage() {
                 </ul>
               </section>
 
-              <section>
+              <section id="konkyo">
                 <h2 className="text-xl font-semibold text-slate-900">5. 情報の根拠</h2>
                 <ul className="mt-3 list-disc space-y-2 pl-6">
                   <li>金額・寿命・制度は、公式の発表、メーカーの公表、大手事業者の販売価格など、一次資料で確認したものだけを書き、出典を明記します</li>
@@ -179,11 +179,22 @@ export default function PolicyPage() {
                 </ul>
               </section>
 
+              <section id="ayamari">
+                <h2 className="text-xl font-semibold text-slate-900">6. 編集と誤りの連絡</h2>
+                <ul className="mt-3 list-disc space-y-2 pl-6">
+                  <li>記事は、つぎの手ナビ 編集部（運営：BlueAdventures合同会社）が作っています</li>
+                  <li>税・保険・相続の金額や期限は、国税庁・法務省・裁判所・日本年金機構・生命保険文化センターなどの公式の情報で確かめ、確認した日をページに書きます。制度が変わったら直します</li>
+                  <li>計算の道具とエクセルの式は、公式の計算例と同じ答えになるかを確かめてから出します</li>
+                  <li>誤りに気づいたら、support@tsuginotenavi.jp にお知らせください。確かめて直し、ページの最終更新日を改めます</li>
+                </ul>
+              </section>
+
               <section>
                 <h2 className="text-xl font-semibold text-slate-900">改定履歴</h2>
                 <ul className="mt-3 list-disc space-y-2 pl-6">
                   <li>2026年7月30日 制定</li>
                   <li>2026年11月4日 改定(扱う分野を暮らし全般に広げたことと、給湯器の見積もりの取り次ぎによる収益を開示)</li>
+                  <li>2026年11月11日 改定(編集の体制と、誤りの連絡先を追加)</li>
                 </ul>
               </section>
             </div>

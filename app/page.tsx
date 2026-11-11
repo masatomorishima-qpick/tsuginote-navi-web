@@ -84,11 +84,13 @@ const AREAS = [
     icon: HeartHandshake,
     color: 'bg-violet-50 text-violet-600',
     h: '相続・もしもの備え',
-    s: '家族に引き継ぐための準備',
-    href: '/guide/ihinseiri',
+    s: '相続税の計算と手続きの期限',
+    // 2026-11-11：入口を相続のページの一覧（/guide/souzoku）に変えた。相続の8ページへの、サイトでいちばん強いページからの道を作るため
+    href: '/guide/souzoku',
     links: [
+      { label: '相続税の計算', href: '/guide/souzoku/souzokuzei-keisan' },
+      { label: '手続きの期限', href: '/guide/souzoku/tetsuzuki-checklist' },
       { label: 'デジタル遺品', href: '/guide/ihinseiri' },
-      { label: '急な入院の備え', href: '/guide/moshimo-sonae/kyu-nyuin-sonae' },
     ],
   },
 ] as const;

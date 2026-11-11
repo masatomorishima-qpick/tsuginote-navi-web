@@ -40,7 +40,9 @@ export function GET() {
 - [相続の手続きチェックリスト](${SITE_URL}/guide/souzoku/tetsuzuki-checklist): 亡くなった日を入れると、相続放棄・準確定申告・相続税の申告・相続登記の期限の目安が日付で出る一覧。
 - [相続税の申告の必要書類チェックリスト](${SITE_URL}/guide/souzoku/shinkoku-shorui-checklist): 状況を選ぶと、出す書類だけが一覧になる。
 - [死亡保険金の相続税の非課税](${SITE_URL}/guide/souzoku/shibou-hokenkin-hikazei): 非課税の限度額（500万円×法定相続人の数）を、受取人ごとに分けて自動で計算。
-- [遺産分割協議書のひな形](${SITE_URL}/guide/souzoku/isan-bunkatsu-kyogisho)・[相続関係説明図のひな形](${SITE_URL}/guide/souzoku/souzoku-kankei-setsumeizu)・[財産目録のひな形](${SITE_URL}/guide/souzoku/zaisan-mokuroku): 無料のエクセル・PDF。
+- [相続のページ一覧](${SITE_URL}/guide/souzoku): 手続き・相続税・書類のひな形・実家の売却のページの入口。
+- [遺産分割協議書のひな形](${SITE_URL}/guide/souzoku/isan-bunkatsu-kyogisho): 法務局の記載例と同じ形の無料のワード・PDF。
+- [相続関係説明図のひな形](${SITE_URL}/guide/souzoku/souzoku-kankei-setsumeizu)・[財産目録のひな形](${SITE_URL}/guide/souzoku/zaisan-mokuroku): 無料のエクセル・PDF。
 - [相続した実家の3,000万円控除](${SITE_URL}/guide/souzoku/jikka-akiya-tokurei): 使える条件の確かめ方。
 - [デジタル遺品の整理](${SITE_URL}/guide/ihinseiri): スマホやネットの口座を家族に引き継ぐための準備。
 - [急な入院に備えて家族に伝えておく情報](${SITE_URL}/guide/moshimo-sonae/kyu-nyuin-sonae)

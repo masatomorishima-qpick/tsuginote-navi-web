@@ -389,6 +389,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 相続のページの入口（2026-11-11 作成）。
+    {
+      url: `${baseUrl}/guide/souzoku`,
+      lastModified: new Date("2026-11-11T14:00:00+09:00"),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
     // 生命保険の見直しチェックリスト（2026-11-10 作成、docs/seisaku-queue.md の T3）。
     {
       url: `${baseUrl}/guide/shisan-kanri/hoken-minaoshi-checklist`,

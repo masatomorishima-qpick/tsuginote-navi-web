@@ -160,7 +160,7 @@ export default function SouzokuArticle({
         </section>
 
         <nav className="flex flex-col gap-2" aria-label="相続の書類のひな形">
-          <p className="text-[13px] font-bold text-slate-600">ほかの無料のひな形</p>
+          <p className="flex items-center justify-between text-[13px] font-bold text-slate-600">ほかの無料の道具とひな形<Link href="/guide/souzoku" className="text-[12px] text-sky-800 underline underline-offset-2">相続のページ一覧</Link></p>
           <ul className="grid grid-cols-2 gap-2">
             {SOUZOKU_PAGES.filter((p) => p.href !== path).map((p) => (
               <li key={p.href}>
@@ -189,7 +189,8 @@ export function jsonLdFor({ url, title, description, crumb, faqs, date }: { url:
         '@type': 'BreadcrumbList',
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'つぎの手ナビ', item: 'https://www.tsuginotenavi.jp/' },
-          { '@type': 'ListItem', position: 2, name: crumb, item: url },
+          { '@type': 'ListItem', position: 2, name: '相続', item: 'https://www.tsuginotenavi.jp/guide/souzoku' },
+          { '@type': 'ListItem', position: 3, name: crumb, item: url },
         ],
       },
       { '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },

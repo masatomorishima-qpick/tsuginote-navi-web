@@ -247,8 +247,47 @@ const categories = [
         title: '保険契約の一覧表をエクセルで作る方法｜無料テンプレート付き',
       },
       {
+        href: '/guide/shisan-kanri/hoken-hikaku-excel',
+        title: '保険の比較表（無料・エクセル）｜払う総額を自動計算',
+      },
+      {
+        href: '/guide/shisan-kanri/hoken-minaoshi-checklist',
+        title: '生命保険の見直しチェックリスト｜節目・証券の6項目・更新の時期',
+      },
+      {
+        href: '/guide/shisan-kanri/hoken-shoken-mikata',
+        title: '保険証券の見方｜欄ごとの意味と書き写し表',
+      },
+      {
         href: '/guide/shisan-kanri/toshi-kazoku',
         title: '投資、家族に知らせる？知らせない？｜もしものときどうなるか',
+      },
+    ],
+  },
+  {
+    href: '/guide/souzoku',
+    name: '相続',
+    description: '亡くなった後の手続きの期限、相続税の計算、申告の必要書類、遺産分割協議書などのひな形。',
+    articles: [
+      {
+        href: '/guide/souzoku/tetsuzuki-checklist',
+        title: '相続の手続きチェックリスト｜亡くなった後の期限を日付で一覧に',
+      },
+      {
+        href: '/guide/souzoku/souzokuzei-keisan',
+        title: '相続税の計算シミュレーション｜いくらからかかるか',
+      },
+      {
+        href: '/guide/souzoku/shibou-hokenkin-hikazei',
+        title: '死亡保険金の相続税の非課税｜受取人ごとの額を自動計算',
+      },
+      {
+        href: '/guide/souzoku/shinkoku-shorui-checklist',
+        title: '相続税の申告の必要書類チェックリスト',
+      },
+      {
+        href: '/guide/souzoku/zaisan-mokuroku',
+        title: '財産目録のテンプレート（無料・エクセル）',
       },
     ],
   },

@@ -5,6 +5,7 @@ import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import HokenSoudanBox, { HOKEN_LP_ID } from '@/components/guide/HokenSoudanBox';
+import HokenIchiranDownload from '@/components/guide/HokenIchiranDownload';
 
 /*
  * 2026-11-05 v2：出口を1つ置いた（保険見直し本舗の無料相談、レントラックス 7502）。
@@ -171,7 +172,7 @@ export default function HokenIchiranExcelPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <GuideHeader />
-      <LpViewTracker lpId={HOKEN_LP_ID} version="v2-2026-11-05" />
+      <LpViewTracker lpId={HOKEN_LP_ID} version="v3-2026-11-11" />
 
       <div className="mx-auto max-w-3xl px-5 pb-20 pt-8 sm:px-8">
         <nav className="text-sm text-slate-500">
@@ -249,15 +250,9 @@ export default function HokenIchiranExcelPage() {
             <p className="text-[15px] leading-8 text-slate-700">
               記入例2行入り・月額合計は自動計算。登録やメールアドレスの入力は不要です。
             </p>
-            <p className="mt-4">
-              <a
-                href="/downloads/hoken-keiyaku-ichiran.xlsx"
-                download
-                className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
-              >
-                保険契約一覧表テンプレート（Excel）を無料ダウンロード
-              </a>
-            </p>
+            <div className="mt-4">
+              <HokenIchiranDownload />
+            </div>
             <p className="mt-3 text-xs text-slate-500">
               Excelのほか、Googleスプレッドシートや無料のオフィスソフトでも開けます。
             </p>

@@ -4,7 +4,8 @@
 -- 紹介先の押下は event_name = 'partner_click'（cta_id は「紹介先-置き場所」）。
 with e as (
   select lp_id, event_name, visit_id, cta_id,
-         coalesce(metadata->>'gclid', metadata->>'utm_source', '') as ad
+         coalesce(metadata->>'gclid', metadata->>'utm_source', '') as ad,
+         coalesce(metadata->>'ref', '') as ref
   from public.lp_event_logs
   where (lp_id like 'guide-souzoku-%' or lp_id like 'guide-hoken-%')
     and created_at >= timestamptz '2026-11-05 00:00+09'   -- :from
@@ -16,6 +17,8 @@ select
   count(distinct visit_id) filter (where event_name = 'lp_internal_click' and cta_id like '/downloads/%') as 配布物の押下,
   count(distinct visit_id) filter (where event_name not like 'lp\_%' and event_name <> 'partner_click') as 道具の利用,
   count(distinct visit_id) filter (where event_name = 'partner_click')                                 as 紹介先の押下,
+  -- AI の答えから来た閲覧（2026-11-11 から ref を記録。#95 の取り込み後）
+  count(distinct visit_id) filter (where event_name = 'lp_view' and ref ~ '(chatgpt\.com|openai\.com|perplexity\.ai|gemini\.google\.com|copilot\.microsoft\.com|claude\.ai)') as AIから来た閲覧,
   string_agg(distinct split_part(cta_id, '-', 1), ',') filter (where event_name = 'partner_click')     as 押された紹介先
 from e
 group by 1

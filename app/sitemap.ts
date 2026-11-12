@@ -37,6 +37,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // 2026-11-04 削除：家計診断・住宅ローン・退職金・ジム・トレンド速攻（売上がなく検索も少ないためページごと削除。docs/site-top.md）。
     // 給湯器の交換費用（記事型、2026-10-31 新設）。2026-11-04 に検索からの集客の親ページとして載せる
     // （docs/kyutoki-seo/plan.md の P1。それまで sitemap に載っていなかった）。
+    // 給湯器のページの一覧（2026-11-13 新設）。
+    {
+      url: `${baseUrl}/kyutoki`,
+      lastModified: new Date("2026-11-13T09:00:00+09:00"),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
     {
       url: `${baseUrl}/kyutoki/kokan-hiyou`,
       lastModified: new Date("2026-11-04T09:00:00+09:00"),

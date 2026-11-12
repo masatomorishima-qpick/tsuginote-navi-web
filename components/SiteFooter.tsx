@@ -16,8 +16,12 @@ export default function SiteFooter() {
             {/* 2026-11-04 削除：「住宅ローンの判断」「退職金・年金の判断」。お金の判断の記事とツールは
                 売上がなく検索のクリックも3か月で12だったため、ページごと外す（オーナー判断、docs/site-top.md）。 */}
             {/* 2026-11-04 追加：トップの作り直し（入口3つ）にあわせ、住まいの設備（給湯器）の入口を先頭に置く。 */}
-            <Link href="/kyutoki/kokan-hiyou" className="hover:text-slate-700">
-              給湯器の交換
+            {/* 2026-11-13：給湯器は一覧（/kyutoki）へ。相続の一覧も足す（どのページからも1回で行けるように） */}
+            <Link href="/kyutoki" className="hover:text-slate-700">
+              給湯器
+            </Link>
+            <Link href="/guide/souzoku" className="hover:text-slate-700">
+              相続
             </Link>
             <Link href="/guide" className="hover:text-slate-700">
               暮らしの整理

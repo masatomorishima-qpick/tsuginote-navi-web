@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
+import KyutokiNav from '@/components/kyutoki/KyutokiNav';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import PartnerLink, { PartnerPriceCards, PartnerValueCards } from '@/components/kyutoki/PartnerLink';
@@ -154,7 +155,8 @@ const jsonLd = {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
-        { '@type': 'ListItem', position: 2, name: 'ガス給湯器の交換費用', item: `${SITE_URL}${PAGE_PATH}` },
+        { '@type': 'ListItem', position: 2, name: '給湯器', item: `${SITE_URL}/kyutoki` },
+        { '@type': 'ListItem', position: 3, name: 'ガス給湯器の交換費用', item: `${SITE_URL}${PAGE_PATH}` },
       ],
     },
     {
@@ -612,6 +614,7 @@ export default async function KokanHiyouPage({ searchParams }: { searchParams: P
         <p className="text-[11px] leading-relaxed text-slate-400">
           費用は一般的な目安で、設置場所や配管の状態で変わります。各社の価格・保証・受付時間は各社の公表内容によります。最終更新：2026年11月4日
         </p>
+        <KyutokiNav current={PAGE_PATH} />
       </main>
 
       {/* スマホの画面下に固定する見積もりボタン */}

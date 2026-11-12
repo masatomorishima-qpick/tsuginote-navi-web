@@ -29,9 +29,9 @@ export const SOUZOKU_PARTNERS: Record<SouzokuPartnerKey, SouzokuPartner> = {
   // レントラックス 15468（提携中）。成果＝新規申込完了、13,200円。
   souzokuAssist: {
     key: 'souzokuAssist', name: '相続アシスト', cta: '相続税の申告をまとめて頼む',
-    // 公式 swats.or.jp/service/sozoku の記載（2026-11-05 確認、11-10 再確認）。対応は東京・神奈川・大阪・京都・兵庫の案件。
+    // 公式 swats.or.jp/service/sozoku の記載（2026-11-05 確認、11-10・11-12 再確認）。対応は東京・神奈川・大阪・京都・兵庫の案件。
     points: ['戸籍集めから申告まで代行。こちらはサインと面談だけ', '税理士・弁護士・司法書士が連携', '対象：東京・神奈川・大阪・京都・兵庫'],
-    checkedAt: '2026年11月10日',
+    checkedAt: '2026年11月12日',
     href: 'https://www.rentracks.jp/adx/r.html?idx=0.75552.390675.10832.15468&dna=175712',
     beacon: 'https://www.rentracks.jp/adx/p.gifx?idx=0.75552.390675.10832.15468&dna=175712',
     asp: 'rentracks', programId: '15468', reward: 13200,

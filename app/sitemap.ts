@@ -90,6 +90,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 法定相続分の計算（2026-11-12 作成、docs/seisaku-queue.md の T8）。
+    {
+      url: `${baseUrl}/guide/souzoku/houtei-souzokubun`,
+      lastModified: new Date("2026-11-12T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    // 相続登記の必要書類チェックリスト（2026-11-12 作成、docs/seisaku-queue.md の T11）。
+    {
+      url: `${baseUrl}/guide/souzoku/touki-shorui`,
+      lastModified: new Date("2026-11-12T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    // 準確定申告の必要書類チェックリスト（2026-11-12 作成、docs/seisaku-queue.md の T12）。
+    {
+      url: `${baseUrl}/guide/souzoku/junkakutei-checklist`,
+      lastModified: new Date("2026-11-12T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 相続税の計算（2026-11-10 作成、docs/seisaku-queue.md の S1）。
     {
       url: `${baseUrl}/guide/souzoku/souzokuzei-keisan`,

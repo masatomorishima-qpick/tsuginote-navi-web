@@ -27,6 +27,8 @@ const GROUPS = [
     h: '期限と手続き', icon: CalendarClock,
     items: [
       { href: '/guide/souzoku/tetsuzuki-checklist', t: '相続の手続きチェックリスト', s: '亡くなった日から、期限を日付で' },
+      { href: '/guide/souzoku/houtei-souzokubun', t: '法定相続分の計算', s: '誰がいくらかを自動で' },
+      { href: '/guide/souzoku/junkakutei-checklist', t: '準確定申告の必要書類', s: '4か月の期限と出す書類' },
     ],
   },
   {
@@ -48,6 +50,7 @@ const GROUPS = [
   {
     h: '実家・不動産', icon: Home,
     items: [
+      { href: '/guide/souzoku/touki-shorui', t: '相続登記の必要書類', s: '期限と登録免許税も計算' },
       { href: '/guide/souzoku/jikka-akiya-tokurei', t: '相続した実家の3,000万円控除', s: '使えるか8つのチェック' },
     ],
   },

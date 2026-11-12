@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { ArrowDown, FileStack, Network } from 'lucide-react';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import SouzokuArticle, { A, H2, NumberedCards, SECTION, SOUZOKU_FILES, SRC, SouzokuDownload, jsonLdFor } from '@/components/souzoku/SouzokuArticle';
@@ -69,6 +70,7 @@ export default function Page() {
             ))}
           </ul>
           <p className={SRC}>出典：<a href={S.houmuKisai.url} target="_blank" rel="noopener noreferrer" className={A}>{S.houmuKisai.name}</a>（{DATA.checkedAt.split('-').join('/')} 確認）</p>
+          <Link href="/guide/souzoku/koseki-atsumekata" className="rounded-xl bg-white p-3 text-[13px] font-bold text-sky-800 ring-1 ring-slate-200 hover:ring-slate-300">戸籍をまだ集めていないとき：相続の戸籍の集め方（要る戸籍と広域交付）</Link>
         </section>
       </SouzokuArticle>
     </>

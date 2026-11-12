@@ -29,6 +29,8 @@ const GROUPS = [
       { href: '/guide/souzoku/tetsuzuki-checklist', t: '相続の手続きチェックリスト', s: '亡くなった日から、期限を日付で' },
       { href: '/guide/souzoku/houtei-souzokubun', t: '法定相続分の計算', s: '誰がいくらかを自動で' },
       { href: '/guide/souzoku/junkakutei-checklist', t: '準確定申告の必要書類', s: '4か月の期限と出す書類' },
+      { href: '/guide/souzoku/koseki-atsumekata', t: '相続の戸籍の集め方', s: '要る戸籍と広域交付で取れるか' },
+      { href: '/guide/souzoku/zaisan-shirabekata', t: '相続財産の調べ方', s: '財産ごとの窓口と手数料' },
     ],
   },
   {

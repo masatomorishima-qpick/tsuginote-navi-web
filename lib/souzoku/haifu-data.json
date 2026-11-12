@@ -128,6 +128,70 @@
     "nta1600": {
       "name": "国税庁 タックスアンサー No.1600「公的年金等の課税関係」（令和8年4月1日現在法令等）",
       "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1600.htm"
+    },
+    "mojShoyu": {
+      "name": "法務省「所有不動産記録証明制度について」（令和8年2月2日施行）",
+      "url": "https://www.moj.go.jp/MINJI/minji05_00740.html"
+    },
+    "yokohamaNayose": {
+      "name": "横浜市「固定資産税に関する証明書（名寄帳兼課税台帳など）」",
+      "url": "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/zeikin/shizei-shomei/koteishisan-shomei.html"
+    },
+    "zenginSouzoku": {
+      "name": "全国銀行協会「預金の相続手続に必要な書類」",
+      "url": "https://www.zenginkyo.or.jp/article/tag-f/7705/"
+    },
+    "mizuhoZandaka": {
+      "name": "みずほ銀行「残高証明書（相続）」",
+      "url": "https://www.mizuhobank.co.jp/retail/tetsuduki/inheritance/zandaka.html"
+    },
+    "digitalSouzoku": {
+      "name": "デジタル庁「よくある質問：預貯金口座へのマイナンバー付番について」（相続時照会）",
+      "url": "https://www.digital.go.jp/policies/mynumber_faq_09"
+    },
+    "jasdecKaiji": {
+      "name": "証券保管振替機構「登録済加入者情報の開示請求」",
+      "url": "https://www.jasdec.com/procedure/shareholders/disclosure/"
+    },
+    "jasdecHiyou": {
+      "name": "証券保管振替機構「登録済加入者情報の開示請求に係る費用の改定について」（2026年10月1日から）",
+      "url": "https://www.jasdec.com/assets/download/news/20260630_tsuuchi_HP.pdf"
+    },
+    "seihoShokai": {
+      "name": "生命保険協会「生命保険契約照会制度」",
+      "url": "https://www.seiho.or.jp/contact/inquiry/"
+    },
+    "kscSouzoku": {
+      "name": "全国銀行個人信用情報センター「登録情報開示の申込み（法定相続人用）」（2026年10月版）",
+      "url": "https://www.zenginkyo.or.jp/fileadmin/res/abstract/pcic/open/04_kaiji_succession_202610.pdf"
+    },
+    "cicYuso": {
+      "name": "CIC「郵送で開示する」（法定相続人の開示）",
+      "url": "https://www.cic.co.jp/credit-report/mailing/"
+    },
+    "jiccSouzoku": {
+      "name": "JICC「亡くなった方の信用情報を確認する」",
+      "url": "https://www.jicc.co.jp/kaiji/31"
+    },
+    "mojKouiki": {
+      "name": "法務省「戸籍証明書等の広域交付」（令和6年3月1日施行）",
+      "url": "https://www.moj.go.jp/MINJI/minji04_00082.html"
+    },
+    "yokohamaKouiki": {
+      "name": "横浜市「戸籍証明書の広域交付」（2026年6月3日更新）",
+      "url": "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/todokede/koseki-juminhyo/shoumei/kosekikouiki.html"
+    },
+    "yokohamaYuso": {
+      "name": "横浜市「郵送での戸籍の請求（郵送請求事務センター）」",
+      "url": "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/todokede/koseki-juminhyo/shoumei/yusocenter.html"
+    },
+    "houmuJouhou": {
+      "name": "法務局「法定相続情報証明制度について」",
+      "url": "https://houmukyoku.moj.go.jp/homu/page7_000013.html"
+    },
+    "houmuJouhouTetsuzuki": {
+      "name": "法務局「法定相続情報証明制度の具体的な手続について」",
+      "url": "https://houmukyoku.moj.go.jp/homu/page7_000014.html"
     }
   },
   "kyogisho": {
@@ -1029,5 +1093,284 @@
     "sakusei": "国税庁の「確定申告書等作成コーナー」では、準確定申告書は作れません（e-Tax ソフトなどを使う）。",
     "nenkin": "公的年金がすべて源泉徴収の対象で、その収入が400万円以下、ほかの所得が20万円以下なら、確定申告をしなくてよい制度があります。医療費などで税金が戻る場合は、申告すると還付を受けられます。",
     "fukusu": "相続人が2人以上なら、全員が名前を連ねて1通出すのが基本。ほかの相続人の名前を書き添えて、各人が別々に出すこともでき、その場合はほかの相続人に内容を知らせます。"
+  },
+  "shirabe": {
+    "checkedAt": "2026-11-13",
+    "kotae": "相続財産は、通帳・郵便物・固定資産税の通知などの手がかりから当たりを付け、財産ごとの窓口で証明書を取って確かめます。預貯金は銀行の残高証明書、不動産は市区町村の名寄帳と法務局の所有不動産記録証明書（2026年2月2日から）、株は証券保管振替機構（ほふり）の開示、借金は信用情報機関の開示で調べます。相続放棄をするかは、相続を知った時から3か月以内に決めます（法務省・裁判所ほか）。",
+    "items": [
+      {
+        "key": "yokin",
+        "h": "預貯金",
+        "tegakari": "通帳・キャッシュカード・銀行からの郵便物・スマホの銀行アプリ",
+        "rows": [
+          {
+            "saki": "口座のある銀行など",
+            "shomei": "亡くなった日の残高証明書",
+            "hiyou": "銀行ごとに違う（例：みずほ銀行 1通880円）",
+            "yen": 0,
+            "motsu": "戸籍謄本か法定相続情報一覧図の写し、亡くなった人の通帳、実印と印鑑証明書（みずほ銀行の例）",
+            "src": [
+              "mizuhoZandaka",
+              "zenginSouzoku"
+            ]
+          },
+          {
+            "saki": "どこか1つの金融機関",
+            "shomei": "マイナンバーを登録していた口座の一覧（相続時の照会）",
+            "hiyou": "手数料あり（金額は申し込む金融機関で）",
+            "yen": 0,
+            "motsu": "亡くなった人が生前に口座へマイナンバーを登録していた場合だけ。亡くなってから10年まで",
+            "src": [
+              "digitalSouzoku"
+            ]
+          }
+        ]
+      },
+      {
+        "key": "fudosan",
+        "h": "不動産（土地・家）",
+        "tegakari": "固定資産税の納税通知書（課税明細書）・権利証・登記識別情報",
+        "rows": [
+          {
+            "saki": "法務局（全国どこでも。郵送・オンラインも可）",
+            "shomei": "所有不動産記録証明書：亡くなった人の名義の不動産を全国から一覧に",
+            "hiyou": "書面で1,600円（オンラインは1,500円か1,470円）",
+            "yen": 1600,
+            "motsu": "相続人と分かる戸籍か法定相続情報一覧図の写し、本人確認書類の写しか印鑑証明書",
+            "src": [
+              "mojShoyu"
+            ]
+          },
+          {
+            "saki": "不動産のある市区町村",
+            "shomei": "名寄帳：その市区町村の中にある不動産の一覧と評価額",
+            "hiyou": "市区町村ごとに違う（例：横浜市 1年度・1区・1人ごとに300円）",
+            "yen": 0,
+            "motsu": "顔写真つきの本人確認書類、相続人と分かる戸籍か法定相続情報一覧図（横浜市の例）",
+            "src": [
+              "yokohamaNayose"
+            ]
+          }
+        ]
+      },
+      {
+        "key": "kabu",
+        "h": "株・投資信託",
+        "tegakari": "証券会社・信託銀行からの郵便物（取引報告書・配当の通知）",
+        "rows": [
+          {
+            "saki": "証券保管振替機構（ほふり）",
+            "shomei": "口座のある証券会社・信託銀行の一覧（銘柄と残高は各社に聞く）",
+            "hiyou": "法定相続人は7,700円（法定相続情報一覧図があれば6,050円）。2026年10月1日から",
+            "yen": 7700,
+            "yenIchiranzu": 6050,
+            "motsu": "機構の案内のとおり",
+            "src": [
+              "jasdecKaiji",
+              "jasdecHiyou"
+            ]
+          }
+        ]
+      },
+      {
+        "key": "hoken",
+        "h": "生命保険",
+        "tegakari": "保険証券・保険会社からの郵便物・保険料の引き落とし",
+        "rows": [
+          {
+            "saki": "生命保険協会（国内の生命保険会社が全社加盟）",
+            "shomei": "生命保険契約照会制度：契約があるかどうか",
+            "hiyou": "利用料あり（金額は協会の案内で）",
+            "yen": 0,
+            "motsu": "協会の案内のとおり。契約が見つかったら、その保険会社に問い合わせる",
+            "src": [
+              "seihoShokai"
+            ]
+          }
+        ]
+      },
+      {
+        "key": "shakkin",
+        "h": "借金・ローン・カード",
+        "tegakari": "督促状・利用明細・通帳の引き落とし",
+        "rows": [
+          {
+            "saki": "全国銀行個人信用情報センター（郵送）",
+            "shomei": "登録されている借入の情報",
+            "hiyou": "2,403円（コンビニで買う利用券。開示2,060円＋発券343円）",
+            "yen": 2403,
+            "motsu": "死亡が分かる書類、相続人と分かる戸籍、本人確認書類2種類",
+            "src": [
+              "kscSouzoku"
+            ]
+          },
+          {
+            "saki": "CIC（郵送）",
+            "shomei": "登録されている借入・カードの情報",
+            "hiyou": "1,650円（コンビニの利用券・本人限定受取郵便）",
+            "yen": 1650,
+            "motsu": "本人確認書類2点、法定相続情報一覧図の原本か戸籍一式と相続関係説明図",
+            "src": [
+              "cicYuso"
+            ]
+          },
+          {
+            "saki": "JICC",
+            "shomei": "登録されている借入の情報",
+            "hiyou": "JICC の案内で",
+            "yen": 0,
+            "motsu": "法定相続人などが申し込める",
+            "src": [
+              "jiccSouzoku"
+            ]
+          }
+        ]
+      }
+    ],
+    "kigen": [
+      {
+        "h": "相続放棄・限定承認",
+        "n": 3,
+        "d": "借金が多いときに。家庭裁判所へ",
+        "src": "courtHouki"
+      },
+      {
+        "h": "相続税の申告と納税",
+        "n": 10,
+        "d": "財産が基礎控除を超えるとき。税務署へ",
+        "src": "nta4205"
+      }
+    ],
+    "shoyuNote": "所有不動産記録証明書は、請求に書いた氏名・住所で探すので、登記の氏名・住所が違う不動産は出ません。所有権の登記がない不動産も対象外で、見つからなくても手数料は返りません。",
+    "nayoseNote": "名寄帳はその市区町村の中の分だけです。非課税の不動産は載りません（横浜市の例）。",
+    "hofuriNote": "ほふりで分かるのは口座のある会社の名前までです。銘柄・残高・取引の履歴は、その会社に残高証明書を請求します。",
+    "hiyouNote": "手数料は、金額が公式で確かめられたものだけを足しています。銀行の残高証明書・名寄帳・生命保険協会・JICC の分は、窓口で確かめてください。"
+  },
+  "koseki": {
+    "checkedAt": "2026-11-13",
+    "kotae": "相続の戸籍は、亡くなった人の出生から死亡までの戸籍（除籍・改製原戸籍を含む）と、相続人全員の今の戸籍を集めます。親や兄弟姉妹が相続人のときは、亡くなった子や親の死亡が分かる戸籍も足します。2024年3月1日から、本人・配偶者・父母や祖父母・子や孫の戸籍は、最寄りの市区町村の窓口でまとめて請求できます（広域交付）。兄弟姉妹の戸籍は広域交付の対象外です（法務省・裁判所・全国銀行協会）。",
+    "patterns": [
+      {
+        "key": "ko",
+        "h": "子（亡くなった子がいれば孫）"
+      },
+      {
+        "key": "oya",
+        "h": "親（子・孫がいない）"
+      },
+      {
+        "key": "kyoudai",
+        "h": "兄弟姉妹（子も親もいない）"
+      }
+    ],
+    "seikyusha": [
+      {
+        "key": "haigu",
+        "h": "配偶者"
+      },
+      {
+        "key": "ko",
+        "h": "子"
+      },
+      {
+        "key": "mago",
+        "h": "孫（亡くなった子の代わり）"
+      },
+      {
+        "key": "oya",
+        "h": "親"
+      },
+      {
+        "key": "kyoudai",
+        "h": "兄弟姉妹"
+      },
+      {
+        "key": "oime",
+        "h": "おい・めい"
+      }
+    ],
+    "items": [
+      {
+        "key": "hisouzoku",
+        "h": "亡くなった人の出生から死亡までの戸籍",
+        "d": "今の戸籍・除籍・改製原戸籍を、途切れずに全部",
+        "when": "all",
+        "whose": "hisouzoku",
+        "src": [
+          "zenginSouzoku",
+          "courtHouki"
+        ]
+      },
+      {
+        "key": "souzokunin",
+        "h": "相続人全員の今の戸籍",
+        "d": "亡くなった日より後に発行されたもの。自分の分は自分で、ほかの相続人の分はその人に取ってもらうと早い",
+        "when": "all",
+        "whose": "self",
+        "src": [
+          "zenginSouzoku",
+          "houmuToukiShorui"
+        ]
+      },
+      {
+        "key": "daishu",
+        "h": "亡くなった子の死亡の記載のある戸籍",
+        "d": "孫が代わりに相続するとき",
+        "when": "ko+shibouko",
+        "whose": "ko",
+        "src": [
+          "courtHouki"
+        ]
+      },
+      {
+        "key": "koAll",
+        "h": "亡くなった子の出生から死亡までの戸籍",
+        "d": "亡くなった人の子で、すでに亡くなった人がいるとき",
+        "when": "oyakyoudai+shibouko",
+        "whose": "ko",
+        "src": [
+          "courtHouki"
+        ]
+      },
+      {
+        "key": "sonzoku",
+        "h": "親（父母・祖父母）の死亡の記載のある戸籍",
+        "d": "兄弟姉妹が相続人のとき",
+        "when": "kyoudai",
+        "whose": "oya",
+        "src": [
+          "courtHouki"
+        ]
+      },
+      {
+        "key": "oime",
+        "h": "亡くなった兄弟姉妹の死亡の記載のある戸籍",
+        "d": "おい・めいが代わりに相続するとき",
+        "when": "kyoudai+shiboukyoudai",
+        "whose": "kyoudai",
+        "src": [
+          "courtHouki"
+        ]
+      }
+    ],
+    "kouikiWho": "本人・配偶者・父母や祖父母（直系尊属）・子や孫（直系卑属）の戸籍",
+    "kouikiRules": [
+      "窓口だけ。郵送や代理人による請求はできない",
+      "顔写真つきの本人確認書類（運転免許証・マイナンバーカード・パスポートなど）",
+      "コンピュータ化されていない一部の戸籍・除籍は本籍地でしか取れない",
+      "一部事項証明書・個人事項証明書は請求できない",
+      "枚数や混雑で後日の受け取りになることがある（横浜市）"
+    ],
+    "tesuryo": {
+      "koseki": 450,
+      "joseki": 750,
+      "note": "横浜市の手数料（戸籍全部事項証明書450円、除籍全部事項証明書・改製原戸籍謄本750円）。請求先の市区町村で確かめてください"
+    },
+    "ichiranzu": [
+      "戸籍がそろったら、法務局に戸籍の束と一覧図を出すと、法定相続情報一覧図の写しを無料で交付してもらえる",
+      "出す先：亡くなった人の本籍地・最後の住所地・申出人の住所地・亡くなった人の名義の不動産の所在地のどれかの法務局（郵送も可）",
+      "法務局で5年間（申出日の翌年から）保存される"
+    ],
+    "chuui": "提出先から追加の戸籍を求められることがあります（裁判所）。手に入らない戸籍があるときは、提出先に相談してください。"
   }
 }

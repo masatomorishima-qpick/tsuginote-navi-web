@@ -44,6 +44,8 @@ export function GET() {
 - [法定相続分の計算](${SITE_URL}/guide/souzoku/houtei-souzokubun): 家族の形と遺産の額を入れると、配偶者・子・孫・親・兄弟姉妹・おい・めいの法定相続分と金額、遺留分の割合を民法の決まりで計算。
 - [相続登記の必要書類チェックリスト](${SITE_URL}/guide/souzoku/touki-shorui): 遺産分割・法定相続分・遺言から選ぶと、法務局の一覧に合わせた必要書類と取る場所が出る。期限（取得を知った日から3年）と登録免許税（1,000分の4）も計算。
 - [準確定申告の必要書類チェックリスト](${SITE_URL}/guide/souzoku/junkakutei-checklist): 亡くなった日を入れると期限（知った日の翌日から4か月）が日付で出て、当てはまる控除や所得を選ぶと出す書類だけが一覧になる。
+- [相続財産の調べ方チェックリスト](${SITE_URL}/guide/souzoku/zaisan-shirabekata): 預貯金・不動産・株・生命保険・借金から選ぶと、調べる窓口（銀行・法務局の所有不動産記録証明・名寄帳・ほふり・生命保険協会・信用情報機関）と手数料が一覧になる。相続放棄（3か月）と申告（10か月）の期限も日付で。
+- [相続の戸籍の集め方チェックリスト](${SITE_URL}/guide/souzoku/koseki-atsumekata): 相続人（子・親・兄弟姉妹）と集める人を選ぶと、要る戸籍と、広域交付（2024年3月から）で最寄りの窓口で取れるかが出る。手数料も通数から計算。
 - [相続のページ一覧](${SITE_URL}/guide/souzoku): 手続き・相続税・書類のひな形・実家の売却のページの入口。
 - [遺産分割協議書のひな形](${SITE_URL}/guide/souzoku/isan-bunkatsu-kyogisho): 法務局の記載例と同じ形の無料のワード・PDF。
 - [相続関係説明図のひな形](${SITE_URL}/guide/souzoku/souzoku-kankei-setsumeizu)・[財産目録のひな形](${SITE_URL}/guide/souzoku/zaisan-mokuroku): 無料のエクセル・PDF。

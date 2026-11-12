@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Banknote, Calculator, CalendarClock, Home, LineChart, ReceiptText } from 'lucide-react';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import SouzokuArticle, { A, H2, SECTION, SOUZOKU_FILES, SRC, SouzokuDownload, jsonLdFor } from '@/components/souzoku/SouzokuArticle';
@@ -63,6 +64,7 @@ export default function Page() {
             ))}
           </ul>
           <ul className="flex flex-col gap-1.5 text-[13px] text-slate-700">{DATA.mokuroku.notes.map((t) => <li key={t}>・{t}</li>)}</ul>
+          <Link href="/guide/souzoku/zaisan-shirabekata" className="rounded-xl bg-white p-3 text-[13px] font-bold text-sky-800 ring-1 ring-slate-200 hover:ring-slate-300">どこに何があるか分からないとき：相続財産の調べ方（窓口と手数料の一覧）</Link>
           <p className={SRC}>欄の元：<a href={S.courtMokuroku.url} target="_blank" rel="noopener noreferrer" className={A}>{S.courtMokuroku.name}</a></p>
         </section>
 

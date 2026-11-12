@@ -54,6 +54,14 @@ export const SOUZOKU_FILES = {
     { label: 'エクセル', href: '/downloads/souzoku-junkakutei-shorui.xlsx', icon: FileSpreadsheet },
     { label: 'PDF', href: '/downloads/souzoku-junkakutei-shorui.pdf', icon: FileText },
   ],
+  shirabe: [
+    { label: 'エクセル', href: '/downloads/souzoku-zaisan-shirabekata.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-zaisan-shirabekata.pdf', icon: FileText },
+  ],
+  koseki: [
+    { label: 'エクセル', href: '/downloads/souzoku-koseki-atsumekata.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-koseki-atsumekata.pdf', icon: FileText },
+  ],
 } as const;
 
 export const SOUZOKU_PAGES = [
@@ -64,6 +72,8 @@ export const SOUZOKU_PAGES = [
   { href: '/guide/souzoku/houtei-souzokubun', h: '法定相続分の計算' },
   { href: '/guide/souzoku/junkakutei-checklist', h: '準確定申告の必要書類' },
   { href: '/guide/souzoku/touki-shorui', h: '相続登記の必要書類' },
+  { href: '/guide/souzoku/koseki-atsumekata', h: '相続の戸籍の集め方' },
+  { href: '/guide/souzoku/zaisan-shirabekata', h: '相続財産の調べ方' },
   { href: '/guide/souzoku/isan-bunkatsu-kyogisho', h: '遺産分割協議書' },
   { href: '/guide/souzoku/souzoku-kankei-setsumeizu', h: '相続関係説明図' },
   { href: '/guide/souzoku/zaisan-mokuroku', h: '財産目録' },

@@ -42,6 +42,18 @@ export const SOUZOKU_FILES = {
     { label: 'エクセル', href: '/downloads/souzoku-hokenkin-hikazei.xlsx', icon: FileSpreadsheet },
     { label: 'PDF', href: '/downloads/souzoku-hokenkin-hikazei.pdf', icon: FileText },
   ],
+  houtei: [
+    { label: 'エクセル', href: '/downloads/souzoku-houtei-souzokubun.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-houtei-souzokubun.pdf', icon: FileText },
+  ],
+  touki: [
+    { label: 'エクセル', href: '/downloads/souzoku-touki-shorui.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-touki-shorui.pdf', icon: FileText },
+  ],
+  junkakutei: [
+    { label: 'エクセル', href: '/downloads/souzoku-junkakutei-shorui.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-junkakutei-shorui.pdf', icon: FileText },
+  ],
 } as const;
 
 export const SOUZOKU_PAGES = [
@@ -49,6 +61,9 @@ export const SOUZOKU_PAGES = [
   { href: '/guide/souzoku/souzokuzei-keisan', h: '相続税の計算' },
   { href: '/guide/souzoku/shinkoku-shorui-checklist', h: '相続税の申告の必要書類' },
   { href: '/guide/souzoku/shibou-hokenkin-hikazei', h: '死亡保険金の非課税の計算' },
+  { href: '/guide/souzoku/houtei-souzokubun', h: '法定相続分の計算' },
+  { href: '/guide/souzoku/junkakutei-checklist', h: '準確定申告の必要書類' },
+  { href: '/guide/souzoku/touki-shorui', h: '相続登記の必要書類' },
   { href: '/guide/souzoku/isan-bunkatsu-kyogisho', h: '遺産分割協議書' },
   { href: '/guide/souzoku/souzoku-kankei-setsumeizu', h: '相続関係説明図' },
   { href: '/guide/souzoku/zaisan-mokuroku', h: '財産目録' },

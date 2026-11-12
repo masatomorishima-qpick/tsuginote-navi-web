@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { AlertTriangle, CalendarClock, Package, Search, Wrench } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
+import KyutokiNav from '@/components/kyutoki/KyutokiNav';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import { HaifuDownload, OyuBox, OyuSticky, PrNote } from '@/components/kyutoki/Haifu';
@@ -41,7 +42,7 @@ const jsonLd = {
     { '@type': 'Article', headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', dateModified: '2026-11-07T09:00:00+09:00', datePublished: '2026-11-07T09:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PAGE_PATH}`, isPartOf: { '@id': `${SITE_URL}/#website` }, publisher: { '@id': `${SITE_URL}/#organization` } },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
-      { '@type': 'ListItem', position: 2, name: 'ガス給湯器の交換費用', item: `${SITE_URL}/kyutoki/kokan-hiyou` },
+      { '@type': 'ListItem', position: 2, name: '給湯器', item: `${SITE_URL}/kyutoki` },
       { '@type': 'ListItem', position: 3, name: '給湯器の寿命', item: `${SITE_URL}${PAGE_PATH}` },
     ] },
     { '@type': 'FAQPage', mainEntity: FAQS.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
@@ -144,6 +145,7 @@ export default function NensuPage() {
         </section>
         <OyuBox lpId={LP_ID} position="bottom" lead="10年を過ぎていたら、壊れる前に見積もり" points={POINTS} beacon={false} />
         <p className="text-[11px] leading-relaxed text-slate-400">年数の区切りは目安です。最終更新：2026年11月7日</p>
+        <KyutokiNav current={PAGE_PATH} />
       </main>
       <OyuSticky lpId={LP_ID} />
       <LpFooter />

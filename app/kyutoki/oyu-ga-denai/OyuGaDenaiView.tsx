@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
+import KyutokiNav from '@/components/kyutoki/KyutokiNav';
 import { SITE_URL, SITE_NAME } from '@/components/loan/LoanArticle';
 import OyuDiagnosis from './OyuDiagnosis';
 import LpViewTracker from '@/components/lp/LpViewTracker';
@@ -68,7 +69,8 @@ const jsonLd = {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
-        { '@type': 'ListItem', position: 2, name: 'お湯が出ないときの30秒診断', item: `${SITE_URL}${PAGE_PATH}` },
+        { '@type': 'ListItem', position: 2, name: '給湯器', item: `${SITE_URL}/kyutoki` },
+        { '@type': 'ListItem', position: 3, name: 'お湯が出ないときの30秒診断', item: `${SITE_URL}${PAGE_PATH}` },
       ],
     },
     {
@@ -249,6 +251,7 @@ export default function OyuGaDenaiView({ hero = 'default' }: { hero?: Hero }) {
         <p className="text-[11px] leading-relaxed text-slate-400">
           診断は一般的な目安で、故障の原因を特定するものではありません。各社の対応時間や保証は各社の公表内容によります。最終更新：2026年10月29日
         </p>
+        <KyutokiNav current={PAGE_PATH} />
       </main>
       <LpFooter />
     </div>

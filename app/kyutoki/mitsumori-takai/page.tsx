@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
+import KyutokiNav from '@/components/kyutoki/KyutokiNav';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import { OyuBox, OyuSticky, HaifuDownload, PrNote } from '@/components/kyutoki/Haifu';
@@ -92,7 +93,7 @@ const jsonLd = {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
-        { '@type': 'ListItem', position: 2, name: 'ガス給湯器の交換費用', item: `${SITE_URL}/kyutoki/kokan-hiyou` },
+        { '@type': 'ListItem', position: 2, name: '給湯器', item: `${SITE_URL}/kyutoki` },
         { '@type': 'ListItem', position: 3, name: '見積もりが高いとき', item: `${SITE_URL}${PAGE_PATH}` },
       ],
     },
@@ -236,6 +237,7 @@ export default function MitsumoriTakaiPage() {
         <p className="text-[11px] leading-relaxed text-slate-400">
           金額は設置の状況で変わります。最終的な金額は見積書で確かめてください。最終更新：2026年11月5日
         </p>
+        <KyutokiNav current={PAGE_PATH} />
       </main>
       <OyuSticky lpId={LP_ID} />
       <LpFooter />

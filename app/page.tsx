@@ -60,11 +60,13 @@ const AREAS = [
     icon: Flame,
     color: 'bg-orange-50 text-orange-600',
     h: '住まいの設備',
-    s: '給湯器の交換費用と見積もり',
-    href: '/kyutoki/kokan-hiyou',
+    s: '給湯器の故障と交換費用',
+    // 2026-11-13：入口を給湯器のページの一覧（/kyutoki）に変えた。トップから辿れる給湯器のページが19のうち4つだけだったため
+    href: '/kyutoki',
     links: [
-      { label: '交換費用の目安', href: '/kyutoki/kokan-hiyou' },
       { label: 'お湯が出ないとき', href: '/kyutoki/oyu-ga-denai' },
+      { label: '交換費用の目安', href: '/kyutoki/kokan-hiyou' },
+      { label: 'エラー番号', href: '/kyutoki/error' },
     ],
   },
   {

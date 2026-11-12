@@ -170,6 +170,19 @@ const latestArticles = [
 
 // カテゴリ（ジャンル）。記事が増えたカテゴリを追加していく
 const categories = [
+  // 2026-11-13 追加：給湯器（住まいの設備）。役立ちガイドから給湯器のページへの道がなかったため
+  {
+    href: '/kyutoki',
+    name: '給湯器',
+    description: 'お湯が出ない・エラー番号・水漏れのときにまず確かめること、交換費用の目安と見積もりの見方、号数の選び方。',
+    articles: [
+      { href: '/kyutoki/oyu-ga-denai', title: 'お湯が出ないときの30秒診断｜修理か交換か' },
+      { href: '/kyutoki/error', title: '給湯器のエラー番号の早見' },
+      { href: '/kyutoki/kokan-hiyou', title: 'ガス給湯器の交換費用の目安' },
+      { href: '/kyutoki/mitsumori-mikata', title: '給湯器の見積もりの見方' },
+      { href: '/kyutoki/nensu', title: '給湯器の寿命と、修理か交換か' },
+    ],
+  },
   {
     href: '/guide/digital-seiri',
     name: 'デジタル整理術',

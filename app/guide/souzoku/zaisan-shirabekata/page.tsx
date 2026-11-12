@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 const Z = DATA.shirabe;
 const FAQS = [
   { q: '亡くなった人の銀行口座を調べる方法は？', a: '通帳やキャッシュカード、郵便物で銀行の見当を付け、その銀行に亡くなった日の残高証明書を請求します。亡くなった人が口座にマイナンバーを登録していれば、どこか1つの金融機関で口座の所在を照会できます（デジタル庁）。' },
-  { q: '亡くなった人の不動産を全部調べる方法は？', a: '法務局の所有不動産記録証明書で、亡くなった人の名義の不動産を全国から一覧にできます（2026年2月2日から。書面の請求で1,600円）。市区町村の名寄帳では、その市区町村の中の分が分かります（法務省・横浜市）。' },
+  { q: '亡くなった人の不動産を全部調べる方法は？', a: '法務局の所有不動産記録証明書で、亡くなった人の名義の不動産を全国から探せます（2026年2月2日から。書面の請求で1,600円）。ただし登記の氏名・住所が請求に書いたものと違う不動産や、所有権の登記のない不動産は出ないので、市区町村の名寄帳とあわせて確かめます（法務省・横浜市）。' },
   { q: '亡くなった人の借金を調べるには？', a: '信用情報機関に開示を請求します。全国銀行個人信用情報センターは2,403円、CICは1,650円で、どちらも法定相続人が郵送で申し込めます。借金が多いときの相続放棄は、知った時から3か月以内です（全国銀行協会・CIC・裁判所）。' },
 ];
 
@@ -56,7 +56,7 @@ export default function Page() {
             <p className="text-[15px] leading-relaxed text-slate-800">{Z.kotae}</p>
             <ZaisanShirabeCheck lpId={LP_ID} />
             <p className="rounded-xl bg-white p-3 text-[13px] leading-relaxed text-slate-700 ring-1 ring-slate-200">
-              調べた財産の合計が基礎控除（3,000万円＋600万円×法定相続人の数）を超えそうなら、相続税の申告が要ります。
+              財産から借金や葬式の費用を差し引いた額が、基礎控除（3,000万円＋600万円×法定相続人の数）を超えそうなら、相続税の申告が要ります。
               <Link href="/guide/souzoku/souzokuzei-keisan" className="ml-1 font-bold text-sky-800 underline underline-offset-2">相続税の計算</Link>
             </p>
             <SouzokuExit lpId={LP_ID} partner="souzokuAssist" position="hero" lead="申告が要りそうなら、戸籍集めから相続税の申告までまとめて任せられる" />
@@ -91,7 +91,7 @@ export default function Page() {
           <ul className="grid gap-2">
             {[
               { I: Landmark, h: '所有不動産記録証明書（法務局）', d: '全国の不動産を一覧に。どこの法務局でも、郵送・オンラインでも請求できる', n: Z.shoyuNote },
-              { I: Building2, h: '名寄帳（市区町村）', d: '不動産のある市区町村ごとに請求。評価額も分かる', n: Z.nayoseNote },
+              { I: Building2, h: '名寄帳（市区町村）', d: '不動産のある市区町村ごとに請求（東京23区は都税事務所）。評価額も分かる', n: Z.nayoseNote },
             ].map(({ I, h, d, n }) => (
               <li key={h} className="flex items-start gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
                 <I size={20} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />
@@ -99,7 +99,7 @@ export default function Page() {
               </li>
             ))}
           </ul>
-          <p className={SRC}>出典：{src(['mojShoyu', 'yokohamaNayose'])}（{checked} 確認）</p>
+          <p className={SRC}>出典：{src(['mojShoyu', 'yokohamaNayose', 'tokyoSozokunin'])}（{checked} 確認）</p>
         </section>
 
         <section className={SECTION} aria-labelledby="kabu">
@@ -107,7 +107,7 @@ export default function Page() {
           <ul className="grid gap-2">
             {[
               { h: '株・投資信託', d: Z.hofuriNote },
-              { h: '生命保険', d: '生命保険協会の照会で分かるのは、契約があるかどうかだけです。見つかったら、その保険会社に連絡します。' },
+              { h: '生命保険', d: '生命保険協会の照会で分かるのは、契約があるかどうかだけです。見つかったら、その保険会社に連絡します。共済は生命保険会社ではないので、それぞれの共済に問い合わせます。' },
               { h: '借金・カード', d: '全国銀行個人信用情報センター・CIC・JICC の3つとも、法定相続人が開示を申し込めます。借金が多いと分かったら、相続放棄の期限（3か月）に気を付けます。' },
             ].map((f) => (
               <li key={f.h} className="flex items-start gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">

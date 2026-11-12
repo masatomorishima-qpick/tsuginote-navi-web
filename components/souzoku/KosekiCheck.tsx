@@ -23,17 +23,18 @@ const KOUIKI: Record<string, Record<Who, Res>> = {
   hisouzoku: { haigu: 'ok', ko: 'ok', mago: 'ok', oya: 'ok', kyoudai: 'ng', oime: 'ng' },
   self: { haigu: 'ok', ko: 'ok', mago: 'ok', oya: 'ok', kyoudai: 'ok', oime: 'ok' },
   ko: { haigu: 'maybe', ko: 'ng', mago: 'ok', oya: 'ok', kyoudai: 'ng', oime: 'ng' },
-  oya: { haigu: 'ng', ko: 'ok', mago: 'ok', oya: 'ok', kyoudai: 'ok', oime: 'ok' },
+  oya: { haigu: 'ng', ko: 'ok', mago: 'ok', oya: 'ok', kyoudai: 'maybe', oime: 'maybe' },
   kyoudai: { haigu: 'ng', ko: 'ng', mago: 'ng', oya: 'ok', kyoudai: 'ng', oime: 'ok' },
 };
 
 /** 選んだ形で要る戸籍の行。 */
-export function kosekiItems(pat: Pat, shiboKo: boolean, shiboKyoudai: boolean) {
+export function kosekiItems(pat: Pat, shiboKo: boolean, shiboKyoudai: boolean, shiboOya = false) {
   return K.items.filter((it) => {
     switch (it.when) {
       case 'all': return true;
       case 'ko+shibouko': return pat === 'ko' && shiboKo;
       case 'oyakyoudai+shibouko': return pat !== 'ko' && shiboKo;
+      case 'oya+shibouoya': return pat === 'oya' && shiboOya;
       case 'kyoudai': return pat === 'kyoudai';
       case 'kyoudai+shiboukyoudai': return pat === 'kyoudai' && shiboKyoudai;
       default: return false;
@@ -51,17 +52,32 @@ export function kosekiHiyou(nKoseki: number, nJoseki: number) {
 
 const LABEL: Record<Res, { t: string; c: string }> = {
   ok: { t: '広域交付で取れる：最寄りの市区町村の窓口', c: 'text-emerald-700' },
-  maybe: { t: '自分の子なら広域交付で取れる。そうでなければ本籍地へ', c: 'text-amber-700' },
+  maybe: { t: '', c: 'text-amber-700' },
   ng: { t: '広域交付では取れない：本籍地の市区町村へ', c: 'text-slate-600' },
 };
+const MAYBE: Record<string, string> = {
+  ko: '亡くなった子があなた自身の子でもあれば、広域交付で取れる。そうでなければ本籍地へ',
+  oya: 'あなた自身の親（祖父母）でもあれば、広域交付で取れる。父母の一方だけが同じなら本籍地へ',
+};
+function kouikiText(whose: string, r: Res) {
+  if (whose === 'self') return '自分の分は広域交付で取れる：最寄りの市区町村の窓口';
+  return r === 'maybe' ? MAYBE[whose] ?? LABEL.ng.t : LABEL[r].t;
+}
 
-const num = (s: string) => Math.min(99, Number(s.replace(/[^0-9]/g, '')) || 0);
+/** 通数。全角の数字も読む。整数でないときは NaN。 */
+export function parseTsu(s: string) {
+  const h = s.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0)).trim();
+  if (h === '') return 0;
+  return /^[0-9]+$/.test(h) ? Number(h) : NaN;
+}
+const MAX = 99;
 
 export default function KosekiCheck({ lpId }: { lpId: string }) {
   const [pat, setPat] = useState<Pat>('ko');
   const [who, setWho] = useState<Who>('ko');
   const [shiboKo, setShiboKo] = useState(false);
   const [shiboKyoudai, setShiboKyoudai] = useState(false);
+  const [shiboOya, setShiboOya] = useState(false);
   const [nk, setNk] = useState('');
   const [nj, setNj] = useState('');
   const sent = useRef(false);
@@ -79,9 +95,17 @@ export default function KosekiCheck({ lpId }: { lpId: string }) {
     setPat(p);
     if (!WHO_BY_PAT[p].includes(who)) setWho(WHO_BY_PAT[p][0]);
     if (p !== 'kyoudai') setShiboKyoudai(false);
+    if (p !== 'oya') setShiboOya(false);
   };
-  const list = kosekiItems(pat, shiboKo, shiboKyoudai);
-  const hiyou = kosekiHiyou(num(nk), num(nj));
+  // 孫・おい・めいが集めるなら、代わりに相続する元の人は必ず亡くなっている
+  const ko2 = shiboKo || who === 'mago';
+  const ky2 = shiboKyoudai || who === 'oime';
+  const list = kosekiItems(pat, ko2, ky2, shiboOya);
+  const a = parseTsu(nk);
+  const b = parseTsu(nj);
+  const bad = Number.isNaN(a) || Number.isNaN(b);
+  const over = !bad && (a > MAX || b > MAX);
+  const hiyou = bad || over ? 0 : kosekiHiyou(a, b);
   const box = (on: boolean) => `flex h-5 w-5 shrink-0 items-center justify-center rounded-full ring-1 ${on ? 'bg-emerald-600 text-white ring-emerald-600' : 'bg-white text-transparent ring-slate-300'}`;
 
   return (
@@ -91,7 +115,7 @@ export default function KosekiCheck({ lpId }: { lpId: string }) {
       </p>
 
       <div className="flex flex-col gap-1.5" role="radiogroup" aria-label="相続人">
-        <p className="text-[13px] font-black text-slate-700">相続人は（配偶者がいれば配偶者も）</p>
+        <p className="text-[13px] font-black text-slate-700">配偶者のほかに相続人になるのは</p>
         {K.patterns.map((p) => (
           <button key={p.key} type="button" role="radio" aria-checked={pat === p.key} onClick={() => pickPat(p.key as Pat)}
             className={`flex w-full items-center gap-2.5 rounded-xl bg-white p-2.5 text-left ring-1 ${pat === p.key ? 'ring-emerald-300' : 'ring-slate-200'}`}>
@@ -100,8 +124,9 @@ export default function KosekiCheck({ lpId }: { lpId: string }) {
           </button>
         ))}
         {[
-          { on: shiboKo, set: setShiboKo, h: '亡くなった人の子で、すでに亡くなった人がいる', show: true },
-          { on: shiboKyoudai, set: setShiboKyoudai, h: '兄弟姉妹で、すでに亡くなった人がいる', show: pat === 'kyoudai' },
+          { on: ko2, set: setShiboKo, h: '亡くなった人の子で、すでに亡くなった人がいる', show: true },
+          { on: shiboOya, set: setShiboOya, h: '父母がすでに亡くなり、祖父母が相続人', show: pat === 'oya' },
+          { on: ky2, set: setShiboKyoudai, h: '兄弟姉妹で、すでに亡くなった人がいる', show: pat === 'kyoudai' },
         ].filter((o) => o.show).map((o) => (
           <button key={o.h} type="button" aria-pressed={o.on} onClick={() => touch(o.set)(!o.on)}
             className={`flex w-full items-center gap-2.5 rounded-xl bg-white p-2.5 text-left ring-1 ${o.on ? 'ring-emerald-300' : 'ring-slate-200'}`}>
@@ -134,7 +159,7 @@ export default function KosekiCheck({ lpId }: { lpId: string }) {
                 <span className="flex flex-col">
                   <span className="font-bold text-slate-900">{it.h}</span>
                   <span className="text-[11px] text-slate-500">{it.d}</span>
-                  <span className={`flex items-center gap-1 text-[11px] font-bold ${LABEL[r].c}`}><MapPin size={12} aria-hidden="true" />{it.whose === 'self' ? '自分の分は広域交付で取れる：最寄りの市区町村の窓口' : LABEL[r].t}</span>
+                  <span className={`flex items-center gap-1 text-[11px] font-bold ${LABEL[r].c}`}><MapPin size={12} aria-hidden="true" />{kouikiText(it.whose, r)}</span>
                 </span>
               </li>
             );
@@ -154,14 +179,15 @@ export default function KosekiCheck({ lpId }: { lpId: string }) {
               className="min-w-0 flex-1 rounded-xl bg-white px-3 py-2.5 text-[16px] font-bold text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-sky-600" />
           </label>
         ))}
+        {(bad || over) && <p className="text-[12px] font-bold text-orange-700" aria-live="polite">{bad ? '通数は数字だけで入れてください' : `通数は${MAX}通までで入れてください`}</p>}
         {hiyou > 0 && (
           <p className="rounded-xl bg-white p-3 text-[13px] text-slate-700 ring-1 ring-slate-200" aria-live="polite">
             <span className="block text-[18px] font-black text-orange-700">{hiyou.toLocaleString('ja-JP')}円</span>
-            今の戸籍 {num(nk)}通 × {K.tesuryo.koseki}円 ＋ 除籍・改製原戸籍 {num(nj)}通 × {K.tesuryo.joseki}円
+            今の戸籍 {a}通 × {K.tesuryo.koseki}円 ＋ 除籍・改製原戸籍 {b}通 × {K.tesuryo.joseki}円
           </p>
         )}
       </div>
-      <p className="text-[11px] leading-relaxed text-slate-500">手数料は横浜市の額です。請求先の市区町村で確かめてください。{K.chuui}入れた内容は送られません。</p>
+      <p className="text-[11px] leading-relaxed text-slate-500">兄弟姉妹が集めるとき、亡くなった人が父母の戸籍に入っていたころの分は、父母の戸籍として取れることがあります。窓口で確かめてください。手数料は横浜市の額です。請求先の市区町村で確かめてください。{K.chuui}入れた内容は送られません。</p>
     </div>
   );
 }

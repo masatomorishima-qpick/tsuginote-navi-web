@@ -20,7 +20,7 @@ import DATA from '@/lib/souzoku/haifu-data.json';
 const LP_ID = 'guide-souzoku-koseki-atsumekata';
 const PATH = '/guide/souzoku/koseki-atsumekata';
 const TITLE = '相続の戸籍の集め方チェックリスト｜要る戸籍・広域交付・手数料が分かる';
-const DESCRIPTION = '相続の戸籍の集め方を1枚に。相続人（子・親・兄弟姉妹）と集める人を選ぶと、要る戸籍と、広域交付で最寄りの窓口で取れるかが出ます。手数料（450円・750円）も通数から計算。無料のエクセル・PDF付き。';
+const DESCRIPTION = '相続の戸籍の集め方を1枚に。相続人（子・親・兄弟姉妹）と集める人を選ぶと、要る戸籍と、広域交付で最寄りの窓口で取れるかが出ます。手数料（横浜市の例：450円・750円）も通数から計算。無料のエクセル・PDF付き。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 
 const K = DATA.koseki;
 const FAQS = [
-  { q: '相続で必要な戸籍はどこまで？', a: '亡くなった人の出生から死亡までの戸籍（除籍・改製原戸籍を含む）と、相続人全員の今の戸籍です。親や兄弟姉妹が相続人のときは、亡くなった子や親の死亡が分かる戸籍も要ります（全国銀行協会・裁判所）。' },
+  { q: '相続で必要な戸籍はどこまで？', a: '亡くなった人の出生から死亡までの戸籍（除籍・改製原戸籍を含む）と、相続人全員の今の戸籍です。親や兄弟姉妹が相続人のときは、亡くなった子がいればその子の出生から死亡までの戸籍も、兄弟姉妹が相続人なら親の死亡が分かる戸籍も要ります（全国銀行協会・裁判所）。' },
   { q: '戸籍の広域交付で兄弟の戸籍は取れますか？', a: '取れません。広域交付で請求できるのは、本人・配偶者・父母や祖父母・子や孫の戸籍です。兄弟姉妹の戸籍は本籍地の市区町村に請求します（法務省）。' },
   { q: '相続の戸籍集めにかかる費用は？', a: '横浜市では、今の戸籍が1通450円、除籍と改製原戸籍が1通750円です。法定相続情報一覧図の写しは、法務局で無料で交付されます（横浜市・法務局）。' },
 ];
@@ -45,7 +45,7 @@ export default function Page() {
     <span key={k}>{i > 0 && '・'}<a href={S[k].url} target="_blank" rel="noopener noreferrer" className={A}>{S[k].name}</a></span>
   ));
   const cols = K.patterns;
-  const need = (when: string, p: string) => when === 'all' || (p === 'ko' ? when === 'ko+shibouko' : p === 'oya' ? when === 'oyakyoudai+shibouko' : when !== 'ko+shibouko');
+  const need = (when: string, p: string) => when === 'all' || (p === 'ko' ? when === 'ko+shibouko' : p === 'oya' ? when === 'oyakyoudai+shibouko' || when === 'oya+shibouoya' : when !== 'ko+shibouko' && when !== 'oya+shibouoya');
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -57,13 +57,17 @@ export default function Page() {
             <p className="text-[15px] leading-relaxed text-slate-800">{K.kotae}</p>
             <KosekiCheck lpId={LP_ID} />
             <p className="rounded-xl bg-white p-3 text-[13px] leading-relaxed text-slate-700 ring-1 ring-slate-200">
-              戸籍がそろったら、法務局で法定相続情報一覧図の写しを無料で作ってもらうと、銀行・登記・相続税の申告で戸籍の束の代わりに出せます。
+              戸籍がそろったら、自分で書いた一覧図と戸籍の束を法務局に出すと、法定相続情報一覧図の写しを無料で交付してもらえます。登記や銀行の手続きで戸籍の束の代わりに使えます（使えるかは出す先で確かめる）。
             </p>
-            <SouzokuExit lpId={LP_ID} partner="souzokuAssist" position="hero" lead="戸籍集めが大変なら、戸籍集めから相続税の申告までまとめて任せられる" />
+            <p className="rounded-xl bg-white p-3 text-[13px] leading-relaxed text-slate-700 ring-1 ring-slate-200">
+              財産から借金や葬式の費用を差し引いた額が、基礎控除（3,000万円＋600万円×法定相続人の数）を超えそうなら、相続税の申告が要ります。
+              <Link href="/guide/souzoku/souzokuzei-keisan" className="ml-1 font-bold text-sky-800 underline underline-offset-2">相続税の計算</Link>
+            </p>
+            <SouzokuExit lpId={LP_ID} partner="souzokuAssist" position="hero" lead="相続税の申告も要るなら、戸籍集めから申告までまとめて任せられる" />
             <SouzokuDownload icon={ClipboardList} h="相続の戸籍の集め方チェックリスト" s="通数と手数料を書き込める。印刷して印を付ける" files={SOUZOKU_FILES.koseki} />
           </div>
         }
-        partner="souzokuAssist" exitLead="戸籍集めから相続税の申告まで、まとめて任せる" faqs={FAQS} updated="2026年11月13日"
+        partner="souzokuAssist" exitLead="相続税の申告も要るなら、戸籍集めから申告までまとめて任せる" faqs={FAQS} updated="2026年11月13日"
       >
         <section className={SECTION} aria-labelledby="ichiran">
           <h2 id="ichiran" className={H2}>相続人ごとの必要な戸籍</h2>
@@ -72,7 +76,7 @@ export default function Page() {
               <thead className="bg-slate-50 text-[11px] text-slate-600">
                 <tr>
                   <th className="px-2 py-2 text-left font-bold">戸籍</th>
-                  {cols.map((c) => <th key={c.key} className="w-[52px] px-1 py-2 text-center font-bold">{c.key === 'ko' ? '子' : c.key === 'oya' ? '親' : '兄弟姉妹'}</th>)}
+                  {cols.map((c) => <th key={c.key} className="w-[52px] px-1 py-2 text-center font-bold">{c.key === 'ko' ? '子' : c.key === 'oya' ? '親・祖父母' : '兄弟姉妹'}</th>)}
                 </tr>
               </thead>
               <tbody>

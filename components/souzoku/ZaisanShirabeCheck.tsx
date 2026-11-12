@@ -9,16 +9,20 @@ import DATA from '@/lib/souzoku/haifu-data.json';
  * 相続財産の調べ方：手がかりのある財産を選ぶと、調べる窓口・取る証明・手数料の目安が出る＋期限（/guide/souzoku/zaisan-shirabekata、2026-11-13）。
  * 窓口と手数料：法務省（所有不動産記録証明）・横浜市（名寄帳）・証券保管振替機構（2026/10/1 改定の費用）・生命保険協会・
  *   全国銀行個人信用情報センター（2026年10月版）・CIC・JICC・デジタル庁（相続時の口座照会）・みずほ銀行（残高証明の例）。
- * 期限：裁判所（相続放棄は知った時から3か月）・国税庁 No.4205（申告は10か月）。同じ日付で数えた目安（相続の手続きチェックリストと同じ）。
+ * 期限：裁判所（相続放棄は知った時から3か月）・国税庁 No.4205（申告は翌日から10か月）。翌日から数えた目安（準確定申告の道具と同じ）。
  * 手数料の合計は、公式で金額を確かめられたもの（yen > 0）だけを足す。
  * 使われたかは lp_event_logs の event_name 'zaisan_shirabe'（1回目だけ）。入れた内容は送らない。
  */
 const D = DATA.shirabe;
 
-function addMonths(d: Date, n: number) {
-  const r = new Date(d.getFullYear(), d.getMonth() + n, d.getDate());
-  if (r.getDate() !== d.getDate()) return new Date(d.getFullYear(), d.getMonth() + n + 1, 0);
-  return r;
+/** 「知った日から n か月以内」の最後の日：翌日から数えて応当日の前の日。応当日がない月は末日（準確定申告の道具と同じ数え方）。 */
+export function kigenDate(d: Date, n: number) {
+  const next = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+  const y = next.getFullYear();
+  const m = next.getMonth() + n;
+  const dd = next.getDate() - 1;
+  if (dd === 0) return new Date(y, m, 0);
+  return new Date(y, m, Math.min(dd, new Date(y, m + 1, 0).getDate()));
 }
 const fmt = (d: Date) => `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 const yen = (n: number) => `${n.toLocaleString('ja-JP')}円`;
@@ -105,13 +109,13 @@ export default function ZaisanShirabeCheck({ lpId }: { lpId: string }) {
           ))}
           <p className="flex items-center gap-1.5 rounded-xl bg-white p-3 text-[13px] text-slate-700 ring-1 ring-slate-200">
             <Wallet size={18} className="shrink-0 text-orange-700" aria-hidden="true" />
-            <span>手数料の合計 <b className="text-[17px] text-orange-700">{yen(h.total)}</b>{h.unknown > 0 && `＋窓口で確かめる分 ${h.unknown}か所`}</span>
+            <span>手数料の合計 <b className="text-[17px] text-orange-700">{yen(h.total)}</b>{h.unknown > 0 && `（ほかに、金額を窓口で確かめるものが${h.unknown}つ）`}</span>
           </p>
         </div>
       )}
 
       <label className="flex flex-col gap-1.5">
-        <span className="flex items-center gap-1.5 text-[13px] font-black text-slate-700"><CalendarClock size={16} aria-hidden="true" />亡くなった日（相続を知った日）</span>
+        <span className="flex items-center gap-1.5 text-[13px] font-black text-slate-700"><CalendarClock size={16} aria-hidden="true" />亡くなった日（あとから知ったときは、知った日）</span>
         <input type="date" value={day} onChange={(e) => { touched.current = true; setDay(e.target.value); }} aria-label="亡くなった日"
           className="rounded-xl bg-white px-3 py-3 text-[17px] font-bold text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-sky-600" />
       </label>
@@ -119,13 +123,13 @@ export default function ZaisanShirabeCheck({ lpId }: { lpId: string }) {
         <ul className="flex flex-col gap-1.5" aria-live="polite">
           {D.kigen.map((k) => (
             <li key={k.h} className="rounded-xl bg-orange-50 p-3 text-[14px] font-black text-orange-800 ring-1 ring-orange-200">
-              {k.h}：{fmt(addMonths(base!, k.n))}まで（目安）
+              {k.h}：{fmt(kigenDate(base!, k.n))}まで（目安）
               <span className="mt-0.5 block text-[11px] font-bold text-orange-700">{k.n}か月以内。{k.d}</span>
             </li>
           ))}
         </ul>
       )}
-      <p className="text-[11px] leading-relaxed text-slate-500">{D.hiyouNote}期限は同じ日付で数えた目安で、土日・祝日なら翌日になることがあります。入れた内容は送られません。</p>
+      <p className="text-[11px] leading-relaxed text-slate-500">{D.hiyouNote}期限は翌日から数えた目安で、土日・祝日なら翌日になることがあります。入れた内容は送られません。</p>
     </div>
   );
 }

@@ -53,6 +53,13 @@ const articles = [
       '見直しで確かめることを1枚に。節目、保険証券で見る6つの項目、次の更新の目安、見直す前の注意まで。',
   },
   {
+    href: '/guide/shisan-kanri/hoken-minaoshi-shussan',
+    category: '保険の見直し',
+    title: '子どもが生まれたら保険の見直しチェックリスト｜遺族年金の計算つき（無料・エクセル）',
+    description:
+      '受取人・死亡保障の額・教育の備えなど8つの点。子の生年月日から遺族基礎年金の目安も出ます。',
+  },
+  {
     href: '/guide/shisan-kanri/hoken-shoken-mikata',
     category: '保険の書類',
     title: '保険証券の見方｜欄ごとの意味と書き写し表（無料・エクセル）、税の種類も分かる',

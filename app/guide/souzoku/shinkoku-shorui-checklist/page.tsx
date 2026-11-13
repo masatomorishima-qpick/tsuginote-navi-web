@@ -112,6 +112,7 @@ export default function Page() {
             <span className="flex flex-col gap-1"><span className="text-[14px] font-black text-slate-900">金額を書くときに手元に置くもの（例）</span>
               <span className="text-[13px] text-slate-600">{D.tegoto.join('・')}</span></span>
           </div>
+          <Link href="/guide/souzoku/shinkoku-jibun" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">表を作る順番と、申告を自分でする手順<ArrowRight size={14} aria-hidden="true" /></Link>
           <p className={SRC}>出典：{src(['ntaYoshikiR08'])}（{checked} 確認）</p>
         </section>
 

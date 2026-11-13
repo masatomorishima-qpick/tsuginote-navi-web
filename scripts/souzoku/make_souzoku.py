@@ -13,7 +13,9 @@
   souzoku-houtei-souzokubun.xlsx / .pdf       法定相続分の計算表（人数を入れると割合と金額・遺留分。2026-11-12）
   souzoku-touki-shorui.xlsx / .pdf            相続登記の必要書類チェックリスト（期限と登録免許税の計算つき。2026-11-12）
   souzoku-junkakutei-shorui.xlsx / .pdf       準確定申告の必要書類チェックリスト（期限の計算つき。2026-11-12）
-  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei も同じ）
+  souzoku-zaisan-shirabekata.xlsx / .pdf      相続財産の調べ方チェックリスト（窓口・手数料・期限の計算つき。2026-11-13）
+  souzoku-koseki-atsumekata.xlsx / .pdf       相続の戸籍の集め方チェックリスト（相続人ごとの戸籍・手数料の計算つき。2026-11-13）
+  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki も同じ）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import json
@@ -883,6 +885,166 @@ def make_junkakutei_pdf():
     _pdf(doc, "souzoku-junkakutei-shorui.pdf", "/guide/souzoku/junkakutei-checklist", ck)
 
 
+# ---------- 相続財産の調べ方チェックリスト（2026-11-13） ----------
+def make_shirabe_xlsx():
+    Z = DATA["shirabe"]
+    ck = Z["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "相続財産の調べ方"
+    widths(ws, [4, 12, 22, 30, 24, 30, 7, 10, 6])
+    put(ws, 1, 1, "相続財産の調べ方チェックリスト", H, border=False)
+    put(ws, 2, 1, "調べる行の「調べる」に ○ を選ぶと、手数料の合計が出ます。手数料の欄は、公式で金額が確かめられたものだけ入れてあります（ほかは分かったら書き込む）。済んだら「済」を選びます。", S, border=False)
+    put(ws, 4, 2, "亡くなった日（あとから知ったときは、知った日）", B)
+    ws.merge_cells(start_row=4, start_column=2, end_row=4, end_column=3)
+    d = put(ws, 4, 4, None, B, IN_FILL, fmt="yyyy/m/d").coordinate
+    for k, kg in enumerate(Z["kigen"]):
+        put(ws, 5 + k, 2, f"{kg['h']}の期限（目安・自動）", B)
+        ws.merge_cells(start_row=5 + k, start_column=2, end_row=5 + k, end_column=3)
+        put(ws, 5 + k, 4, f'=IF({d}="","",' + kigen_f(d, kg["n"]) + ')', B, OK_FILL, fmt="yyyy/m/d")
+        put(ws, 5 + k, 5, f"{kg['n']}か月以内。{kg['d']}", N, border=False)
+    r = 8
+    for i, t in enumerate(["", "財産", "窓口", "取る証明・分かること", "費用", "主に要るもの・注意", "調べる", "手数料（円）", "済"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    dv = DataValidation(type="list", formula1='"済"', allow_blank=True)
+    dv2 = DataValidation(type="list", formula1='"○"', allow_blank=True)
+    ws.add_data_validation(dv)
+    ws.add_data_validation(dv2)
+    rr = r
+    for it in Z["items"]:
+        for j, row in enumerate(it["rows"]):
+            rr += 1
+            put(ws, rr, 1, rr - r)
+            put(ws, rr, 2, it["h"] + ("\n手がかり：" + it["tegakari"] if j == 0 else ""), B if j == 0 else N)
+            put(ws, rr, 3, row["saki"], N)
+            put(ws, rr, 4, row["shomei"], N)
+            put(ws, rr, 5, row["hiyou"], N)
+            put(ws, rr, 6, row["motsu"], N)
+            dv2.add(put(ws, rr, 7, None, B, IN_FILL))
+            put(ws, rr, 8, row["yen"] if row["yen"] else None, N, IN_FILL, fmt="#,##0")
+            dv.add(put(ws, rr, 9, None, B, IN_FILL))
+            ws.row_dimensions[rr].height = 58
+    put(ws, rr + 1, 6, "「調べる」に ○ の行の手数料の合計（自動）", B)
+    put(ws, rr + 1, 8, f'=SUMIF(G{r + 1}:G{rr},"○",H{r + 1}:H{rr})', B, OK_FILL, fmt="#,##0")
+    r = rr + 3
+    notes = ["・" + Z["kotae"], "・" + Z["shoyuNote"], "・" + Z["nayoseNote"], "・" + Z["hofuriNote"],
+             "・ほふりは法定相続情報一覧図があれば6,050円です（手数料の欄を書き換える）。" + Z["hiyouNote"],
+             "・期限は知った日の翌日から数えた目安です（月末に知ったら、その月数後の月末）。土日・祝日なら翌日になることがあります。"]
+    for k, t in enumerate(notes):
+        put(ws, r + k, 1, t, N, border=False)
+        ws.merge_cells(start_row=r + k, start_column=1, end_row=r + k, end_column=9)
+        ws.row_dimensions[r + k].height = 30
+    r += len(notes)
+    keys = list(dict.fromkeys(k for it in Z["items"] for row in it["rows"] for k in row["src"])) + ["courtHouki", "nta4205"]
+    put(ws, r, 1, "出典：" + "／".join(SRC[k]["name"] for k in keys) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=9)
+    ws.row_dimensions[r].height = 42
+    put(ws, r + 1, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/zaisan-shirabekata", S, border=False)
+    ws.page_setup.orientation = "landscape"
+    ws.page_setup.fitToWidth = 1
+    wb.save(OUT / "souzoku-zaisan-shirabekata.xlsx")
+
+
+def make_shirabe_pdf():
+    Z = DATA["shirabe"]
+    ck = Z["checkedAt"].replace("-", "/")
+    rows = ""
+    for it in Z["items"]:
+        for j, row in enumerate(it["rows"]):
+            head = f"<td rowspan='{len(it['rows'])}'><b>{esc(it['h'])}</b><br><small>{esc(it['tegakari'])}</small></td>" if j == 0 else ""
+            rows += (f"<tr><td>☐</td>{head}<td><b>{esc(row['saki'])}</b><br>{esc(row['shomei'])}</td>"
+                     f"<td>{esc(row['hiyou'])}</td><td><small>{esc(row['motsu'])}</small></td></tr>")
+    keys = list(dict.fromkeys(k for it in Z["items"] for row in it["rows"] for k in row["src"])) + ["courtHouki", "nta4205"]
+    body = f"""<style>small{{color:#64748b;font-size:8pt}} td:first-child{{width:5mm;text-align:center}}</style>
+<p>亡くなった日（あとから知ったときは、知った日）：<span class="line"></span><br>相続放棄の期限（3か月）：<span class="line"></span><br>相続税の申告の期限（10か月）：<span class="line"></span></p>
+<table><tr><th></th><th style="width:26mm">財産</th><th>窓口と分かること</th><th style="width:38mm">費用</th><th style="width:46mm">主に要るもの・注意</th></tr>{rows}</table>
+<div class="box">{esc(Z['shoyuNote'])}{esc(Z['nayoseNote'])}<br>{esc(Z['hofuriNote'])}</div>
+<p class="note">{esc(Z['hiyouNote'])}</p>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in keys))}（{ck} 確認）</p>"""
+    doc = page("相続財産の調べ方チェックリスト", "手がかりのある財産の窓口に請求し、済んだら☐に印を付けます。", body)
+    _pdf(doc, "souzoku-zaisan-shirabekata.pdf", "/guide/souzoku/zaisan-shirabekata", ck)
+
+
+# ---------- 相続の戸籍の集め方チェックリスト（2026-11-13） ----------
+def _koseki_need(when, p):
+    if when == "all":
+        return True
+    if p == "ko":
+        return when == "ko+shibouko"
+    if p == "oya":
+        return when in ("oyakyoudai+shibouko", "oya+shibouoya")
+    return when not in ("ko+shibouko", "oya+shibouoya")
+
+
+def make_koseki_xlsx():
+    Kd = DATA["koseki"]
+    ck = Kd["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "相続の戸籍"
+    widths(ws, [4, 36, 9, 9, 9, 8, 8, 6])
+    put(ws, 1, 1, "相続の戸籍の集め方チェックリスト", H, border=False)
+    put(ws, 2, 1, "相続人の列で ○ の戸籍を集めます。取った通数を書くと手数料が出ます。そろったら「済」を選びます。", S, border=False)
+    r = 4
+    for i, t in enumerate(["", "戸籍", "子", "親・祖父母", "兄弟姉妹", "今の戸籍（通）", "除籍・改製原戸籍（通）", "済"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    ws.row_dimensions[r].height = 30
+    dv = DataValidation(type="list", formula1='"済"', allow_blank=True)
+    ws.add_data_validation(dv)
+    for k, it in enumerate(Kd["items"]):
+        rr = r + 1 + k
+        put(ws, rr, 1, k + 1)
+        put(ws, rr, 2, it["h"] + "\n" + it["d"], N)
+        for c, pk in enumerate(["ko", "oya", "kyoudai"]):
+            put(ws, rr, 3 + c, "○" if _koseki_need(it["when"], pk) else "－", B)
+        put(ws, rr, 6, None, N, IN_FILL, fmt="0")
+        put(ws, rr, 7, None, N, IN_FILL, fmt="0")
+        dv.add(put(ws, rr, 8, None, B, IN_FILL))
+        ws.row_dimensions[rr].height = 42
+    last = r + len(Kd["items"])
+    tk, tj = Kd["tesuryo"]["koseki"], Kd["tesuryo"]["joseki"]
+    put(ws, last + 1, 2, f"手数料の合計（自動。今の戸籍{tk}円・除籍と改製原戸籍{tj}円で計算）", B)
+    ws.merge_cells(start_row=last + 1, start_column=2, end_row=last + 1, end_column=5)
+    put(ws, last + 1, 6, f"=SUM(F{r + 1}:F{last})*{tk}+SUM(G{r + 1}:G{last})*{tj}", B, OK_FILL, fmt="#,##0")
+    ws.merge_cells(start_row=last + 1, start_column=6, end_row=last + 1, end_column=7)
+    r = last + 3
+    notes = ["・" + Kd["kotae"], "・広域交付で請求できるのは" + Kd["kouikiWho"] + "。" + "。".join(Kd["kouikiRules"]) + "。",
+             "・" + Kd["tesuryo"]["note"] + "。", "・" + "。".join(Kd["ichiranzu"]) + "。", "・" + Kd["chuui"]]
+    for k, t in enumerate(notes):
+        put(ws, r + k, 1, t, N, border=False)
+        ws.merge_cells(start_row=r + k, start_column=1, end_row=r + k, end_column=8)
+        ws.row_dimensions[r + k].height = 44
+    r += len(notes)
+    keys = ["zenginSouzoku", "courtHouki", "houmuToukiShorui", "mojKouiki", "yokohamaKouiki", "yokohamaYuso", "houmuJouhou", "houmuJouhouTetsuzuki"]
+    put(ws, r, 1, "出典：" + "／".join(SRC[k]["name"] for k in keys) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=8)
+    ws.row_dimensions[r].height = 42
+    put(ws, r + 1, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/koseki-atsumekata", S, border=False)
+    ws.page_setup.orientation = "portrait"
+    ws.page_setup.fitToWidth = 1
+    wb.save(OUT / "souzoku-koseki-atsumekata.xlsx")
+
+
+def make_koseki_pdf():
+    Kd = DATA["koseki"]
+    ck = Kd["checkedAt"].replace("-", "/")
+    rows = "".join(
+        f"<tr><td>☐</td><td><b>{esc(it['h'])}</b><br><small>{esc(it['d'])}</small></td>"
+        + "".join(f"<td style='text-align:center'>{'○' if _koseki_need(it['when'], pk) else '－'}</td>" for pk in ["ko", "oya", "kyoudai"])
+        + "<td></td></tr>" for it in Kd["items"])
+    keys = ["zenginSouzoku", "courtHouki", "houmuToukiShorui", "mojKouiki", "yokohamaKouiki", "yokohamaYuso", "houmuJouhou", "houmuJouhouTetsuzuki"]
+    tk, tj = Kd["tesuryo"]["koseki"], Kd["tesuryo"]["joseki"]
+    body = f"""<style>small{{color:#64748b;font-size:8pt}}</style>
+<table><tr><th style="width:5mm"></th><th>戸籍</th><th style="width:12mm">子</th><th style="width:16mm">親・祖父母</th><th style="width:16mm">兄弟姉妹</th><th style="width:22mm">通数</th></tr>{rows}</table>
+<p class="note">{esc(Kd['chuui'])}</p>
+<div class="box"><b>手数料</b>：今の戸籍 <span class="line" style="min-width:12mm"></span>通 × {tk}円 ＋ 除籍・改製原戸籍 <span class="line" style="min-width:12mm"></span>通 × {tj}円 ＝ <span class="line" style="min-width:25mm"></span>円<br><small>{esc(Kd['tesuryo']['note'])}。</small></div>
+<div class="box"><b>広域交付</b>：{esc(Kd['kouikiWho'])}は、最寄りの市区町村の窓口で請求できる。<br><small>{esc('。'.join(Kd['kouikiRules']))}。</small></div>
+<div class="box"><b>法定相続情報一覧図</b><br><small>{esc('。'.join(Kd['ichiranzu']))}。</small></div>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in keys))}（{ck} 確認）</p>"""
+    doc = page("相続の戸籍の集め方チェックリスト", "相続人の列で ○ の戸籍を集め、☐に印を付けます。", body)
+    _pdf(doc, "souzoku-koseki-atsumekata.pdf", "/guide/souzoku/koseki-atsumekata", ck)
+
+
 if __name__ == "__main__":
     import sys
     if sys.argv[1:] == ["shinkoku"]:
@@ -893,7 +1055,7 @@ if __name__ == "__main__":
         make_hikazei_xlsx()
         make_hikazei_pdf()
         sys.exit(0)
-    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei"):
+    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki"):
         for name in sys.argv[1:]:
             globals()[f"make_{name}_xlsx"]()
             globals()[f"make_{name}_pdf"]()

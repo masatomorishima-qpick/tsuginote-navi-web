@@ -111,6 +111,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 相続財産の調べ方チェックリスト（2026-11-13 作成、docs/seisaku-queue.md の T13）。
+    {
+      url: `${baseUrl}/guide/souzoku/zaisan-shirabekata`,
+      lastModified: new Date("2026-11-13T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    // 相続の戸籍の集め方チェックリスト（2026-11-13 作成、docs/seisaku-queue.md の T19）。
+    {
+      url: `${baseUrl}/guide/souzoku/koseki-atsumekata`,
+      lastModified: new Date("2026-11-13T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 準確定申告の必要書類チェックリスト（2026-11-12 作成、docs/seisaku-queue.md の T12）。
     {
       url: `${baseUrl}/guide/souzoku/junkakutei-checklist`,

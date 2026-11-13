@@ -7,17 +7,25 @@ import DATA from '@/lib/souzoku/haifu-data.json';
 
 /**
  * 相続の手続きの期限の目安（/guide/souzoku/tetsuzuki-checklist、2026-11-10）。
- * 亡くなった日を入れると、月・年で決まる期限を「同じ日付」で数えた目安を出す（国税庁 No.4205 の例：1月6日→11月6日）。
+ * 亡くなった日を入れると、月・年で決まる期限を、翌日から数えた目安で出す（国税庁 No.4205 の例：1月6日→11月6日）。
  * 日数で決まる期限（死亡届7日・年金10日／14日）は数え方が手続きで違うので、日付は出さず文言だけ。
  * 使われたかは lp_event_logs の event_name 'tetsuzuki_kigen'（1回目だけ）。入れた日付は送らない。
  */
 const T = DATA.tetsuzuki;
 
+/**
+ * 「亡くなった日（知った日）から n か月以内」の最後の日。
+ * 2026-11-13 直し：翌日から数えて、n か月後の応当日の前の日（民法140条・143条、国税通則法10条と同じ数え方）。応当日がない月はその月の末日。
+ * それまでは「同じ日付」で数えていたため、月末に亡くなった場合に1〜3日早く出ていた（例：2/28 → 3か月 は 5/31 が正しいのに 5/28）。
+ * 国税庁 No.4205 の例（1月6日→11月6日）は、直したあとも同じ答え。
+ */
 function addMonths(d: Date, n: number) {
-  const r = new Date(d.getFullYear(), d.getMonth() + n, d.getDate());
-  // 応当日がない月（例：1/31 の1か月後）は、その月の末日にする
-  if (r.getDate() !== d.getDate()) return new Date(d.getFullYear(), d.getMonth() + n + 1, 0);
-  return r;
+  const next = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+  const y = next.getFullYear();
+  const m = next.getMonth() + n;
+  const dd = next.getDate() - 1;
+  if (dd === 0) return new Date(y, m, 0);
+  return new Date(y, m, Math.min(dd, new Date(y, m + 1, 0).getDate()));
 }
 const fmt = (d: Date) => `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 

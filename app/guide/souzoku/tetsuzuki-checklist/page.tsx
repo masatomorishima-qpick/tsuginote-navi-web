@@ -43,7 +43,7 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
-        lpId={LP_ID} version="v1-2026-11-10" path={PATH} eyebrow="相続の手続き"
+        lpId={LP_ID} version="v2-2026-11-13" path={PATH} eyebrow="相続の手続き"
         title={<>相続の手続き<br /><span className="text-orange-600">期限の一覧</span></>}
         download={
           <div className="flex flex-col gap-3">

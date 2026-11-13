@@ -405,9 +405,10 @@ def make_tetsuzuki_xlsx():
         put(ws, rr, 2, it["h"], B)
         put(ws, rr, 3, it["kigen"], N)
         if it["unit"] == "m":
-            f = f'=IF({d}="","",EDATE({d},{it["n"]}))'
+            # 2026-11-13 直し：翌日から数えて応当日の前の日（応当日がない月は月末）。EDATE だけだと月末に亡くなった場合に1〜3日早く出ていた
+            f = f'=IF({d}="","",IF(DAY(EDATE({d}+1,{it["n"]}))<DAY({d}+1),EDATE({d}+1,{it["n"]}),EDATE({d}+1,{it["n"]})-1))'
         elif it["unit"] == "y":
-            f = f'=IF({d}="","",EDATE({d},{it["n"] * 12}))'
+            f = f'=IF({d}="","",IF(DAY(EDATE({d}+1,{it["n"] * 12}))<DAY({d}+1),EDATE({d}+1,{it["n"] * 12}),EDATE({d}+1,{it["n"] * 12})-1))'
         else:
             f = "日数の期限は出す先で確認" if it["unit"] == "d" else "－"
         put(ws, rr, 4, f, B, OK_FILL, fmt="yyyy/m/d")

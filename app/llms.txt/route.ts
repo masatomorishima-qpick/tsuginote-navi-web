@@ -32,6 +32,7 @@ export function GET() {
 - [保険契約の一覧表をエクセルで作る方法](${SITE_URL}/guide/shisan-kanri/hoken-ichiran-excel): 無料テンプレート付き。
 - [保険の比較表](${SITE_URL}/guide/shisan-kanri/hoken-hikaku-excel): いまの保険と見直し案を並べ、払う総額（月の保険料×12×年数）と差を自動で計算するエクセル。
 - [生命保険の見直しチェックリスト](${SITE_URL}/guide/shisan-kanri/hoken-minaoshi-checklist): 見直しの節目、保険証券で確かめる6項目、契約した日から次の更新の目安を出す道具。
+- [子どもが生まれたときの保険の見直しチェックリスト](${SITE_URL}/guide/shisan-kanri/hoken-minaoshi-shussan): 受取人・死亡保障の額・教育の備えなど8つの点と、子の生年月日から遺族基礎年金（令和8年度 年847,300円＋子の加算）の年額と合計の目安を出す計算。
 - [保険証券の見方](${SITE_URL}/guide/shisan-kanri/hoken-shoken-mikata): 欄ごとの意味、契約者・被保険者・受取人の組み合わせで変わる税の種類、書き写し表。
 - [スマホのパスワード管理](${SITE_URL}/guide/password-kanri/sumaho-password): メモ帳管理の危険と、忘れずに安全に管理する方法。
 
@@ -40,9 +41,11 @@ export function GET() {
 - [相続税のかんたん計算](${SITE_URL}/guide/souzoku/souzokuzei-keisan): 遺産の合計と相続人の数から、基礎控除（3,000万円＋600万円×法定相続人の数）と相続税の総額の目安を国税庁の手順で計算。
 - [相続の手続きチェックリスト](${SITE_URL}/guide/souzoku/tetsuzuki-checklist): 亡くなった日を入れると、相続放棄・準確定申告・相続税の申告・相続登記の期限の目安が日付で出る一覧。
 - [相続税の申告の必要書類チェックリスト](${SITE_URL}/guide/souzoku/shinkoku-shorui-checklist): 状況を選ぶと、出す書類だけが一覧になる。
+- [相続税の申告を自分でする手順](${SITE_URL}/guide/souzoku/shinkoku-jibun): 国税庁の案内に合わせた7つの手順。亡くなった日から10か月の期限が日付で出て、当てはまるものを選ぶと申告書の表（第9表〜第15表・第11表・第1表・第2表など）が作る順に並ぶ。e-Tax で出せる条件も。
 - [死亡保険金の相続税の非課税](${SITE_URL}/guide/souzoku/shibou-hokenkin-hikazei): 非課税の限度額（500万円×法定相続人の数）を、受取人ごとに分けて自動で計算。
 - [法定相続分の計算](${SITE_URL}/guide/souzoku/houtei-souzokubun): 家族の形と遺産の額を入れると、配偶者・子・孫・親・兄弟姉妹・おい・めいの法定相続分と金額、遺留分の割合を民法の決まりで計算。
 - [相続登記の必要書類チェックリスト](${SITE_URL}/guide/souzoku/touki-shorui): 遺産分割・法定相続分・遺言から選ぶと、法務局の一覧に合わせた必要書類と取る場所が出る。期限（取得を知った日から3年）と登録免許税（1,000分の4）も計算。
+- [相続人申告登記の必要書類](${SITE_URL}/guide/souzoku/souzokunin-shinkoku-touki): 配偶者・子・親・兄弟姉妹から選ぶと要る戸籍が出る。申出書に書く項目、出し方（窓口・書留・かんたん登記申請）、相続登記との違い、期限（3年・遺産分割から3年）の計算。
 - [準確定申告の必要書類チェックリスト](${SITE_URL}/guide/souzoku/junkakutei-checklist): 亡くなった日を入れると期限（知った日の翌日から4か月）が日付で出て、当てはまる控除や所得を選ぶと出す書類だけが一覧になる。
 - [相続財産の調べ方チェックリスト](${SITE_URL}/guide/souzoku/zaisan-shirabekata): 預貯金・不動産・株・生命保険・借金から選ぶと、調べる窓口（銀行・法務局の所有不動産記録証明・名寄帳・ほふり・生命保険協会・信用情報機関）と手数料が一覧になる。相続放棄（3か月）と申告（10か月）の期限も日付で。
 - [相続の戸籍の集め方チェックリスト](${SITE_URL}/guide/souzoku/koseki-atsumekata): 相続人（子・親・兄弟姉妹）と集める人を選ぶと、要る戸籍と、広域交付（2024年3月から）で最寄りの窓口で取れるかが出る。手数料も通数から計算。

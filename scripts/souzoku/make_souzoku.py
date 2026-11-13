@@ -15,7 +15,9 @@
   souzoku-junkakutei-shorui.xlsx / .pdf       準確定申告の必要書類チェックリスト（期限の計算つき。2026-11-12）
   souzoku-zaisan-shirabekata.xlsx / .pdf      相続財産の調べ方チェックリスト（窓口・手数料・期限の計算つき。2026-11-13）
   souzoku-koseki-atsumekata.xlsx / .pdf       相続の戸籍の集め方チェックリスト（相続人ごとの戸籍・手数料の計算つき。2026-11-13）
-  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki も同じ）
+  souzoku-shinkoku-jibun.xlsx / .pdf          相続税の申告を自分でする手順チェックリスト（期限・目安の日・作る表。2026-11-14）
+  souzoku-souzokunin-shinkoku-touki.xlsx / .pdf  相続人申告登記のチェックリスト（続柄ごとの戸籍・期限・申出書の下書き。2026-11-14）
+  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki も同じ）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import json
@@ -1045,6 +1047,196 @@ def make_koseki_pdf():
     _pdf(doc, "souzoku-koseki-atsumekata.pdf", "/guide/souzoku/koseki-atsumekata", ck)
 
 
+# ---------- 相続税の申告を自分でする手順（2026-11-14） ----------
+def make_jibun_xlsx():
+    Jd = DATA["jibun"]
+    ck = Jd["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "申告の手順"
+    widths(ws, [4, 34, 44, 14, 7])
+    put(ws, 1, 1, "相続税の申告を自分でする手順チェックリスト", H, border=False)
+    put(ws, 2, 1, "亡くなったことを知った日を入れると、期限と手順ごとの目安の日付が出ます。済んだら「済」を選びます。", S, border=False)
+    put(ws, 4, 2, "亡くなったことを知った日（例：2026/1/6）", B)
+    d = put(ws, 4, 3, None, B, IN_FILL, fmt="yyyy/m/d").coordinate
+    put(ws, 5, 2, "申告と納税の期限（自動）", B)
+    k5 = put(ws, 5, 3, f'=IF({d}="","",' + kigen_f(d, Jd["kigenN"]) + ')', B, OK_FILL, fmt="yyyy/m/d").coordinate
+    put(ws, 6, 2, "土日・年末年始に当たるときの期限（自動。祝日は入っていない）", B)
+    put(ws, 6, 3, f'=IF({k5}="","",WORKDAY(IF(AND(MONTH({k5})=12,DAY({k5})>=29),DATE(YEAR({k5})+1,1,4),IF(AND(MONTH({k5})=1,DAY({k5})<=3),DATE(YEAR({k5}),1,4),{k5}))-1,1))', B, OK_FILL, fmt="yyyy/m/d")
+    r = 8
+    for i, t in enumerate(["", "手順", "すること", "目安の日（自動）", "済"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    dv = DataValidation(type="list", formula1='"済"', allow_blank=True)
+    ws.add_data_validation(dv)
+    for k, st in enumerate(Jd["steps"]):
+        rr = r + 1 + k
+        put(ws, rr, 1, k + 1)
+        put(ws, rr, 2, st["h"], B)
+        put(ws, rr, 3, st["d"], N)
+        put(ws, rr, 4, f'=IF({d}="","",' + kigen_f(d, st["ato"]) + ')', B, OK_FILL, fmt="yyyy/m/d")
+        dv.add(put(ws, rr, 5, None, B, IN_FILL))
+        ws.row_dimensions[rr].height = 44
+    r = r + len(Jd["steps"]) + 1
+    put(ws, r, 1, "・" + Jd["atoNote"], S, border=False)
+    r += 2
+    put(ws, r, 2, "作る申告書の表（当てはまる行に「○」を選ぶと、作る表に「作る」が出ます。上から順に作ります）", B, border=False)
+    ws.merge_cells(start_row=r, start_column=2, end_row=r, end_column=5)
+    r += 1
+    for i, t in enumerate(["順", "表", "作るとき", "当てはまる", "作る"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    dv2 = DataValidation(type="list", formula1='"○"', allow_blank=True)
+    ws.add_data_validation(dv2)
+    when = {k["key"]: k["h"] for k in Jd["jokyo"]}
+    for k, h in enumerate(Jd["hyo"]):
+        rr = r + 1 + k
+        put(ws, rr, 1, k + 1)
+        put(ws, rr, 2, h["no"] + "\n" + h["h"], N)
+        if h["when"] == "always":
+            put(ws, rr, 3, "必ず作る", B)
+            put(ws, rr, 4, "－", N)
+            put(ws, rr, 5, "作る", B, OK_FILL)
+        else:
+            put(ws, rr, 3, when[h["when"]], N)
+            c = put(ws, rr, 4, None, B, IN_FILL)
+            dv2.add(c)
+            put(ws, rr, 5, f'=IF({c.coordinate}="○","作る","－")', B, OK_FILL)
+        ws.row_dimensions[rr].height = 36
+    r = r + len(Jd["hyo"]) + 2
+    notes = ["・" + Jd["kyujitsu"], "・" + Jd["hyoNote"], "・" + Jd["kasanNote"], "・" + Jd["yoshiki"],
+             "・出し方：" + "。".join(t["h"] + "：" + t["d"] for t in Jd["dashikata"]) + "。",
+             "・納め方：" + "。".join(t["h"] + "：" + t["d"] for t in Jd["nofu"]) + "。", "・" + Jd["madoguchi"]]
+    for k, t in enumerate(notes):
+        put(ws, r + k, 1, t, N, border=False)
+        ws.merge_cells(start_row=r + k, start_column=1, end_row=r + k, end_column=5)
+        ws.row_dimensions[r + k].height = 58
+    r += len(notes)
+    keys = ["nta4202", "nta4205r8", "ntaShikataKisai", "ntaShikataNofu", "ntaYoshikiR08", "nta4157", "etaxSouzokuSakusei", "etaxSouzokuFuka", "ntaSouzokuTetsuzuki"]
+    put(ws, r, 1, "出典：" + "／".join(SRC[k]["name"] for k in keys) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=5)
+    ws.row_dimensions[r].height = 70
+    put(ws, r + 1, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/shinkoku-jibun", S, border=False)
+    ws.page_setup.orientation = "portrait"
+    ws.page_setup.fitToWidth = 1
+    wb.save(OUT / "souzoku-shinkoku-jibun.xlsx")
+
+
+def make_jibun_pdf():
+    Jd = DATA["jibun"]
+    ck = Jd["checkedAt"].replace("-", "/")
+    when = {k["key"]: k["h"] for k in Jd["jokyo"]}
+    st = "".join(f"<tr><td>☐</td><td><b>{k + 1}. {esc(s_['h'])}</b><br><small>{esc(s_['d'])}</small></td><td></td></tr>" for k, s_ in enumerate(Jd["steps"]))
+    hy = "".join(f"<tr><td>☐</td><td>{k + 1}</td><td><b>{esc(h['no'])}</b> <small>{esc(h['h'])}</small></td><td>{'必ず作る' if h['when'] == 'always' else esc(when[h['when']])}</td></tr>" for k, h in enumerate(Jd["hyo"]))
+    da = "".join(f"<li><b>{esc(t['h'])}</b>：{esc(t['d'])}</li>" for t in Jd["dashikata"])
+    no = "".join(f"<li><b>{esc(t['h'])}</b>：{esc(t['d'])}</li>" for t in Jd["nofu"])
+    keys = ["nta4202", "nta4205r8", "ntaShikataKisai", "ntaShikataNofu", "ntaYoshikiR08", "nta4157", "etaxSouzokuSakusei", "etaxSouzokuFuka"]
+    body = f"""<style>small{{color:#64748b;font-size:8pt}} ul{{margin:1mm 0 0;padding-left:5mm}} li{{font-size:9pt}}</style>
+<div class="box"><b>期限</b>：{esc(Jd['kigen'])}（知った日 <span class="line" style="min-width:30mm"></span> → 期限 <span class="line" style="min-width:30mm"></span>）<br><small>{esc(Jd['kyujitsu'])}</small></div>
+<h2>手順</h2>
+<table><tr><th style="width:5mm"></th><th>すること</th><th style="width:30mm">目安の日</th></tr>{st}</table>
+<p class="note">{esc(Jd['atoNote'])}</p>
+<h2>作る申告書の表（上から順に）</h2>
+<table><tr><th style="width:5mm"></th><th style="width:6mm">順</th><th>表</th><th style="width:58mm">作るとき</th></tr>{hy}</table>
+<p class="note">{esc(Jd['hyoNote'])}{esc(Jd['kasanNote'])}</p>
+<div class="box"><b>出し方</b><ul>{da}</ul></div>
+<div class="box"><b>納め方</b><ul>{no}</ul></div>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in keys))}（{ck} 確認）</p>"""
+    doc = page("相続税の申告を自分でする手順チェックリスト", "済んだ手順と、作り終えた表の☐に印を付けます。", body)
+    _pdf(doc, "souzoku-shinkoku-jibun.pdf", "/guide/souzoku/shinkoku-jibun", ck)
+
+
+# ---------- 相続人申告登記の必要書類（2026-11-14） ----------
+def make_shinkokuTouki_xlsx():
+    Td = DATA["shinkokuTouki"]
+    ck = Td["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "相続人申告登記"
+    widths(ws, [4, 46, 26, 7])
+    put(ws, 1, 1, "相続人申告登記のチェックリスト", H, border=False)
+    put(ws, 2, 1, "申し出る人の続柄の戸籍と、共通の書類をそろえます。そろったら「済」を選びます。日付を入れると期限が出ます。", S, border=False)
+    r = 4
+    dv = DataValidation(type="list", formula1='"済"', allow_blank=True)
+    ws.add_data_validation(dv)
+    for z in Td["zokugara"]:
+        put(ws, r, 2, f"戸籍（申し出る人が{z['h']}）", B, HEAD_FILL)
+        put(ws, r, 3, "取る所", B, HEAD_FILL)
+        put(ws, r, 4, "済", B, HEAD_FILL)
+        for k in z["koseki"]:
+            r += 1
+            put(ws, r, 2, k, N)
+            put(ws, r, 3, "本籍地の市区町村", N)
+            dv.add(put(ws, r, 4, None, B, IN_FILL))
+            ws.row_dimensions[r].height = 30
+        r += 2
+    put(ws, r, 2, "共通の書類（当てはまるものだけ）", B, HEAD_FILL)
+    put(ws, r, 3, "取る所・作る人", B, HEAD_FILL)
+    put(ws, r, 4, "済", B, HEAD_FILL)
+    for c in Td["common"]:
+        r += 1
+        put(ws, r, 2, c["h"] + "\n" + c["d"], N)
+        put(ws, r, 3, c["saki"], N)
+        dv.add(put(ws, r, 4, None, B, IN_FILL))
+        ws.row_dimensions[r].height = 42
+    r += 2
+    put(ws, r, 2, "不動産を相続で取得したと知った日", N)
+    d = put(ws, r, 3, None, B, IN_FILL, fmt="yyyy/m/d").coordinate
+    put(ws, r + 1, 2, "申し出の期限（目安・自動）", B)
+    put(ws, r + 1, 3, f'=IF({d}="","",IF({d}<=DATE(2024,4,1),DATE(2027,3,31),' + kigen_f(d, 36) + '))', B, OK_FILL, fmt="yyyy/m/d")
+    put(ws, r + 2, 2, "相続人申告登記をした後に、遺産分割がまとまった日", N)
+    b = put(ws, r + 2, 3, None, B, IN_FILL, fmt="yyyy/m/d").coordinate
+    put(ws, r + 3, 2, "相続登記の期限（目安・自動）", B)
+    put(ws, r + 3, 3, f'=IF({b}="","",' + kigen_f(b, 36) + ')', B, OK_FILL, fmt="yyyy/m/d")
+    r += 5
+    notes = ["・" + Td["kosekiNote"] + Td["kawari"], "・" + Td["kigen"] + "。" + Td["kigenOldNote"] + "。",
+             "・" + Td["bunkatsu"] + "。" + Td["karyo"] + "。", "・登録免許税はかかりません。" + Td["kiroku"],
+             "・出し方：" + "。".join(t["h"] + "（" + t["d"] + "）" for t in Td["dashikata"]) + "。"]
+    for k, t in enumerate(notes):
+        put(ws, r + k, 1, t, N, border=False)
+        ws.merge_cells(start_row=r + k, start_column=1, end_row=r + k, end_column=4)
+        ws.row_dimensions[r + k].height = 44
+    r += len(notes)
+    keys = ["mojShinkoku", "mojShinkokuAnnai", "mojShinkokuKisai", "mojGimuQA", "mojTouki"]
+    put(ws, r, 1, "出典：" + "／".join(SRC[k]["name"] for k in keys) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+    ws.row_dimensions[r].height = 42
+    put(ws, r + 1, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/souzokunin-shinkoku-touki", S, border=False)
+    ws.page_setup.orientation = "portrait"
+    ws.page_setup.fitToWidth = 1
+    # 2枚目：申出書に書く項目の下書き
+    w2 = wb.create_sheet("申出書の下書き")
+    widths(w2, [24, 40, 40])
+    put(w2, 1, 1, "申出書に書く項目の下書き", H, border=False)
+    put(w2, 2, 1, "法務省の様式に書き写す前の下書きです。右の欄に書き込みます。", S, border=False)
+    for i, t in enumerate(["項目", "書き方", "書く内容"], 1):
+        put(w2, 4, i, t, B, HEAD_FILL)
+    for k, it in enumerate(Td["kisai"]):
+        put(w2, 5 + k, 1, it["h"], B)
+        put(w2, 5 + k, 2, it["d"], N)
+        put(w2, 5 + k, 3, None, N, IN_FILL)
+        w2.row_dimensions[5 + k].height = 36
+    put(w2, 6 + len(Td["kisai"]), 1, "出典：" + SRC["mojShinkokuKisai"]["name"] + f"（{ck} 確認）", S, border=False)
+    wb.save(OUT / "souzoku-souzokunin-shinkoku-touki.xlsx")
+
+
+def make_shinkokuTouki_pdf():
+    Td = DATA["shinkokuTouki"]
+    ck = Td["checkedAt"].replace("-", "/")
+    zk = "".join(f"<tr><th style='width:34mm'>{esc(z['h'])}</th><td>" + "<br>".join("☐ " + esc(k) for k in z["koseki"]) + "</td></tr>" for z in Td["zokugara"])
+    cm = "".join(f"<tr><td>☐</td><td><b>{esc(c['h'])}</b><br><small>{esc(c['d'])}</small></td><td>{esc(c['saki'])}</td></tr>" for c in Td["common"])
+    ks = "".join(f"<tr><th style='width:34mm'>{esc(k['h'])}<br><small>{esc(k['d'])}</small></th><td></td></tr>" for k in Td["kisai"])
+    keys = ["mojShinkoku", "mojShinkokuAnnai", "mojShinkokuKisai", "mojGimuQA", "mojTouki"]
+    body = f"""<style>small{{color:#64748b;font-size:8pt;font-weight:normal}}</style>
+<h2>申し出る人の続柄ごとの戸籍</h2><table>{zk}</table>
+<p class="note">{esc(Td['kosekiNote'])}{esc(Td['kawari'])}</p>
+<h2>共通の書類（当てはまるものだけ）</h2>
+<table><tr><th style="width:5mm"></th><th>書類</th><th style="width:44mm">取る所・作る人</th></tr>{cm}</table>
+<div class="box"><b>期限</b>：{esc(Td['kigen'])}（知った日 <span class="line" style="min-width:28mm"></span> → 期限 <span class="line" style="min-width:28mm"></span>）<br><small>{esc(Td['kigenOldNote'])}。{esc(Td['bunkatsu'])}。{esc(Td['karyo'])}。登録免許税はかかりません。</small></div>
+<h2>申出書に書く項目の下書き</h2><table>{ks}</table>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in keys))}（{ck} 確認）</p>"""
+    doc = page("相続人申告登記のチェックリスト", "そろえた書類の☐に印を付け、申出書に書く内容を下書きします。", body)
+    _pdf(doc, "souzoku-souzokunin-shinkoku-touki.pdf", "/guide/souzoku/souzokunin-shinkoku-touki", ck)
+
+
 if __name__ == "__main__":
     import sys
     if sys.argv[1:] == ["shinkoku"]:
@@ -1055,7 +1247,7 @@ if __name__ == "__main__":
         make_hikazei_xlsx()
         make_hikazei_pdf()
         sys.exit(0)
-    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki"):
+    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki", "jibun", "shinkokuTouki"):
         for name in sys.argv[1:]:
             globals()[f"make_{name}_xlsx"]()
             globals()[f"make_{name}_pdf"]()

@@ -111,6 +111,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 相続税の申告を自分でする手順（2026-11-14 作成、docs/seisaku-queue.md の T20）。
+    {
+      url: `${baseUrl}/guide/souzoku/shinkoku-jibun`,
+      lastModified: new Date("2026-11-14T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    // 相続人申告登記の必要書類（2026-11-14 作成、docs/seisaku-queue.md の T22）。
+    {
+      url: `${baseUrl}/guide/souzoku/souzokunin-shinkoku-touki`,
+      lastModified: new Date("2026-11-14T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 相続財産の調べ方チェックリスト（2026-11-13 作成、docs/seisaku-queue.md の T13）。
     {
       url: `${baseUrl}/guide/souzoku/zaisan-shirabekata`,
@@ -437,6 +451,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date("2026-11-11T14:00:00+09:00"),
       changeFrequency: "weekly",
       priority: 0.8,
+    },
+    // 子どもが生まれたときの保険の見直しチェックリスト（2026-11-14 作成、docs/seisaku-queue.md の T21）。
+    {
+      url: `${baseUrl}/guide/shisan-kanri/hoken-minaoshi-shussan`,
+      lastModified: new Date("2026-11-14T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
     },
     // 生命保険の見直しチェックリスト（2026-11-10 作成、docs/seisaku-queue.md の T3）。
     {

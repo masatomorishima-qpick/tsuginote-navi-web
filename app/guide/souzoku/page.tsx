@@ -38,6 +38,7 @@ const GROUPS = [
     items: [
       { href: '/guide/souzoku/souzokuzei-keisan', t: '相続税の計算', s: 'かかるか・いくらかの目安' },
       { href: '/guide/souzoku/shibou-hokenkin-hikazei', t: '死亡保険金の非課税', s: '受取人ごとの額を計算' },
+      { href: '/guide/souzoku/shinkoku-jibun', t: '相続税の申告を自分でする手順', s: '期限と、申告書の表を作る順' },
       { href: '/guide/souzoku/shinkoku-shorui-checklist', t: '相続税の申告の必要書類', s: '状況を選ぶと一覧に' },
     ],
   },
@@ -53,6 +54,7 @@ const GROUPS = [
     h: '実家・不動産', icon: Home,
     items: [
       { href: '/guide/souzoku/touki-shorui', t: '相続登記の必要書類', s: '期限と登録免許税も計算' },
+      { href: '/guide/souzoku/souzokunin-shinkoku-touki', t: '相続人申告登記の必要書類', s: '続柄を選ぶと要る戸籍が出る' },
       { href: '/guide/souzoku/jikka-akiya-tokurei', t: '相続した実家の3,000万円控除', s: '使えるか8つのチェック' },
     ],
   },

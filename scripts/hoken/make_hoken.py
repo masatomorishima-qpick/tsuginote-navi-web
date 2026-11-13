@@ -6,7 +6,8 @@
   hoken-hikaku.xlsx / .pdf   保険の比較表（いまの保険と見直し案を並べる。払う総額は自動計算）
   hoken-minaoshi-checklist.xlsx / .pdf   生命保険の見直しチェックリスト（節目・証券の6項目・次の更新の年は自動）
   hoken-shoken-kakiutsushi.xlsx / .pdf   保険証券の書き写し表（死亡保険金の税の種類と保険料の合計は自動。2026-11-11）
-  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken も同じ）
+  hoken-minaoshi-shussan.xlsx / .pdf   子どもが生まれたときの見直しチェックリスト（遺族基礎年金の目安は自動。2026-11-14）
+  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken・shussan も同じ）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import html
@@ -349,6 +350,132 @@ thead th {{ text-align: center; }} small {{ color: #64748b; font-weight: normal;
         b.close()
 
 
+# ---------- 子どもが生まれたときの保険の見直し（2026-11-14） ----------
+def make_shussan_xlsx():
+    from openpyxl.worksheet.datavalidation import DataValidation
+    P = DATA["shussan"]
+    Z = P["izoku"]
+    ck = P["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "見直しチェック"
+    for i, w in enumerate([4, 40, 52, 7], 1):
+        ws.column_dimensions[get_column_letter(i)].width = w
+    put(ws, 1, 1, "子どもが生まれたら 保険の見直しチェックリスト", H, border=False)
+    put(ws, 2, 1, "確かめたら「済」を選びます。2枚目のシートで、子の生年月日から遺族基礎年金の目安が出ます。", S, border=False)
+    for i, t in enumerate(["", "確かめること", "見るところ", "済"], 1):
+        put(ws, 4, i, t, B, HEAD)
+    dv = DataValidation(type="list", formula1='"済"', allow_blank=True)
+    ws.add_data_validation(dv)
+    for k, c in enumerate(P["check"]):
+        r = 5 + k
+        put(ws, r, 1, k + 1)
+        put(ws, r, 2, f"【{c['g']}】{c['h']}", B)
+        put(ws, r, 3, c["d"], N)
+        dv.add(put(ws, r, 4, None, B, IN))
+        ws.row_dimensions[r].height = 36
+    r = 6 + len(P["check"])
+    put(ws, r, 2, "出産と子育ての公的な給付", B, border=False)
+    for k, t in enumerate(P["kouteki"]):
+        put(ws, r + 1 + k, 2, t["h"] + "：" + t["v"], B)
+        put(ws, r + 1 + k, 3, t["d"], N)
+        ws.row_dimensions[r + 1 + k].height = 44
+    r += len(P["kouteki"]) + 2
+    for k, t in enumerate([P["hitsuyo"], P["kaisei"]] + P["izokuNote"]):
+        put(ws, r + k, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r + k, start_column=1, end_row=r + k, end_column=4)
+        ws.row_dimensions[r + k].height = 32
+    r += len(P["izokuNote"]) + 2
+    keys = ["jiliHitsuyo", "jiliMinaoshi", "mhlwKougaku", "kyoukaiShussan", "mhlwShussan", "cfaJidou", "nenkinIzokuKiso", "nenkinIzokuGuide", "mhlwIzokuMinaoshi"]
+    put(ws, r, 1, "出典：" + "／".join(SRC[k]["name"] for k in keys) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+    ws.row_dimensions[r].height = 58
+    put(ws, r + 1, 1, f"つぎの手ナビ　{SITE}/guide/shisan-kanri/hoken-minaoshi-shussan", S, border=False)
+    ws.page_setup.fitToWidth = 1
+
+    w2 = wb.create_sheet("遺族基礎年金の目安")
+    for i, w in enumerate([22, 16, 16, 12, 16], 1):
+        w2.column_dimensions[get_column_letter(i)].width = w
+    put(w2, 1, 1, f"遺族基礎年金の目安（{Z['nendo']}の額）", H, border=False)
+    put(w2, 2, 1, "子のある配偶者が受け取る場合。仮に「基準の日」の月に亡くなったとして、翌月分から年度ごとに数えます。", S, border=False)
+    put(w2, 4, 1, "基準の日（ふつうは今日）", B)
+    base = put(w2, 4, 2, "=TODAY()", B, IN, fmt="yyyy/m/d").coordinate
+    put(w2, 5, 1, "基本の額（年）", N); put(w2, 5, 2, Z["base"], N, fmt="#,##0")
+    put(w2, 6, 1, "子の加算 1人目・2人目（各）", N); put(w2, 6, 2, Z["add12"], N, fmt="#,##0")
+    put(w2, 7, 1, "子の加算 3人目から（各）", N); put(w2, 7, 2, Z["add3"], N, fmt="#,##0")
+    put(w2, 9, 1, "子", B, HEAD); put(w2, 9, 2, "生年月日", B, HEAD); put(w2, 9, 3, "対象の最後の日（自動）", B, HEAD)
+    ends = []
+    for k in range(5):
+        r = 10 + k
+        put(w2, r, 1, f"{k + 1}人目", N)
+        b = put(w2, r, 2, None, B, IN, fmt="yyyy/m/d").coordinate
+        # 18歳になる日＝18回目の誕生日の前の日。その日以後の最初の3月31日まで
+        e = put(w2, r, 3, f'=IF({b}="","",DATE(YEAR(EDATE({b},216)-1)+IF(MONTH(EDATE({b},216)-1)>3,1,0),3,31))', B, OK, fmt="yyyy/m/d")
+        ends.append(e.coordinate)
+    rng = f"$C$10:$C$14"
+    m1 = f"DATE(YEAR({base}),MONTH({base})+1,1)"
+    put(w2, 16, 1, "年度", B, HEAD); put(w2, 16, 2, "対象の子の数", B, HEAD); put(w2, 16, 3, "月数", B, HEAD); put(w2, 16, 4, "", B, HEAD); put(w2, 16, 5, "額（円）", B, HEAD)
+    for k in range(20):
+        r = 17 + k
+        y = f"(YEAR({m1})-IF(MONTH({m1})<4,1,0)+{k})"
+        put(w2, r, 1, f"={y}", N, fmt='0"年度"')
+        put(w2, r, 2, f'=COUNTIF({rng},">="&DATE({y}+1,3,31))', N)
+        mo = f"(({y}+1-YEAR({m1}))*12+4-MONTH({m1}))" if k == 0 else "12"
+        put(w2, r, 3, f"={mo}", N)
+        put(w2, r, 4, "", N)
+        put(w2, r, 5, f"=IF(B{r}=0,0,ROUND(($B$5+$B$6*MIN(B{r},2)+$B$7*MAX(B{r}-2,0))*C{r}/12,0))", B, OK, fmt="#,##0")
+    put(w2, 38, 1, "今の年額（自動）", B)
+    put(w2, 38, 5, "=IF(B17=0,0,$B$5+$B$6*MIN(B17,2)+$B$7*MAX(B17-2,0))", B, OK, fmt="#,##0")
+    put(w2, 39, 1, "合計の目安（自動）", B)
+    put(w2, 39, 5, "=SUM(E17:E36)", B, OK, fmt="#,##0")
+    put(w2, 41, 1, P["keisanNote"], S, border=False)
+    w2.merge_cells("A41:E41"); w2.row_dimensions[41].height = 44
+    put(w2, 42, 1, "出典：" + SRC["nenkinIzokuKiso"]["name"] + "／" + SRC["nenkinIzokuGuide"]["name"] + f"（{ck} 確認）", S, border=False)
+    w2.merge_cells("A42:E42"); w2.row_dimensions[42].height = 30
+    wb.save(OUT / "hoken-minaoshi-shussan.xlsx")
+
+
+def make_shussan_pdf():
+    from playwright.sync_api import sync_playwright
+    P = DATA["shussan"]
+    Z = P["izoku"]
+    ck = P["checkedAt"].replace("-", "/")
+    ch = "".join(f"<tr><td style='width:5mm'>□</td><td><b>{esc(c['h'])}</b><br><small>{esc(c['g'])}｜{esc(c['d'])}</small></td><td style='width:40mm'></td></tr>" for c in P["check"])
+    ko = "".join(f"<tr><th>{esc(t['h'])}</th><td><b>{esc(t['v'])}</b><br><small>{esc(t['d'])}</small></td></tr>" for t in P["kouteki"])
+    def ng(n):
+        return Z["base"] + Z["add12"] * min(n, 2) + Z["add3"] * max(n - 2, 0)
+    hy = "".join(f"<td>{ng(n):,}円</td>" for n in (1, 2, 3, 4))
+    notes = "".join(f"<li>{esc(t)}</li>" for t in P["izokuNote"])
+    keys = ["jiliHitsuyo", "jiliMinaoshi", "mhlwKougaku", "kyoukaiShussan", "cfaJidou", "nenkinIzokuKiso", "nenkinIzokuGuide", "mhlwIzokuMinaoshi"]
+    doc = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>
+@page {{ size: A4; margin: 11mm 14mm 14mm; }}
+body {{ font-family: 'Noto Sans CJK JP', sans-serif; color: #0f172a; font-size: 9.5pt; line-height: 1.5; }}
+h1 {{ font-size: 17pt; margin: 0 0 1mm; }} h2 {{ font-size: 11pt; margin: 3.5mm 0 1.5mm; }} .sub {{ color: #475569; margin: 0 0 2mm; font-size: 9pt; }}
+table {{ width: 100%; border-collapse: collapse; font-size: 9pt; }}
+th, td {{ border: 1px solid #94a3b8; padding: 1.2mm 2mm; }} th {{ background: #e0f2fe; text-align: left; width: 40mm; }}
+small {{ color: #64748b; font-weight: normal; font-size: 7.5pt; }}
+.box {{ border: 1.5px solid #fdba74; background: #fff7ed; border-radius: 3mm; padding: 1.8mm 4mm; margin-top: 2.5mm; }}
+.box ul {{ margin: 1mm 0 0; padding-left: 5mm; }} .note {{ color: #64748b; font-size: 7.5pt; margin: 1.5mm 0 0; }}
+</style></head><body><h1>子どもが生まれたら 保険の見直しチェックリスト</h1><p class="sub">確かめたら□に印を付け、右の欄にメモします。</p>
+<h2>① 確かめる8つの点</h2><table><tr><th style="width:5mm"></th><th style="width:auto">確かめること</th><th style="width:40mm">メモ</th></tr>{ch}</table>
+<p class="note">{esc(P['hitsuyo'])}</p>
+<h2>② 遺族基礎年金の年額（子のある配偶者が受け取るとき・{esc(Z['nendo'])}）</h2>
+<table><tr><th>対象の子の数</th><td>1人</td><td>2人</td><td>3人</td><td>4人</td></tr><tr><th>年額</th>{hy}</tr></table>
+<div class="box"><b>受け取れる人と条件</b><ul>{notes}</ul><small>{esc(P['kaisei'])}</small></div>
+<h2>③ 出産と子育ての公的な給付</h2><table>{ko}</table>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in keys))}（{ck} 確認）</p></body></html>"""
+    url = f"{SITE}/guide/shisan-kanri/hoken-minaoshi-shussan"
+    with sync_playwright() as p:
+        b = p.chromium.launch()
+        pg = b.new_page()
+        pg.set_content(doc, wait_until="load")
+        ft = (f"<div style=\"font-family:'Noto Sans CJK JP';font-size:7px;color:#94a3b8;width:100%;padding:0 14mm;display:flex;justify-content:space-between\">"
+              f"<span>つぎの手ナビ　{esc(url)}　（{ck} 確認）</span><span><span class='pageNumber'></span> / <span class='totalPages'></span></span></div>")
+        pg.pdf(path=str(OUT / "hoken-minaoshi-shussan.pdf"), format="A4", print_background=True, prefer_css_page_size=True,
+               display_header_footer=True, header_template="<div></div>", footer_template=ft)
+        b.close()
+
+
 if __name__ == "__main__":
     import sys
     only = sys.argv[1] if len(sys.argv) > 1 else ""
@@ -361,5 +488,8 @@ if __name__ == "__main__":
     if only in ("", "minaoshi"):
         make_minaoshi_xlsx()
         make_minaoshi_pdf()
+    if only in ("", "shussan"):
+        make_shussan_xlsx()
+        make_shussan_pdf()
     for f in sorted(OUT.glob("hoken-*")):
         print(f.name, f.stat().st_size)

@@ -98,6 +98,7 @@ export default function Page() {
               </li>
             ))}
           </ul>
+          <Link href="/guide/souzoku/souzokunin-shinkoku-touki" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">分け方が3年以内にまとまらないときの相続人申告登記<ArrowRight size={14} aria-hidden="true" /></Link>
           <p className={SRC}>出典：{src(['mojTouki'])}（{checked} 確認）</p>
         </section>
 

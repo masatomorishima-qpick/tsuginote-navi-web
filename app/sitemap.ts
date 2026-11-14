@@ -118,6 +118,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 生前贈与加算の計算（2026-11-14 作成、docs/seisaku-queue.md の T23）。
+    {
+      url: `${baseUrl}/guide/souzoku/seizen-zouyo-kasan`,
+      lastModified: new Date("2026-11-14T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    // 小規模宅地等の特例の必要書類（2026-11-14 作成、docs/seisaku-queue.md の T24）。
+    {
+      url: `${baseUrl}/guide/souzoku/shokibo-takuchi-shorui`,
+      lastModified: new Date("2026-11-14T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    // 相続税の未成年者控除・障害者控除の計算（2026-11-14 作成、docs/seisaku-queue.md の T25）。
+    {
+      url: `${baseUrl}/guide/souzoku/miseinen-shougaisha-kojo`,
+      lastModified: new Date("2026-11-14T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 相続人申告登記の必要書類（2026-11-14 作成、docs/seisaku-queue.md の T22）。
     {
       url: `${baseUrl}/guide/souzoku/souzokunin-shinkoku-touki`,

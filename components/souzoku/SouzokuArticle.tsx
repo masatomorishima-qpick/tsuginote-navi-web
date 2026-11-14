@@ -70,6 +70,18 @@ export const SOUZOKU_FILES = {
     { label: 'エクセル', href: '/downloads/souzoku-souzokunin-shinkoku-touki.xlsx', icon: FileSpreadsheet },
     { label: 'PDF', href: '/downloads/souzoku-souzokunin-shinkoku-touki.pdf', icon: FileText },
   ],
+  seizen: [
+    { label: 'エクセル', href: '/downloads/souzoku-seizen-zouyo-kasan.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-seizen-zouyo-kasan.pdf', icon: FileText },
+  ],
+  shokibo: [
+    { label: 'エクセル', href: '/downloads/souzoku-shokibo-takuchi-shorui.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-shokibo-takuchi-shorui.pdf', icon: FileText },
+  ],
+  miseinen: [
+    { label: 'エクセル', href: '/downloads/souzoku-miseinen-shougaisha-kojo.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-miseinen-shougaisha-kojo.pdf', icon: FileText },
+  ],
 } as const;
 
 export const SOUZOKU_PAGES = [
@@ -78,6 +90,9 @@ export const SOUZOKU_PAGES = [
   { href: '/guide/souzoku/shinkoku-jibun', h: '相続税の申告を自分でする手順' },
   { href: '/guide/souzoku/shinkoku-shorui-checklist', h: '相続税の申告の必要書類' },
   { href: '/guide/souzoku/shibou-hokenkin-hikazei', h: '死亡保険金の非課税の計算' },
+  { href: '/guide/souzoku/seizen-zouyo-kasan', h: '生前贈与加算の計算' },
+  { href: '/guide/souzoku/shokibo-takuchi-shorui', h: '小規模宅地等の特例の必要書類' },
+  { href: '/guide/souzoku/miseinen-shougaisha-kojo', h: '未成年者控除・障害者控除の計算' },
   { href: '/guide/souzoku/houtei-souzokubun', h: '法定相続分の計算' },
   { href: '/guide/souzoku/junkakutei-checklist', h: '準確定申告の必要書類' },
   { href: '/guide/souzoku/touki-shorui', h: '相続登記の必要書類' },

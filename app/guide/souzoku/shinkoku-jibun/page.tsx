@@ -77,7 +77,7 @@ export default function Page() {
             ))}
           </ol>
           <p className="text-[13px] text-slate-700">{J.kyujitsu}</p>
-          <p className={SRC}>出典：{src(['nta4202', 'nta4205r8', 'nta4152', 'nta4158', 'ntaShikataKisai'])}（{checked} 確認）</p>
+          <p className={SRC}>出典：{src(['nta4202', 'nta4205r8', 'nta4152', 'nta4158', 'nta4124', 'ntaShikataKisai'])}（{checked} 確認）</p>
         </section>
 
         <section className={SECTION} aria-labelledby="hyo">

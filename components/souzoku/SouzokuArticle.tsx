@@ -6,6 +6,7 @@ import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import SouzokuExit, { SouzokuExitSticky } from '@/components/souzoku/SouzokuExit';
+import AfterDownload from '@/components/souzoku/AfterDownload';
 import { SOUZOKU_PARTNERS, type SouzokuPartnerKey } from '@/lib/souzoku/partners';
 
 /**
@@ -185,7 +186,7 @@ export default function SouzokuArticle({
             <p className="text-[13px] font-bold text-sky-700">{eyebrow}</p>
             <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">{title}</h1>
           </div>
-          {download}
+          {hasExit ? <AfterDownload lpId={lpId} partner={partner} lead={exitLead}>{download}</AfterDownload> : download}
         </section>
 
         {children}

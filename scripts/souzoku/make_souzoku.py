@@ -17,9 +17,9 @@
   souzoku-koseki-atsumekata.xlsx / .pdf       相続の戸籍の集め方チェックリスト（相続人ごとの戸籍・手数料の計算つき。2026-11-13）
   souzoku-shinkoku-jibun.xlsx / .pdf          相続税の申告を自分でする手順チェックリスト（期限・目安の日・作る表。2026-11-14）
   souzoku-souzokunin-shinkoku-touki.xlsx / .pdf  相続人申告登記のチェックリスト（続柄ごとの戸籍・期限・申出書の下書き。2026-11-14）
-  souzoku-seizen-zouyo-kasan.xlsx / .pdf      生前贈与加算の計算表（亡くなった日で期間を決め、贈与を振り分け。2026-11-14）
-  souzoku-shokibo-takuchi-shorui.xlsx / .pdf  小規模宅地等の特例の必要書類チェックリスト（○で要る書類・減る額の計算。2026-11-14）
-  souzoku-miseinen-shougaisha-kojo.xlsx / .pdf  未成年者控除・障害者控除の計算表（生年月日から年数と額。2026-11-14）
+  souzoku-seizen-zouyo-kasan.xlsx / .pdf      生前贈与加算の計算表（亡くなった日で期間を決め、贈与を振り分け。2026-11-15）
+  souzoku-shokibo-takuchi-shorui.xlsx / .pdf  小規模宅地等の特例の必要書類チェックリスト（○で要る書類・減る額の計算。2026-11-15）
+  souzoku-miseinen-shougaisha-kojo.xlsx / .pdf  未成年者控除・障害者控除の計算表（生年月日から年数と額。2026-11-15）
   python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki・seizen・shokibo・miseinen も同じ）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
@@ -1242,7 +1242,7 @@ def make_shinkokuTouki_pdf():
 
 
 
-# ---------- 生前贈与加算の計算表（2026-11-14） ----------
+# ---------- 生前贈与加算の計算表（2026-11-15） ----------
 def make_seizen_xlsx():
     Se = DATA["seizen"]
     ck = Se["checkedAt"].replace("-", "/")
@@ -1328,7 +1328,7 @@ def make_seizen_pdf():
     _pdf(doc, "souzoku-seizen-zouyo-kasan.pdf", "/guide/souzoku/seizen-zouyo-kasan", ck)
 
 
-# ---------- 小規模宅地等の特例のチェックリスト（2026-11-14） ----------
+# ---------- 小規模宅地等の特例のチェックリスト（2026-11-15） ----------
 def make_shokibo_xlsx():
     Sh = DATA["shokibo"]
     ck = Sh["checkedAt"].replace("-", "/")
@@ -1429,7 +1429,7 @@ def make_shokibo_pdf():
     _pdf(doc, "souzoku-shokibo-takuchi-shorui.pdf", "/guide/souzoku/shokibo-takuchi-shorui", ck)
 
 
-# ---------- 未成年者控除・障害者控除の計算表（2026-11-14） ----------
+# ---------- 未成年者控除・障害者控除の計算表（2026-11-15） ----------
 def make_miseinen_xlsx():
     Mi = DATA["miseinen"]
     ck = Mi["checkedAt"].replace("-", "/")

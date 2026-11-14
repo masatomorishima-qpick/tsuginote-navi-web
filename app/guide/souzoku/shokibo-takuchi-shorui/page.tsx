@@ -8,9 +8,9 @@ import ShokiboTakuchiCheck from '@/components/souzoku/ShokiboTakuchiCheck';
 import DATA from '@/lib/souzoku/haifu-data.json';
 
 /**
- * 小規模宅地等の特例の必要書類チェックリスト（2026-11-14 作成。docs/seisaku-queue.md の T24）。
+ * 小規模宅地等の特例の必要書類チェックリスト（2026-11-15 作成。docs/seisaku-queue.md の T24）。
  * 受ける言葉：小規模宅地等の特例 必要書類（主）・チェックリスト・添付書類・家なき子 必要書類・老人ホーム 必要書類・小規模宅地 計算。
- *   上位5件（11/14、WebSearch。Chrome につながらず）：1 不動産会社のコラム（2026/5 更新、計算例1つ）2 税理士法人トゥモローズ（2026/8 更新、表なし）
+ *   上位5件（11/15、WebSearch。Chrome につながらず）：1 不動産会社のコラム（2026/5 更新、計算例1つ）2 税理士法人トゥモローズ（2026/8 更新、表なし）
  *   3 税理士法人ともに（2022、平成30年版の資料が元）4 世田谷の相続専門の税理士事務所（令和8年分の資料、表7つ）5 3位の事務所の PDF（2022）。
  *   上位に欠けている点：①形を選ぶと要る書類だけが出る道具がない（4位は表で読む）②減る額の計算がどこにもない（限度面積 330・400㎡の数字があるのは1件）
  *   ③エクセルがない ④令和8年分（R8.7）の国税庁の一覧で確かめた日つきのものが1件だけ。
@@ -47,7 +47,7 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
-        lpId={LP_ID} version="v1-2026-11-14" path={PATH} eyebrow="相続税の土地の特例"
+        lpId={LP_ID} version="v1-2026-11-15" path={PATH} eyebrow="相続税の土地の特例"
         title={<>小規模宅地等の特例の必要書類<br /><span className="text-orange-600">自宅の土地は330㎡まで80%減</span></>}
         download={
           <div className="flex flex-col gap-3">
@@ -57,7 +57,7 @@ export default function Page() {
             <SouzokuDownload icon={ListChecks} h="小規模宅地等の特例のチェックリスト" s="形に ○ を付けると要る書類と減る額が出る" files={SOUZOKU_FILES.shokibo} />
           </div>
         }
-        partner="souzokuAssist" exitLead="特例を使うなら申告が要る。書類集めから任せる" faqs={FAQS} updated="2026年11月14日"
+        partner="souzokuAssist" exitLead="特例を使うなら申告が要る。書類集めから任せる" faqs={FAQS} updated="2026年11月15日"
       >
         <section className={SECTION} aria-labelledby="hyo">
           <h2 id="hyo" className={H2}>小規模宅地等の特例の限度面積と減額の割合</h2>

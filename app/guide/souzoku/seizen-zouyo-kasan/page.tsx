@@ -8,9 +8,9 @@ import SeizenKasanCalc from '@/components/souzoku/SeizenKasanCalc';
 import DATA from '@/lib/souzoku/haifu-data.json';
 
 /**
- * 生前贈与加算（7年）の計算（2026-11-14 作成。docs/seisaku-queue.md の T23）。
+ * 生前贈与加算（7年）の計算（2026-11-15 作成。docs/seisaku-queue.md の T23）。
  * 受ける言葉：生前贈与加算 7年 計算（主）・相続開始前贈与 加算・生前贈与 7年 いつから・100万円 控除。
- *   上位5件（11/14、WebSearch。Chrome につながらず）：1 税理士法人レガシィ（2026/10 更新、税額の計算例）2 税理士法人チェスター（2026/9）
+ *   上位5件（11/15、WebSearch。Chrome につながらず）：1 税理士法人レガシィ（2026/10 更新、税額の計算例）2 税理士法人チェスター（2026/9）
  *   3 税理士法人AOIみらい（2026/11 更新）4 山田＆パートナーズ（2023 の改正速報、更新日なし）5 個人の note（2026/7）。
  *   7位 情報媒体（亡くなる年別の表）、8位 札幌の会計事務所（3項目を入れる計算の道具）。
  *   上位に欠けている点：①亡くなった日と贈与の日・額を入れると、期間の内外・3年以内かを自動で分けて足し戻す額が出る道具がない
@@ -48,7 +48,7 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
-        lpId={LP_ID} version="v1-2026-11-14" path={PATH} eyebrow="相続税と生前の贈与"
+        lpId={LP_ID} version="v1-2026-11-15" path={PATH} eyebrow="相続税と生前の贈与"
         title={<>生前贈与加算の計算<br /><span className="text-orange-600">7年は2031年から</span></>}
         download={
           <div className="flex flex-col gap-3">
@@ -58,7 +58,7 @@ export default function Page() {
             <SouzokuDownload icon={Calculator} h="生前贈与加算の計算表" s="亡くなった日と贈与を入れると自動で振り分け" files={SOUZOKU_FILES.seizen} />
           </div>
         }
-        partner="souzokuAssist" exitLead="贈与の記録がそろったら、申告はまとめて任せる" faqs={FAQS} updated="2026年11月14日"
+        partner="souzokuAssist" exitLead="贈与の記録がそろったら、申告はまとめて任せる" faqs={FAQS} updated="2026年11月15日"
       >
         <section className={SECTION} aria-labelledby="kikan">
           <h2 id="kikan" className={H2}>亡くなった日ごとの加算の期間（3年から7年へ）</h2>

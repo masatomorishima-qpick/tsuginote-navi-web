@@ -8,9 +8,9 @@ import MiseinenKojoCalc from '@/components/souzoku/MiseinenKojoCalc';
 import DATA from '@/lib/souzoku/haifu-data.json';
 
 /**
- * 相続税の未成年者控除・障害者控除の計算（2026-11-14 作成。docs/seisaku-queue.md の T25）。
+ * 相続税の未成年者控除・障害者控除の計算（2026-11-15 作成。docs/seisaku-queue.md の T25）。
  * 受ける言葉：相続税 未成年者控除 計算（主）・障害者控除 計算・未成年者控除 扶養義務者・18歳。
- *   上位5件（11/14、WebSearch。Chrome につながらず）：1 VSG相続税理士法人（2026/10 更新）2 税理士法人チェスター（2026/3）
+ *   上位5件（11/15、WebSearch。Chrome につながらず）：1 VSG相続税理士法人（2026/10 更新）2 税理士法人チェスター（2026/3）
  *   3 ランドマーク税理士法人の相談サイト（2025/4、一次情報の引用なし）4 アトム相続税理士法人（2026/9、早見表あり）5 税理士法人の情報サイト（読めず）。
  *   上位に欠けている点：①生年月日と亡くなった日を入れると年数と控除の額が出る道具がない ②本人で引き切れない分（扶養義務者から引く分）を出す道具がない
  *   ③未成年者控除と障害者控除を1つで計算できない ④エクセルがない ⑤国税庁の確認日の記載が0件。
@@ -47,7 +47,7 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
-        lpId={LP_ID} version="v1-2026-11-14" path={PATH} eyebrow="相続税の控除"
+        lpId={LP_ID} version="v1-2026-11-15" path={PATH} eyebrow="相続税の控除"
         title={<>相続税の未成年者控除・<br className="sm:hidden" />障害者控除の計算<br /><span className="text-orange-600">1年10万円×18歳までの年数</span></>}
         download={
           <div className="flex flex-col gap-3">
@@ -57,7 +57,7 @@ export default function Page() {
             <SouzokuDownload icon={Calculator} h="未成年者控除・障害者控除の計算表" s="生年月日と亡くなった日を入れると自動で計算" files={SOUZOKU_FILES.miseinen} />
           </div>
         }
-        partner="souzokuAssist" exitLead="子どもの分も含めて、相続税の申告をまとめて任せる" faqs={FAQS} updated="2026年11月14日"
+        partner="souzokuAssist" exitLead="子どもの分も含めて、相続税の申告をまとめて任せる" faqs={FAQS} updated="2026年11月15日"
       >
         <section className={SECTION} aria-labelledby="hayami">
           <h2 id="hayami" className={H2}>未成年者控除の早見表</h2>

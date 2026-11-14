@@ -6,7 +6,7 @@ import { trackEvent } from '@/lib/trackEvent';
 import DATA from '@/lib/souzoku/haifu-data.json';
 
 /**
- * 小規模宅地等の特例：状況を選ぶと要る書類が一覧になり、面積と評価額で減る額が出る（/guide/souzoku/shokibo-takuchi-shorui、2026-11-14）。
+ * 小規模宅地等の特例：状況を選ぶと要る書類が一覧になり、面積と評価額で減る額が出る（/guide/souzoku/shokibo-takuchi-shorui、2026-11-15）。
  * 書類：国税庁「相続税の申告の際に提出していただく主な書類」（R8.7）の (5)。限度面積と割合：国税庁 No.4124（令和8年4月1日現在法令等）。
  * 減る額 ＝ 評価額 × min(面積, 限度面積) ÷ 面積 × 割合（1つの区分だけ使うとき）。
  * 使われたかは lp_event_logs の event_name 'shokibo_takuchi'（1回目だけ）。選んだ内容・数字は送らない。

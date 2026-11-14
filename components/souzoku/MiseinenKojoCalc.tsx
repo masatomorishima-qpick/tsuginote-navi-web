@@ -6,7 +6,7 @@ import { trackEvent } from '@/lib/trackEvent';
 import DATA from '@/lib/souzoku/haifu-data.json';
 
 /**
- * 相続税の未成年者控除・障害者控除の計算（/guide/souzoku/miseinen-shougaisha-kojo、2026-11-14）。
+ * 相続税の未成年者控除・障害者控除の計算（/guide/souzoku/miseinen-shougaisha-kojo、2026-11-15）。
  * 決まり：国税庁 No.4164・No.4167（令和8年4月1日現在法令等）。
  *   控除額 ＝ 1年あたりの額 ×（18歳か85歳になるまでの年数。1年未満は切り上げ）＝ 1年あたりの額 ×（18か85 − 満年齢）。
  *   本人の相続税で引き切れない分は、扶養義務者の相続税から引く。

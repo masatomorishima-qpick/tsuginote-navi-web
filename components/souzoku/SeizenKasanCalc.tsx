@@ -5,7 +5,7 @@ import { Calculator, Plus, Trash2 } from 'lucide-react';
 import { trackEvent } from '@/lib/trackEvent';
 
 /**
- * 生前贈与の加算（7年）の計算（/guide/souzoku/seizen-zouyo-kasan、2026-11-14）。
+ * 生前贈与の加算（7年）の計算（/guide/souzoku/seizen-zouyo-kasan、2026-11-15）。
  * 決まり：国税庁 No.4161（令和8年4月1日現在法令等）。
  *   足す期間：亡くなった日が 2026-12-31 まで → 3年前の日〜亡くなった日／2027-01-01〜2030-12-31 → 2024-01-01〜亡くなった日／
  *   2031-01-01 から → 7年前の日〜亡くなった日。

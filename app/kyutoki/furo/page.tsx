@@ -76,7 +76,7 @@ export default function FuroPage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">ガス給湯器の交換</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">お風呂の給湯器<br />3つの種類</h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">お風呂の給湯器の交換費用<br /><span className="text-orange-600">3つの種類と値段の差</span></h1>
           </div>
           <ul className="grid grid-cols-3 gap-2">
             {[

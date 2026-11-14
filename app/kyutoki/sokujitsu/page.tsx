@@ -101,7 +101,7 @@ export default function SokujitsuPage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">ガス給湯器が止まった</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">今日お湯を<br />使うまで</h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">給湯器が壊れた日に<br /><span className="text-orange-600">今日お湯を使うまで</span></h1>
           </div>
           <ol className="flex flex-col gap-1">
             {[

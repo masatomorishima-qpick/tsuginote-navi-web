@@ -99,7 +99,7 @@ export default function MitsumoriMikataPage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">ガス給湯器の交換</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">見積もりの見方<br />確かめる10か所</h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">給湯器の見積もりの見方<br /><span className="text-orange-600">確かめる10か所</span></h1>
           </div>
           <HaifuDownload main="check" others={['hiyou', 'gosu']} />
         </section>

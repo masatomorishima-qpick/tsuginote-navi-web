@@ -52,7 +52,7 @@ export default function Page() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
         lpId={LP_ID} version="v1-2026-11-11" path={PATH} eyebrow="死亡保険金と相続税"
-        title={<>死亡保険金の<br /><span className="text-orange-600">非課税の計算</span></>}
+        title={<>死亡保険金の相続税<br /><span className="text-orange-600">非課税の計算</span></>}
         download={
           <div className="flex flex-col gap-3">
             <p className="rounded-2xl bg-white p-4 text-center ring-1 ring-slate-200">

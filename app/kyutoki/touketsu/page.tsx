@@ -76,7 +76,7 @@ export default function TouketsuPage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="flex items-center gap-1.5 text-[13px] font-bold text-sky-700"><Snowflake size={16} aria-hidden="true" />給湯器の凍結</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">凍ったら<br /><span className="text-orange-600">お湯をかけずに待つ</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">給湯器が凍結したら<br /><span className="text-orange-600">お湯をかけずに待つ</span></h1>
             <p className="text-[14px] text-slate-700">{F.sain}</p>
           </div>
           <ol className="grid grid-cols-3 gap-2">

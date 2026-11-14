@@ -41,7 +41,7 @@ export default function Page() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
         lpId={LP_ID} version="v1-2026-11-05" path={PATH} eyebrow="相続した実家"
-        title={<>実家を売るときの<br />3,000万円控除</>}
+        title={<>相続した実家の<br />3,000万円控除</>}
         download={<SouzokuDownload icon={ClipboardCheck} h="使えるかのチェック表" s="8つの条件と、売る期限の自動計算" files={SOUZOKU_FILES.akiya} />}
         partner="akiyaHonpo" exitLead="古い家のままでも、まず買い取り額を聞く" faqs={FAQS} updated="2026年11月5日"
       >

@@ -69,7 +69,7 @@ export default function NuruiPage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="flex items-center gap-1.5 text-[13px] font-bold text-sky-700"><ShowerHead size={16} aria-hidden="true" />お湯がぬるい・温度が安定しない</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">ぬるいときは<br /><span className="text-orange-600">まず4つを確かめる</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">給湯器のお湯がぬるいとき<br /><span className="text-orange-600">まず4つを確かめる</span></h1>
           </div>
           <ol className="grid gap-2">
             {F.genin.map((g, i) => {

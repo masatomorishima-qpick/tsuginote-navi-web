@@ -69,7 +69,7 @@ export default function NensuPage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">ガス給湯器の寿命</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">目安は<span className="text-orange-600">約10年</span><br />年数で決める</h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">給湯器の寿命は約10年<br /><span className="text-orange-600">使った年数で決める</span></h1>
           </div>
           <ol className="grid gap-2">
             {[

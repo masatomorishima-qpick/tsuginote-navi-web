@@ -76,7 +76,7 @@ export default function MizumorePage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="flex items-center gap-1.5 text-[13px] font-bold text-sky-700"><Wrench size={16} aria-hidden="true" />給湯器の水漏れ</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">水漏れは<br /><span className="text-orange-600">止水栓・電源・ガス栓</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">給湯器の水漏れ<br /><span className="text-orange-600">まず止水栓・電源・ガス栓</span></h1>
             <p className="flex items-start gap-1.5 text-[14px] font-bold text-red-700"><AlertTriangle size={18} className="mt-0.5 shrink-0" aria-hidden="true" />{F.kiken}</p>
           </div>
           <ol className="grid grid-cols-2 gap-2">

@@ -81,7 +81,7 @@ export default function DanboPage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">ガス給湯器の交換</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">暖房付きの給湯器<br /><span className="text-orange-600">30〜35万円ほど</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">暖房付き給湯器の交換費用<br /><span className="text-orange-600">30〜35万円ほど</span></h1>
           </div>
           <div className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
             <span className="flex shrink-0 gap-1 text-sky-700"><Heater size={20} aria-hidden="true" /><Bath size={20} aria-hidden="true" /></span>

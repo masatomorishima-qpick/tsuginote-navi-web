@@ -86,7 +86,7 @@ export default function EcojozuPage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">ガス給湯器の交換</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">エコジョーズの差額<br /><span className="text-orange-600">約2万〜3万円</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">エコジョーズへの交換費用<br /><span className="text-orange-600">差額は約2万〜3万円</span></h1>
           </div>
           <ul className="grid gap-2">
             {[

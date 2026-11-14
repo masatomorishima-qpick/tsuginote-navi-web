@@ -55,7 +55,7 @@ export default function Page() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
         lpId={LP_ID} version="v1-2026-11-10" path={PATH} eyebrow="相続税"
-        title={<>相続税は<br /><span className="text-orange-600">いくらからかかる？</span></>}
+        title={<>相続税の計算<br /><span className="text-orange-600">いくらからかかる？</span></>}
         download={<SouzokuzeiCalc lpId={LP_ID} />}
         partner="souzokuAssist" exitLead="相続税がかかりそうなら、申告をまとめて頼む" faqs={FAQS} updated="2026年11月10日"
       >

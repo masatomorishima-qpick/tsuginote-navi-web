@@ -79,7 +79,7 @@ export default function MansionPage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">ガス給湯器の交換</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">マンションの<br />給湯器の交換</h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">マンションの給湯器の交換費用<br /><span className="text-orange-600">扉の中と壁掛けで変わる</span></h1>
           </div>
           <ul className="grid gap-2">
             {[

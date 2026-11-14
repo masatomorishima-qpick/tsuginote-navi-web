@@ -84,7 +84,7 @@ export default function ErrorPage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">給湯器のエラー番号</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">番号で分かる<br /><span className="text-orange-600">自分で直せるか</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">給湯器のエラー番号の早見<br /><span className="text-orange-600">自分で直せるか分かる</span></h1>
           </div>
           <ul className="grid gap-2">
             {E.groups.map((g) => {

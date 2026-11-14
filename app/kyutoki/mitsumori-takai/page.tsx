@@ -122,7 +122,7 @@ export default function MitsumoriTakaiPage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">ガス給湯器の交換</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">見積もりが高いとき<br />目安の金額</h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">給湯器の見積もりが高いとき<br /><span className="text-orange-600">目安の金額</span></h1>
           </div>
           <figure className="flex flex-col gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
             <figcaption className="text-[13px] font-bold text-slate-700">工事費込み・税込の総額（東京ガス）</figcaption>

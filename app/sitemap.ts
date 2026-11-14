@@ -241,7 +241,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
-    // 給湯器の頼み先（2026-11-08 作成、docs/seisaku-queue.md の P12）。
+    // 給湯器の相談先（2026-11-08 作成、docs/seisaku-queue.md の P12）。
     {
       url: `${baseUrl}/kyutoki/tanomisaki`,
       lastModified: new Date("2026-11-08T09:00:00+09:00"),

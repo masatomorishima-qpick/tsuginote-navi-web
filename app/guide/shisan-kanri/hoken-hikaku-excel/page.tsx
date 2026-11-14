@@ -78,7 +78,7 @@ export default function Page() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">保険の見直し</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">保険の比較表<br /><span className="text-orange-600">いまの保険と並べる</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">保険の比較表（エクセル）<br /><span className="text-orange-600">いまの保険と並べる</span></h1>
           </div>
           <div className="flex flex-col gap-3 rounded-2xl border-2 border-sky-200 bg-sky-50/60 p-4">
             <div className="flex items-center gap-3">

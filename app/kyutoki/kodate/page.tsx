@@ -79,7 +79,7 @@ export default function KodatePage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">ガス給湯器の交換</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">戸建ての給湯器<br />置き場所で変わる値段</h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">戸建ての給湯器の交換費用<br /><span className="text-orange-600">置き場所で変わる値段</span></h1>
           </div>
           <ul className="grid gap-2">
             {[

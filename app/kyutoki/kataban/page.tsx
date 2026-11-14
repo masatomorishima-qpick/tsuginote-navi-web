@@ -74,7 +74,7 @@ export default function KatabanPage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">給湯器の型番の見方</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">型番で分かる<br /><span className="text-orange-600">号数とエコジョーズ</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">給湯器の型番の見方<br /><span className="text-orange-600">号数とエコジョーズが分かる</span></h1>
           </div>
           <KatabanCheck lpId={LP_ID} />
           <p className={SRC}>読み方の元：<a href={S.tgWhat.url} target="_blank" rel="noopener noreferrer" className={A}>{S.tgWhat.name}</a>・<a href={S.tgHowto.url} target="_blank" rel="noopener noreferrer" className={A}>{S.tgHowto.name}</a>（{checked} 確認）。入れた型番は送られません。</p>

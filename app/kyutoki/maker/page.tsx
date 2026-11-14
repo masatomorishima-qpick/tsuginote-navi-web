@@ -84,7 +84,7 @@ export default function MakerPage() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">ガス給湯器の交換</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">メーカーの差は<br /><span className="text-orange-600">数千円〜1万円</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">給湯器のメーカーと値段<br /><span className="text-orange-600">差は数千円〜1万円</span></h1>
           </div>
           <div className="flex flex-col items-center gap-1 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
             <div className="flex items-center gap-3">

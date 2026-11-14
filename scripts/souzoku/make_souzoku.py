@@ -17,7 +17,10 @@
   souzoku-koseki-atsumekata.xlsx / .pdf       相続の戸籍の集め方チェックリスト（相続人ごとの戸籍・手数料の計算つき。2026-11-13）
   souzoku-shinkoku-jibun.xlsx / .pdf          相続税の申告を自分でする手順チェックリスト（期限・目安の日・作る表。2026-11-14）
   souzoku-souzokunin-shinkoku-touki.xlsx / .pdf  相続人申告登記のチェックリスト（続柄ごとの戸籍・期限・申出書の下書き。2026-11-14）
-  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki も同じ）
+  souzoku-seizen-zouyo-kasan.xlsx / .pdf      生前贈与加算の計算表（亡くなった日で期間を決め、贈与を振り分け。2026-11-15）
+  souzoku-shokibo-takuchi-shorui.xlsx / .pdf  小規模宅地等の特例の必要書類チェックリスト（○で要る書類・減る額の計算。2026-11-15）
+  souzoku-miseinen-shougaisha-kojo.xlsx / .pdf  未成年者控除・障害者控除の計算表（生年月日から年数と額。2026-11-15）
+  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki・seizen・shokibo・miseinen も同じ）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import json
@@ -1237,6 +1240,265 @@ def make_shinkokuTouki_pdf():
     _pdf(doc, "souzoku-souzokunin-shinkoku-touki.pdf", "/guide/souzoku/souzokunin-shinkoku-touki", ck)
 
 
+
+
+# ---------- 生前贈与加算の計算表（2026-11-15） ----------
+def make_seizen_xlsx():
+    Se = DATA["seizen"]
+    ck = Se["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "生前贈与加算"
+    widths(ws, [16, 16, 30, 16])
+    put(ws, 1, 1, "生前贈与加算（3年→7年）の計算表", H, border=False)
+    put(ws, 2, 1, "オレンジの欄に、亡くなった日と、1人が亡くなった人から受けた暦年課税の贈与（日付と額）を入れると、足し戻す額が出ます。100万円の控除は受け取った人ごとなので、1人ずつ1枚で計算します。", S, border=False)
+    put(ws, 4, 1, "亡くなった日", B, HEAD_FILL)
+    put(ws, 4, 2, "2031-06-30", B, IN_FILL)
+    from datetime import date
+    ws.cell(row=4, column=2).value = date(2031, 6, 30)
+    ws.cell(row=4, column=2).number_format = "yyyy/m/d"
+    put(ws, 5, 1, "足す期間の始まり（自動）", B)
+    put(ws, 5, 2, '=IF(B4="","",IF(B4<=DATE(2026,12,31),EDATE(B4,-36),IF(B4<=DATE(2030,12,31),DATE(2024,1,1),EDATE(B4,-84))))', B, OK_FILL, fmt="yyyy/m/d")
+    put(ws, 6, 1, "3年以内の始まり（自動）", B)
+    put(ws, 6, 2, '=IF(B4="","",EDATE(B4,-36))', B, OK_FILL, fmt="yyyy/m/d")
+    put(ws, 7, 1, "100万円の控除（自動）", B)
+    put(ws, 7, 2, '=IF(B4="","",IF(B4>=DATE(2027,1,2),"あり","なし"))', B, OK_FILL)
+    r = 9
+    for i, t in enumerate(["贈与の日", "贈与の額（円）", "区分（自動）", "払った贈与税（円）"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    sample = [(date(2025, 7, 1), 3000000), (date(2027, 7, 1), 2000000), (date(2029, 7, 1), 2000000), (date(2030, 7, 1), 1000000)]
+    a, b = r + 1, r + 12
+    for k, rr in enumerate(range(a, b + 1)):
+        dt, km = sample[k] if k < len(sample) else (None, None)
+        put(ws, rr, 1, dt, N, IN_FILL, fmt="yyyy/m/d")
+        put(ws, rr, 2, km, N, IN_FILL, fmt="#,##0")
+        put(ws, rr, 3, f'=IF(OR(A{rr}="",B{rr}=""),"",IF(OR(A{rr}<$B$5,A{rr}>$B$4),"期間の外（足さない）",IF(A{rr}>=$B$6,"3年以内","3年より前")))', B, OK_FILL)
+        put(ws, rr, 4, None, N, IN_FILL, fmt="#,##0")
+    r = b + 2
+    put(ws, r, 1, "3年以内の合計", B)
+    put(ws, r, 2, f'=SUMIF(C{a}:C{b},"3年以内",B{a}:B{b})', B, OK_FILL, fmt="#,##0")
+    put(ws, r + 1, 1, "3年より前の合計", B)
+    put(ws, r + 1, 2, f'=SUMIF(C{a}:C{b},"3年より前",B{a}:B{b})', B, OK_FILL, fmt="#,##0")
+    put(ws, r + 2, 1, "引く額（総額100万円まで）", B)
+    put(ws, r + 2, 2, f'=IF($B$7="あり",MIN(B{r + 1},1000000),0)', B, OK_FILL, fmt="#,##0")
+    put(ws, r + 3, 1, "足し戻す額", B)
+    put(ws, r + 3, 2, f"=B{r}+B{r + 1}-B{r + 2}", B, OK_FILL, fmt="#,##0")
+    put(ws, r + 4, 1, "足した贈与の贈与税（目安）", B)
+    put(ws, r + 4, 2, f'=SUMIF(C{a}:C{b},"3年以内",D{a}:D{b})+SUMIF(C{a}:C{b},"3年より前",D{a}:D{b})', B, OK_FILL, fmt="#,##0")
+    put(ws, r + 4, 3, "相続税から引ける額の目安。その年の贈与の一部だけ足すときは割合で計算", S, border=False)
+    r += 6
+    put(ws, r, 1, "きまり", B, border=False)
+    for k, x in enumerate(Se["rules"], 1):
+        put(ws, r + k, 1, f"・{x['h']}：{x['d']}", N, border=False)
+        ws.merge_cells(start_row=r + k, start_column=1, end_row=r + k, end_column=4)
+        ws.row_dimensions[r + k].height = 30
+    r += len(Se["rules"]) + 1
+    for t in [Se["hyaku"], Se["seisan"], "払った贈与税は、足した贈与にかかった分をその人の相続税から引けます（その年の一部だけ足すときは割合で計算）。", Se["kazoe"]]:
+        put(ws, r, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+        ws.row_dimensions[r].height = 30
+        r += 1
+    put(ws, r, 1, "入っている例：" + Se["reiGifts"] + "。2031年6月30日に亡くなった場合は700万円。", S, border=False)
+    put(ws, r + 1, 1, "出典：" + "／".join(SRC[k]["name"] for k in ["nta4161", "nta4103"]) + f"（{ck} 確認）", S, border=False)
+    put(ws, r + 2, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/seizen-zouyo-kasan", S, border=False)
+    ws.page_setup.orientation = "portrait"
+    ws.page_setup.fitToWidth = 1
+    wb.save(OUT / "souzoku-seizen-zouyo-kasan.xlsx")
+
+
+def make_seizen_pdf():
+    Se = DATA["seizen"]
+    ck = Se["checkedAt"].replace("-", "/")
+    kk = "".join(f"<tr><td><b>{esc(k['h'])}</b></td><td>{esc(k['kikan'])}</td><td>{esc(k['hyaku'])}</td></tr>" for k in Se["kikan"])
+    rl = "".join(f"<li><b>{esc(x['h'])}</b>：{esc(x['d'])}</li>" for x in Se["rules"])
+    blank = "".join("<tr><td class='w'></td><td></td><td>3年以内・3年より前・外</td><td></td></tr>" for _ in range(8))
+    body = f"""<h2>亡くなった日ごとの加算の期間</h2>
+<table><tr><th>亡くなった日</th><th>足す贈与の期間</th><th>100万円の控除</th></tr>{kk}</table>
+<p class="note">{esc(Se['hyaku'])}。</p>
+<h2>書き込み欄</h2>
+<p>亡くなった日：<span class="line"></span>　足す期間の始まり：<span class="line"></span>　3年以内の始まり：<span class="line"></span></p>
+<table><tr><th>贈与の日</th><th>贈与の額</th><th>区分</th><th>払った贈与税</th></tr>{blank}</table>
+<p>3年以内の合計 <span class="line"></span>円 ＋ 3年より前の合計 <span class="line"></span>円 − 100万円まで <span class="line"></span>円 ＝ 足し戻す額 <span class="line"></span>円</p>
+<div class="box"><b>きまり</b><ul style="margin:1mm 0 0;padding-left:5mm">{rl}</ul></div>
+<p class="note">足した贈与にかかった贈与税（目安）：<span class="line"></span>円　100万円の控除は受け取った人ごとなので、1人ずつ書きます。</p>
+<p class="note">{esc(Se['seisan'])}。{esc(Se['kazoe'])}。</p>
+<p class="note">例：{esc(Se['reiGifts'])} → 2026年6月30日に亡くなったら300万円、2028年6月30日なら400万円、2031年6月30日なら700万円。</p>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in ['nta4161', 'nta4103']))}（{ck} 確認）</p>"""
+    doc = page("生前贈与加算（3年→7年）の確認表", "亡くなった日から足す期間を決め、贈与を1つずつ振り分けます。", body)
+    _pdf(doc, "souzoku-seizen-zouyo-kasan.pdf", "/guide/souzoku/seizen-zouyo-kasan", ck)
+
+
+# ---------- 小規模宅地等の特例のチェックリスト（2026-11-15） ----------
+def make_shokibo_xlsx():
+    Sh = DATA["shokibo"]
+    ck = Sh["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "必要書類"
+    widths(ws, [8, 46, 40])
+    put(ws, 1, 1, "小規模宅地等の特例の必要書類チェックリスト", H, border=False)
+    put(ws, 2, 1, "当てはまる形の「選ぶ」に ○ を付けると、その形で足す書類の行に「要る」と出ます（老人ホームは、受け継ぐ人の形と一緒に ○）。どの形でも出す書類は最初から「要る」です。", S, border=False)
+    r = 4
+    for i, t in enumerate(["選ぶ", "当てはまる形", "条件"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    dv = DataValidation(type="list", formula1='"○"', allow_blank=True)
+    ws.add_data_validation(dv)
+    rowof = {}
+    for j in Sh["jokyo"]:
+        r += 1
+        c = put(ws, r, 1, None, B, IN_FILL)
+        dv.add(c)
+        put(ws, r, 2, j["h"], N)
+        put(ws, r, 3, j["yoken"], N)
+        ws.row_dimensions[r].height = 42
+        rowof[j["key"]] = r
+    r += 2
+    for i, t in enumerate(["要るか", "書類", "メモ"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    for k in Sh["kyotsu"]:
+        r += 1
+        put(ws, r, 1, "場合による" if k.get("baai") else "要る", B, OK_FILL)
+        put(ws, r, 2, k["h"], N)
+        put(ws, r, 3, k["d"] or "", N)
+        ws.row_dimensions[r].height = 30
+    for j in Sh["jokyo"]:
+        for it in j["items"]:
+            r += 1
+            put(ws, r, 1, f'=IF(A{rowof[j["key"]]}="○","要る","")', B, OK_FILL)
+            put(ws, r, 2, f"{it['h']}（{j['h']}）", N)
+            put(ws, r, 3, it["d"] or "", N)
+            ws.row_dimensions[r].height = 30
+    r += 2
+    put(ws, r, 1, "減る額の計算（1つの区分だけ使うとき）", B, border=False)
+    r += 1
+    for i, t in enumerate(["", "土地の使い方", "限度面積・割合"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    dv2 = DataValidation(type="list", formula1='"' + ",".join(k["h"] for k in Sh["kubun"]) + '"', allow_blank=False)
+    ws.add_data_validation(dv2)
+    kr = r + 1
+    c = put(ws, kr, 2, Sh["kubun"][0]["h"], N, IN_FILL)
+    dv2.add(c)
+    names = ",".join(f'"{k["h"]}"' for k in Sh["kubun"])
+    lim = ",".join(str(k["menseki"]) for k in Sh["kubun"])
+    wari = ",".join(str(k["wari"]) for k in Sh["kubun"])
+    put(ws, kr, 1, "区分", B)
+    put(ws, kr + 1, 1, "限度面積", B)
+    put(ws, kr + 1, 2, f'=INDEX({{{lim}}},MATCH(B{kr},{{{names}}},0))', B, OK_FILL, fmt='0"㎡"')
+    put(ws, kr + 2, 1, "割合", B)
+    put(ws, kr + 2, 2, f'=INDEX({{{wari}}},MATCH(B{kr},{{{names}}},0))/100', B, OK_FILL, fmt="0%")
+    put(ws, kr + 3, 1, "面積（㎡）", B)
+    put(ws, kr + 3, 2, Sh["rei"]["menseki"], B, IN_FILL)
+    put(ws, kr + 4, 1, "評価額（円）", B)
+    put(ws, kr + 4, 2, Sh["rei"]["kagaku"], B, IN_FILL, fmt="#,##0")
+    put(ws, kr + 5, 1, "減る額", B)
+    put(ws, kr + 5, 2, f'=IF(OR(B{kr + 3}<=0,B{kr + 4}<=0),0,ROUNDDOWN(B{kr + 4}*MIN(B{kr + 3},B{kr + 1})/B{kr + 3}*B{kr + 2},0))', B, OK_FILL, fmt="#,##0")
+    put(ws, kr + 6, 1, "特例の後", B)
+    put(ws, kr + 6, 2, f"=B{kr + 4}-B{kr + 5}", B, OK_FILL, fmt="#,##0")
+    r = kr + 8
+    for t in Sh["heiyou"] + [x["h"] + "：" + x["d"] for x in Sh["tsumazuki"]]:
+        put(ws, r, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=3)
+        ws.row_dimensions[r].height = 30
+        r += 1
+    put(ws, r, 1, "入っている例：" + Sh["rei"]["note"], S, border=False)
+    put(ws, r + 1, 1, "出典：" + "／".join(SRC[k]["name"] for k in ["nta4124", "ntaShoruiIchiran", "nta4208qa"]) + f"（{ck} 確認）", S, border=False)
+    put(ws, r + 2, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/shokibo-takuchi-shorui", S, border=False)
+    ws.page_setup.orientation = "portrait"
+    ws.page_setup.fitToWidth = 1
+    wb.save(OUT / "souzoku-shokibo-takuchi-shorui.xlsx")
+
+
+def make_shokibo_pdf():
+    Sh = DATA["shokibo"]
+    ck = Sh["checkedAt"].replace("-", "/")
+    kb = "".join(f"<tr><td>{esc(k['h'])}</td><td>{k['menseki']}㎡</td><td>{k['wari']}%</td></tr>" for k in Sh["kubun"])
+    ky = "".join(f"<tr><td>□</td><td><b>{esc(k['h'])}</b>{('<br><span class=note>' + esc(k['d']) + '</span>') if k['d'] else ''}</td></tr>" for k in Sh["kyotsu"])
+    jk = ""
+    for j in Sh["jokyo"]:
+        its = "".join(f"<tr><td>□</td><td><b>{esc(it['h'])}</b>{('<br><span class=note>' + esc(it['d']) + '</span>') if it['d'] else ''}</td></tr>" for it in j["items"]) or "<tr><td></td><td>足す書類はなし</td></tr>"
+        jk += f"<h3 style='font-size:10.5pt;margin:3mm 0 1mm'>{esc(j['h'])}</h3><p class='note'>条件：{esc(j['yoken'])}</p><table>{its}</table>"
+    tz = "".join(f"<li><b>{esc(t['h'])}</b>：{esc(t['d'])}</li>" for t in Sh["tsumazuki"])
+    body = f"""<h2>限度面積と減らす割合</h2>
+<table><tr><th>土地の使い方</th><th>限度面積</th><th>割合</th></tr>{kb}</table>
+<p class="note">{esc(Sh['rei']['note'])}。{esc(' ／ '.join(Sh['heiyou']))}。</p>
+<h2>どの形でも出す書類</h2><table>{ky}</table>
+<h2>形ごとに足す書類</h2>{jk}
+<div class="box"><b>使えなくなる落とし穴</b><ul style="margin:1mm 0 0;padding-left:5mm">{tz}</ul></div>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in ['nta4124', 'ntaShoruiIchiran', 'nta4208qa']))}（{ck} 確認）</p>"""
+    doc = page("小規模宅地等の特例の必要書類チェックリスト", "当てはまる形の書類に印を付けながら集めます。", body)
+    _pdf(doc, "souzoku-shokibo-takuchi-shorui.pdf", "/guide/souzoku/shokibo-takuchi-shorui", ck)
+
+
+# ---------- 未成年者控除・障害者控除の計算表（2026-11-15） ----------
+def make_miseinen_xlsx():
+    Mi = DATA["miseinen"]
+    ck = Mi["checkedAt"].replace("-", "/")
+    from datetime import date
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "控除の計算"
+    widths(ws, [16, 14, 14, 18, 14, 14, 16, 16])
+    put(ws, 1, 1, "相続税の未成年者控除・障害者控除の計算表", H, border=False)
+    put(ws, 2, 1, "オレンジの欄に入れると、満年齢・年数・控除の額と、本人で引き切れず扶養義務者から引く額が出ます。", S, border=False)
+    put(ws, 4, 1, "亡くなった日", B, HEAD_FILL)
+    put(ws, 4, 2, date(2026, 11, 14), B, IN_FILL, fmt="yyyy/m/d")
+    r = 6
+    hd = ["名前", "生年月日", "種類", "満年齢（自動）", "年数（自動）", "控除の額（自動）", "本人の相続税（控除の前・円）", "扶養義務者から引く額（自動）"]
+    for i, t in enumerate(hd, 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    kinds = [x["h"] for x in Mi["shurui"]]
+    dv = DataValidation(type="list", formula1='"' + ",".join(kinds) + '"', allow_blank=True)
+    ws.add_data_validation(dv)
+    sample = [("長男", date(2011, 2, 14), kinds[0], 200000), ("長女", date(2016, 11, 15), kinds[0], None), ("妻", date(1960, 1, 1), kinds[2], None)]
+    made = "IF(C{r}=\"" + kinds[0] + "\",18,85)"
+    per = "IF(C{r}=\"" + kinds[2] + "\",200000,100000)"
+    for k in range(8):
+        rr = r + 1 + k
+        nm, bd, kd, zz = sample[k] if k < len(sample) else (None, None, None, None)
+        put(ws, rr, 1, nm, N, IN_FILL)
+        put(ws, rr, 2, bd, N, IN_FILL, fmt="yyyy/m/d")
+        c = put(ws, rr, 3, kd, N, IN_FILL)
+        dv.add(c)
+        put(ws, rr, 4, f'=IF(OR(B{rr}="",$B$4=""),"",DATEDIF(B{rr},$B$4,"y"))', B, OK_FILL)
+        m = made.format(r=rr)
+        p = per.format(r=rr)
+        put(ws, rr, 5, f'=IF(OR(D{rr}="",C{rr}=""),"",MAX(0,{m}-D{rr}))', B, OK_FILL)
+        put(ws, rr, 6, f'=IF(E{rr}="","",E{rr}*{p})', B, OK_FILL, fmt="#,##0")
+        put(ws, rr, 7, zz, N, IN_FILL, fmt="#,##0")
+        put(ws, rr, 8, f'=IF(OR(F{rr}="",G{rr}=""),"",MAX(0,F{rr}-G{rr}))', B, OK_FILL, fmt="#,##0")
+    r = r + 10
+    for t in [Mi["kotae"], Mi["fuyou"] + "。", Mi["zenkai"] + "。", "満年齢は誕生日で1つ上がるものとして数えています。亡くなった日が誕生日の前日のときは、税務署か税理士に確かめてください。"] + [x["h"] + "：" + x["d"] for x in Mi["yoken"]]:
+        put(ws, r, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=8)
+        ws.row_dimensions[r].height = 30
+        r += 1
+    put(ws, r, 1, "例：" + Mi["rei"]["note"], S, border=False)
+    put(ws, r + 1, 1, "出典：" + "／".join(SRC[k]["name"] for k in ["nta4164", "nta4167"]) + f"（{ck} 確認）", S, border=False)
+    put(ws, r + 2, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/miseinen-shougaisha-kojo", S, border=False)
+    ws.page_setup.orientation = "landscape"
+    ws.page_setup.fitToWidth = 1
+    wb.save(OUT / "souzoku-miseinen-shougaisha-kojo.xlsx")
+
+
+def make_miseinen_pdf():
+    Mi = DATA["miseinen"]
+    ck = Mi["checkedAt"].replace("-", "/")
+    hy = "".join(f"<tr><td>{a}歳</td><td>{18 - a}年</td><td><b>{(18 - a) * 10}万円</b></td></tr>" for a in Mi["hayami"])
+    sh = "".join(f"<tr><td>{esc(x['h'])}</td><td>{x['made']}歳になるまでの年数</td><td>1年 {x['per'] // 10000}万円</td></tr>" for x in Mi["shurui"])
+    yk = "".join(f"<li><b>{esc(x['h'])}</b>：{esc(x['d'])}</li>" for x in Mi["yoken"])
+    blank = "".join("<tr><td class='w'></td><td></td><td></td><td></td><td></td><td></td></tr>" for _ in range(5))
+    body = f"""<h2>控除の額の決まり</h2>
+<table><tr><th>控除</th><th>年数</th><th>1年あたり</th></tr>{sh}</table>
+<p class="note">年数に1年未満の端数があるときは切り上げて1年にします（＝18か85から満年齢を引いた数）。{esc(Mi['rei']['note'])}。</p>
+<h2>未成年者控除の早見表</h2>
+<table><tr><th>満年齢</th><th>18歳までの年数</th><th>控除の額</th></tr>{hy}</table>
+<h2>書き込み欄</h2>
+<table><tr><th>名前</th><th>満年齢</th><th>年数</th><th>控除の額</th><th>本人の相続税</th><th>扶養義務者から引く額</th></tr>{blank}</table>
+<div class="box"><b>使える人</b><ul style="margin:1mm 0 0;padding-left:5mm">{yk}</ul><p class="note">{esc(Mi['fuyou'])}。{esc(Mi['zenkai'])}。</p></div>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in ['nta4164', 'nta4167']))}（{ck} 確認）</p>"""
+    doc = page("相続税の未成年者控除・障害者控除の確認表", "亡くなった日の満年齢から、年数と控除の額を書き込みます。", body)
+    _pdf(doc, "souzoku-miseinen-shougaisha-kojo.pdf", "/guide/souzoku/miseinen-shougaisha-kojo", ck)
+
 if __name__ == "__main__":
     import sys
     if sys.argv[1:] == ["shinkoku"]:
@@ -1247,7 +1509,7 @@ if __name__ == "__main__":
         make_hikazei_xlsx()
         make_hikazei_pdf()
         sys.exit(0)
-    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki", "jibun", "shinkokuTouki"):
+    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki", "jibun", "shinkokuTouki", "seizen", "shokibo", "miseinen"):
         for name in sys.argv[1:]:
             globals()[f"make_{name}_xlsx"]()
             globals()[f"make_{name}_pdf"]()

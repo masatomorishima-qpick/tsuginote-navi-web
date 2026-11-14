@@ -124,6 +124,7 @@ export default function Page() {
               { h: '財産と借金を書き出す', s: '財産目録で、表ごとに分ける', href: '/guide/souzoku/zaisan-mokuroku' },
               { h: '相続税がかかるか計算する', s: '基礎控除を超えるか', href: '/guide/souzoku/souzokuzei-keisan' },
               { h: '分け方を決めて協議書にする', s: '特例を使うなら印鑑証明書も', href: '/guide/souzoku/isan-bunkatsu-kyogisho' },
+              { h: '自宅の土地の特例の書類を確かめる', s: '小規模宅地等の特例：形ごとの書類と減る額', href: '/guide/souzoku/shokibo-takuchi-shorui' },
             ].map((f, i) => (
               <li key={f.h}>
                 <Link href={f.href} className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200 hover:ring-slate-300">

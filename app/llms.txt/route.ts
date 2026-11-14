@@ -49,6 +49,9 @@ export function GET() {
 - [準確定申告の必要書類チェックリスト](${SITE_URL}/guide/souzoku/junkakutei-checklist): 亡くなった日を入れると期限（知った日の翌日から4か月）が日付で出て、当てはまる控除や所得を選ぶと出す書類だけが一覧になる。
 - [相続財産の調べ方チェックリスト](${SITE_URL}/guide/souzoku/zaisan-shirabekata): 預貯金・不動産・株・生命保険・借金から選ぶと、調べる窓口（銀行・法務局の所有不動産記録証明・名寄帳・ほふり・生命保険協会・信用情報機関）と手数料が一覧になる。相続放棄（3か月）と申告（10か月）の期限も日付で。
 - [相続の戸籍の集め方チェックリスト](${SITE_URL}/guide/souzoku/koseki-atsumekata): 相続人（子・親・兄弟姉妹）と集める人を選ぶと、要る戸籍と、広域交付（2024年3月から）で最寄りの窓口で取れるかが出る。手数料も通数から計算。
+- [生前贈与加算の計算](${SITE_URL}/guide/souzoku/seizen-zouyo-kasan): 亡くなった日と贈与の日・額を入れると、国税庁 No.4161 の期間（2026年までは3年、2027〜2030年は2024年1月1日から、2031年から7年）で振り分け、3年より前の分の100万円の控除も入れて足し戻す額を計算。
+- [小規模宅地等の特例の必要書類チェックリスト](${SITE_URL}/guide/souzoku/shokibo-takuchi-shorui): 配偶者・同居の親族・持ち家のない親族・老人ホーム・事業用・同族会社・貸付から選ぶと、国税庁の一覧（R8.7）の添付書類と要件が出る。限度面積（330㎡・400㎡・200㎡）と割合（80%・50%）で減る額も計算。
+- [相続税の未成年者控除・障害者控除の計算](${SITE_URL}/guide/souzoku/miseinen-shougaisha-kojo): 生年月日と亡くなった日から、18歳（85歳）までの年数と控除の額（1年10万円、特別障害者は20万円）、本人で引き切れず扶養義務者から引く額を計算。
 - [相続のページ一覧](${SITE_URL}/guide/souzoku): 手続き・相続税・書類のひな形・実家の売却のページの入口。
 - [遺産分割協議書のひな形](${SITE_URL}/guide/souzoku/isan-bunkatsu-kyogisho): 法務局の記載例と同じ形の無料のワード・PDF。
 - [相続関係説明図のひな形](${SITE_URL}/guide/souzoku/souzoku-kankei-setsumeizu)・[財産目録のひな形](${SITE_URL}/guide/souzoku/zaisan-mokuroku): 無料のエクセル・PDF。

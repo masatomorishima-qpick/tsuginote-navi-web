@@ -7,7 +7,8 @@
   hoken-minaoshi-checklist.xlsx / .pdf   生命保険の見直しチェックリスト（節目・証券の6項目・次の更新の年は自動）
   hoken-shoken-kakiutsushi.xlsx / .pdf   保険証券の書き写し表（死亡保険金の税の種類と保険料の合計は自動。2026-11-11）
   hoken-minaoshi-shussan.xlsx / .pdf   子どもが生まれたときの見直しチェックリスト（遺族基礎年金の目安は自動。2026-11-14）
-  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken・shussan も同じ）
+  hoken-minaoshi-kekkon.xlsx / .pdf   結婚したときの見直しチェックリスト（子のない夫婦の遺族年金の表・2人の保険の一覧。2026-11-16）
+  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken・shussan・kekkon も同じ。kekkon は名前を付けたときだけ作る）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import html
@@ -476,6 +477,123 @@ small {{ color: #64748b; font-weight: normal; font-size: 7.5pt; }}
         b.close()
 
 
+# ---------- 結婚したときの保険の見直しチェックリスト（2026-11-16） ----------
+IZOKU_KEKKON = [
+    ("妻 30歳未満", "出ない", "5年間だけ"),
+    ("妻 30〜39歳", "出ない", "受け取れる"),
+    ("妻 40〜64歳", "出ない", "受け取れる＋中高齢寡婦加算"),
+    ("夫 55歳未満", "出ない", "出ない"),
+    ("夫 55〜59歳", "出ない", "60歳から"),
+    ("夫 60歳以上", "出ない", "受け取れる"),
+]
+KEKKON_KEYS = ["jiliShohenkou", "jiliHitsuyo", "jiliMinaoshi", "mhlwKougaku", "nenkinIzokuKousei", "nenkinIzokuKiso", "nenkinIzokuGuide", "mhlwIzokuMinaoshi"]
+
+
+def make_kekkon_xlsx():
+    from openpyxl.worksheet.datavalidation import DataValidation
+    P = DATA["kekkon"]
+    ck = P["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "見直しチェック"
+    for i, w in enumerate([4, 40, 52, 7], 1):
+        ws.column_dimensions[get_column_letter(i)].width = w
+    put(ws, 1, 1, "結婚したら 保険の見直しチェックリスト", H, border=False)
+    put(ws, 2, 1, "確かめたら「済」を選びます。2枚目のシートに2人の保険を書き出すと、保険料の合計が出ます。3枚目は子のない夫婦の遺族年金の表です。", S, border=False)
+    for i, t in enumerate(["", "確かめること", "見るところ", "済"], 1):
+        put(ws, 4, i, t, B, HEAD)
+    dv = DataValidation(type="list", formula1='"済"', allow_blank=True)
+    ws.add_data_validation(dv)
+    for k, c in enumerate(P["check"]):
+        r = 5 + k
+        put(ws, r, 1, k + 1)
+        put(ws, r, 2, f"【{c['g']}】{c['h']}", B)
+        put(ws, r, 3, c["d"], N)
+        dv.add(put(ws, r, 4, None, B, IN))
+        ws.row_dimensions[r].height = 36
+    r = 6 + len(P["check"])
+    for k, t in enumerate([P["hitsuyo"], P["kaisei"]] + P["izokuNote"]):
+        put(ws, r + k, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r + k, start_column=1, end_row=r + k, end_column=4)
+        ws.row_dimensions[r + k].height = 32
+    r += len(P["izokuNote"]) + 3
+    put(ws, r, 1, "出典：" + "／".join(SRC[k]["name"] for k in KEKKON_KEYS) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+    ws.row_dimensions[r].height = 58
+    put(ws, r + 1, 1, f"つぎの手ナビ　{SITE}/guide/shisan-kanri/hoken-minaoshi-kekkon", S, border=False)
+    ws.page_setup.fitToWidth = 1
+
+    w2 = wb.create_sheet("2人の保険")
+    hd = ["保険の名前・会社", "種類", "被保険者", "受取人", "死亡保障（万円）", "保険料（月・円）", "保障の終わり（年）", "メモ"]
+    for i, w in enumerate([24, 12, 10, 10, 14, 14, 14, 24], 1):
+        w2.column_dimensions[get_column_letter(i)].width = w
+    put(w2, 1, 1, "2人の保険の一覧", H, border=False)
+    put(w2, 2, 1, "保険証券を見ながら書き出します。重なりと、受取人が今の家族に合うかを見ます。", S, border=False)
+    for i, t in enumerate(hd, 1):
+        put(w2, 4, i, t, B, HEAD)
+    for k in range(12):
+        for i in range(1, 9):
+            put(w2, 5 + k, i, None, N, IN, fmt="#,##0" if i in (5, 6) else None)
+    put(w2, 18, 4, "合計（自動）", B)
+    put(w2, 18, 5, "=SUM(E5:E16)", B, OK, fmt="#,##0")
+    put(w2, 18, 6, "=SUM(F5:F16)", B, OK, fmt="#,##0")
+    put(w2, 19, 4, "保険料（年・自動）", B)
+    put(w2, 19, 6, "=F18*12", B, OK, fmt="#,##0")
+    w2.page_setup.orientation = "landscape"
+    w2.page_setup.fitToWidth = 1
+    w3 = wb.create_sheet("遺族年金（子のない夫婦）")
+    for i, w in enumerate([16, 14, 44], 1):
+        w3.column_dimensions[get_column_letter(i)].width = w
+    put(w3, 1, 1, "子のない夫婦の遺族年金（残る人ごと）", H, border=False)
+    for i, t in enumerate(["残る人", "遺族基礎年金", "遺族厚生年金（厚生年金に入っている間に亡くなったときなど）"], 1):
+        put(w3, 3, i, t, B, HEAD)
+    for k, row in enumerate(IZOKU_KEKKON):
+        for i, t in enumerate(row, 1):
+            put(w3, 4 + k, i, t, N)
+    put(w3, 5 + len(IZOKU_KEKKON), 1, P["keisanNote"], S, border=False)
+    w3.merge_cells(start_row=5 + len(IZOKU_KEKKON), start_column=1, end_row=5 + len(IZOKU_KEKKON), end_column=3)
+    w3.row_dimensions[5 + len(IZOKU_KEKKON)].height = 44
+    wb.save(OUT / "hoken-minaoshi-kekkon.xlsx")
+
+
+def make_kekkon_pdf():
+    from playwright.sync_api import sync_playwright
+    P = DATA["kekkon"]
+    ck = P["checkedAt"].replace("-", "/")
+    ch = "".join(f"<tr><td style='width:5mm'>□</td><td><b>{esc(c['h'])}</b><br><small>{esc(c['g'])}｜{esc(c['d'])}</small></td><td style='width:40mm'></td></tr>" for c in P["check"])
+    iz = "".join(f"<tr><td>{esc(a)}</td><td>{esc(b)}</td><td><b>{esc(c)}</b></td></tr>" for a, b, c in IZOKU_KEKKON)
+    notes = "".join(f"<li>{esc(t)}</li>" for t in P["izokuNote"])
+    blank = "".join("<tr><td style='height:7mm'></td><td></td><td></td><td></td><td></td></tr>" for _ in range(5))
+    doc = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>
+@page {{ size: A4; margin: 11mm 14mm 14mm; }}
+body {{ font-family: 'Noto Sans CJK JP', sans-serif; color: #0f172a; font-size: 9.5pt; line-height: 1.5; }}
+h1 {{ font-size: 17pt; margin: 0 0 1mm; }} h2 {{ font-size: 11pt; margin: 3.5mm 0 1.5mm; }} .sub {{ color: #475569; margin: 0 0 2mm; font-size: 9pt; }}
+table {{ width: 100%; border-collapse: collapse; font-size: 9pt; }}
+th, td {{ border: 1px solid #94a3b8; padding: 1.2mm 2mm; }} th {{ background: #e0f2fe; text-align: left; }}
+small {{ color: #64748b; font-weight: normal; font-size: 7.5pt; }}
+.box {{ border: 1.5px solid #fdba74; background: #fff7ed; border-radius: 3mm; padding: 1.8mm 4mm; margin-top: 2.5mm; }}
+.box ul {{ margin: 1mm 0 0; padding-left: 5mm; }} .note {{ color: #64748b; font-size: 7.5pt; margin: 1.5mm 0 0; }}
+</style></head><body><h1>結婚したら 保険の見直しチェックリスト</h1><p class="sub">確かめたら□に印を付け、右の欄にメモします。</p>
+<h2>① 確かめる8つの点</h2><table><tr><th style="width:5mm"></th><th>確かめること</th><th style="width:40mm">メモ</th></tr>{ch}</table>
+<p class="note">{esc(P['hitsuyo'])}</p>
+<h2>② 子のない夫婦の遺族年金（残る人ごと）</h2>
+<table><tr><th>残る人</th><th>遺族基礎年金</th><th>遺族厚生年金（厚生年金に入っている間に亡くなったときなど）</th></tr>{iz}</table>
+<div class="box"><b>受け取れる人と条件</b><ul>{notes}</ul><small>{esc(P['kaisei'])}</small></div>
+<h2>③ 2人の保険の書き出し</h2>
+<table><tr><th>保険の名前・会社</th><th>被保険者</th><th>受取人</th><th>死亡保障</th><th>保険料（月）</th></tr>{blank}</table>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in KEKKON_KEYS))}（{ck} 確認）</p></body></html>"""
+    url = f"{SITE}/guide/shisan-kanri/hoken-minaoshi-kekkon"
+    with sync_playwright() as p:
+        b = p.chromium.launch()
+        pg = b.new_page()
+        pg.set_content(doc, wait_until="load")
+        ft = (f"<div style=\"font-family:'Noto Sans CJK JP';font-size:7px;color:#94a3b8;width:100%;padding:0 14mm;display:flex;justify-content:space-between\">"
+              f"<span>つぎの手ナビ　{esc(url)}　（{ck} 確認）</span><span><span class='pageNumber'></span> / <span class='totalPages'></span></span></div>")
+        pg.pdf(path=str(OUT / "hoken-minaoshi-kekkon.pdf"), format="A4", print_background=True, prefer_css_page_size=True,
+               display_header_footer=True, header_template="<div></div>", footer_template=ft)
+        b.close()
+
+
 if __name__ == "__main__":
     import sys
     only = sys.argv[1] if len(sys.argv) > 1 else ""
@@ -491,5 +609,8 @@ if __name__ == "__main__":
     if only in ("", "shussan"):
         make_shussan_xlsx()
         make_shussan_pdf()
+    if only == "kekkon":
+        make_kekkon_xlsx()
+        make_kekkon_pdf()
     for f in sorted(OUT.glob("hoken-*")):
         print(f.name, f.stat().st_size)

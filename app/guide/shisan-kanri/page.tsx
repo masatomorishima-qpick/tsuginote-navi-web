@@ -60,6 +60,13 @@ const articles = [
       '受取人・死亡保障の額・教育の備えなど8つの点。子の生年月日から遺族基礎年金の目安も出ます。',
   },
   {
+    href: '/guide/shisan-kanri/hoken-minaoshi-kekkon',
+    category: '保険の見直し',
+    title: '結婚したら保険の見直しチェックリスト｜遺族年金が出るか確認（無料・エクセル）',
+    description:
+      '受取人・名字と住所の届け出・2人の保険の重なりなど8つの点。子のない夫婦で遺族年金が出るかも確かめられます。',
+  },
+  {
     href: '/guide/shisan-kanri/hoken-shoken-mikata',
     category: '保険の書類',
     title: '保険証券の見方｜欄ごとの意味と書き写し表（無料・エクセル）、税の種類も分かる',

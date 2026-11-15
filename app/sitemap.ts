@@ -118,6 +118,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 相次相続控除の計算（2026-11-16 作成、docs/seisaku-queue.md の T27）。
+    {
+      url: `${baseUrl}/guide/souzoku/souji-souzoku-kojo`,
+      lastModified: new Date("2026-11-16T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 生前贈与加算の計算（2026-11-15 作成、docs/seisaku-queue.md の T23）。
     {
       url: `${baseUrl}/guide/souzoku/seizen-zouyo-kasan`,
@@ -472,6 +479,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date("2026-11-11T14:00:00+09:00"),
       changeFrequency: "weekly",
       priority: 0.8,
+    },
+    // 結婚したときの保険の見直しチェックリスト（2026-11-16 作成、docs/seisaku-queue.md の T28）。
+    {
+      url: `${baseUrl}/guide/shisan-kanri/hoken-minaoshi-kekkon`,
+      lastModified: new Date("2026-11-16T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
     },
     // 子どもが生まれたときの保険の見直しチェックリスト（2026-11-14 作成、docs/seisaku-queue.md の T21）。
     {

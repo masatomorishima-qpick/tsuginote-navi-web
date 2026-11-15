@@ -83,6 +83,10 @@ export const SOUZOKU_FILES = {
     { label: 'エクセル', href: '/downloads/souzoku-miseinen-shougaisha-kojo.xlsx', icon: FileSpreadsheet },
     { label: 'PDF', href: '/downloads/souzoku-miseinen-shougaisha-kojo.pdf', icon: FileText },
   ],
+  souji: [
+    { label: 'エクセル', href: '/downloads/souzoku-souji-souzoku-kojo.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-souji-souzoku-kojo.pdf', icon: FileText },
+  ],
 } as const;
 
 export const SOUZOKU_PAGES = [
@@ -94,6 +98,7 @@ export const SOUZOKU_PAGES = [
   { href: '/guide/souzoku/seizen-zouyo-kasan', h: '生前贈与加算の計算' },
   { href: '/guide/souzoku/shokibo-takuchi-shorui', h: '小規模宅地等の特例の必要書類' },
   { href: '/guide/souzoku/miseinen-shougaisha-kojo', h: '未成年者控除・障害者控除の計算' },
+  { href: '/guide/souzoku/souji-souzoku-kojo', h: '相次相続控除の計算' },
   { href: '/guide/souzoku/houtei-souzokubun', h: '法定相続分の計算' },
   { href: '/guide/souzoku/junkakutei-checklist', h: '準確定申告の必要書類' },
   { href: '/guide/souzoku/touki-shorui', h: '相続登記の必要書類' },

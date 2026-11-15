@@ -3,7 +3,7 @@
  * href が空のあいだはボタンを出さない（提携前・リンク未発行のリンクを踏ませないため）。
  * 紹介先の一覧と判断：docs/haifu-plan.md（枝 docs/listing-rules）の「レントラックスの紹介先」。
  */
-export type SouzokuPartnerKey = 'iisouzoku' | 'souzokuAssist' | 'akiyaHonpo' | 'rakuuru';
+export type SouzokuPartnerKey = 'iisouzoku' | 'souzokuAssist' | 'akiyaHonpo' | 'rakuuru' | 'zeirishiDotcom';
 
 export type SouzokuPartner = {
   key: SouzokuPartnerKey;
@@ -52,4 +52,26 @@ export const SOUZOKU_PARTNERS: Record<SouzokuPartnerKey, SouzokuPartner> = {
     key: 'rakuuru', name: 'ラクウル', cta: '相続した家の売り方を無料で相談する',
     points: [], checkedAt: '', href: '', asp: 'rentracks', programId: '13857', reward: 11440,
   },
+  // A8 s00000014783001（未提携。11/15 オーナーに申込を提案）。成果＝新規お問合せ（相続）5,000円。全国。
+  // 提携してリンクを発行したら href と、公式サイトで確かめた points・checkedAt を入れる。
+  zeirishiDotcom: {
+    key: 'zeirishiDotcom', name: '税理士ドットコム', cta: '相続に強い税理士を無料で探す',
+    points: [], checkedAt: '', href: '', asp: 'a8', programId: 's00000014783001', reward: 5000,
+  },
 };
+
+/**
+ * 地域で出口を分ける（2026-11-15 オーナー了承「二択OK」）。
+ * 相続アシストの対象は東京・神奈川・大阪・京都・兵庫だけなので、それ以外の地域の人には全国対応の紹介先を出す。
+ * 全国対応の候補は上から順に、href があるものを使う。どれも href が空のあいだは分けず、今までどおり1つの出口のまま。
+ */
+export const REGION_SPLIT: Partial<Record<SouzokuPartnerKey, { areas: string; alt: SouzokuPartnerKey[] }>> = {
+  souzokuAssist: { areas: '東京・神奈川・大阪・京都・兵庫', alt: ['iisouzoku', 'zeirishiDotcom'] },
+};
+
+export function regionAlt(key: SouzokuPartnerKey): { areas: string; alt: SouzokuPartner } | null {
+  const r = REGION_SPLIT[key];
+  if (!r) return null;
+  const alt = r.alt.map((k) => SOUZOKU_PARTNERS[k]).find((p) => !!p.href);
+  return alt ? { areas: r.areas, alt } : null;
+}

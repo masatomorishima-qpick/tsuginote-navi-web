@@ -418,6 +418,30 @@ export default function HokenIchiranExcelPage() {
             あわせて確認したい記事
           </h2>
           <ul className="mt-5 space-y-5">
+            {/* 2026-11-16 追加：このページは保険の一覧表の言葉で5位前後・表示が週100超あり、サイトでいちばん評価されている。
+                保険証券の書き写しと、死亡保険金の相続税の非課税（どちらも一覧表を書いた人の次の困りごと）へつなぎ、評価を相続・保険のページに回す */}
+            <li>
+              <p className="text-xs font-medium text-slate-500">
+                保険証券のどこを書き写せばいいか分からない方
+              </p>
+              <Link
+                href="/guide/shisan-kanri/hoken-shoken-mikata"
+                className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
+              >
+                保険証券の見方｜欄ごとの意味と書き写し表 &rsaquo;
+              </Link>
+            </li>
+            <li>
+              <p className="text-xs font-medium text-slate-500">
+                死亡保険金に相続税がかかるか知りたい方
+              </p>
+              <Link
+                href="/guide/souzoku/shibou-hokenkin-hikazei"
+                className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
+              >
+                死亡保険金の相続税の非課税｜受取人ごとの額を自動計算 &rsaquo;
+              </Link>
+            </li>
             <li>
               <p className="text-xs font-medium text-slate-500">
                 投資を家族に知らせるか迷っている方

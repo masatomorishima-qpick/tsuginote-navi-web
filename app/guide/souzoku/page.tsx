@@ -43,6 +43,7 @@ const GROUPS = [
       { href: '/guide/souzoku/seizen-zouyo-kasan', t: '生前贈与加算の計算', s: '7年はいつからかと足す額' },
       { href: '/guide/souzoku/shokibo-takuchi-shorui', t: '小規模宅地等の特例の必要書類', s: '形を選ぶと書類と減る額' },
       { href: '/guide/souzoku/miseinen-shougaisha-kojo', t: '未成年者控除・障害者控除', s: '生年月日で額を計算' },
+      { href: '/guide/souzoku/souji-souzoku-kojo', t: '相次相続控除の計算', s: '10年以内に続いた相続で引く額' },
     ],
   },
   {

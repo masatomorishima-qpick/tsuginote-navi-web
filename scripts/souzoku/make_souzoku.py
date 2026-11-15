@@ -20,7 +20,8 @@
   souzoku-seizen-zouyo-kasan.xlsx / .pdf      生前贈与加算の計算表（亡くなった日で期間を決め、贈与を振り分け。2026-11-15）
   souzoku-shokibo-takuchi-shorui.xlsx / .pdf  小規模宅地等の特例の必要書類チェックリスト（○で要る書類・減る額の計算。2026-11-15）
   souzoku-miseinen-shougaisha-kojo.xlsx / .pdf  未成年者控除・障害者控除の計算表（生年月日から年数と額。2026-11-15）
-  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki・seizen・shokibo・miseinen も同じ）
+  souzoku-souji-souzoku-kojo.xlsx / .pdf      相次相続控除の計算表（日付と金額から年数・割合・控除の額。2026-11-16）
+  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki・seizen・shokibo・miseinen・souji も同じ）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import json
@@ -1499,6 +1500,90 @@ def make_miseinen_pdf():
     doc = page("相続税の未成年者控除・障害者控除の確認表", "亡くなった日の満年齢から、年数と控除の額を書き込みます。", body)
     _pdf(doc, "souzoku-miseinen-shougaisha-kojo.pdf", "/guide/souzoku/miseinen-shougaisha-kojo", ck)
 
+
+# ---------- 相次相続控除の計算表（2026-11-16） ----------
+def make_souji_xlsx():
+    Sj = DATA["souji"]
+    ck = Sj["checkedAt"].replace("-", "/")
+    from datetime import date
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "相次相続控除"
+    widths(ws, [30, 18, 16, 16, 16, 18])
+    put(ws, 1, 1, "相次相続控除の計算表", H, border=False)
+    put(ws, 2, 1, "オレンジの欄に入れると、年数・割合と、相続人ごとの控除の額が出ます（例は国税庁 No.4168 の質疑応答の数字。きょうだいの行は仮の数字）。", S, border=False)
+    rows = [
+        ("前の相続の日", date(2022, 5, 1), "yyyy/m/d"),
+        ("今回の相続の日", date(2026, 11, 1), "yyyy/m/d"),
+        ("A 前の相続で、今回亡くなった人が課せられた相続税（円）", Sj["rei"]["A"], "#,##0"),
+        ("B 前の相続で、今回亡くなった人が受け取った純資産（円）", Sj["rei"]["B"], "#,##0"),
+        ("C 今回の相続で財産を受け取った全員の純資産の合計（円）", Sj["rei"]["C"], "#,##0"),
+    ]
+    for k, (h, v, f) in enumerate(rows):
+        put(ws, 4 + k, 1, h, B, HEAD_FILL)
+        put(ws, 4 + k, 2, v, B, IN_FILL, fmt=f)
+        ws.row_dimensions[4 + k].height = 30
+    put(ws, 10, 1, "E 年数（自動。1年未満は切り捨て）", B, HEAD_FILL)
+    put(ws, 10, 2, '=IF(OR(B4="",B5=""),"",DATEDIF(B4,B5,"y"))', B, OK_FILL)
+    put(ws, 11, 1, "C÷(B−A)（自動。1を超えたら1）", B, HEAD_FILL)
+    put(ws, 11, 2, '=IF(OR(B6="",B7="",B8=""),"",IF(B7-B6<=0,1,MIN(1,B8/(B7-B6))))', B, OK_FILL, fmt="0.0%")
+    put(ws, 12, 1, "(10−E)÷10（自動）", B, HEAD_FILL)
+    put(ws, 12, 2, '=IF(B10="","",IF(B10>=10,0,(10-B10)/10))', B, OK_FILL, fmt="0%")
+    r = 14
+    for i, t in enumerate(["相続人", "D その人の純資産（円）", "D÷C（自動）", "控除の額（自動）", "その人の相続税（控除の前・円）", "控除のあとの相続税（自動）"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    sample = [("あなた", Sj["rei"]["D"], 9500000), ("きょうだい", 90000000, None)]
+    for k in range(6):
+        rr = r + 1 + k
+        nm, dd, zz = sample[k] if k < len(sample) else (None, None, None)
+        put(ws, rr, 1, nm, N, IN_FILL)
+        put(ws, rr, 2, dd, N, IN_FILL, fmt="#,##0")
+        put(ws, rr, 3, f'=IF(OR(B{rr}="",$B$8="",$B$8=0),"",B{rr}/$B$8)', B, OK_FILL, fmt="0.0%")
+        put(ws, rr, 4, f'=IF(OR(C{rr}="",$B$11="",$B$12="",$B$6=""),"",IF($B$6=0,0,ROUNDDOWN($B$6*$B$11*C{rr}*$B$12,0)))', B, OK_FILL, fmt="#,##0")
+        put(ws, rr, 5, zz, N, IN_FILL, fmt="#,##0")
+        put(ws, rr, 6, f'=IF(OR(D{rr}="",E{rr}=""),"",MAX(0,E{rr}-D{rr}))', B, OK_FILL, fmt="#,##0")
+    r = r + 8
+    for t in [Sj["kotae"]] + [x["h"] + "：" + x["d"] for x in Sj["yoken"]] + [x["h"] + "：" + x["d"] for x in Sj["tsumazuki"]] + [Sj["keisanNote"], "円未満は切り捨てて表示しています。"]:
+        put(ws, r, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=6)
+        ws.row_dimensions[r].height = 30
+        r += 1
+    put(ws, r, 1, "例：" + Sj["rei"]["note"], S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=6)
+    ws.row_dimensions[r].height = 44
+    put(ws, r + 1, 1, "出典：" + "／".join(SRC[k]["name"] for k in ["nta4168", "nta4168qa", "ntaYoshikiR08"]) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r + 1, start_column=1, end_row=r + 1, end_column=6)
+    ws.row_dimensions[r + 1].height = 44
+    put(ws, r + 2, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/souji-souzoku-kojo", S, border=False)
+    ws.page_setup.orientation = "landscape"
+    ws.page_setup.fitToWidth = 1
+    wb.save(OUT / "souzoku-souji-souzoku-kojo.xlsx")
+
+
+def make_souji_pdf():
+    Sj = DATA["souji"]
+    ck = Sj["checkedAt"].replace("-", "/")
+    kg = "".join(f"<tr><td><b>{esc(x['k'])}</b></td><td>{esc(x['h'])}<br><span class='note'>{esc(x['d'])}</span></td><td class='w'></td></tr>" for x in Sj["kigou"])
+    hy = "".join(f"<td>{'1年未満' if e == 0 else str(e) + '年'}<br><b>{(10 - e) * 10}%</b></td>" for e in Sj["hayami"])
+    yk = "".join(f"<li><b>{esc(x['h'])}</b>：{esc(x['d'])}</li>" for x in Sj["yoken"])
+    tz = "".join(f"<li><b>{esc(x['h'])}</b>：{esc(x['d'])}</li>" for x in Sj["tsumazuki"])
+    blank = "".join("<tr><td class='w'></td><td></td><td></td><td></td></tr>" for _ in range(4))
+    body = f"""<h2>計算式</h2>
+<p style="font-size:12pt;text-align:center;margin:1mm 0"><b>A × C÷(B−A) × D÷C × (10−E)÷10</b></p>
+<p class="note">C÷(B−A) が1（100/100）を超えるときは1にします。Eは1年未満を切り捨てます。</p>
+<table><tr><th>記号</th><th>中身</th><th>金額・年数を書く</th></tr>{kg}</table>
+<h2>年数ごとの残る割合</h2>
+<table><tr>{hy}</tr></table>
+<h2>相続人ごとの書き込み欄</h2>
+<table><tr><th>相続人</th><th>D その人の純資産</th><th>D÷C</th><th>控除の額</th></tr>{blank}</table>
+<p class="note">例：{esc(Sj['rei']['note'])}。</p>
+<div class="box"><b>使える人</b><ul style="margin:1mm 0 0;padding-left:5mm">{yk}</ul></div>
+<h2>間違えやすい所</h2><ul style="margin:0;padding-left:5mm">{tz}</ul>
+<p class="note">{esc(Sj['keisanNote'])}</p>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in ['nta4168', 'nta4168qa', 'ntaYoshikiR08']))}（{ck} 確認）</p>"""
+    doc = page("相次相続控除の計算表", "前の相続の申告書を見ながら、AからEを書き込みます。", body)
+    _pdf(doc, "souzoku-souji-souzoku-kojo.pdf", "/guide/souzoku/souji-souzoku-kojo", ck)
+
 if __name__ == "__main__":
     import sys
     if sys.argv[1:] == ["shinkoku"]:
@@ -1509,7 +1594,7 @@ if __name__ == "__main__":
         make_hikazei_xlsx()
         make_hikazei_pdf()
         sys.exit(0)
-    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki", "jibun", "shinkokuTouki", "seizen", "shokibo", "miseinen"):
+    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki", "jibun", "shinkokuTouki", "seizen", "shokibo", "miseinen", "souji"):
         for name in sys.argv[1:]:
             globals()[f"make_{name}_xlsx"]()
             globals()[f"make_{name}_pdf"]()

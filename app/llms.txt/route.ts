@@ -33,6 +33,7 @@ export function GET() {
 - [保険の比較表](${SITE_URL}/guide/shisan-kanri/hoken-hikaku-excel): いまの保険と見直し案を並べ、払う総額（月の保険料×12×年数）と差を自動で計算するエクセル。
 - [生命保険の見直しチェックリスト](${SITE_URL}/guide/shisan-kanri/hoken-minaoshi-checklist): 見直しの節目、保険証券で確かめる6項目、契約した日から次の更新の目安を出す道具。
 - [子どもが生まれたときの保険の見直しチェックリスト](${SITE_URL}/guide/shisan-kanri/hoken-minaoshi-shussan): 受取人・死亡保障の額・教育の備えなど8つの点と、子の生年月日から遺族基礎年金（令和8年度 年847,300円＋子の加算）の年額と合計の目安を出す計算。
+- [結婚したときの保険の見直しチェックリスト](${SITE_URL}/guide/shisan-kanri/hoken-minaoshi-kekkon): 受取人・名字と住所の届け出・2人の保険の重なり・死亡保障など8つの点と、子のない夫婦で遺族年金が出るか（遺族基礎年金は出ない。遺族厚生年金は30歳未満の妻は5年間、夫は55歳以上）を働き方と年齢から確かめる道具。2028年4月の見直しも。
 - [保険証券の見方](${SITE_URL}/guide/shisan-kanri/hoken-shoken-mikata): 欄ごとの意味、契約者・被保険者・受取人の組み合わせで変わる税の種類、書き写し表。
 - [スマホのパスワード管理](${SITE_URL}/guide/password-kanri/sumaho-password): メモ帳管理の危険と、忘れずに安全に管理する方法。
 
@@ -52,6 +53,7 @@ export function GET() {
 - [生前贈与加算の計算](${SITE_URL}/guide/souzoku/seizen-zouyo-kasan): 亡くなった日と贈与の日・額を入れると、国税庁 No.4161 の期間（2026年までは3年、2027〜2030年は2024年1月1日から、2031年から7年）で振り分け、3年より前の分の100万円の控除も入れて足し戻す額を計算。
 - [小規模宅地等の特例の必要書類チェックリスト](${SITE_URL}/guide/souzoku/shokibo-takuchi-shorui): 配偶者・同居の親族・持ち家のない親族・老人ホーム・事業用・同族会社・貸付から選ぶと、国税庁の一覧（R8.7）の添付書類と要件が出る。限度面積（330㎡・400㎡・200㎡）と割合（80%・50%）で減る額も計算。
 - [相続税の未成年者控除・障害者控除の計算](${SITE_URL}/guide/souzoku/miseinen-shougaisha-kojo): 生年月日と亡くなった日から、18歳（85歳）までの年数と控除の額（1年10万円、特別障害者は20万円）、本人で引き切れず扶養義務者から引く額を計算。
+- [相次相続控除の計算](${SITE_URL}/guide/souzoku/souji-souzoku-kojo): 前と今回の相続の日と4つの金額（前の相続税・前に受け取った純資産・今回の全員の純資産・その人の純資産）を入れると、年数（1年未満は切り捨て）、割合（C÷(B−A) は1が上限）、控除の額を計算。国税庁 No.4168 の例（300万円）と同じ答え。
 - [相続のページ一覧](${SITE_URL}/guide/souzoku): 手続き・相続税・書類のひな形・実家の売却のページの入口。
 - [遺産分割協議書のひな形](${SITE_URL}/guide/souzoku/isan-bunkatsu-kyogisho): 法務局の記載例と同じ形の無料のワード・PDF。
 - [相続関係説明図のひな形](${SITE_URL}/guide/souzoku/souzoku-kankei-setsumeizu)・[財産目録のひな形](${SITE_URL}/guide/souzoku/zaisan-mokuroku): 無料のエクセル・PDF。

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Landmark } from 'lucide-react';
+import { ArrowRight, Coins, Landmark } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import { SITE_URL, SITE_NAME } from '@/components/loan/LoanArticle';
@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 
 const HOUJIN_PAGES = [
   { href: '/guide/houjin/kouza-tsukurenai', t: '法人口座が作れない', s: '3行に申し込み、通ったのは1行', icon: Landmark },
+  { href: '/guide/houjin/raksulbank', t: 'ラクスルバンク', s: '審査はGMOあおぞら。手数料と申し込める会社', icon: Coins },
 ];
 
 const jsonLd = {

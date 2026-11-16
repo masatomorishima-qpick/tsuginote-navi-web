@@ -58,10 +58,15 @@ const DOWNLOAD_CANONICAL: [string, string][] = [
 
 const nextConfig: NextConfig = {
   async headers() {
-    return DOWNLOAD_CANONICAL.map(([file, page]) => ({
-      source: `/downloads/${file}.:ext(pdf|xlsx|docx)`,
-      headers: [{ key: 'Link', value: `<https://www.tsuginotenavi.jp${page}>; rel="canonical"` }],
-    }));
+    return [
+      ...DOWNLOAD_CANONICAL.map(([file, page]) => ({
+        source: `/downloads/${file}.:ext(pdf|xlsx|docx)`,
+        headers: [{ key: 'Link', value: `<https://www.tsuginotenavi.jp${page}>; rel="canonical"` }],
+      })),
+      // 2026-11-16 共有用の画像（/og?title=…）は検索に載せない。Search Console の「クロール済み - インデックス未登録」41件のうち15件がこの画像だった。
+      // SNS が画像を読む妨げにならないよう、robots.txt で止めずに X-Robots-Tag で検索から外す。
+      { source: '/og', headers: [{ key: 'X-Robots-Tag', value: 'noindex' }] },
+    ];
   },
   async redirects() {
     return [

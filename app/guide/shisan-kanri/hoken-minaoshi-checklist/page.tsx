@@ -172,6 +172,7 @@ export default function Page() {
             })}
           </ol>
           <Link href="/guide/shisan-kanri/hoken-shoken-mikata" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">保険証券の欄の意味と書き写し表<ArrowRight size={14} aria-hidden="true" /></Link>
+          <Link href="/guide/shisan-kanri/hoken-minaoshi-teinen" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">定年退職のときの見直し（健康保険の期限の計算つき）<ArrowRight size={14} aria-hidden="true" /></Link>
           <Link href="/guide/shisan-kanri/hoken-minaoshi-kekkon" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">結婚したときの見直し（遺族年金が出るかの確認つき）<ArrowRight size={14} aria-hidden="true" /></Link>
           <Link href="/guide/shisan-kanri/hoken-minaoshi-shussan" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">子どもが生まれたときの見直し（遺族年金の計算つき）<ArrowRight size={14} aria-hidden="true" /></Link>
         </section>

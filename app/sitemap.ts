@@ -118,6 +118,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 相続税の2割加算の計算（2026-11-17 作成、docs/seisaku-queue.md の T26）。
+    {
+      url: `${baseUrl}/guide/souzoku/niwari-kasan`,
+      lastModified: new Date("2026-11-17T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    // 死亡退職金の非課税の計算（2026-11-17 作成、docs/seisaku-queue.md の T30）。
+    {
+      url: `${baseUrl}/guide/souzoku/shibou-taishokukin-hikazei`,
+      lastModified: new Date("2026-11-17T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 相次相続控除の計算（2026-11-16 作成、docs/seisaku-queue.md の T27）。
     {
       url: `${baseUrl}/guide/souzoku/souji-souzoku-kojo`,
@@ -516,6 +530,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date("2026-11-11T14:00:00+09:00"),
       changeFrequency: "weekly",
       priority: 0.8,
+    },
+    // 定年退職のときの保険の見直しチェックリスト（2026-11-17 作成、docs/seisaku-queue.md の T29）。
+    {
+      url: `${baseUrl}/guide/shisan-kanri/hoken-minaoshi-teinen`,
+      lastModified: new Date("2026-11-17T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
     },
     // 結婚したときの保険の見直しチェックリスト（2026-11-16 作成、docs/seisaku-queue.md の T28）。
     {

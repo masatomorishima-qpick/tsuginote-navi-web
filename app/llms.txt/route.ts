@@ -34,6 +34,7 @@ export function GET() {
 - [生命保険の見直しチェックリスト](${SITE_URL}/guide/shisan-kanri/hoken-minaoshi-checklist): 見直しの節目、保険証券で確かめる6項目、契約した日から次の更新の目安を出す道具。
 - [子どもが生まれたときの保険の見直しチェックリスト](${SITE_URL}/guide/shisan-kanri/hoken-minaoshi-shussan): 受取人・死亡保障の額・教育の備えなど8つの点と、子の生年月日から遺族基礎年金（令和8年度 年847,300円＋子の加算）の年額と合計の目安を出す計算。
 - [結婚したときの保険の見直しチェックリスト](${SITE_URL}/guide/shisan-kanri/hoken-minaoshi-kekkon): 受取人・名字と住所の届け出・2人の保険の重なり・死亡保障など8つの点と、子のない夫婦で遺族年金が出るか（遺族基礎年金は出ない。遺族厚生年金は30歳未満の妻は5年間、夫は55歳以上）を働き方と年齢から確かめる道具。2028年4月の見直しも。
+- [定年退職のときの保険の見直しチェックリスト](${SITE_URL}/guide/shisan-kanri/hoken-minaoshi-teinen): 退職日から、任意継続（退職日の翌日から20日以内・最長2年）と国民健康保険（14日以内）の期限を出す道具、退職後の健康保険3つの比べ方、死亡保障・更新・高額療養費など8つの点。
 - [保険証券の見方](${SITE_URL}/guide/shisan-kanri/hoken-shoken-mikata): 欄ごとの意味、契約者・被保険者・受取人の組み合わせで変わる税の種類、書き写し表。
 - [スマホのパスワード管理](${SITE_URL}/guide/password-kanri/sumaho-password): メモ帳管理の危険と、忘れずに安全に管理する方法。
 
@@ -63,6 +64,8 @@ export function GET() {
 - [小規模宅地等の特例の必要書類チェックリスト](${SITE_URL}/guide/souzoku/shokibo-takuchi-shorui): 配偶者・同居の親族・持ち家のない親族・老人ホーム・事業用・同族会社・貸付から選ぶと、国税庁の一覧（R8.7）の添付書類と要件が出る。限度面積（330㎡・400㎡・200㎡）と割合（80%・50%）で減る額も計算。
 - [相続税の未成年者控除・障害者控除の計算](${SITE_URL}/guide/souzoku/miseinen-shougaisha-kojo): 生年月日と亡くなった日から、18歳（85歳）までの年数と控除の額（1年10万円、特別障害者は20万円）、本人で引き切れず扶養義務者から引く額を計算。
 - [相次相続控除の計算](${SITE_URL}/guide/souzoku/souji-souzoku-kojo): 前と今回の相続の日と4つの金額（前の相続税・前に受け取った純資産・今回の全員の純資産・その人の純資産）を入れると、年数（1年未満は切り捨て）、割合（C÷(B−A) は1が上限）、控除の額を計算。国税庁 No.4168 の例（300万円）と同じ答え。
+- [相続税の2割加算の計算](${SITE_URL}/guide/souzoku/niwari-kasan): 受け取る人の続柄から2割加算の対象かを判定し（配偶者・子・父母・代襲相続人の孫は対象外、兄弟姉妹・甥姪・代襲相続人でない孫養子・相続人でない孫は対象）、正味の遺産額と相続人と受け取る額から、その人の相続税額と加算額（税額控除の前の税額×0.2）を計算。国税庁 No.4157・No.4152。
+- [死亡退職金の非課税の計算](${SITE_URL}/guide/souzoku/shibou-taishokukin-hikazei): 非課税の限度額（500万円×法定相続人の数。死亡保険金とは別の枠）と、受け取った人ごとの非課税と課税の額、弔慰金のうち普通給与の3年分（業務外は半年分）を超えて退職金に足す額を計算。国税庁 No.4117 の例と同じ答え。
 - [相続のページ一覧](${SITE_URL}/guide/souzoku): 手続き・相続税・書類のひな形・実家の売却のページの入口。
 - [遺産分割協議書のひな形](${SITE_URL}/guide/souzoku/isan-bunkatsu-kyogisho): 法務局の記載例と同じ形の無料のワード・PDF。
 - [相続関係説明図のひな形](${SITE_URL}/guide/souzoku/souzoku-kankei-setsumeizu)・[財産目録のひな形](${SITE_URL}/guide/souzoku/zaisan-mokuroku): 無料のエクセル・PDF。

@@ -98,6 +98,7 @@ export default function Page() {
             { h: '実際の取り分で割り振る', d: '配偶者は軽減あり。兄弟姉妹などは2割増し', icon: HeartHandshake },
           ]} />
           <p className="text-[13px] text-slate-600">{Z.rei.note}。</p>
+          <Link href="/guide/souzoku/niwari-kasan" className="text-[13px] font-bold text-sky-700 underline underline-offset-2">兄弟姉妹・孫が受け取るときの2割加算を計算する</Link>
           <p className={SRC}>出典：<a href={S.nta4152.url} target="_blank" rel="noopener noreferrer" className={A}>{S.nta4152.name}</a>・<a href={S.nta4155.url} target="_blank" rel="noopener noreferrer" className={A}>{S.nta4155.name}</a></p>
         </section>
 

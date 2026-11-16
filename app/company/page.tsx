@@ -85,6 +85,17 @@ export default function CompanyPage() {
                   暮らしの判断に役立つ情報サイト「つぎの手ナビ」の運営、および給湯器の見積もりの取り次ぎ
                 </dd>
               </div>
+
+              {/* 2026-11-16 追加：同じ会社が運営するサイトへのリンク（オーナー指示）。 */}
+              <div className="grid gap-2 px-5 py-4 sm:grid-cols-[180px_1fr] sm:px-6">
+                <dt className="font-semibold text-slate-900">同じ会社のサイト</dt>
+                <dd className="text-slate-700">
+                  <a href="https://umaiyonekoko.jp/" className="text-blue-700 underline hover:no-underline">
+                    うまいよね、ここ
+                  </a>
+                  （横浜の居酒屋・バーの営業時間と休みが分かる一覧）
+                </dd>
+              </div>
             </dl>
           </div>
         </div>

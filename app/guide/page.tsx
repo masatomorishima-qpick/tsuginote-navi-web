@@ -183,6 +183,15 @@ const categories = [
       { href: '/kyutoki/nensu', title: '給湯器の寿命と、修理か交換か' },
     ],
   },
+  // 2026-11-16 追加：法人成り（運営会社の法人口座の審査の実例）
+  {
+    href: '/guide/houjin',
+    name: '法人成り',
+    description: '個人事業から会社にする人へ。設立から法人口座まで、運営会社がつまずいた所を日付と結果つきで。',
+    articles: [
+      { href: '/guide/houjin/kouza-tsukurenai', title: '法人口座が作れない？3行に申し込み、通ったのは1行' },
+    ],
+  },
   {
     href: '/guide/digital-seiri',
     name: 'デジタル整理術',

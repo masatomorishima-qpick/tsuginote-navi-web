@@ -474,6 +474,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     // 相続のページの入口（2026-11-11 作成）。
+    // 法人成り（2026-11-16 新設）。運営会社の法人口座の審査の実例。
+    {
+      url: `${baseUrl}/guide/houjin`,
+      lastModified: new Date("2026-11-16T18:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/guide/houjin/kouza-tsukurenai`,
+      lastModified: new Date("2026-11-16T18:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     {
       url: `${baseUrl}/guide/souzoku`,
       lastModified: new Date("2026-11-11T14:00:00+09:00"),

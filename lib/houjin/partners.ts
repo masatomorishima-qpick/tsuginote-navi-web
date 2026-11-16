@@ -1,0 +1,35 @@
+/**
+ * 法人成り・法人口座のページの出口（1ページに1つ）。2026-11-16 新設。
+ * href が空のあいだはボタンを出さない（提携前のリンクを踏ませないため）。
+ *
+ * 2026-11-16 の確認（A8.net の管理画面・各公式）：
+ * - PayPay銀行の法人口座は、A8.net にもポイントサイトにも案件がない（紹介料なし）。
+ * - ラクスルバンク（A8 s00000027458001）：成果＝WEBからの新規法人口座開設の申込、10,000円、確定率100%、再訪問90日。
+ *   否認：1企業2回以上の申込・アプリ経由・クリックと申込でブラウザが違う・リスティング違反。人物画像はNG。
+ *   口座は GMOあおぞらネット銀行のラクスルバンク支店（GMOあおぞらの特約 2026/6/24 現在）。
+ *   運営会社は GMOあおぞらネット銀行に直接申し込んで通らなかったため、紹介の書き方はオーナーが決める（それまで href は空）。
+ */
+export type HoujinPartnerKey = 'raksulBank';
+
+export type HoujinPartner = {
+  key: HoujinPartnerKey;
+  name: string;
+  cta: string;
+  /** 売り。公式の記載だけ。確かめた日を checkedAt に */
+  points: string[];
+  checkedAt: string;
+  href: string;
+  asp: 'a8';
+  programId: string;
+  reward: number;
+};
+
+export const HOUJIN_PARTNERS: Record<HoujinPartnerKey, HoujinPartner> = {
+  raksulBank: {
+    key: 'raksulBank', name: 'ラクスルバンク', cta: 'ラクスルバンクに申し込む',
+    // GMOあおぞらネット銀行「ラクスルバンク支店に関する特約」（2026/6/24 現在）の記載。2026-11-16 確認。
+    points: ['他の銀行あての振込は1件119円（税込）', '口座はGMOあおぞらネット銀行のラクスルバンク支店', '申し込めるのは法人だけ'],
+    checkedAt: '2026年11月16日',
+    href: '', asp: 'a8', programId: 's00000027458001', reward: 10000,
+  },
+};

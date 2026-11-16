@@ -52,6 +52,16 @@ export default function SiteFooter() {
         <p className="mt-6 border-t border-slate-100 pt-4 text-center text-xs leading-relaxed text-slate-500 sm:text-left">
           本サイトは一般的な情報と、入力された数字にもとづく試算のみを提供します。特定の金融商品・保険・サービスの推奨や、投資助言・金融商品の販売勧誘は行いません。すべて目安です。
         </p>
+
+        {/* 2026-11-16 追加：同じ会社が運営するサイトへのリンク（オーナー指示）。
+            記事の本文には入れず、全ページ共通のフッターに1行だけ置く（記事の出口を増やさないため）。 */}
+        <p className="mt-3 text-center text-xs text-slate-500 sm:text-left">
+          同じ会社のサイト：
+          <a href="https://umaiyonekoko.jp/" className="underline hover:text-slate-700">
+            うまいよね、ここ
+          </a>
+          （横浜の居酒屋・バーの一覧）
+        </p>
       </div>
     </footer>
   );

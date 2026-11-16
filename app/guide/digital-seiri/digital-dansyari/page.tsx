@@ -6,10 +6,13 @@ import SiteFooter from '@/components/SiteFooter';
 
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 const PAGE_PATH = '/guide/digital-seiri/digital-dansyari';
+// 2026-11-17 題名・説明文を直した（深夜④）。直前28日：表示150・クリック率2.7%・順位10.3。
+// 検索語は「デジタル断捨離 退会」（5.9位、表示18、クリック0）「アカウント 断捨離」「会員登録 断捨離」。上位の題名は「退会」「会員登録したサイト」が中心。
+// 判定 12/15：クリック率 2.7%→4%。順位が2以上落ちたら戻す。
 const PAGE_TITLE =
-  'デジタル断捨離のやり方｜スマホ・アカウント・サブスクをスッキリ整理する全手順';
+  'デジタル断捨離のやり方｜使っていないアカウントの退会と、写真・アプリ・サブスクの整理を5ステップで';
 const PAGE_DESCRIPTION =
-  'デジタル断捨離のやり方を5つのステップ（写真・アプリ・サブスク・アカウント・メール）に分けて全手順で解説。スマホ・パソコンが軽くなり、無駄な出費も減らせます。最後に、多くの人が見落とす「整理した情報の残し方」まで紹介。';
+  'デジタル断捨離のやり方を5つのステップで。使っていない会員登録・アカウントの退会と、写真・アプリ・サブスク・メールの整理まで、何から手をつけるかが分かります。最後に、残したログイン情報を家族に伝える方法も。';
 
 export const metadata: Metadata = {
   title: `${PAGE_TITLE} | つぎの手ナビ`,
@@ -212,7 +215,7 @@ export default function DigitalDansyariPage() {
         <h1 className="mt-3 text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
           デジタル断捨離のやり方
           <span className="mt-2 block text-xl font-medium leading-snug text-slate-600 sm:text-2xl">
-            スマホ・アカウント・サブスクをスッキリ整理する全手順
+            アカウントの退会と、写真・アプリ・サブスクの整理を5ステップで
           </span>
         </h1>
 

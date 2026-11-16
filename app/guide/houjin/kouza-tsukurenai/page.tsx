@@ -9,7 +9,7 @@ import HoujinExit from '@/components/houjin/HoujinExit';
 import KouzaCheck from '@/components/houjin/KouzaCheck';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import { HOUJIN_PARTNERS } from '@/lib/houjin/partners';
-import { CHECKED_AT, SOURCES, RESULTS, JOUKEN, KEIKA, MITATE, type SourceKey } from '@/lib/houjin/kouza-data';
+import { CHECKED_AT, SOURCES, RESULTS, JOUKEN, KEIKA, MITATE, ATO, type SourceKey } from '@/lib/houjin/kouza-data';
 
 /**
  * 法人口座が作れない：運営会社が3行に申し込んだ実例（2026-11-16 作成）。
@@ -24,8 +24,8 @@ import { CHECKED_AT, SOURCES, RESULTS, JOUKEN, KEIKA, MITATE, type SourceKey } f
  */
 const LP_ID = 'guide-houjin-kouza-tsukurenai';
 const PATH = '/guide/houjin/kouza-tsukurenai';
-const TITLE = '法人口座が作れない？3行に申し込み、通ったのは1行｜設立直後の合同会社・バーチャルオフィスの審査の実例';
-const DESCRIPTION = '設立から1〜2週間・資本金50万円・本店がバーチャルオフィスの合同会社で、法人口座を3つの銀行に申し込んだ結果と日付。落ちた2行と通った1行の違いの見立て、申し込む前に整える7つ、無料の申込前チェック表（エクセル・PDF）。';
+const TITLE = '法人口座が作れない？審査に2行落ち、通ったのは1行｜設立直後の合同会社・バーチャルオフィスの実例';
+const DESCRIPTION = '設立直後・資本金50万円・本店がバーチャルオフィスの合同会社で、法人口座を3つの銀行に申し込んだ結果と日付。審査に落ちた理由の見立て、落ちたあとにしたこと、申し込む前に整える7つ。無料の申込前チェック表（エクセル・PDF）つき。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -36,9 +36,9 @@ export const metadata: Metadata = {
 };
 
 const FAQS = [
-  { q: '落ちた理由は教えてもらえますか？', a: '私たちが申し込んだ3行では、どこも理由の説明はありませんでした。ドコモSMTBネット銀行は「口座開設を見合わせ」と伝えるメールだけでした。' },
-  { q: '結果が出るまで何日かかりましたか？', a: '3行とも約1週間でした。PayPay銀行は最短当日の開設と案内していますが、申込の内容によっては日数がかかるとしています。' },
-  { q: 'バーチャルオフィスの住所では作れませんか？', a: '私たちは、本店がバーチャルオフィスのまま、PayPay銀行で口座を作れました。ただ、落ちた2行にも共通していたため、審査で見られる点の一つと考えています（推定）。' },
+  { q: '審査に落ちた理由は教えてもらえますか？', a: '私たちが落ちた2行では、どちらも理由の説明はありませんでした。ドコモSMTBネット銀行は「口座開設を見合わせ」と伝えるメールだけでした。' },
+  { q: '審査の結果が出るまで何日かかりましたか？', a: '11/12に申し込んだドコモSMTBネット銀行とPayPay銀行は、4日後の11/16に結果が届きました。PayPay銀行は最短当日の開設と案内していますが、申込の内容によっては日数がかかるとしています。' },
+  { q: 'バーチャルオフィスの住所では法人口座は作れませんか？', a: '私たちは、本店がバーチャルオフィスのまま、PayPay銀行で法人口座を作れました。ただ、落ちた2行にも共通していたため、審査で見られる点の一つと考えています（推定）。' },
   { q: '個人事業の口座を、会社の口座に変えられますか？', a: 'できません。個人名義の口座を会社名義に変えることはできず、会社の口座は登記が終わってから新しく作ります。' },
 ];
 
@@ -97,6 +97,7 @@ export default function Page() {
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">運営会社の実例</p>
             <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">法人口座が作れない<br /><span className="text-[22px] text-orange-600">3行に申し込み、通ったのは1行</span></h1>
+            <p className="text-[14px] text-slate-600">設立直後の合同会社で、法人口座を3つの銀行に申し込んだ結果です。</p>
           </div>
           <ul className="grid gap-2" aria-label="申し込んだ3行の結果">
             {RESULTS.map((r) => (
@@ -112,7 +113,7 @@ export default function Page() {
               </li>
             ))}
           </ul>
-          <p className="flex items-start gap-2 text-[13px] text-slate-700"><Info size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />どの銀行も、落ちた理由は教えてくれませんでした。</p>
+          <p className="flex items-start gap-2 text-[13px] text-slate-700"><Info size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />落ちた2行とも、理由の説明はありませんでした。</p>
           <div className="flex flex-col gap-3 rounded-2xl border-2 border-sky-200 bg-sky-50/60 p-4">
             <div className="flex items-center gap-3">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-sky-700 ring-1 ring-sky-200"><FileSpreadsheet size={24} aria-hidden="true" /></span>
@@ -133,7 +134,7 @@ export default function Page() {
         </section>
 
         <section className={SECTION} aria-labelledby="jouken">
-          <h2 id="jouken" className={H2}>申し込んだ会社</h2>
+          <h2 id="jouken" className={H2}>申し込んだ会社の条件</h2>
           <ul className="grid grid-cols-2 gap-2">
             {JOUKEN.map((j, i) => {
               const I = ICONS[i];
@@ -150,7 +151,7 @@ export default function Page() {
         </section>
 
         <section className={SECTION} aria-labelledby="keika">
-          <h2 id="keika" className={H2}>日付ごとの経過</h2>
+          <h2 id="keika" className={H2}>審査の経過<span className="ml-2 text-[14px] font-bold text-slate-500">2026年</span></h2>
           <ol className="flex flex-col">
             {KEIKA.map((k, i) => (
               <li key={`${k.d}-${i}`} className="flex gap-3">
@@ -165,11 +166,11 @@ export default function Page() {
               </li>
             ))}
           </ol>
-          <p className="rounded-2xl bg-white p-3.5 text-[13px] font-bold text-slate-800 ring-1 ring-slate-200">申込から結果まで、どの銀行も約1週間でした。</p>
+          <p className="rounded-2xl bg-white p-3.5 text-[13px] font-bold text-slate-800 ring-1 ring-slate-200">11/12に申し込んだ2行は、4日後に結果が届きました。設立から審査に通るまで19日でした。</p>
         </section>
 
         <section className={SECTION} aria-labelledby="mitate">
-          <h2 id="mitate" className={H2}>落ちた理由の見立て<span className="ml-2 align-middle rounded bg-slate-200 px-1.5 py-0.5 text-[11px] font-bold text-slate-600">推定</span></h2>
+          <h2 id="mitate" className={H2}>法人口座の審査に落ちた理由<span className="ml-2 align-middle rounded bg-slate-200 px-1.5 py-0.5 text-[11px] font-bold text-slate-600">推定</span></h2>
           <ol className="grid gap-2.5">
             {MITATE.map((m, i) => (
               <li key={m.h} className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
@@ -192,10 +193,25 @@ export default function Page() {
           </div>
         </section>
 
+        <section className={SECTION} aria-labelledby="ato">
+          <h2 id="ato" className={H2}>法人口座が作れないとき</h2>
+          <ol className="grid gap-2.5">
+            {ATO.map((a, i) => (
+              <li key={a.h} className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-[15px] font-black text-sky-700">{i + 1}</span>
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-[15px] font-black text-slate-900">{a.h}</span>
+                  <span className="text-[13px] leading-relaxed text-slate-600">{a.d}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </section>
+
         <section className={SECTION} aria-labelledby="check">
-          <h2 id="check" className={H2}>申し込む前に整える7つ</h2>
+          <h2 id="check" className={H2}>法人口座を申し込む前に整える7つ</h2>
           <KouzaCheck lpId={LP_ID} />
-          <p className={SRC}>郵便：PayPay銀行は、本人確認の郵便を受け取れないと口座の利用を止めると案内しています（出典：{src(['paypayStart'])}、{checked} 確認）。</p>
+          <p className={SRC}>郵便：PayPay銀行は、郵送物を受け取れないと口座の利用を止めると案内しています（出典：{src(['paypayStart'])}、{checked} 確認）。</p>
         </section>
 
         <section className={SECTION} aria-labelledby="kojin">
@@ -203,7 +219,7 @@ export default function Page() {
           <ul className="grid gap-2">
             {[
               { h: '個人の口座は、会社の口座にできない', d: '名義を変えることはできず、登記のあとに新しく作ります。' },
-              { h: '口座ができるまでの請求を決めておく', d: '私たちは設立から口座ができるまで約3週間。最初の請求の振込先を、先に考えておきます。' },
+              { h: '口座ができるまでの請求を決めておく', d: '私たちは設立から法人口座の審査に通るまで19日。最初の請求の振込先を、先に考えておきます。' },
               { h: '本店の住所は口座のことも考えて', d: '自宅を出したくない人は、バーチャルオフィスでも通った銀行がある（私たちはPayPay銀行）。' },
             ].map((c) => (
               <li key={c.h} className="flex flex-col gap-0.5 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">

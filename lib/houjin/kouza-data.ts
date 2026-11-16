@@ -6,18 +6,18 @@
 export const CHECKED_AT = '2026-11-16';
 
 export const SOURCES = {
-  paypayStart: { name: 'PayPay銀行「法人口座を開設するには」', url: 'https://www.paypay-bank.co.jp/business/first/start-company.html' },
-  mfVirtual: { name: 'マネーフォワード クラウド会社設立「バーチャルオフィスで法人口座は作れる？」', url: 'https://biz.moneyforward.com/establish/basic/90771/' },
-  mfHoujinnari: { name: 'マネーフォワード クラウド会社設立「法人化したら口座の変更は必要？」', url: 'https://biz.moneyforward.com/establish/basic/82590/' },
-  sogyoVirtual: { name: '創業手帳「バーチャルオフィスでも法人口座は開設できる？」', url: 'https://sogyotecho.jp/virtual-office-hojin-koza-kaisetsu/' },
-  sogyoGodo: { name: '創業手帳「合同会社でも法人口座は開設できる」', url: 'https://sogyotecho.jp/goudougaisha-houjinkouza/' },
+  paypayStart: { name: 'PayPay銀行「会社設立時に法人口座が必要な理由とは？」', url: 'https://www.paypay-bank.co.jp/business/first/start-company.html' },
+  mfVirtual: { name: 'マネーフォワード クラウド会社設立「バーチャルオフィスで東京に法人登記するには？」', url: 'https://biz.moneyforward.com/establish/basic/90771/' },
+  mfHoujinnari: { name: 'マネーフォワード クラウド会社設立「法人化したら口座の変更は必要？個人口座からの手続きの流れを解説」', url: 'https://biz.moneyforward.com/establish/basic/82590/' },
+  sogyoVirtual: { name: '創業手帳「バーチャルオフィスでも法人口座は開設できる？審査の傾向と対策を解説」', url: 'https://sogyotecho.jp/virtual-office-hojin-koza-kaisetsu/' },
+  sogyoGodo: { name: '創業手帳「合同会社でも法人口座開設できる！必要書類や審査のポイントを解説」', url: 'https://sogyotecho.jp/goudougaisha-houjinkouza/' },
 } as const;
 export type SourceKey = keyof typeof SOURCES;
 
 /** 申し込んだ3行の結果（運営会社の実例） */
 export const RESULTS = [
-  { bank: 'GMOあおぞらネット銀行', ok: false, when: '11月上旬に申込', result: '見送り' },
-  { bank: 'ドコモSMTBネット銀行', ok: false, when: '11/12 申込 → 11/16 メール', result: '見送り' },
+  { bank: 'GMOあおぞらネット銀行', ok: false, when: '11月上旬に申込', result: '通らず' },
+  { bank: 'ドコモSMTBネット銀行', ok: false, when: '11/12 申込 → 11/16 メール', result: '通らず' },
   { bank: 'PayPay銀行', ok: true, when: '11/12 申込 → 11/16 通過', result: '開設' },
 ] as const;
 
@@ -31,20 +31,20 @@ export const JOUKEN = [
   { h: '会社の取引はまだなし', s: '個人で運営していた実績はあり' },
 ] as const;
 
-/** 日付ごとの経過 */
+/** 日付ごとの経過（2026年） */
 export const KEIKA = [
   { d: '10/28', t: '会社を設立（登記）' },
-  { d: '11月上旬', t: 'GMOあおぞらネット銀行に申込 → 見送り' },
+  { d: '11月上旬', t: 'GMOあおぞらネット銀行に申込 → 通らず' },
   { d: '11/12', t: 'ドコモSMTBネット銀行とPayPay銀行に申込' },
-  { d: '11/13', t: 'PayPay銀行：登記の住所と、入力した住所が違っていて手続きが止まる → 申し込み直し' },
+  { d: '11/13', t: 'PayPay銀行：登記の住所と、申込に入れた住所が違っていて手続きが止まる → 登記どおりに入れて申し込み直し' },
   { d: '11/16', t: 'ドコモSMTBネット銀行：「口座開設を見合わせ」のメール。理由の説明なし' },
   { d: '11/16', t: 'PayPay銀行：審査に通過' },
 ] as const;
 
 /** 落ちた理由の見立て（推定） */
 export const MITATE = [
-  { h: '本店がバーチャルオフィス', d: '落ちた2行に共通。事業の実態が見えにくいと受け取られやすいとされます。', src: ['mfVirtual'] as SourceKey[] },
-  { h: '設立直後で、取引の実績がない', d: '収益の見込みを確かめられるため、起業してすぐは厳しい傾向とされます。', src: ['sogyoVirtual'] as SourceKey[] },
+  { h: '本店がバーチャルオフィス', d: '落ちた2行に共通。銀行は事業の実態を確かめるため、実態がないと見られやすいとされます。', src: ['mfVirtual'] as SourceKey[] },
+  { h: '設立直後で、取引の実績がない', d: '収益の見込みを確かめられるため、特にメガバンクでは起業してすぐは厳しい傾向とされます。ネット銀行は、実績がなくても通る余地があるとされます。', src: ['sogyoVirtual'] as SourceKey[] },
   { h: '申込の社名が登記と1文字違った', d: 'ドコモSMTBネット銀行の申込で、社名の英字が1文字抜けていました。', src: [] as SourceKey[] },
   { h: '合同会社であること', d: 'それだけで落ちることは原則ないとされます。', src: ['sogyoGodo'] as SourceKey[] },
 ] as const;
@@ -52,10 +52,16 @@ export const MITATE = [
 /** 申し込む前に整えること（チェック表と同じ並び） */
 export const CHECKS = [
   { h: '社名は登記と1文字も違わない', s: '英字・記号・空白まで、登記事項証明書どおりに' },
-  { h: '本店の住所は登記どおり', s: '丁目・番地・建物名・部屋番号まで' },
-  { h: '代表者の住所は本人確認書類どおり', s: '登記の本店と混ぜて入れない' },
+  { h: '住所は登記と1文字も違わない', s: '本店も代表者も。建物名・部屋番号まで' },
+  { h: '代表者の住所が本人確認書類と同じ', s: '引っ越していると、登記と違うことがある' },
   { h: '事業の説明を用意した', s: '何を・誰に・どうやって売るか' },
   { h: '事業が分かるホームページがある', s: '会社名・所在地・事業内容が載っている' },
   { h: '銀行からの郵便を受け取れる', s: '転送では受け取れない郵便もある' },
-  { h: '2〜3行に同時に申し込む', s: '結果まで約1週間。理由は教えてもらえない' },
+  { h: '2行以上に同時に申し込む', s: '落ちた理由は教えてもらえない。1行ずつ待つと遅れる' },
+] as const;
+
+/** 落ちたあとにしたこと（運営会社の実例） */
+export const ATO = [
+  { h: '2行に同時に申し込んだ', d: '1行目に通らなかったあと、11/12にドコモSMTBネット銀行とPayPay銀行へ。結果は4日後の11/16に届きました。' },
+  { h: '止まった申込は、登記どおりに入れ直した', d: 'PayPay銀行で住所の食い違いから手続きが止まり、登記の表記に合わせて申し込み直しました。通ったのはこの銀行です。' },
 ] as const;

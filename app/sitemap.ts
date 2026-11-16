@@ -495,6 +495,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/guide/houjin/kouza-hitsuyou-shorui`,
+      lastModified: new Date("2026-11-17T10:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/guide/houjin/kouza-kaisetsu-kikan`,
       lastModified: new Date("2026-11-17T03:00:00+09:00"),
       changeFrequency: "monthly",

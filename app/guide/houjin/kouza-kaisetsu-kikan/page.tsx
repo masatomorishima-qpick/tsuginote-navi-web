@@ -289,6 +289,7 @@ export default function Page() {
 
         <nav aria-label="あわせて読む" className="flex flex-col gap-2">
         {[
+          { href: '/guide/houjin/kouza-hitsuyou-shorui', t: '法人口座の必要書類', s: '銀行4つの比較と、設立直後の事業内容の資料' },
           { href: '/guide/houjin/paypay-houjin-kouza', t: 'PayPay銀行の法人口座', s: '4日で審査に通った経過と必要書類' },
           { href: '/guide/houjin/raksulbank', t: 'ラクスルバンクの審査と手数料', s: '審査はGMOあおぞらネット銀行。申し込める会社' },
           { href: '/guide/houjin', t: '法人成りのページ一覧', s: '設立から口座まで、つまずいた所' },

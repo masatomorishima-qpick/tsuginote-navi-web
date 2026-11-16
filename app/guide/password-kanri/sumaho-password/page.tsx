@@ -6,10 +6,15 @@ import SiteFooter from '@/components/SiteFooter';
 
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 const PAGE_PATH = '/guide/password-kanri/sumaho-password';
+// 2026-11-16 題名と説明文だけを直す（オーナー了承。本文・見出し1は変えない）。
+// Search Console 28日（10/18〜11/14）：表示4,156・クリック69・1.7%・8.6位。検索語は「パスワード メモ帳 危険 iphone」755（10.0位・1.3%）、
+// 「パスワード メモ帳 危険」365（10.3位・1.6%）、「パスワード メモ帳 危険 android」309（5.9位・1.3%）。いちばん多い iPhone を前に出し、
+// 説明文の最初で「なぜ危ないか」に答える（本文の「なぜメモ帳保管が危ないのか」の内容どおり）。判定 12/14：CTR 1.7%→3.0%。
+// 前の題名：パスワードをメモ帳で管理するのは危険？スマホでも忘れず安全に管理する方法【iPhone/Android】
 const PAGE_TITLE =
-  'パスワードをメモ帳で管理するのは危険？スマホでも忘れず安全に管理する方法【iPhone/Android】';
+  'パスワードをメモ帳に保存するのは危険？iPhone・Androidのメモが危ない理由と安全な管理方法';
 const PAGE_DESCRIPTION =
-  'パスワードをメモ帳に書くのは危険？という疑問に答え、忘れっぽい人でも安全に管理できる方法を解説。危険な保管法の見分け方、パスワード管理アプリの始め方、二段階認証・パスキー、忘れたときのiPhone・Android別の対処まで、難しい知識なしで今日から実践できます。';
+  'iPhone・Androidのメモ帳は中身が暗号化されず、スマホを開かれたときや、iCloudなどの同期先のアカウントが乗っ取られたときに、パスワードがまとめて見られるおそれがあります。危険な保管法の見分け方、管理アプリの始め方、忘れたときの対処まで。';
 
 export const metadata: Metadata = {
   title: `${PAGE_TITLE} | つぎの手ナビ`,

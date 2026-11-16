@@ -152,7 +152,7 @@ export default function Page() {
 
         <section className="flex flex-col gap-5" aria-labelledby="tsugi">
           <h2 id="tsugi" className={H2}>登記が終わったら、法人口座</h2>
-          <p className="text-[13px] text-slate-600">銀行の申込は、登記どおりの字で入れます。私たちは住所の食い違いで、一度手続きが止まりました。</p>
+          <p className="text-[13px] text-slate-600">銀行の申込は、登記どおりの字で入れます。私たちは法人の住所に自宅を入れてしまい、一度手続きが止まりました。</p>
           <ul className="grid gap-2">
             {[
               { href: '/guide/houjin/kouza-tsukurenai', h: '法人口座が作れない', s: '3行に申し込み、通ったのは1行' },

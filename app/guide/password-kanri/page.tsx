@@ -31,13 +31,6 @@ const articles = [
     description:
       '危険な保管法の見分け方から、忘れっぽい人でもできるパスワード管理アプリの始め方、二段階認証・パスキーまでを解説します。',
   },
-  {
-    href: '/guide/password-kanri/nidankai-ninsho',
-    category: '二段階認証',
-    title: 'スマホの二段階認証とは？設定のやり方と“もしも”の落とし穴',
-    description:
-      '二段階認証の仕組みと設定手順（SMS・認証アプリ・パスキー）、リカバリーコードや機種変更の注意点までを解説します。',
-  },
 ];
 
 export default function PasswordKanriIndexPage() {

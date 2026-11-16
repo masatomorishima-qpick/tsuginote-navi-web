@@ -19,7 +19,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "digitalihin-003",
     "digitalihin-004",
     "digitalihin-005",
-    "digitalihin-006",
     "digitalihin-007",
     "digitalihin-008",
   ];
@@ -421,12 +420,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
-    {
-      url: `${baseUrl}/guide/password-kanri/nidankai-ninsho`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
     // 家族間の情報共有（本命ジャンル）
     {
       url: `${baseUrl}/guide/kazoku-kyoyu`,
@@ -551,18 +544,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     // 親・家族のケア
-    {
-      url: `${baseUrl}/guide/oya-care`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/guide/oya-care/oya-netbank`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
     // もしもの備え
     {
       url: `${baseUrl}/guide/moshimo-sonae`,
@@ -584,37 +565,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
     {
-      url: `${baseUrl}/guide/column/subsuku-kaiyaku-riyu`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
       url: `${baseUrl}/guide/column/okane-kanri-kichinto`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/guide/column/saifu-hikidashi-5sen`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/guide/column/kodomo-omoide-5shukan`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/guide/column/sumaho-shuyaku-5sen`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/guide/column/pet-omoide-5shukan`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.7,

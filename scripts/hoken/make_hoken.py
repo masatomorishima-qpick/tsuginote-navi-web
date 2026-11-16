@@ -612,13 +612,13 @@ def make_teinen_xlsx():
     put(ws, 2, 1, "オレンジの欄に退職日を入れると、健康保険の手続きの期限が出ます（例の日付は入れ替えてください）。確かめたら「済」を選びます。", S, border=False)
     ws.merge_cells("A2:D2")
     ws.row_dimensions[2].height = 30
-    put(ws, 4, 2, "退職日（最後に勤める日）", B, HEAD)
+    put(ws, 4, 2, "退職日（会社に籍がある最後の日。有給休暇の消化中も含む）", B, HEAD)
     put(ws, 4, 3, date(2027, 3, 31), B, IN, fmt="yyyy/m/d(aaa)")
     rows = [
         ("健康保険の資格がなくなる日（この日を1日目に数える）", "=IF(C4=\"\",\"\",C4+1)", "yyyy/m/d(aaa)"),
         ("任意継続の申し出の期限（必着。土日・祝日なら次の営業日）", "=IF(C4=\"\",\"\",C4+20)", "yyyy/m/d(aaa)"),
         ("国民健康保険の届け出の期限（市区町村で確かめる）", "=IF(C4=\"\",\"\",C4+14)", "yyyy/m/d(aaa)"),
-        ("任意継続の終わり（最長2年・目安）", "=IF(C4=\"\",\"\",EDATE(C4,24))", "yyyy/m/d(aaa)"),
+        ("任意継続の終わり（最長2年・目安）", "=IF(C4=\"\",\"\",EDATE(C4+1,24)-1)", "yyyy/m/d(aaa)"),
     ]
     for k, (h, f, fm) in enumerate(rows):
         put(ws, 5 + k, 2, h, B)
@@ -706,7 +706,7 @@ small {{ color: #64748b; font-weight: normal; font-size: 7.5pt; }}
 </style></head><body><h1>定年退職の 保険の見直しチェックリスト</h1><p class="sub">退職日を書き、期限を数えて書き込みます。確かめたら□に印を付けます。</p>
 <h2>① 健康保険の期限（退職日の翌日を1日目に数える）</h2>
 <table><tr><th style="width:45%">項目</th><th>日付を書く</th></tr>
-<tr><td>退職日</td><td class="w"></td></tr>
+<tr><td>退職日（会社に籍がある最後の日）</td><td class="w"></td></tr>
 <tr><td>任意継続の申し出の期限（翌日から20日目。必着。土日・祝日なら次の営業日）</td><td class="w"></td></tr>
 <tr><td>国民健康保険の届け出の期限（14日以内。市区町村で確かめる）</td><td class="w"></td></tr>
 <tr><td>任意継続の終わり（最長2年）</td><td class="w"></td></tr></table>

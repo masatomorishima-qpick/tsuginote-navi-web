@@ -33,8 +33,8 @@ export const metadata: Metadata = {
 
 const D = DATA.taishoku;
 const FAQS = [
-  { q: '死亡退職金の非課税枠はいくらですか？', a: '「500万円×法定相続人の数」です。相続人が受け取った死亡退職金の合計がこの額以下なら、相続税はかかりません（国税庁 No.4117）。死亡保険金の非課税とは別の枠です。' },
-  { q: '相続放棄をしても死亡退職金は受け取れますか？', a: '退職金の規程で受取人とされていれば受け取れますが、非課税は使えず、受け取った全額が相続税の対象になります。法定相続人の数には、放棄した人も数えます（国税庁 No.4117）。' },
+  { q: '死亡退職金の非課税枠はいくらですか？', a: '「500万円×法定相続人の数」です。相続人が受け取った死亡退職金の合計がこの額以下なら、その死亡退職金には相続税がかかりません（国税庁 No.4117）。死亡保険金の非課税とは別の枠です（生命保険文化センター）。' },
+  { q: '相続放棄をしても死亡退職金は受け取れますか？', a: '受け取れますが、非課税は使えず、受け取った全額が相続税の対象になります。法定相続人の数には、放棄した人も数えます（国税庁 No.4117・生命保険文化センター）。' },
   { q: '弔慰金にも相続税はかかりますか？', a: 'ふつうはかかりません。ただ、仕事中の死亡なら死亡したときの普通給与の3年分、仕事中でない死亡なら半年分を超える部分は、退職手当金等として相続税の対象になります（国税庁 No.4120）。' },
 ];
 
@@ -54,9 +54,9 @@ export default function Page() {
         title={<>死亡退職金の非課税の計算<br /><span className="text-orange-600">500万円×法定相続人の数</span></>}
         download={
           <div className="flex flex-col gap-3">
-            <p className="text-[15px] leading-relaxed text-slate-800">{D.kotae}<span className="text-[11px] text-slate-500">（国税庁 No.4117・No.4108）</span></p>
+            <p className="text-[15px] leading-relaxed text-slate-800">{D.kotae}<span className="text-[11px] text-slate-500">（国税庁 No.4117・No.4108・生命保険文化センター）</span></p>
             <TaishokukinHikazeiCalc lpId={LP_ID} />
-            <SouzokuExit lpId={LP_ID} partner="souzokuAssist" position="hero" lead="死亡退職金を足して基礎控除を超えたら申告が要る。まとめて任せられる" />
+            <SouzokuExit lpId={LP_ID} partner="souzokuAssist" position="hero" lead="非課税を超えた分を遺産に足して、基礎控除を超えたら申告が要る。まとめて任せられる" />
             <SouzokuDownload icon={Calculator} h="死亡退職金の非課税の計算表" s="受け取った人ごとの非課税と、弔慰金の多すぎる分を自動で計算" files={SOUZOKU_FILES.taishoku} />
           </div>
         }

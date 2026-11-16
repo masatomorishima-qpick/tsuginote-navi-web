@@ -11,7 +11,7 @@ import { trackEvent } from '@/lib/trackEvent';
  * 数え方：資格喪失日（退職日の翌日）は午前0時から始まるので1日目に数える（民法140条ただし書）。
  *   20日目＝退職日＋20日、14日目＝退職日＋14日。3/31 退職 → 4/1 が1日目 → 任意継続 4/20・国保 4/14。
  *   月末の例：2/28 退職（平年）→ 3/1 が1日目 → 3/20・3/14。
- * 任意継続の2年：資格を取った日（退職日の翌日）から2年。終わりの日の目安＝2年後の退職日と同じ日付（2/29 退職→2年後は2/28）。
+ * 任意継続の2年：資格を取った日（退職日の翌日）から2年。終わりの日の目安＝資格を取った日の2年後の前の日（2026/2/28 退職→2028/2/29、2/29 退職→2年後の2/28）。
  * 祝日は自動では動かさず、曜日を出して「土日・祝日なら次の営業日」と書く。
  * 使われたかは lp_event_logs の event_name 'teinen_kenpo'（1回目だけ）。入れた日付は送らない。
  */
@@ -20,14 +20,13 @@ const fmt = (d: Date) => `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate
 
 export function kigen(taishoku: Date) {
   const add = (n: number) => new Date(taishoku.getFullYear(), taishoku.getMonth(), taishoku.getDate() + n);
-  const y = taishoku.getFullYear() + 2;
-  const m = taishoku.getMonth();
-  const last = new Date(y, m + 1, 0).getDate();
+  const s = add(1);
   return {
-    soshitsu: add(1),
+    soshitsu: s,
     ninkei: add(20),
     kokuho: add(14),
-    owari: new Date(y, m, Math.min(taishoku.getDate(), last)),
+    // 資格を取った日（退職日の翌日）から2年たつ日の前の日。2026/2/28 退職 → 2028/2/29。
+    owari: new Date(s.getFullYear() + 2, s.getMonth(), s.getDate() - 1),
   };
 }
 
@@ -45,6 +44,7 @@ export default function TeinenKenpoKigen({ lpId }: { lpId: string }) {
   }, [ok, lpId]);
 
   const wk = (x: Date) => x.getDay() === 0 || x.getDay() === 6;
+  const nextWeekday = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate() + (x.getDay() === 6 ? 2 : 1));
   const rows = r ? [
     { h: '任意継続の申し出の期限', v: fmt(r.ninkei), d: '協会けんぽの支部に必着。郵送は早めに', warn: wk(r.ninkei) },
     { h: '国民健康保険の届け出の期限', v: fmt(r.kokuho), d: '住んでいる市区町村の窓口へ', warn: false },
@@ -56,7 +56,7 @@ export default function TeinenKenpoKigen({ lpId }: { lpId: string }) {
       <p className="flex items-center gap-2 text-[17px] font-black text-slate-900">
         <CalendarClock size={22} className="text-sky-700" aria-hidden="true" />健康保険の手続きの期限<span className="text-[12px] font-bold text-sky-700">無料</span>
       </p>
-      <label className="flex flex-col gap-1 text-[11px] font-bold text-slate-600">退職日（最後に勤める日）
+      <label className="flex flex-col gap-1 text-[11px] font-bold text-slate-600">退職日（会社に籍がある最後の日。有給休暇の消化中も含む）
         <input type="date" value={day} onChange={(e) => setDay(e.target.value)}
           className="w-full min-w-0 rounded-xl bg-white px-3 py-2.5 text-[16px] font-bold text-slate-900 ring-1 ring-slate-300 outline-none focus:ring-2 focus:ring-sky-600" />
       </label>
@@ -68,7 +68,8 @@ export default function TeinenKenpoKigen({ lpId }: { lpId: string }) {
               <li key={x.h} className="flex flex-col rounded-xl bg-white p-3 ring-1 ring-slate-200">
                 <span className="text-[12px] font-bold text-slate-600">{x.h}</span>
                 <span className="text-[17px] font-black text-orange-700">{x.v}</span>
-                <span className="text-[12px] text-slate-600">{x.d}{x.warn && '。土日なので、次の営業日まで'}</span>
+                <span className="text-[12px] text-slate-600">{x.d}</span>
+                {x.warn && r && <span className="text-[12px] font-bold text-orange-800">この日は土日なので、期限は次の営業日（{fmt(nextWeekday(r.ninkei))}、祝日ならその次）です</span>}
               </li>
             ))}
           </ul>

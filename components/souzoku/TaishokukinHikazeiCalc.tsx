@@ -71,10 +71,10 @@ export default function TaishokukinHikazeiCalc({ lpId }: { lpId: string }) {
         <p className="text-[13px] font-black text-slate-700">① 法定相続人（相続を放棄した人も数える）</p>
         <div className="grid grid-cols-3 gap-2">
           {sel(haigusha, setHaigusha, 1, '配偶者')}
-          {sel(jitsu, setJitsu, 8, '実の子')}
+          {sel(jitsu, setJitsu, 8, '子')}
           {sel(yoshi, setYoshi, 5, '養子')}
         </div>
-        <p className="text-[11px] text-slate-500">子がいないときは、親か兄弟姉妹の人数を「実の子」の欄に入れます。</p>
+        <p className="text-[11px] text-slate-500">「子」には実の子の人数を入れます。子がいないときは、親か兄弟姉妹の人数を入れます。</p>
         <p className="rounded-xl bg-white px-3 py-2 text-center text-[14px] font-black text-slate-900 ring-1 ring-slate-200">
           数える人数 {ninzu}人 → 非課税の限度額 <span className="text-orange-700">{yen(res.gendo)}</span>
         </p>
@@ -142,6 +142,7 @@ export default function TaishokukinHikazeiCalc({ lpId }: { lpId: string }) {
         <p className="rounded-xl bg-orange-600 px-3 py-3 text-center text-white" aria-live="polite">
           <span className="block text-[12px] opacity-90">遺産に足す死亡退職金の合計</span>
           <span className="text-[20px] font-black">{yen(sumKazei)}</span>
+          {ch.kazei > 0 && <span className="block text-[11px] opacity-90">弔慰金の分は入っていません。③の「退職金に足す額」を受け取った人の②に足すと計算し直せます</span>}
           <span className="block text-[11px] opacity-90">死亡保険金も受け取ったときは、それとは別に {yen(res.gendo)} の非課税があります</span>
         </p>
       )}

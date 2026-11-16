@@ -1723,7 +1723,7 @@ def make_taishoku_xlsx():
     put(ws, 9, 1, "非課税の限度額（自動）", B)
     put(ws, 9, 2, f"={Tk['per']}*B8", B, OK_FILL, fmt="#,##0\"円\"")
     r = 11
-    for i, t in enumerate(["② 受け取った人", "死亡退職金（円）", "相続人か（はい／いいえ）", "非課税（自動）", "相続税の対象（自動）"], 1):
+    for i, t in enumerate(["② 受け取った人", "死亡退職金（円）", "相続人で、放棄していない（はい／いいえ）", "非課税（自動）", "相続税の対象（自動）"], 1):
         put(ws, r, i, t, B, HEAD_FILL)
     dv = DataValidation(type="list", formula1='"はい,いいえ"', allow_blank=True)
     ws.add_data_validation(dv)

@@ -101,6 +101,7 @@ export default function NiwariKasanCalc({ lpId }: { lpId: string }) {
       <label className="flex flex-col gap-1 text-[13px] font-black text-slate-700">③ その人が受け取る額（万円）
         <input inputMode="numeric" value={shutokuMan} placeholder="4000" onChange={(e) => setShutokuMan(e.target.value)} className={INPUT} />
       </label>
+      {!spouse && kosei === 'nashi' && <p className="text-[12px] font-bold text-orange-700">配偶者か、ほかの相続人を1人以上選んでください。</p>}
       {over && <p className="text-[12px] font-bold text-orange-700">受け取る額が正味の遺産額より多くなっています。遺産額と同じとして計算します。</p>}
 
       {res && (
@@ -114,7 +115,7 @@ export default function NiwariKasanCalc({ lpId }: { lpId: string }) {
             <span className="text-[22px] font-black">{yen(res.goukei)}</span>
             <span className="block text-[11px] opacity-90">配偶者の税額の軽減・未成年者控除などは、このあとに引きます</span>
           </p>
-          {res.sogaku === 0 && <p className="text-[12px] font-bold text-emerald-800">正味の遺産額が基礎控除（{yen(res.kiso)}）以下なので、相続税はかかりません。</p>}
+          {res.sogaku === 0 && <p className="text-[12px] font-bold text-emerald-800">課税される遺産が0円なので、相続税はかかりません（基礎控除 {yen(res.kiso)}）。</p>}
         </div>
       )}
       <p className="text-[11px] leading-relaxed text-slate-500">{N.keisanNote}入れた数字は送られません。</p>

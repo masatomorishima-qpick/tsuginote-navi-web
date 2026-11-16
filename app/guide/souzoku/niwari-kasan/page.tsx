@@ -56,7 +56,7 @@ export default function Page() {
           <div className="flex flex-col gap-3">
             <p className="text-[15px] leading-relaxed text-slate-800">{D.kotae}<span className="text-[11px] text-slate-500">（国税庁 No.4157）</span></p>
             <NiwariKasanCalc lpId={LP_ID} />
-            <SouzokuExit lpId={LP_ID} partner="souzokuAssist" position="hero" lead="兄弟姉妹や孫が受け取る申告は、第4表の計算も要る。まとめて任せられる" />
+            <SouzokuExit lpId={LP_ID} partner="souzokuAssist" position="hero" lead="兄弟姉妹や、代襲相続人でない孫が受け取る申告は、第4表の計算も要る。まとめて任せられる" />
             <SouzokuDownload icon={Calculator} h="2割加算の計算表" s="続柄を選ぶと対象かを表示し、加算額を自動で計算" files={SOUZOKU_FILES.niwari} />
           </div>
         }

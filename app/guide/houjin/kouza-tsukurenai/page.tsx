@@ -61,7 +61,7 @@ function src(keys: readonly SourceKey[]) {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', datePublished: `${CHECKED_AT}T18:00:00+09:00`, dateModified: `${CHECKED_AT}T18:00:00+09:00`, mainEntityOfPage: `${SITE_URL}${PATH}` },
+    { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', about: { '@type': 'Thing', name: '法人口座の審査' }, mentions: ['GMOあおぞらネット銀行', 'ドコモSMTBネット銀行', 'PayPay銀行'].map((name) => ({ '@type': 'BankOrCreditUnion', name })), datePublished: `${CHECKED_AT}T18:00:00+09:00`, dateModified: `${CHECKED_AT}T18:00:00+09:00`, mainEntityOfPage: `${SITE_URL}${PATH}` },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: '法人成り', item: `${SITE_URL}/guide/houjin` },
@@ -114,6 +114,10 @@ export default function Page() {
             ))}
           </ul>
           <p className="flex items-start gap-2 text-[13px] text-slate-700"><Info size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />落ちた2行とも、理由の説明はありませんでした。</p>
+          <p className="rounded-2xl bg-white p-4 text-[14px] leading-relaxed text-slate-800 ring-1 ring-slate-200">
+            <span className="mb-1 block text-[12px] font-black text-sky-700">結論</span>
+            設立直後・本店がバーチャルオフィスの合同会社でも、法人口座は作れました。落ちた2行に共通していたのは、バーチャルオフィスと設立直後で実績がないこと。通った1行では、申込の入力を登記どおりにそろえていました。
+          </p>
           <div className="flex flex-col gap-3 rounded-2xl border-2 border-sky-200 bg-sky-50/60 p-4">
             <div className="flex items-center gap-3">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-sky-700 ring-1 ring-sky-200"><FileSpreadsheet size={24} aria-hidden="true" /></span>
@@ -151,7 +155,7 @@ export default function Page() {
         </section>
 
         <section className={SECTION} aria-labelledby="keika">
-          <h2 id="keika" className={H2}>審査の経過<span className="ml-2 text-[14px] font-bold text-slate-500">2026年</span></h2>
+          <h2 id="keika" className={H2}>審査の経過（2026年）</h2>
           <ol className="flex flex-col">
             {KEIKA.map((k, i) => (
               <li key={`${k.d}-${i}`} className="flex gap-3">
@@ -170,7 +174,10 @@ export default function Page() {
         </section>
 
         <section className={SECTION} aria-labelledby="mitate">
-          <h2 id="mitate" className={H2}>法人口座の審査に落ちた理由<span className="ml-2 align-middle rounded bg-slate-200 px-1.5 py-0.5 text-[11px] font-bold text-slate-600">推定</span></h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 id="mitate" className={H2}>法人口座の審査に落ちた理由</h2>
+            <span className="rounded bg-slate-200 px-1.5 py-0.5 text-[11px] font-bold text-slate-600">推定</span>
+          </div>
           <ol className="grid gap-2.5">
             {MITATE.map((m, i) => (
               <li key={m.h} className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">

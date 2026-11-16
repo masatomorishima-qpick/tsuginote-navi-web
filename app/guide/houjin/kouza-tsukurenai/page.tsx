@@ -261,6 +261,10 @@ export default function Page() {
           ))}
         </section>
 
+        <Link href="/guide/houjin/raksulbank" className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200 hover:ring-slate-300">
+          <span className="flex flex-1 flex-col"><span className="text-[15px] font-black text-slate-900">ラクスルバンクの審査と手数料</span><span className="text-[12px] text-slate-600">審査はGMOあおぞらネット銀行。申し込める会社</span></span>
+          <ArrowRight size={18} className="text-sky-700" aria-hidden="true" />
+        </Link>
         <Link href="/guide/houjin" className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200 hover:ring-slate-300">
           <span className="flex flex-1 flex-col"><span className="text-[15px] font-black text-slate-900">法人成りのページ一覧</span><span className="text-[12px] text-slate-600">設立から口座まで、つまずいた所</span></span>
           <ArrowRight size={18} className="text-sky-700" aria-hidden="true" />

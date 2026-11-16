@@ -140,6 +140,7 @@ export default function Page() {
             ))}
           </ul>
           <p className={SRC}>出典：{src(['faq33', 'faq54'])}（{CHECKED} 確認）</p>
+          <Link href="/guide/houjin/kouza-kaisetsu-kikan" className="flex items-center gap-1 text-[13px] font-bold text-sky-800 underline underline-offset-2">法人口座の開設期間：銀行ごとの日数と実例<ArrowRight size={14} aria-hidden="true" /></Link>
           <div className="flex flex-col gap-2 rounded-2xl bg-amber-50 p-4 ring-1 ring-amber-200">
             <p className="flex items-center gap-2 text-[15px] font-black text-amber-900"><Info size={18} aria-hidden="true" />運営会社の実例</p>
             <p className="text-[13px] leading-relaxed text-amber-950">設立直後・本店がバーチャルオフィスの時点で、GMOあおぞらネット銀行に直接申し込み、通りませんでした。ラクスルバンクには申し込んでいません。同じ審査かどうかは公表されていないため、分かりません。</p>

@@ -197,6 +197,7 @@ export default function Page() {
               <li>・本店は同じバーチャルオフィスのまま。銀行ごとの基準の違いも大きいと見ています</li>
             </ul>
             <p className={SRC}>PayPay銀行は、申込フォームに登記の情報や本人確認書類と同じ内容を入れるよう案内しています（出典：{src(['paypayStart'])}）。</p>
+            <Link href="/guide/houjin/paypay-houjin-kouza" className="flex items-center gap-1 text-[13px] font-bold text-emerald-900 underline underline-offset-2">PayPay銀行の法人口座：必要書類と経過<ArrowRight size={14} aria-hidden="true" /></Link>
           </div>
         </section>
 

@@ -19,7 +19,50 @@ import type { NextConfig } from "next";
  *   - /api/track, /api/events, /api/survey/* も残置（呼び出し元が無くなるが
  *     ファイル削除はせず、後で整理）。
  */
+/**
+ * 配布物（PDF・エクセル・ワード）の正規のページ（2026-11-16）。
+ * 検索の28日間（10/18〜11/14）で /downloads/souzoku-shinkoku-shorui.pdf が表示74・12.6位と、PDF そのものが検索に出ていた。
+ * PDF から来た人は紹介先のあるページを通らないため、HTTP の Link ヘッダーで「このファイルの正規のページはここ」と伝え、評価をページへ寄せる。
+ * 配布物を足したら、ここにも1行足す。
+ */
+const DOWNLOAD_CANONICAL: [string, string][] = [
+  ['souzoku-isan-bunkatsu-kyogisho', '/guide/souzoku/isan-bunkatsu-kyogisho'],
+  ['souzoku-kankei-setsumeizu', '/guide/souzoku/souzoku-kankei-setsumeizu'],
+  ['souzoku-zaisan-mokuroku', '/guide/souzoku/zaisan-mokuroku'],
+  ['souzoku-akiya-tokurei-check', '/guide/souzoku/jikka-akiya-tokurei'],
+  ['souzoku-tetsuzuki-checklist', '/guide/souzoku/tetsuzuki-checklist'],
+  ['souzoku-shinkoku-shorui', '/guide/souzoku/shinkoku-shorui-checklist'],
+  ['souzoku-hokenkin-hikazei', '/guide/souzoku/shibou-hokenkin-hikazei'],
+  ['souzoku-houtei-souzokubun', '/guide/souzoku/houtei-souzokubun'],
+  ['souzoku-touki-shorui', '/guide/souzoku/touki-shorui'],
+  ['souzoku-junkakutei-shorui', '/guide/souzoku/junkakutei-checklist'],
+  ['souzoku-zaisan-shirabekata', '/guide/souzoku/zaisan-shirabekata'],
+  ['souzoku-koseki-atsumekata', '/guide/souzoku/koseki-atsumekata'],
+  ['souzoku-shinkoku-jibun', '/guide/souzoku/shinkoku-jibun'],
+  ['souzoku-souzokunin-shinkoku-touki', '/guide/souzoku/souzokunin-shinkoku-touki'],
+  ['souzoku-seizen-zouyo-kasan', '/guide/souzoku/seizen-zouyo-kasan'],
+  ['souzoku-shokibo-takuchi-shorui', '/guide/souzoku/shokibo-takuchi-shorui'],
+  ['souzoku-miseinen-shougaisha-kojo', '/guide/souzoku/miseinen-shougaisha-kojo'],
+  ['souzoku-souji-souzoku-kojo', '/guide/souzoku/souji-souzoku-kojo'],
+  ['hoken-keiyaku-ichiran', '/guide/shisan-kanri/hoken-ichiran-excel'],
+  ['hoken-hikaku', '/guide/shisan-kanri/hoken-hikaku-excel'],
+  ['hoken-minaoshi-checklist', '/guide/shisan-kanri/hoken-minaoshi-checklist'],
+  ['hoken-minaoshi-kekkon', '/guide/shisan-kanri/hoken-minaoshi-kekkon'],
+  ['hoken-minaoshi-shussan', '/guide/shisan-kanri/hoken-minaoshi-shussan'],
+  ['hoken-shoken-kakiutsushi', '/guide/shisan-kanri/hoken-shoken-mikata'],
+  ['houjin-kouza-check', '/guide/houjin/kouza-tsukurenai'],
+  ['kyutoki-hiyou-meyasu', '/kyutoki/kokan-hiyou'],
+  ['kyutoki-mitsumori-check', '/kyutoki/mitsumori-mikata'],
+  ['kyutoki-gosu', '/kyutoki/gosu-erabikata'],
+];
+
 const nextConfig: NextConfig = {
+  async headers() {
+    return DOWNLOAD_CANONICAL.map(([file, page]) => ({
+      source: `/downloads/${file}.:ext(pdf|xlsx|docx)`,
+      headers: [{ key: 'Link', value: `<https://www.tsuginotenavi.jp${page}>; rel="canonical"` }],
+    }));
+  },
   async redirects() {
     return [
       // 1. 相続放棄解説ページ

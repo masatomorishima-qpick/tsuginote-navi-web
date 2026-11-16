@@ -171,6 +171,7 @@ export default function Page() {
             ))}
           </ol>
           <p className="rounded-2xl bg-white p-3.5 text-[13px] font-bold text-slate-800 ring-1 ring-slate-200">11/12に申し込んだ2行は、4日後に結果が届きました。設立から審査に通るまで19日でした。</p>
+          <Link href="/guide/houjin/kouza-kaisetsu-kikan" className="flex items-center gap-1 text-[13px] font-bold text-sky-800 underline underline-offset-2">法人口座の開設期間：銀行ごとの日数と、延びる理由<ArrowRight size={14} aria-hidden="true" /></Link>
         </section>
 
         <section className={SECTION} aria-labelledby="mitate">

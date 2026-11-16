@@ -494,6 +494,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/guide/houjin/paypay-houjin-kouza`,
+      lastModified: new Date("2026-11-16T19:30:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/guide/souzoku`,
       lastModified: new Date("2026-11-11T14:00:00+09:00"),
       changeFrequency: "weekly",

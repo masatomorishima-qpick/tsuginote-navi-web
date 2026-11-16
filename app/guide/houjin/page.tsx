@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 
 const HOUJIN_PAGES = [
   { href: '/guide/houjin/kouza-tsukurenai', t: '法人口座が作れない', s: '3行に申し込み、通ったのは1行', icon: Landmark },
+  { href: '/guide/houjin/paypay-houjin-kouza', t: 'PayPay銀行の法人口座', s: '設立直後でも審査に通った実例と必要書類', icon: Landmark },
   { href: '/guide/houjin/raksulbank', t: 'ラクスルバンク', s: '審査はGMOあおぞら。手数料と申し込める会社', icon: Coins },
 ];
 

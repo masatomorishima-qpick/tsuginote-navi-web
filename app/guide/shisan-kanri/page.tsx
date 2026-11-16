@@ -60,6 +60,13 @@ const articles = [
       '受取人・死亡保障の額・教育の備えなど8つの点。子の生年月日から遺族基礎年金の目安も出ます。',
   },
   {
+    href: '/guide/shisan-kanri/hoken-minaoshi-teinen',
+    category: '保険の見直し',
+    title: '定年退職の保険の見直しチェックリスト｜健康保険の期限も計算（無料・エクセル）',
+    description:
+      '退職日を入れると、任意継続（20日以内）と国民健康保険（14日以内）の期限が出ます。死亡保障・更新・医療費の上限など8つの点も1枚に。',
+  },
+  {
     href: '/guide/shisan-kanri/hoken-minaoshi-kekkon',
     category: '保険の見直し',
     title: '結婚したら保険の見直しチェックリスト｜遺族年金が出るか確認（無料・エクセル）',

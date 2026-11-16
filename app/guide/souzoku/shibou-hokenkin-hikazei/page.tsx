@@ -132,6 +132,7 @@ export default function Page() {
               { h: '相続税がかかるか計算する', s: '対象になった額を遺産に足す', href: '/guide/souzoku/souzokuzei-keisan' },
               { h: '申告の必要書類をそろえる', s: '状況を選ぶと要る書類が分かる', href: '/guide/souzoku/shinkoku-shorui-checklist' },
               { h: '保険証券で受取人を確かめる', s: '契約者・被保険者・受取人の見方', href: '/guide/shisan-kanri/hoken-shoken-mikata' },
+              { h: '死亡退職金の非課税も計算する', s: '同じ500万円×人数の別の枠', href: '/guide/souzoku/shibou-taishokukin-hikazei' },
             ].map((f, i) => (
               <li key={f.h}>
                 <Link href={f.href} className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200 hover:ring-slate-300">

@@ -8,7 +8,8 @@
   hoken-shoken-kakiutsushi.xlsx / .pdf   保険証券の書き写し表（死亡保険金の税の種類と保険料の合計は自動。2026-11-11）
   hoken-minaoshi-shussan.xlsx / .pdf   子どもが生まれたときの見直しチェックリスト（遺族基礎年金の目安は自動。2026-11-14）
   hoken-minaoshi-kekkon.xlsx / .pdf   結婚したときの見直しチェックリスト（子のない夫婦の遺族年金の表・2人の保険の一覧。2026-11-16）
-  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken・shussan・kekkon も同じ。kekkon は名前を付けたときだけ作る）
+  hoken-minaoshi-teinen.xlsx / .pdf   定年退職のときの見直しチェックリスト（退職日から健康保険の期限は自動・健康保険3つの表。2026-11-17）
+  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken・shussan・kekkon・teinen も同じ。kekkon・teinen は名前を付けたときだけ作る）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import html
@@ -594,6 +595,139 @@ small {{ color: #64748b; font-weight: normal; font-size: 7.5pt; }}
         b.close()
 
 
+TEINEN_KEYS = ["kyoukaiNinkei", "kyoukaiNinkeiFaq", "kyoukaiNinkeiFaq3", "nagoyaKokuho", "kobeKokuho", "jiliHitsuyo", "jiliShikumi", "jiliView", "mhlwKougaku", "jiliMinaoshi"]
+
+
+def make_teinen_xlsx():
+    from datetime import date
+    from openpyxl.worksheet.datavalidation import DataValidation
+    P = DATA["teinen"]
+    ck = P["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "見直しチェック"
+    for i, w in enumerate([4, 40, 52, 7], 1):
+        ws.column_dimensions[get_column_letter(i)].width = w
+    put(ws, 1, 1, "定年退職の 保険の見直しチェックリスト", H, border=False)
+    put(ws, 2, 1, "オレンジの欄に退職日を入れると、健康保険の手続きの期限が出ます（例の日付は入れ替えてください）。確かめたら「済」を選びます。", S, border=False)
+    ws.merge_cells("A2:D2")
+    ws.row_dimensions[2].height = 30
+    put(ws, 4, 2, "退職日（会社に籍がある最後の日。有給休暇の消化中も含む）", B, HEAD)
+    put(ws, 4, 3, date(2027, 3, 31), B, IN, fmt="yyyy/m/d(aaa)")
+    rows = [
+        ("健康保険の資格がなくなる日（この日を1日目に数える）", "=IF(C4=\"\",\"\",C4+1)", "yyyy/m/d(aaa)"),
+        ("任意継続の申し出の期限（必着。土日・祝日なら次の営業日）", "=IF(C4=\"\",\"\",C4+20)", "yyyy/m/d(aaa)"),
+        ("国民健康保険の届け出の期限（市区町村で確かめる）", "=IF(C4=\"\",\"\",C4+14)", "yyyy/m/d(aaa)"),
+        ("任意継続の終わり（最長2年・目安）", "=IF(C4=\"\",\"\",EDATE(C4+1,24)-1)", "yyyy/m/d(aaa)"),
+    ]
+    for k, (h, f, fm) in enumerate(rows):
+        put(ws, 5 + k, 2, h, B)
+        put(ws, 5 + k, 3, f, B, OK, fmt=fm)
+        ws.row_dimensions[5 + k].height = 28
+    r = 10
+    for i, t in enumerate(["", "確かめること", "見るところ", "済"], 1):
+        put(ws, r, i, t, B, HEAD)
+    dv = DataValidation(type="list", formula1='"済"', allow_blank=True)
+    ws.add_data_validation(dv)
+    for k, c in enumerate(P["check"]):
+        rr = r + 1 + k
+        put(ws, rr, 1, k + 1)
+        put(ws, rr, 2, f"【{c['g']}】{c['h']}", B)
+        put(ws, rr, 3, c["d"], N)
+        dv.add(put(ws, rr, 4, None, B, IN))
+        ws.row_dimensions[rr].height = 44
+    r = r + 2 + len(P["check"])
+    for k, t in enumerate(P["ninkeiNote"]):
+        put(ws, r + k, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r + k, start_column=1, end_row=r + k, end_column=4)
+        ws.row_dimensions[r + k].height = 30
+    r += len(P["ninkeiNote"]) + 1
+    put(ws, r, 1, "出典：" + "／".join(SRC[k]["name"] for k in TEINEN_KEYS) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+    ws.row_dimensions[r].height = 70
+    put(ws, r + 1, 1, f"つぎの手ナビ　{SITE}/guide/shisan-kanri/hoken-minaoshi-teinen", S, border=False)
+    ws.page_setup.fitToWidth = 1
+
+    w2 = wb.create_sheet("退職後の健康保険")
+    for i, w in enumerate([22, 30, 34, 26, 44], 1):
+        w2.column_dimensions[get_column_letter(i)].width = w
+    put(w2, 1, 1, "定年退職後の健康保険3つ", H, border=False)
+    for i, t in enumerate(["加入先", "入れる人", "期限", "期間", "保険料"], 1):
+        put(w2, 3, i, t, B, HEAD)
+    for k, x in enumerate(P["kenpo"]):
+        for i, t in enumerate([x["h"], x["jouken"], x["kigen"], x["kikan"], x["hokenryo"]], 1):
+            put(w2, 4 + k, i, t, B if i == 1 else N)
+        w2.row_dimensions[4 + k].height = 62
+    put(w2, 8, 1, "保険料の見込み（月・円）を書いて並べる", B, border=False)
+    for k, x in enumerate(P["kenpo"]):
+        put(w2, 9 + k, 1, x["h"], N)
+        put(w2, 9 + k, 2, None, N, IN, fmt="#,##0")
+    w2.page_setup.orientation = "landscape"
+    w2.page_setup.fitToWidth = 1
+
+    w3 = wb.create_sheet("夫婦の保険")
+    hd = ["保険の名前・会社", "種類", "被保険者", "死亡保障（万円）", "保険料（月・円）", "払い込む年齢まで", "次の更新（年）", "メモ"]
+    for i, w in enumerate([24, 12, 10, 14, 14, 14, 14, 24], 1):
+        w3.column_dimensions[get_column_letter(i)].width = w
+    put(w3, 1, 1, "夫婦の保険の一覧", H, border=False)
+    put(w3, 2, 1, "保険証券を見ながら書き出します。年金で暮らす間も払う保険料と、更新で上がる保険を見ます。", S, border=False)
+    for i, t in enumerate(hd, 1):
+        put(w3, 4, i, t, B, HEAD)
+    for k in range(12):
+        for i in range(1, 9):
+            put(w3, 5 + k, i, None, N, IN, fmt="#,##0" if i in (4, 5) else None)
+    put(w3, 18, 3, "合計（自動）", B)
+    put(w3, 18, 4, "=SUM(D5:D16)", B, OK, fmt="#,##0")
+    put(w3, 18, 5, "=SUM(E5:E16)", B, OK, fmt="#,##0")
+    put(w3, 19, 3, "保険料（年・自動）", B)
+    put(w3, 19, 5, "=E18*12", B, OK, fmt="#,##0")
+    w3.page_setup.orientation = "landscape"
+    w3.page_setup.fitToWidth = 1
+    wb.save(OUT / "hoken-minaoshi-teinen.xlsx")
+
+
+def make_teinen_pdf():
+    from playwright.sync_api import sync_playwright
+    P = DATA["teinen"]
+    ck = P["checkedAt"].replace("-", "/")
+    ch = "".join(f"<tr><td style='width:5mm'>□</td><td><b>{esc(c['h'])}</b><br><small>{esc(c['g'])}｜{esc(c['d'])}</small></td><td style='width:40mm'></td></tr>" for c in P["check"])
+    kp = "".join(f"<tr><td><b>{esc(x['h'])}</b></td><td>{esc(x['jouken'])}</td><td>{esc(x['kigen'])}</td><td>{esc(x['kikan'])}</td><td>{esc(x['hokenryo'])}</td></tr>" for x in P["kenpo"])
+    notes = "".join(f"<li>{esc(t)}</li>" for t in P["ninkeiNote"])
+    doc = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>
+@page {{ size: A4; margin: 11mm 14mm 14mm; }}
+body {{ font-family: 'Noto Sans CJK JP', sans-serif; color: #0f172a; font-size: 9.5pt; line-height: 1.5; }}
+h1 {{ font-size: 17pt; margin: 0 0 1mm; }} h2 {{ font-size: 11pt; margin: 3.5mm 0 1.5mm; }} .sub {{ color: #475569; margin: 0 0 2mm; font-size: 9pt; }}
+table {{ width: 100%; border-collapse: collapse; font-size: 8.5pt; }}
+th, td {{ border: 1px solid #94a3b8; padding: 1.2mm 2mm; vertical-align: top; }} th {{ background: #e0f2fe; text-align: left; }}
+small {{ color: #64748b; font-weight: normal; font-size: 7.5pt; }}
+.box {{ border: 1.5px solid #fdba74; background: #fff7ed; border-radius: 3mm; padding: 1.8mm 4mm; margin-top: 2.5mm; }}
+.box ul {{ margin: 1mm 0 0; padding-left: 5mm; }} .note {{ color: #64748b; font-size: 7.5pt; margin: 1.5mm 0 0; }}
+.w {{ height: 7mm; }}
+</style></head><body><h1>定年退職の 保険の見直しチェックリスト</h1><p class="sub">退職日を書き、期限を数えて書き込みます。確かめたら□に印を付けます。</p>
+<h2>① 健康保険の期限（退職日の翌日を1日目に数える）</h2>
+<table><tr><th style="width:45%">項目</th><th>日付を書く</th></tr>
+<tr><td>退職日（会社に籍がある最後の日）</td><td class="w"></td></tr>
+<tr><td>任意継続の申し出の期限（翌日から20日目。必着。土日・祝日なら次の営業日）</td><td class="w"></td></tr>
+<tr><td>国民健康保険の届け出の期限（14日以内。市区町村で確かめる）</td><td class="w"></td></tr>
+<tr><td>任意継続の終わり（最長2年）</td><td class="w"></td></tr></table>
+<p class="note">例：3月31日に退職 → 4月1日が1日目 → 任意継続は4月20日まで、国民健康保険は4月14日まで。</p>
+<h2>② 退職後の健康保険3つ</h2>
+<table><tr><th>加入先</th><th>入れる人</th><th>期限</th><th>期間</th><th>保険料</th></tr>{kp}</table>
+<div class="box"><b>知っておくこと</b><ul>{notes}</ul></div>
+<h2>③ 確かめる8つの点</h2><table><tr><th style="width:5mm"></th><th>確かめること</th><th style="width:40mm">メモ</th></tr>{ch}</table>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in TEINEN_KEYS))}（{ck} 確認）</p></body></html>"""
+    url = f"{SITE}/guide/shisan-kanri/hoken-minaoshi-teinen"
+    with sync_playwright() as p:
+        b = p.chromium.launch()
+        pg = b.new_page()
+        pg.set_content(doc, wait_until="load")
+        ft = (f"<div style=\"font-family:'Noto Sans CJK JP';font-size:7px;color:#94a3b8;width:100%;padding:0 14mm;display:flex;justify-content:space-between\">"
+              f"<span>つぎの手ナビ　{esc(url)}　（{ck} 確認）</span><span><span class='pageNumber'></span> / <span class='totalPages'></span></span></div>")
+        pg.pdf(path=str(OUT / "hoken-minaoshi-teinen.pdf"), format="A4", print_background=True, prefer_css_page_size=True,
+               display_header_footer=True, header_template="<div></div>", footer_template=ft)
+        b.close()
+
+
 if __name__ == "__main__":
     import sys
     only = sys.argv[1] if len(sys.argv) > 1 else ""
@@ -612,5 +746,8 @@ if __name__ == "__main__":
     if only == "kekkon":
         make_kekkon_xlsx()
         make_kekkon_pdf()
+    if only == "teinen":
+        make_teinen_xlsx()
+        make_teinen_pdf()
     for f in sorted(OUT.glob("hoken-*")):
         print(f.name, f.stat().st_size)

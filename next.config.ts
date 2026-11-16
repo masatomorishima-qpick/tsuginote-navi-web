@@ -138,7 +138,19 @@ const nextConfig: NextConfig = {
         destination: "/kyutoki/nensu",
         permanent: false,
       },
-      // ※ /guide/ihinseiri/digitalihin-* は残置（リダイレクトしない）
+      // 8. Google が読んだのに登録しなかった古いページの整理（2026-11-17、オーナー了承「悪影響するなら消して良い」）。
+      //    条件：Search Console で「クロール済み - インデックス未登録」、直近3か月の検索の表示が10回以下、紹介先の出口なし、
+      //    他のページの根拠（調査のページなど）になっていない。いちばん近い内容のページへ転送する（リンクの評価と訪問者を逃がさない）。
+      { source: "/guide/column/pet-omoide-5shukan", destination: "/guide/column", permanent: true },
+      { source: "/guide/column/kodomo-omoide-5shukan", destination: "/guide/column", permanent: true },
+      { source: "/guide/column/sumaho-shuyaku-5sen", destination: "/guide/column", permanent: true },
+      { source: "/guide/column/saifu-hikidashi-5sen", destination: "/guide/column", permanent: true },
+      { source: "/guide/column/subsuku-kaiyaku-riyu", destination: "/guide/digital-seiri/sabusuku-kanri", permanent: true },
+      { source: "/guide/oya-care/oya-netbank", destination: "/guide/digital-shisan", permanent: true },
+      { source: "/guide/oya-care", destination: "/guide/digital-shisan", permanent: true },
+      { source: "/guide/password-kanri/nidankai-ninsho", destination: "/guide/password-kanri/sumaho-password", permanent: true },
+      { source: "/guide/ihinseiri/digitalihin-006", destination: "/guide/ihinseiri/digitalihin-005", permanent: true },
+      // ※ /guide/ihinseiri/digitalihin-* は 006 以外は残置（リダイレクトしない）
       // ※ /digital/*, /login, /auth/*, /privacy, /terms, /company も残置
     ];
   },

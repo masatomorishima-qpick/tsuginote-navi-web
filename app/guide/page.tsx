@@ -41,39 +41,9 @@ export const metadata: Metadata = {
 // 新着記事（公開日の新しい順。記事を追加したら先頭に足す）
 const latestArticles = [
   {
-    href: '/guide/column/pet-omoide-5shukan',
-    category: 'コラム',
-    title: 'ペットの思い出を一生ものにする5つの習慣',
-    date: '2026-06-18',
-  },
-  {
-    href: '/guide/column/sumaho-shuyaku-5sen',
-    category: 'コラム',
-    title: 'この5年で、スマホ1台に集約された機能5選',
-    date: '2026-06-18',
-  },
-  {
-    href: '/guide/column/kodomo-omoide-5shukan',
-    category: 'コラム',
-    title: '子どもの思い出を一生ものにする5つの習慣',
-    date: '2026-06-14',
-  },
-  {
-    href: '/guide/column/saifu-hikidashi-5sen',
-    category: 'コラム',
-    title: 'この5年で、財布と引き出しから消えたもの5選',
-    date: '2026-06-12',
-  },
-  {
     href: '/guide/column/okane-kanri-kichinto',
     category: 'コラム',
     title: 'お金の管理がきちんとしている人ほど、家族を困らせてしまう3つの理由',
-    date: '2026-06-12',
-  },
-  {
-    href: '/guide/column/subsuku-kaiyaku-riyu',
-    category: 'コラム',
-    title: 'サブスクは全部、死ぬまでに解約しておかなければならない3つの理由',
     date: '2026-06-12',
   },
   {
@@ -81,12 +51,6 @@ const latestArticles = [
     category: 'デジタル整理術',
     title: 'サブスク管理アプリの選び方と使い方｜契約の見える化から“もしもの備え”まで',
     date: '2026-06-11',
-  },
-  {
-    href: '/guide/oya-care/oya-netbank',
-    category: '親・家族のケア',
-    title: '親がネット銀行を使っているなら｜もしものとき家族が困らない「在りか」の備え方',
-    date: '2026-06-10',
   },
   {
     href: '/guide/kazoku-kyoyu/fuufu-joho-kyoyu',
@@ -98,12 +62,6 @@ const latestArticles = [
     href: '/guide/moshimo-sonae/kyu-nyuin-sonae',
     category: 'もしもの備え',
     title: '急な入院に備えて、家族に伝えておく情報リスト｜持ち物だけでは足りない',
-    date: '2026-06-09',
-  },
-  {
-    href: '/guide/password-kanri/nidankai-ninsho',
-    category: 'パスワード・認証管理',
-    title: 'スマホの二段階認証とは？設定のやり方と“もしも”の落とし穴',
     date: '2026-06-09',
   },
   {
@@ -234,10 +192,6 @@ const categories = [
         href: '/guide/password-kanri/sumaho-password',
         title: 'スマホのパスワード管理｜忘れっぽい人でも安全な方法',
       },
-      {
-        href: '/guide/password-kanri/nidankai-ninsho',
-        title: 'スマホの二段階認証とは？設定のやり方と“もしも”の落とし穴',
-      },
     ],
   },
   {
@@ -315,18 +269,6 @@ const categories = [
     ],
   },
   {
-    href: '/guide/oya-care',
-    name: '親・家族のケア',
-    description:
-      '親のネット銀行・スマホ・契約まわりを、プライバシーに踏み込まずに「在りか」の共有で備える。',
-    articles: [
-      {
-        href: '/guide/oya-care/oya-netbank',
-        title: '親がネット銀行を使っているなら｜「在りか」の備え方',
-      },
-    ],
-  },
-  {
     href: '/guide/moshimo-sonae',
     name: 'もしもの備え',
     description: '急な入院やもしものときに、家族が困らないための前向きな備え。',
@@ -343,28 +285,8 @@ const categories = [
     description: '暮らしを支えるデジタルの仕組みに隠れた、知られていない性質を解き明かす読み物。',
     articles: [
       {
-        href: '/guide/column/pet-omoide-5shukan',
-        title: 'ペットの思い出を一生ものにする5つの習慣',
-      },
-      {
-        href: '/guide/column/sumaho-shuyaku-5sen',
-        title: 'この5年で、スマホ1台に集約された機能5選',
-      },
-      {
-        href: '/guide/column/kodomo-omoide-5shukan',
-        title: '子どもの思い出を一生ものにする5つの習慣',
-      },
-      {
-        href: '/guide/column/saifu-hikidashi-5sen',
-        title: 'この5年で、財布と引き出しから消えたもの5選',
-      },
-      {
         href: '/guide/column/okane-kanri-kichinto',
         title: 'お金の管理がきちんとしている人ほど、家族を困らせてしまう3つの理由',
-      },
-      {
-        href: '/guide/column/subsuku-kaiyaku-riyu',
-        title: 'サブスクは全部、死ぬまでに解約しておかなければならない3つの理由',
       },
     ],
   },

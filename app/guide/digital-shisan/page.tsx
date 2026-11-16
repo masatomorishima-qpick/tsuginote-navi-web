@@ -420,10 +420,6 @@ export default function DigitalShisanPage() {
                 <Link href="/guide/password-kanri/sumaho-password" className="text-blue-600 hover:underline">
                   スマホのパスワードのメモは危険？
                 </Link>
-                ／
-                <Link href="/guide/password-kanri/nidankai-ninsho" className="text-blue-600 hover:underline">
-                  二段階認証のもしもの落とし穴
-                </Link>
               </p>
             </div>
             <div>

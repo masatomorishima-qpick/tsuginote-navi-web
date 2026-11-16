@@ -359,13 +359,6 @@ export default function OkaneKanriKichintoPage() {
           <p>
             私たちBlueAdventuresが2026年に行った調査でも、大切な方を亡くした経験のある人の60.9%が「デジタル関係で困った経験がある」と答え、困りごとの第1位は「スマホ・パソコンのパスワードが分からない」でした。お金の在りかへの扉が、最初の一枚から開かないのです。
           </p>
-          <p>
-            親がネット銀行を使っているご家庭の備え方は、
-            <Link href="/guide/oya-care/oya-netbank" className="text-blue-600 hover:underline">
-              親がネット銀行を使っているなら
-            </Link>
-            でも詳しく解説しています。
-          </p>
         </Section>
 
         <Section id="kyumin" title="見つけてもらえなかったお金は、どうなるのか">
@@ -524,28 +517,6 @@ export default function OkaneKanriKichintoPage() {
             あわせて確認したい記事
           </h2>
           <ul className="mt-5 space-y-5">
-            <li>
-              <p className="text-xs font-medium text-slate-500">
-                サブスクにも同じ仕組みの問題があります
-              </p>
-              <Link
-                href="/guide/column/subsuku-kaiyaku-riyu"
-                className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
-              >
-                サブスクは全部、死ぬまでに解約しておかなければならない3つの理由 &rsaquo;
-              </Link>
-            </li>
-            <li>
-              <p className="text-xs font-medium text-slate-500">
-                親のネット銀行が気になった方
-              </p>
-              <Link
-                href="/guide/oya-care/oya-netbank"
-                className="mt-1 inline-block text-base font-medium text-blue-600 hover:underline"
-              >
-                親がネット銀行を使っているなら｜「在りか」の備え方 &rsaquo;
-              </Link>
-            </li>
             <li>
               <p className="text-xs font-medium text-slate-500">
                 投資を家族にどう伝えるか考えたい方

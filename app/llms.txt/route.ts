@@ -37,6 +37,11 @@ export function GET() {
 - [保険証券の見方](${SITE_URL}/guide/shisan-kanri/hoken-shoken-mikata): 欄ごとの意味、契約者・被保険者・受取人の組み合わせで変わる税の種類、書き写し表。
 - [スマホのパスワード管理](${SITE_URL}/guide/password-kanri/sumaho-password): メモ帳管理の危険と、忘れずに安全に管理する方法。
 
+## 法人成り
+
+- [法人成りでつまずいた所](${SITE_URL}/guide/houjin): 個人事業から会社にする人へ。設立から法人口座まで、運営会社の実例。
+- [法人口座が作れない：3行に申し込んだ実例](${SITE_URL}/guide/houjin/kouza-tsukurenai): 設立直後・資本金50万円・本店がバーチャルオフィスの合同会社で、法人口座を3行に申し込んだ結果と日付（通ったのはPayPay銀行の1行）。落ちた理由の見立てと、申込前のチェック表。
+
 ## 相続・もしもの備え
 
 - [相続税のかんたん計算](${SITE_URL}/guide/souzoku/souzokuzei-keisan): 遺産の合計と相続人の数から、基礎控除（3,000万円＋600万円×法定相続人の数）と相続税の総額の目安を国税庁の手順で計算。

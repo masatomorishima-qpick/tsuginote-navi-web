@@ -23,6 +23,10 @@ export default function SiteFooter() {
             <Link href="/guide/souzoku" className="hover:text-slate-700">
               相続
             </Link>
+            {/* 2026-11-16 追加：法人成り（法人口座の審査の実例） */}
+            <Link href="/guide/houjin" className="hover:text-slate-700">
+              法人成り
+            </Link>
             <Link href="/guide" className="hover:text-slate-700">
               暮らしの整理
             </Link>

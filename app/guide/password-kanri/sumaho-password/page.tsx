@@ -3,6 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
+import LpViewTracker from '@/components/lp/LpViewTracker';
+import DigitalKeeperBox, { PASSWORD_LP_ID } from '@/components/guide/DigitalKeeperBox';
 
 const SITE_URL = 'https://www.tsuginotenavi.jp';
 const PAGE_PATH = '/guide/password-kanri/sumaho-password';
@@ -193,6 +195,8 @@ export default function SumahoPasswordPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <GuideHeader />
+      {/* 2026-11-16 閲覧の計測を足す（紹介先の押下率を出すため） */}
+      <LpViewTracker lpId={PASSWORD_LP_ID} version="v2-2026-11-16" />
 
       <div className="mx-auto max-w-3xl px-5 pb-20 pt-8 sm:px-8">
         <nav className="text-sm text-slate-500">
@@ -218,6 +222,13 @@ export default function SumahoPasswordPage() {
             <li className="text-slate-700">スマホのパスワード管理</li>
           </ol>
         </nav>
+
+        {/* 2026-11-16 紹介先（Digital Keeper）を置いたため、広告の表示を最初の画面に出す */}
+        <p className="mt-6 flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">
+          <span className="rounded border border-slate-300 px-1.5 tracking-widest">PR</span>
+          <span>当サイトは紹介料を受け取っています</span>
+          <Link href="/policy" className="text-blue-600 underline underline-offset-2">中立性ポリシー</Link>
+        </p>
 
         <p className="mt-10 text-xs font-medium uppercase tracking-wide text-slate-500">
           役立ち情報｜パスワード・認証管理
@@ -424,6 +435,8 @@ export default function SumahoPasswordPage() {
           <p>
             今日、パスワードを安全にしたなら、その勢いで「在りかを残す」ところまで。それだけで、毎日の安全が、家族のための安心にまで延びます。
           </p>
+          {/* 2026-11-16 この節の「もしものときだけ信頼できる人に届く形」をそのまま受ける紹介先を1つだけ置く（オーナー了承） */}
+          <DigitalKeeperBox position="finish" lead="もしものときだけ、家族にログイン情報を届ける" />
         </Section>
 
         <Section id="locked" title="忘れて開けないときの対処｜iPhone・Android別（応急処置）">

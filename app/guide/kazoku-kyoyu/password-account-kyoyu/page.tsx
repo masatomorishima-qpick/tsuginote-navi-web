@@ -227,6 +227,14 @@ export default function PasswordAccountKyoyuPage() {
           この記事では、まず「何を共有してよくて、何は個人に留めるべきか」という線引きの考え方を整理し、そのうえで安全な共有のやり方（Apple・Google・管理アプリ）を具体的に解説します。最後に、多くの解説が触れない「共有だけでは届かない領域」の備え方まで。読み終えるころには、わが家の共有ルールが決められるはずです。
         </p>
 
+        {/* 2026-11-16 AI の答え・検索の答えとして抜き出されやすい「結論」を最初の画面に置く（本文の「まず線引き」「そもそもパスワードを渡さない方法」の要約。新しい事実は足さない） */}
+        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
+          <p className="text-xs font-semibold text-blue-700">結論</p>
+          <p className="mt-2 text-base leading-8 text-slate-800">
+            家族と共有してよいのは、自宅のWi-Fi・家族で使うサブスク・写真のアルバムなど、一緒に使うものだけです。銀行・決済のログイン情報、メール本体のパスワード、スマホやパソコンのロック解除は、生きている間は共有しません。共有するときも、パスワードを送るのではなく、招待や権限の付与、Apple・Googleの家族共有、パスワード管理アプリの共有機能を使います。
+          </p>
+        </div>
+
         <div className="mt-8 overflow-hidden rounded-2xl">
           <Image
             src="/images/guide/kazoku-kyoyu/password-account-kyoyu-main.webp"

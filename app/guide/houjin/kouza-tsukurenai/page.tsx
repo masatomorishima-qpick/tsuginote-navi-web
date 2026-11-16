@@ -19,7 +19,8 @@ import { CHECKED_AT, SOURCES, RESULTS, JOUKEN, KEIKA, MITATE, type SourceKey } f
  *   創業手帳（約6,000字、2024/6 更新、体験なし）、創業手帳の別記事、ドコモSMTBネット銀行、みずほ銀行、マネーフォワード。
  *   上位に欠けている点：①実際に申し込んだ結果と日付がない ②落ちた後に何をしたかがない ③申込前に点検する表がない。
  * このページは「審査がゆるい」「必ず通る」と書かない。見立ては推定と明記。
- * 出口：ラクスルバンク（A8、申込で成果）。オーナーが提携と書き方を決めるまで href は空（出口は出ない）。
+ * 出口：ラクスルバンク（A8、申込で成果）。11/16 提携申請中。承認されるまで href は空（出口は出ない）。
+ * 書き方はオーナーが案1に決定（11/16）：審査はGMOあおぞらで、運営会社は直接の申込で落ちたことを正直に書いたうえで、申込先の一つとして出す。
  */
 const LP_ID = 'guide-houjin-kouza-tsukurenai';
 const PATH = '/guide/houjin/kouza-tsukurenai';
@@ -217,7 +218,10 @@ export default function Page() {
         {hasExit && (
           <section className={SECTION} aria-labelledby="exit">
             <h2 id="exit" className="sr-only">申込先</h2>
-            <HoujinExit lpId={LP_ID} partner="raksulBank" position="bottom" lead="申込先を増やすなら" />
+            <HoujinExit
+              lpId={LP_ID} partner="raksulBank" position="bottom" lead="申込先を増やすなら"
+              note="審査はGMOあおぞらネット銀行です。私たちは設立直後に、GMOあおぞらネット銀行に直接申し込んで通りませんでした。それを知ったうえで、申込先の一つとして載せています。"
+            />
           </section>
         )}
 

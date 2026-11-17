@@ -8,7 +8,7 @@
  *   否認：1企業2回以上の申込・アプリ経由・クリックと申込でブラウザが違う・リスティング違反。人物画像はNG。
  *   口座は GMOあおぞらネット銀行のラクスルバンク支店（GMOあおぞらの特約 2026/6/24 現在）。
  *   運営会社は GMOあおぞらネット銀行に直接申し込んで通らなかった。書き方は案1（正直に書いて申込先の一つとして出す、11/16 オーナー決定）。
- *   11/16 提携申請中。承認されたら href にA8のリンクを入れる。
+ *   11/16 提携申請、11/17 承認（提携日 2026/11/17）。リンクは A8 の「広告リンク作成」で、サイト「つぎの手ナビ」を選んで発行したテキストリンク。書き換えない。
  */
 export type HoujinPartnerKey = 'raksulBank';
 
@@ -20,6 +20,8 @@ export type HoujinPartner = {
   points: string[];
   checkedAt: string;
   href: string;
+  /** 表示計測（1×1の画像）。広告リンクと一緒に置く */
+  beacon: string;
   asp: 'a8';
   programId: string;
   reward: number;
@@ -31,6 +33,8 @@ export const HOUJIN_PARTNERS: Record<HoujinPartnerKey, HoujinPartner> = {
     // GMOあおぞらネット銀行「ラクスルバンク支店に関する特約」（2026/6/24 現在）の記載。2026-11-16 確認。
     points: ['他の銀行あての振込は1件119円（税込）', '口座はGMOあおぞらネット銀行のラクスルバンク支店', '申し込めるのは法人だけ'],
     checkedAt: '2026年11月16日',
-    href: '', asp: 'a8', programId: 's00000027458001', reward: 10000,
+    href: 'https://px.a8.net/svt/ejp?a8mat=4BGMKC+4W8CM2+5VV8+5YRHE',
+    beacon: 'https://www16.a8.net/0.gif?a8mat=4BGMKC+4W8CM2+5VV8+5YRHE',
+    asp: 'a8', programId: 's00000027458001', reward: 10000,
   },
 };

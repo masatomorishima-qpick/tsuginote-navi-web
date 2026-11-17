@@ -26,7 +26,7 @@ export default function HoujinExit({
     });
   };
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
+    <div className="relative flex flex-col gap-3 rounded-2xl border-2 border-orange-200 bg-orange-50/60 p-4">
       <p className="text-[16px] font-black text-slate-900">{lead}</p>
       <ul className="flex flex-col gap-1.5">
         {p.points.map((t) => (
@@ -46,6 +46,9 @@ export default function HoujinExit({
         {p.cta} <ArrowRight size={20} aria-hidden="true" />
       </a>
       <p className="text-center text-[11px] text-slate-500">{p.name}のサイトに移動します（記載は公式の情報、{p.checkedAt} 確認）</p>
+      {/* 表示計測（1×1の画像）。広告リンクと一緒に置く決まり。 */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {p.beacon && <img src={p.beacon} width={1} height={1} alt="" className="absolute h-px w-px opacity-0" />}
     </div>
   );
 }

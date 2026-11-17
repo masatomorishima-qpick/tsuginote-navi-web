@@ -117,6 +117,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 相続税の0円申告（2026-11-17 作成、docs/seisaku-queue.md の T39）。
+    {
+      url: `${baseUrl}/guide/souzoku/zero-en-shinkoku`,
+      lastModified: new Date("2026-11-17T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    // 相続税の申告期限を過ぎたときの延滞税・無申告加算税（2026-11-17 作成、docs/seisaku-queue.md の T31）。
+    {
+      url: `${baseUrl}/guide/souzoku/shinkoku-okure`,
+      lastModified: new Date("2026-11-17T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 相続税の2割加算の計算（2026-11-17 作成、docs/seisaku-queue.md の T26）。
     {
       url: `${baseUrl}/guide/souzoku/niwari-kasan`,

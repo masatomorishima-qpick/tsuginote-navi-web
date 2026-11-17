@@ -77,6 +77,10 @@ export default function Page() {
             ))}
           </ol>
           <p className="text-[13px] text-slate-700">{J.kyujitsu}</p>
+          <p className="flex flex-wrap gap-x-4 gap-y-1 text-[13px] font-bold">
+            <Link href="/guide/souzoku/zero-en-shinkoku" className="flex items-center gap-1 text-sky-700 underline underline-offset-2">特例で0円になる人の申告<ArrowRight size={12} aria-hidden="true" /></Link>
+            <Link href="/guide/souzoku/shinkoku-okure" className="flex items-center gap-1 text-sky-700 underline underline-offset-2">期限を過ぎたときの延滞税<ArrowRight size={12} aria-hidden="true" /></Link>
+          </p>
           <p className={SRC}>出典：{src(['nta4202', 'nta4205r8', 'nta4152', 'nta4158', 'nta4124', 'ntaShikataKisai'])}（{checked} 確認）</p>
         </section>
 

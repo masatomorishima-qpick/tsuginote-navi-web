@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, CalendarDays, Coins, FileText, Landmark } from 'lucide-react';
+import { ArrowRight, Building2, CalendarDays, Coins, FileText, Landmark } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import { SITE_URL, SITE_NAME } from '@/components/loan/LoanArticle';
@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 
 const HOUJIN_PAGES = [
   { href: '/guide/houjin/kouza-tsukurenai', t: '法人口座が作れない', s: '3行に申し込み、通ったのは1行', icon: Landmark },
+  { href: '/guide/houjin/kouza-virtual-office', t: '法人口座とバーチャルオフィス', s: '3行に申し込み、通ったのは1行。郵便と書類の注意', icon: Building2 },
   { href: '/guide/houjin/kouza-hitsuyou-shorui', t: '法人口座の必要書類', s: '銀行4つの比較と、設立直後の事業内容の資料', icon: FileText },
   { href: '/guide/houjin/kouza-kaisetsu-kikan', t: '法人口座の開設期間', s: '設立から審査通過まで19日。最短当日が延びる理由', icon: CalendarDays },
   { href: '/guide/houjin/paypay-houjin-kouza', t: 'PayPay銀行の法人口座', s: '設立直後でも審査に通った実例と必要書類', icon: Landmark },

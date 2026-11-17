@@ -220,6 +220,7 @@ export default function Page() {
         <section className={SECTION} aria-labelledby="check">
           <h2 id="check" className={H2}>法人口座を申し込む前に整える7つ</h2>
           <KouzaCheck lpId={LP_ID} />
+          <Link href="/guide/houjin/kouza-hitsuyou-shorui" className="flex items-center gap-1 text-[13px] font-bold text-sky-800 underline underline-offset-2">法人口座の必要書類：銀行4つの比較<ArrowRight size={14} aria-hidden="true" /></Link>
           <p className={SRC}>郵便：PayPay銀行は、郵送物を受け取れないと口座の利用を止めると案内しています（出典：{src(['paypayStart'])}、{checked} 確認）。</p>
         </section>
 

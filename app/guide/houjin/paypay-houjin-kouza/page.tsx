@@ -182,6 +182,7 @@ export default function Page() {
             設立直後に気をつけるのは「事業内容の確認資料」。出せないと開設できず、設立直後も同じとPayPay銀行は案内しています。最初の契約書や請求書を、申し込む前に用意しておきます。
           </p>
           <p className={SRC}>出典：{src(['docs'])}（{CHECKED} 確認）</p>
+          <Link href="/guide/houjin/kouza-hitsuyou-shorui" className="flex items-center gap-1 text-[13px] font-bold text-sky-800 underline underline-offset-2">ほかの銀行の必要書類と比べる<ArrowRight size={14} aria-hidden="true" /></Link>
         </section>
 
         <section className="flex flex-col gap-5" aria-labelledby="yubin">

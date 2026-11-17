@@ -270,6 +270,7 @@ export default function Page() {
 
         <nav aria-label="あわせて読む" className="flex flex-col gap-2">
           {[
+            { href: '/guide/houjin/kouza-virtual-office', t: '法人口座とバーチャルオフィス', s: '本店がバーチャルオフィスだと増える書類と郵便の注意' },
             { href: '/guide/houjin/kouza-kaisetsu-kikan', t: '法人口座の開設期間', s: '設立から審査通過まで19日の実例' },
             { href: '/guide/houjin/kouza-tsukurenai', t: '法人口座が作れない', s: '3行に申し込み、通ったのは1行' },
             { href: '/guide/houjin', t: '法人成りのページ一覧', s: '設立から口座まで、つまずいた所' },

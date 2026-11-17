@@ -200,6 +200,7 @@ export default function Page() {
             ))}
           </ul>
           <p className={SRC}>出典：{src(['docs', 'corp'])}（{CHECKED} 確認）</p>
+          <Link href="/guide/houjin/kouza-virtual-office" className="flex items-center gap-1 text-[13px] font-bold text-sky-800 underline underline-offset-2">ほかの銀行で、バーチャルオフィスだと変わること<ArrowRight size={14} aria-hidden="true" /></Link>
         </section>
 
         <section className="flex flex-col gap-5" aria-labelledby="tesuryo">

@@ -9,7 +9,9 @@
   hoken-minaoshi-shussan.xlsx / .pdf   子どもが生まれたときの見直しチェックリスト（遺族基礎年金の目安は自動。2026-11-14）
   hoken-minaoshi-kekkon.xlsx / .pdf   結婚したときの見直しチェックリスト（子のない夫婦の遺族年金の表・2人の保険の一覧。2026-11-16）
   hoken-minaoshi-teinen.xlsx / .pdf   定年退職のときの見直しチェックリスト（退職日から健康保険の期限は自動・健康保険3つの表。2026-11-17）
-  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken・shussan・kekkon・teinen も同じ。kekkon・teinen は名前を付けたときだけ作る）
+  hoken-minaoshi-danshin.xlsx / .pdf   住宅ローンの団信と見直しのチェックリスト（減らせる死亡保障の目安は自動。2026-11-19）
+  hoken-minaoshi-dokuritsu.xlsx / .pdf   子どもが独立したときの見直しチェックリスト（遺族基礎年金が終わる日は自動・減らす方法の表。2026-11-19）
+  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken・shussan・kekkon・teinen も同じ。kekkon・teinen・danshin・dokuritsu は名前を付けたときだけ作る）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import html
@@ -728,6 +730,194 @@ small {{ color: #64748b; font-weight: normal; font-size: 7.5pt; }}
         b.close()
 
 
+def _check_sheet(ws, r, P):
+    from openpyxl.worksheet.datavalidation import DataValidation
+    for i, t in enumerate(["", "確かめること", "見るところ", "済"], 1):
+        put(ws, r, i, t, B, HEAD)
+    dv = DataValidation(type="list", formula1='"済"', allow_blank=True)
+    ws.add_data_validation(dv)
+    for k, c in enumerate(P["check"]):
+        rr = r + 1 + k
+        put(ws, rr, 1, k + 1)
+        put(ws, rr, 2, f"【{c['g']}】{c['h']}", B)
+        put(ws, rr, 3, c["d"], N)
+        dv.add(put(ws, rr, 4, None, B, IN))
+        ws.row_dimensions[rr].height = 48
+    return r + 2 + len(P["check"])
+
+
+def _foot(ws, r, keys, ck, path, cols=4):
+    put(ws, r, 1, "出典：" + "／".join(SRC[k]["name"] for k in keys) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=cols)
+    ws.row_dimensions[r].height = 70
+    put(ws, r + 1, 1, f"つぎの手ナビ　{SITE}{path}", S, border=False)
+    ws.page_setup.fitToWidth = 1
+
+
+def _pdf_out(doc, name, path, ck):
+    from playwright.sync_api import sync_playwright
+    url = f"{SITE}{path}"
+    with sync_playwright() as p:
+        b = p.chromium.launch()
+        pg = b.new_page()
+        pg.set_content(doc, wait_until="load")
+        ft = (f"<div style=\"font-family:'Noto Sans CJK JP';font-size:7px;color:#94a3b8;width:100%;padding:0 14mm;display:flex;justify-content:space-between\">"
+              f"<span>つぎの手ナビ　{esc(url)}　（{ck} 確認）</span><span><span class='pageNumber'></span> / <span class='totalPages'></span></span></div>")
+        pg.pdf(path=str(OUT / name), format="A4", print_background=True, prefer_css_page_size=True,
+               display_header_footer=True, header_template="<div></div>", footer_template=ft)
+        b.close()
+
+
+PDF_CSS = """@page { size: A4; margin: 11mm 14mm 14mm; }
+body { font-family: 'Noto Sans CJK JP', sans-serif; color: #0f172a; font-size: 9.5pt; line-height: 1.5; }
+h1 { font-size: 17pt; margin: 0 0 1mm; } h2 { font-size: 11pt; margin: 3.5mm 0 1.5mm; } .sub { color: #475569; margin: 0 0 2mm; font-size: 9pt; }
+table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+th, td { border: 1px solid #94a3b8; padding: 1.2mm 2mm; vertical-align: top; } th { background: #e0f2fe; text-align: left; }
+small { color: #64748b; font-weight: normal; font-size: 7.5pt; }
+.box { border: 1.5px solid #fdba74; background: #fff7ed; border-radius: 3mm; padding: 1.8mm 4mm; margin-top: 2.5mm; }
+.box ul { margin: 1mm 0 0; padding-left: 5mm; } .note { color: #64748b; font-size: 7.5pt; margin: 1.5mm 0 0; } .w { height: 7mm; }"""
+
+
+# ---------- 住宅ローンの団信と保険の見直し（2026-11-19） ----------
+DANSHIN_KEYS = ["jhfShinDanshin", "jhfHonnin", "jhfDanshinMenu", "jiliHitsuyo", "jiliView", "mhlwKougaku", "jiliMinaoshi"]
+
+
+def make_danshin_xlsx():
+    P = DATA["danshin"]
+    ck = P["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "団信と見直し"
+    for i, w in enumerate([4, 46, 46, 8], 1):
+        ws.column_dimensions[get_column_letter(i)].width = w
+    put(ws, 1, 1, "住宅ローンの団信と 生命保険の見直しチェックリスト", H, border=False)
+    put(ws, 2, 1, "オレンジの欄に入れると、団信で減らせる死亡保障の目安が出ます（例の数字は入れ替えてください）。確かめたら「済」を選びます。", S, border=False)
+    ws.merge_cells("A2:D2")
+    ws.row_dimensions[2].height = 30
+    rows = [("死亡保障で見込んでいた住居費（月・円。家賃なら家賃＋共益費）", 100000), ("見込んでいた年数（年。配偶者が住み続ける年数など）", 25),
+            ("ローンのあとも残る住まいのお金（月・円。管理費・修繕積立金・固定資産税÷12 など）", 25000), ("今の死亡保障の合計（円。分かれば）", 30000000)]
+    for k, (h, v) in enumerate(rows):
+        put(ws, 4 + k, 2, h, B, HEAD)
+        put(ws, 4 + k, 3, v, B, IN, fmt="#,##0")
+        ws.row_dimensions[4 + k].height = 32
+    put(ws, 8, 2, "死亡保障から減らせる目安（自動）＝（住居費−残るお金）×12×年数", B, HEAD)
+    put(ws, 8, 3, "=MAX(0,C4-C6)*12*C5", B, OK, fmt="#,##0")
+    put(ws, 9, 2, "見直し後の死亡保障の目安（自動）", B, HEAD)
+    put(ws, 9, 3, '=IF(C7="","",MAX(0,C7-C8))', B, OK, fmt="#,##0")
+    for r in (8, 9):
+        ws.row_dimensions[r].height = 32
+    put(ws, 10, 1, P["keisanNote"], S, border=False)
+    ws.merge_cells("A10:D10")
+    ws.row_dimensions[10].height = 30
+    r = _check_sheet(ws, 12, P)
+    for t in [x["h"] + "：" + x["d"] for x in P["shikumi"]] + [P["shikumiNote"]]:
+        put(ws, r, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+        ws.row_dimensions[r].height = 44
+        r += 1
+    _foot(ws, r + 1, DANSHIN_KEYS, ck, "/guide/shisan-kanri/hoken-minaoshi-danshin")
+    wb.save(OUT / "hoken-minaoshi-danshin.xlsx")
+
+
+def make_danshin_pdf():
+    P = DATA["danshin"]
+    ck = P["checkedAt"].replace("-", "/")
+    ch = "".join(f"<tr><td style='width:5mm'>□</td><td><b>{esc(c['h'])}</b><br><small>{esc(c['g'])}｜{esc(c['d'])}</small></td><td style='width:40mm'></td></tr>" for c in P["check"])
+    sk = "".join(f"<li><b>{esc(x['h'])}</b>：{esc(x['d'])}</li>" for x in P["shikumi"])
+    doc = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>{PDF_CSS}</style></head><body>
+<h1>住宅ローンの団信と 生命保険の見直しチェックリスト</h1><p class="sub">数字を書いて減らせる額の目安を出し、確かめたら□に印を付けます。</p>
+<h2>① 団信で減らせる死亡保障の目安</h2>
+<table><tr><th style="width:55%">項目</th><th>書く</th></tr>
+<tr><td>死亡保障で見込んでいた住居費（月）　A</td><td class="w"></td></tr>
+<tr><td>見込んでいた年数　B</td><td class="w"></td></tr>
+<tr><td>ローンのあとも残る住まいのお金（月）　C</td><td class="w"></td></tr>
+<tr><td><b>減らせる目安 ＝（A − C）× 12 × B</b></td><td class="w"></td></tr></table>
+<p class="note">例：月10万円を25年見込んでいた、残るお金が月2.5万円 →（10万円−2.5万円）×12×25年＝2,250万円。{esc(P['keisanNote'])}</p>
+<div class="box"><b>団信の決まり（住宅金融支援機構）</b><ul>{sk}</ul></div>
+<h2>② 確かめる8つの点</h2><table><tr><th style="width:5mm"></th><th>確かめること</th><th style="width:40mm">メモ</th></tr>{ch}</table>
+<p class="note">{esc(P['shikumiNote'])}</p>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in DANSHIN_KEYS))}（{ck} 確認）</p></body></html>"""
+    _pdf_out(doc, "hoken-minaoshi-danshin.pdf", "/guide/shisan-kanri/hoken-minaoshi-danshin", ck)
+
+
+# ---------- 子どもが独立したときの保険の見直し（2026-11-19） ----------
+DOKURITSU_KEYS = ["nenkinIzokuKisoR8", "nenkinIzoku", "mhlwIzokuMinaoshi", "jiliHitsuyo", "jiliShohenkou", "jiliShikumi", "jiliView", "mhlwKougaku", "jiliMinaoshi", "jiliKeizoku", "jiliKonnan"]
+
+
+def make_dokuritsu_xlsx():
+    from datetime import date
+    P = DATA["dokuritsu"]
+    Z = P["izoku"]
+    ck = P["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "見直しチェック"
+    for i, w in enumerate([4, 46, 46, 8], 1):
+        ws.column_dimensions[get_column_letter(i)].width = w
+    put(ws, 1, 1, "子どもが独立したときの 保険の見直しチェックリスト", H, border=False)
+    put(ws, 2, 1, "オレンジの欄に末の子の生年月日を入れると、遺族基礎年金が終わる日（18歳になった年度の3月31日）が出ます（例の日付は入れ替えてください）。", S, border=False)
+    ws.merge_cells("A2:D2")
+    ws.row_dimensions[2].height = 30
+    put(ws, 4, 2, "末の子の生年月日", B, HEAD)
+    put(ws, 4, 3, date(2008, 4, 2), B, IN, fmt="yyyy/m/d")
+    put(ws, 5, 2, "独立する年齢（歳。その年度の3月31日）", B, HEAD)
+    put(ws, 5, 3, 22, B, IN)
+    put(ws, 6, 2, "遺族基礎年金が終わる日（自動）", B, HEAD)
+    put(ws, 6, 3, '=IF(C4="","",DATE(YEAR(EDATE(C4,216)-1)+IF(MONTH(EDATE(C4,216)-1)>=4,1,0),3,31))', B, OK, fmt="yyyy/m/d")
+    put(ws, 7, 2, "独立する日（自動）", B, HEAD)
+    put(ws, 7, 3, '=IF(C4="","",DATE(YEAR(EDATE(C4,C5*12)-1)+IF(MONTH(EDATE(C4,C5*12)-1)>=4,1,0),3,31))', B, OK, fmt="yyyy/m/d")
+    put(ws, 8, 2, "遺族基礎年金のない期間（年・自動）", B, HEAD)
+    put(ws, 8, 3, '=IF(C4="","",MAX(0,YEAR(C7)-YEAR(C6)))', B, OK)
+    put(ws, 9, 2, f"子1人のときの遺族基礎年金（年額・{Z['nendo']}）", B, HEAD)
+    put(ws, 9, 3, Z["base"] + Z["add12"], B, OK, fmt="#,##0")
+    for r in range(4, 10):
+        ws.row_dimensions[r].height = 30
+    put(ws, 10, 1, "18歳になるのは誕生日の前の日です（4月1日生まれは、18歳の誕生日の前の日の3月31日が最後）。" + P["keisanNote"], S, border=False)
+    ws.merge_cells("A10:D10")
+    ws.row_dimensions[10].height = 44
+    r = _check_sheet(ws, 12, P)
+    for t in P["izokuNote"]:
+        put(ws, r, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+        ws.row_dimensions[r].height = 32
+        r += 1
+    _foot(ws, r + 1, DOKURITSU_KEYS, ck, "/guide/shisan-kanri/hoken-minaoshi-dokuritsu")
+
+    w2 = wb.create_sheet("見直す方法")
+    for i, w in enumerate([18, 50, 40], 1):
+        w2.column_dimensions[get_column_letter(i)].width = w
+    put(w2, 1, 1, "死亡保障と保険料を見直す方法", H, border=False)
+    for i, t in enumerate(["方法", "中身", "気をつけること"], 1):
+        put(w2, 3, i, t, B, HEAD)
+    for k, x in enumerate(P["hoho"]):
+        for i, t in enumerate([x["h"], x["d"], x["chui"]], 1):
+            put(w2, 4 + k, i, t, B if i == 1 else N)
+        w2.row_dimensions[4 + k].height = 48
+    w2.page_setup.fitToWidth = 1
+    wb.save(OUT / "hoken-minaoshi-dokuritsu.xlsx")
+
+
+def make_dokuritsu_pdf():
+    P = DATA["dokuritsu"]
+    ck = P["checkedAt"].replace("-", "/")
+    ch = "".join(f"<tr><td style='width:5mm'>□</td><td><b>{esc(c['h'])}</b><br><small>{esc(c['g'])}｜{esc(c['d'])}</small></td><td style='width:40mm'></td></tr>" for c in P["check"])
+    hh = "".join(f"<tr><td><b>{esc(x['h'])}</b></td><td>{esc(x['d'])}</td><td>{esc(x['chui'])}</td></tr>" for x in P["hoho"])
+    notes = "".join(f"<li>{esc(t)}</li>" for t in P["izokuNote"])
+    doc = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>{PDF_CSS}</style></head><body>
+<h1>子どもが独立したときの 保険の見直しチェックリスト</h1><p class="sub">日付を書き、確かめたら□に印を付けます。</p>
+<h2>① 遺族基礎年金が終わる日</h2>
+<table><tr><th style="width:55%">項目</th><th>書く</th></tr>
+<tr><td>末の子の生年月日</td><td class="w"></td></tr>
+<tr><td>18歳になった年度の3月31日（遺族基礎年金が終わる）</td><td class="w"></td></tr>
+<tr><td>独立する年度の3月31日</td><td class="w"></td></tr></table>
+<p class="note">例：2008年4月2日生まれ → 18歳になるのは2026年4月1日 → 2027年3月31日まで。2008年4月1日生まれ → 2026年3月31日まで。</p>
+<div class="box"><b>遺族年金で知っておくこと</b><ul>{notes}</ul></div>
+<h2>② 確かめる8つの点</h2><table><tr><th style="width:5mm"></th><th>確かめること</th><th style="width:40mm">メモ</th></tr>{ch}</table>
+<h2>③ 死亡保障と保険料を見直す方法</h2><table><tr><th style="width:24mm">方法</th><th>中身</th><th style="width:48mm">気をつけること</th></tr>{hh}</table>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in DOKURITSU_KEYS))}（{ck} 確認）</p></body></html>"""
+    _pdf_out(doc, "hoken-minaoshi-dokuritsu.pdf", "/guide/shisan-kanri/hoken-minaoshi-dokuritsu", ck)
+
+
 if __name__ == "__main__":
     import sys
     only = sys.argv[1] if len(sys.argv) > 1 else ""
@@ -749,5 +939,11 @@ if __name__ == "__main__":
     if only == "teinen":
         make_teinen_xlsx()
         make_teinen_pdf()
+    if only == "danshin":
+        make_danshin_xlsx()
+        make_danshin_pdf()
+    if only == "dokuritsu":
+        make_dokuritsu_xlsx()
+        make_dokuritsu_pdf()
     for f in sorted(OUT.glob("hoken-*")):
         print(f.name, f.stat().st_size)

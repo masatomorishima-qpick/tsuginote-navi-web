@@ -60,6 +60,20 @@ const articles = [
       '受取人・死亡保障の額・教育の備えなど8つの点。子の生年月日から遺族基礎年金の目安も出ます。',
   },
   {
+    href: '/guide/shisan-kanri/hoken-minaoshi-danshin',
+    category: '保険の見直し',
+    title: '住宅ローンの団信で生命保険を見直す｜減らせる死亡保障の計算（無料・エクセル）',
+    description:
+      '見込んでいた住居費と年数を入れると、団信で減らせる死亡保障の目安が出ます。団信の保障の範囲と、確かめる8つの点も1枚に。',
+  },
+  {
+    href: '/guide/shisan-kanri/hoken-minaoshi-dokuritsu',
+    category: '保険の見直し',
+    title: '子供が独立したら保険の見直し｜遺族年金が終わる日も計算（無料チェックリスト）',
+    description:
+      '末の子の生年月日から、遺族基礎年金が終わる日（18歳の年度末）が出ます。減額・払済・延長の違いと、確かめる8つの点も。',
+  },
+  {
     href: '/guide/shisan-kanri/hoken-minaoshi-teinen',
     category: '保険の見直し',
     title: '定年退職の保険の見直しチェックリスト｜健康保険の期限も計算（無料・エクセル）',

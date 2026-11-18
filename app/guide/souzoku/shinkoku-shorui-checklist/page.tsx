@@ -138,6 +138,7 @@ export default function Page() {
           <p className="flex items-center gap-2 rounded-2xl bg-orange-50 p-3.5 text-[14px] font-bold text-orange-800 ring-1 ring-orange-200">
             <CalendarClock size={20} className="shrink-0" aria-hidden="true" />申告の期限：{DATA.zei.kigen}
           </p>
+          <Link href="/guide/souzoku/shinkoku-tojikata" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">そろえた書類の綴じ方と、提出先・郵送のしかた<ArrowRight size={14} aria-hidden="true" /></Link>
           <p className={SRC}>出典：{src(['nta4205'])}</p>
         </section>
       </SouzokuArticle>

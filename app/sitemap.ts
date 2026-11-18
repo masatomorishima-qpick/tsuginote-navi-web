@@ -117,6 +117,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 相続税申告書の綴じ方と提出の順番（2026-11-19 作成、docs/seisaku-queue.md の T41）。
+    {
+      url: `${baseUrl}/guide/souzoku/shinkoku-tojikata`,
+      lastModified: new Date("2026-11-19T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 相続税の0円申告（2026-11-17 作成、docs/seisaku-queue.md の T39）。
     {
       url: `${baseUrl}/guide/souzoku/zero-en-shinkoku`,
@@ -549,6 +556,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date("2026-11-11T14:00:00+09:00"),
       changeFrequency: "weekly",
       priority: 0.8,
+    },
+    // 住宅ローンの団信と生命保険の見直し（2026-11-19 作成、docs/seisaku-queue.md の T33）。
+    {
+      url: `${baseUrl}/guide/shisan-kanri/hoken-minaoshi-danshin`,
+      lastModified: new Date("2026-11-19T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    // 子どもが独立したときの保険の見直し（2026-11-19 作成、docs/seisaku-queue.md の T34）。
+    {
+      url: `${baseUrl}/guide/shisan-kanri/hoken-minaoshi-dokuritsu`,
+      lastModified: new Date("2026-11-19T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
     },
     // 定年退職のときの保険の見直しチェックリスト（2026-11-17 作成、docs/seisaku-queue.md の T29）。
     {

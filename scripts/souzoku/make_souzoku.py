@@ -25,7 +25,7 @@
   souzoku-shibou-taishokukin-hikazei.xlsx / .pdf  死亡退職金の非課税の計算表（受け取った人ごとの按分・弔慰金の多すぎる分。2026-11-17）
   souzoku-zero-en-shinkoku.xlsx / .pdf        相続税の0円申告のチェックリスト（判定・期限・作る表と書類。2026-11-17）
   souzoku-shinkoku-okure.xlsx / .pdf          延滞税と無申告加算税の計算表（年ごとの割合・期限後の納期限。2026-11-17）
-  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki・seizen・shokibo・miseinen・souji・niwari・taishoku・zero・okure も同じ）
+  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki・seizen・shokibo・miseinen・souji・niwari・taishoku・zero・okure・tojikata も同じ）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import json
@@ -2054,6 +2054,87 @@ def make_okure_pdf():
 
 
 
+# ---------- 相続税申告書の綴じ方と提出の順番（2026-11-19） ----------
+TOJI_KEYS = ["ntaYoshikiR08", "ntaShoruiIchiran", "nta4205r8", "ntaSouzokuTetsuzuki", "ntaSofu", "ntaHasshin", "ntaOnatsu", "etaxImageSouzoku", "etaxHikariSouzoku"]
+TOJI_WHEN = {"always": "いつも", "shomen": "紙で出すとき（持参・郵送）", "tokurei": "配偶者の税額軽減・小規模宅地等の特例"}
+
+
+def make_tojikata_xlsx():
+    T = DATA["tojikata"]
+    ck = T["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "綴じ方と提出"
+    widths(ws, [5, 46, 30, 8])
+    put(ws, 1, 1, "相続税申告書の綴じ方と提出のチェック表", H, border=False)
+    put(ws, 2, 1, "オレンジの欄に知った日を入れると、提出の期限が出ます。上から順に重ね、重ねたら「済」を選びます。", S, border=False)
+    ws.merge_cells("A2:D2")
+    ws.row_dimensions[2].height = 30
+    put(ws, 4, 2, "亡くなったことを知った日（例の日付は入れ替えてください）", B, HEAD_FILL)
+    import datetime as _dt
+    put(ws, 4, 3, _dt.date(2026, 4, 30), B, IN_FILL, fmt="yyyy/m/d")
+    put(ws, 5, 2, "10か月目の日（自動）", B, HEAD_FILL)
+    put(ws, 5, 3, '=IF(C4="","",' + kigen_f("C4", T["kigenN"]) + ')', B, OK_FILL, fmt="yyyy/m/d(aaa)")
+    put(ws, 6, 2, "提出の期限（土日・祝日・年末年始なら次の日。祝日は2026・2027年の分）", B, HEAD_FILL)
+    put(ws, 6, 3, '=IF(C5="","",' + YASUMI_F.format(k="C5") + ')', B, OK_FILL, fmt="yyyy/m/d(aaa)")
+    for r in range(4, 7):
+        ws.row_dimensions[r].height = 30
+    dv = DataValidation(type="list", formula1='"済"', allow_blank=True)
+    ws.add_data_validation(dv)
+    r = 8
+    for i, t in enumerate(["順", "重ねる書類", "入れるとき", "済"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    for k, j in enumerate(T["junban"]):
+        rr = r + 1 + k
+        put(ws, rr, 1, k + 1)
+        put(ws, rr, 2, j["h"] + "\n" + j["d"], N)
+        put(ws, rr, 3, TOJI_WHEN[j["when"]], N)
+        dv.add(put(ws, rr, 4, None, B, IN_FILL))
+        ws.row_dimensions[rr].height = 58
+    r = r + len(T["junban"]) + 2
+    put(ws, r, 1, "留め方・控え・出し方", B, border=False)
+    r += 1
+    for t in T["tome"] + T["hikae"] + T["dashikata"]:
+        put(ws, r, 1, "・" + t["h"] + "：" + t["d"], N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+        ws.row_dimensions[r].height = 44
+        r += 1
+    put(ws, r, 1, "・" + T["fuyo"]["h"] + "：" + "、".join(T["fuyo"]["items"]), N, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+    ws.row_dimensions[r].height = 58
+    r += 1
+    put(ws, r, 1, "・" + T["junbanNote"], N, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+    ws.row_dimensions[r].height = 44
+    r += 2
+    put(ws, r, 1, "出典：" + "／".join(SRC[k]["name"] for k in TOJI_KEYS) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+    ws.row_dimensions[r].height = 90
+    put(ws, r + 1, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/shinkoku-tojikata", S, border=False)
+    ws.page_setup.fitToWidth = 1
+    add_yasumi_sheet(wb)
+    wb.save(OUT / "souzoku-shinkoku-tojikata.xlsx")
+
+
+def make_tojikata_pdf():
+    T = DATA["tojikata"]
+    ck = T["checkedAt"].replace("-", "/")
+    jb = "".join(f"<tr><td>☐</td><td>{k + 1}</td><td><b>{esc(j['h'])}</b><br><small>{esc(j['d'])}</small></td><td>{esc(TOJI_WHEN[j['when']])}</td></tr>" for k, j in enumerate(T["junban"]))
+    tm = "".join(f"<li><b>{esc(t['h'])}</b>：{esc(t['d'])}</li>" for t in T["tome"] + T["hikae"])
+    ds = "".join(f"<tr><td><b>{esc(t['h'])}</b></td><td>{esc(t['d'])}</td></tr>" for t in T["dashikata"])
+    body = f"""<style>small{{color:#64748b;font-size:8pt}}</style>
+<div class="box"><b>期限</b>：知った日 <span class="line" style="min-width:28mm"></span> の翌日から10か月 → <span class="line" style="min-width:28mm"></span>（土日・祝日・年末年始なら次の日）<br>
+<b>提出先</b>：亡くなった人の住所地の税務署 <span class="line" style="min-width:40mm"></span></div>
+<h2>上から順に重ねる</h2><table><tr><th style="width:5mm"></th><th style="width:6mm">順</th><th>書類</th><th style="width:38mm">入れるとき</th></tr>{jb}</table>
+<p class="note">{esc(T['junbanNote'])}</p>
+<h2>留め方と控え</h2><ul style="margin:0;padding-left:5mm">{tm}</ul>
+<h2>出し方</h2><table><tr><th style="width:30mm">出し方</th><th>中身</th></tr>{ds}</table>
+<h2>{esc(T['fuyo']['h'])}</h2><p style="margin:0">{esc('、'.join(T['fuyo']['items']))}</p>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in TOJI_KEYS))}（{ck} 確認）</p>"""
+    doc = page("相続税申告書の綴じ方と提出のチェック表", "上から順に重ね、重ねたら☐に印を付けます。添付書類はのりづけせず、クリップで留めます。", body)
+    _pdf(doc, "souzoku-shinkoku-tojikata.pdf", "/guide/souzoku/shinkoku-tojikata", ck)
+
+
 if __name__ == "__main__":
     import sys
     if sys.argv[1:] == ["shinkoku"]:
@@ -2064,7 +2145,7 @@ if __name__ == "__main__":
         make_hikazei_xlsx()
         make_hikazei_pdf()
         sys.exit(0)
-    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki", "jibun", "shinkokuTouki", "seizen", "shokibo", "miseinen", "souji", "niwari", "taishoku", "zero", "okure"):
+    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki", "jibun", "shinkokuTouki", "seizen", "shokibo", "miseinen", "souji", "niwari", "taishoku", "zero", "okure", "tojikata"):
         for name in sys.argv[1:]:
             globals()[f"make_{name}_xlsx"]()
             globals()[f"make_{name}_pdf"]()

@@ -99,6 +99,10 @@ export const SOUZOKU_FILES = {
     { label: 'エクセル', href: '/downloads/souzoku-zero-en-shinkoku.xlsx', icon: FileSpreadsheet },
     { label: 'PDF', href: '/downloads/souzoku-zero-en-shinkoku.pdf', icon: FileText },
   ],
+  tojikata: [
+    { label: 'エクセル', href: '/downloads/souzoku-shinkoku-tojikata.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-shinkoku-tojikata.pdf', icon: FileText },
+  ],
   okure: [
     { label: 'エクセル', href: '/downloads/souzoku-shinkoku-okure.xlsx', icon: FileSpreadsheet },
     { label: 'PDF', href: '/downloads/souzoku-shinkoku-okure.pdf', icon: FileText },
@@ -112,6 +116,7 @@ export const SOUZOKU_PAGES = [
   { href: '/guide/souzoku/shinkoku-shorui-checklist', h: '相続税の申告の必要書類' },
   { href: '/guide/souzoku/zero-en-shinkoku', h: '相続税の0円申告' },
   { href: '/guide/souzoku/shinkoku-okure', h: '申告期限を過ぎたときの延滞税' },
+  { href: '/guide/souzoku/shinkoku-tojikata', h: '相続税申告書の綴じ方と提出' },
   { href: '/guide/souzoku/shibou-hokenkin-hikazei', h: '死亡保険金の非課税の計算' },
   { href: '/guide/souzoku/shibou-taishokukin-hikazei', h: '死亡退職金の非課税の計算' },
   { href: '/guide/souzoku/niwari-kasan', h: '相続税の2割加算の計算' },

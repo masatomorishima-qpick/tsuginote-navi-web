@@ -574,7 +574,10 @@ def make_shinkoku_pdf():
         items = "".join(f"<tr><td>☐</td><td><b>{esc(it['h'])}</b>{('<br><small>' + esc(it['d']) + '</small>') if it['d'] else ''}</td></tr>" for it in j["items"])
         jo += f"<tr><th colspan='2'>{'　' if j.get('sub') else ''}{esc(j['h'].replace('└ ', '自宅の土地の特例のうち：'))}</th></tr>{items}"
     hy = "".join(f"<tr><td>{esc(h['zaisan'])}</td><td><b>{esc(h['hyo'])}</b>　<small>{esc(h['name'])}</small></td></tr>" for h in D["hyo"])
-    body = f"""<style>td:first-child{{width:6mm;text-align:center}} small{{color:#64748b;font-size:8pt}} th{{font-size:9.5pt}}</style>
+    # 2026-11-18：検索から PDF に直接来る人が多い（直近7日 表示99、「相続税申告 必要書類」4.6位）ため、ページへの道を最初に置く。
+    url = f"{SITE}/guide/souzoku/shinkoku-shorui-checklist"
+    body = f"""<style>td:first-child{{width:6mm;text-align:center}} small{{color:#64748b;font-size:8pt}} th{{font-size:9.5pt}} .go{{border:1.5px solid #0369a1;border-radius:3mm;padding:2.5mm 3.5mm;margin:0 0 3mm;font-size:10pt}} .go a{{color:#0369a1;font-weight:bold}}</style>
+<div class="go">状況を選ぶだけで、要る書類だけが出るチェック表（無料）は、つぎの手ナビのページで使えます。<br><a href="{esc(url)}">{esc(url)}</a></div>
 <h2>誰でも出す書類</h2><table>{ky}</table>
 <h2>特例を使うときに足す書類（当てはまる所だけ）</h2><table>{jo}</table>
 <h2>財産ごとに書く申告書の表</h2><table><tr><th style="width:40mm">財産・特例</th><th>書く表</th></tr>{hy}</table>

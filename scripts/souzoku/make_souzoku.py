@@ -449,7 +449,12 @@ def tetsuzuki_html():
     junbi = "".join(f"<li>☐ {esc(j['h'])}</li>" for j in T["junbi"])
     keys = sorted({it["src"] for it in T["items"]})
     ck = T["checkedAt"].replace("-", "/")
-    body = f"""<p>亡くなった日：<span class="line"></span></p>
+    # 2026-11-19：検索から PDF に直接来る人が出てきた（11/10〜11/16 表示13・5.8位、ページ本体は表示1・57位）。
+    # PDF には紹介先がないため、期限の日が自動で出るページへの道を最初に置く（#134 と同じ形）。
+    url = f"{SITE}/guide/souzoku/tetsuzuki-checklist"
+    body = f"""<style>.go{{border:1.5px solid #0369a1;border-radius:3mm;padding:2.5mm 3.5mm;margin:0 0 3mm;font-size:10pt}} .go a{{color:#0369a1;font-weight:bold}}</style>
+<div class="go">亡くなった日を入れるだけで、手続きごとの期限の日が出るチェック表（無料）は、つぎの手ナビのページで使えます。<br><a href="{esc(url)}">{esc(url)}</a></div>
+<p>亡くなった日：<span class="line"></span></p>
 <table><tr><th style="width:5mm"></th><th style="width:34mm">手続き</th><th style="width:38mm">期限</th><th style="width:22mm">期限の日</th><th style="width:26mm">出す所</th><th>メモ</th></tr>{rows}</table>
 <div class="box"><b>期限の前にしておくこと</b><ul style="margin:1mm 0 0;padding-left:2mm;list-style:none">{junbi}</ul></div>
 <p class="note">{esc(T['keisanNote'])}</p>

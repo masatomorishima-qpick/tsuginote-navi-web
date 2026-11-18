@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Building2, Coins, Landmark, Smartphone, Info, ShieldCheck, Gift } from 'lucide-react';
+import { ArrowRight, Building2, Coins, FileText, Landmark, Smartphone, Info, ShieldCheck, Gift } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
@@ -21,8 +21,11 @@ import { HOUJIN_PARTNERS } from '@/lib/houjin/partners';
 const LP_ID = 'guide-houjin-raksulbank';
 const PATH = '/guide/houjin/raksulbank';
 const CHECKED = '2026/11/16';
-const TITLE = 'ラクスルバンクとは？審査はGMOあおぞらネット銀行｜手数料・申し込める会社・設立直後の注意';
-const DESCRIPTION = 'ラクスルバンクの法人口座は、GMOあおぞらネット銀行のラクスルバンク支店。審査はGMOあおぞらネット銀行が行います。他行あての振込手数料、申し込める会社（個人事業主は不可）、申込の流れ、設立直後の会社が気をつけることを公式の記載で整理。';
+// 2026-11-18 題名を「審査」に寄せた。「ラクスルバンク 審査」で公開2日で8位（11/18 確認）、上位は公式のよくある質問と比較ブログ。
+// 「ラクスルバンク」は月880回（前年比 +127%）。審査の必要書類（公式 FAQ 1293）を足し、申込ボタンを審査の節のすぐ下へ移した。
+// 検索の数字がまだ出ていない（11/16 公開・11/17 登録）ため、14日あける決まりの例外として題名と位置を同時に変えた。判定 12/16。
+const TITLE = 'ラクスルバンクの審査｜日数・必要書類と、審査するGMOあおぞらネット銀行に設立直後に落ちた実例';
+const DESCRIPTION = 'ラクスルバンクの審査はGMOあおぞらネット銀行が行い、通常1週間ほど。必要書類は本人確認書類と事業内容の確認書類の2種類で、設立直後は事業計画書も出せます。手数料・申し込める会社と、運営会社がGMOあおぞらネット銀行に直接申し込んで落ちた実例も。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -37,6 +40,7 @@ const S = {
   faq55: { name: 'ラクスルバンク よくあるご質問「口座開設は誰でも行うことができますか？」', url: 'https://support.raksulbank.com/faq/show/55?site_domain=default' },
   faq33: { name: 'ラクスルバンク よくあるご質問「口座開設の審査にはどれくらいの時間がかかりますか？」', url: 'https://support.raksulbank.com/faq/show/33?site_domain=default' },
   faq54: { name: 'ラクスルバンク よくあるご質問「口座開設の審査基準や、申込が却下される主な理由は何ですか？」', url: 'https://support.raksulbank.com/faq/show/54?site_domain=default' },
+  faq1293: { name: 'ラクスルバンク よくあるご質問「口座開設の際、必要書類は何を提出すればいいですか。」', url: 'https://support.raksulbank.com/faq/show/1293?site_domain=default' },
   gmo: { name: 'GMOあおぞらネット銀行「ラクスルバンク支店に関する特約」', url: 'https://gmo-aozora.com/provision/pdf/raksul_260816.pdf' },
 } as const;
 type K = keyof typeof S;
@@ -57,6 +61,7 @@ const NAGARE = [
 const FAQS = [
   { q: 'ラクスルバンクに個人事業主は申し込めますか？', a: '申し込めません。申し込めるのは法人（非課税法人を含む）で、ラクスルのアカウント登録も必要です。' },
   { q: 'ラクスルバンクの審査は何日かかりますか？', a: '通常1週間ほどです。平日14時までの申込は、原則としてGMOあおぞらネット銀行がその日のうちに審査します。土日祝日や申込が多いときは、当日に開設できないことがあります。' },
+  { q: 'ラクスルバンクの審査に必要な書類は何ですか？', a: '取引責任者の本人確認書類と、事業内容の確認書類（1点以上）の2種類です。取引の書類や契約書がない設立直後の会社は、代表者が署名・捺印した事業計画書も出せます。' },
   { q: '審査に落ちた理由は教えてもらえますか？', a: '教えてもらえません。公式のよくある質問で、審査結果の詳細は開示しないとしています。' },
   { q: 'GMOあおぞらネット銀行と何が違いますか？', a: '口座そのものはGMOあおぞらネット銀行のラクスルバンク支店です。ラクスルのアカウントでログインし、ラクスルで使えるポイントがたまる点が違います。代表口座は1法人1口座までです。' },
 ];
@@ -73,7 +78,7 @@ const SRC = 'text-[11px] leading-relaxed text-slate-500';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', datePublished: '2026-11-16T19:00:00+09:00', dateModified: '2026-11-16T19:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}`, about: { '@type': 'Service', name: 'ラクスルバンク', provider: { '@type': 'Organization', name: 'ラクスルバンク株式会社' } }, mentions: [{ '@type': 'BankOrCreditUnion', name: 'GMOあおぞらネット銀行' }] },
+    { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', datePublished: '2026-11-16T19:00:00+09:00', dateModified: '2026-11-18T23:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}`, about: { '@type': 'Service', name: 'ラクスルバンク', provider: { '@type': 'Organization', name: 'ラクスルバンク株式会社' } }, mentions: [{ '@type': 'BankOrCreditUnion', name: 'GMOあおぞらネット銀行' }] },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: '法人成り', item: `${SITE_URL}/guide/houjin` },
@@ -89,7 +94,7 @@ export default function Page() {
     <div className="flex min-h-screen flex-col bg-[#f6f8fa]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <LpHeader />
-      <LpViewTracker lpId={LP_ID} version="v1-2026-11-16" />
+      <LpViewTracker lpId={LP_ID} version="v2-2026-11-18" />
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-16">
         {hasExit && (
           <p className="-mb-10 flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">
@@ -107,7 +112,7 @@ export default function Page() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">法人口座</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">ラクスルバンク<br /><span className="text-[22px] text-orange-600">審査と手数料、申し込む前に</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">ラクスルバンク<br /><span className="text-[22px] text-orange-600">審査の日数と必要書類</span></h1>
           </div>
           <ul className="grid grid-cols-2 gap-2">
             {YOUTEN.map(({ icon: I, h, s }) => (
@@ -140,6 +145,15 @@ export default function Page() {
             ))}
           </ul>
           <p className={SRC}>出典：{src(['faq33', 'faq54'])}（{CHECKED} 確認）</p>
+          <div className="flex flex-col gap-2 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
+            <p className="flex items-center gap-2 text-[15px] font-black text-slate-900"><FileText size={18} className="text-sky-700" aria-hidden="true" />審査に出す書類は2種類</p>
+            <ul className="flex flex-col gap-1 text-[13px] leading-relaxed text-slate-700">
+              <li>・取引責任者の本人確認書類（マイナンバーカードの読み取りか自撮り動画なら最短当日）</li>
+              <li>・事業内容の確認書類を1点以上（他社からの請求書・発注書・納品書、契約書、ホームページの住所、許認可証）</li>
+              <li className="font-bold text-orange-800">・設立直後は、代表者が署名・捺印した事業計画書も出せる</li>
+            </ul>
+            <p className={SRC}>出典：{src(['faq1293'])}（2026/11/17 確認）</p>
+          </div>
           <Link href="/guide/houjin/kouza-hitsuyou-shorui" className="flex items-center gap-1 text-[13px] font-bold text-sky-800 underline underline-offset-2">法人口座の必要書類：銀行4つの比較<ArrowRight size={14} aria-hidden="true" /></Link>
           <Link href="/guide/houjin/kouza-kaisetsu-kikan" className="flex items-center gap-1 text-[13px] font-bold text-sky-800 underline underline-offset-2">法人口座の開設期間：銀行ごとの日数と実例<ArrowRight size={14} aria-hidden="true" /></Link>
           <div className="flex flex-col gap-2 rounded-2xl bg-amber-50 p-4 ring-1 ring-amber-200">
@@ -148,6 +162,16 @@ export default function Page() {
             <Link href="/guide/houjin/kouza-tsukurenai" className="flex items-center gap-1 text-[13px] font-bold text-sky-800 underline underline-offset-2">3行に申し込んだ結果と日付<ArrowRight size={14} aria-hidden="true" /></Link>
           </div>
         </section>
+
+        {hasExit && (
+          <section className="flex flex-col gap-5" aria-labelledby="exit">
+            <h2 id="exit" className="sr-only">申込先</h2>
+            <HoujinExit
+              lpId={LP_ID} partner="raksulBank" position="after-shinsa" lead="書類がそろったら、申し込む"
+              note="審査はGMOあおぞらネット銀行です。私たちは設立直後に、GMOあおぞらネット銀行に直接申し込んで通りませんでした。それを知ったうえで、申込先の一つとして載せています。"
+            />
+          </section>
+        )}
 
         <section className="flex flex-col gap-5" aria-labelledby="nagare">
           <h2 id="nagare" className={H2}>ラクスルバンクの申込の流れ</h2>
@@ -192,15 +216,6 @@ export default function Page() {
           <p className={SRC}>出典：{src(['top', 'faq55', 'gmo'])}（{CHECKED} 確認）</p>
         </section>
 
-        {hasExit && (
-          <section className="flex flex-col gap-5" aria-labelledby="exit">
-            <h2 id="exit" className="sr-only">申込先</h2>
-            <HoujinExit
-              lpId={LP_ID} partner="raksulBank" position="bottom" lead="支払い用の法人口座を足すなら"
-              note="審査はGMOあおぞらネット銀行です。私たちは設立直後に、GMOあおぞらネット銀行に直接申し込んで通りませんでした。それを知ったうえで、申込先の一つとして載せています。"
-            />
-          </section>
-        )}
 
         <section className="flex flex-col gap-2" aria-labelledby="faq">
           <h2 id="faq" className={`${H2} mb-2`}>よくある質問</h2>

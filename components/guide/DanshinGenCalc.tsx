@@ -55,7 +55,7 @@ export default function DanshinGenCalc({ lpId }: { lpId: string }) {
         <label className="flex flex-col gap-1 text-[11px] font-bold text-slate-600">死亡保障で見込んでいた住居費（月・万円。家賃なら家賃＋共益費）
           <input inputMode="decimal" value={mikomi} onChange={on(setMikomi)} placeholder="例：10" className={INPUT} />
         </label>
-        <label className="flex flex-col gap-1 text-[11px] font-bold text-slate-600">見込んでいた年数（年。住宅ローンの残りの年数まで）
+        <label className="flex flex-col gap-1 text-[11px] font-bold text-slate-600">見込んでいた年数（年。配偶者が住み続ける年数など）
           <input inputMode="numeric" value={nen} onChange={on(setNen)} placeholder="例：25" className={INPUT} />
         </label>
         <label className="flex flex-col gap-1 text-[11px] font-bold text-slate-600">ローンのあとも残る住まいのお金（月・万円。管理費・修繕積立金・固定資産税÷12 など）
@@ -69,10 +69,11 @@ export default function DanshinGenCalc({ lpId }: { lpId: string }) {
         <div className="flex flex-col gap-1.5 rounded-xl bg-white p-3 ring-1 ring-slate-200" aria-live="polite">
           <p className="text-[13px] text-slate-600">死亡保障から減らせる目安</p>
           <p className="text-[24px] font-black text-orange-700">約{man(gen)}</p>
+          {gen === 0 && <p className="text-[12px] font-bold text-orange-800">残る住まいのお金が、見込んでいた住居費以上なので、減らせる額はありません</p>}
           <p className="text-[12px] text-slate-600">（{(m / 10000).toLocaleString('ja-JP')}万円 − {(n / 10000).toLocaleString('ja-JP')}万円）× 12か月 × {y}年</p>
           {imaYen > 0 && (
             <p className="text-[14px] font-bold text-slate-900">見直し後の死亡保障の目安：約{man(Math.max(0, imaYen - gen))}
-              {imaYen - gen <= 0 && <span className="block text-[12px] font-bold text-orange-800">今の保障より大きい差になりました。教育費や生活費の見込みも入れて、計算し直してください</span>}
+              {imaYen - gen < 0 && <span className="block text-[12px] font-bold text-orange-800">減らせる目安が、今の保障の額を超えました。教育費や生活費の見込みも入れて、計算し直してください</span>}
             </p>
           )}
         </div>

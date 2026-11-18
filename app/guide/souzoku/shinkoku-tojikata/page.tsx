@@ -33,9 +33,9 @@ export const metadata: Metadata = {
 
 const T = DATA.tojikata;
 const FAQS = [
-  { q: '相続税の申告書はどこに提出しますか？', a: '亡くなった人の住所地を所轄する税務署です。相続人の住所地の税務署ではありません。期限は、亡くなったことを知った日の翌日から10か月以内です（国税庁）。' },
+  { q: '相続税の申告書はどこに提出しますか？', a: '亡くなった人の、亡くなったときの住所地を所轄する税務署です。相続人の住所地の税務署ではありません。期限は、亡くなったことを知った日の翌日から10か月以内です（国税庁）。' },
   { q: '相続税の申告書は郵送できますか？', a: 'できます。申告書は「信書」なので、郵便物か信書便物で送ります。ゆうパックや宅配便などの荷物扱いでは送れません。郵便・信書便なら、通信日付印の日に出したものとみなされます（国税庁）。' },
-  { q: '相続税の申告に通帳のコピーは必要ですか？', a: '原則、出す必要はありません。国税庁の一覧では、預貯金通帳の写しや残高証明書の写しは「イメージデータ・書面ともに、原則、提出していただく必要はありません」とされています。申告書を作る資料として手元に残します。' },
+  { q: '相続税の申告に通帳のコピーは必要ですか？', a: '原則、出す必要はありません。国税庁の電子申告の添付書類の一覧（書面で出すときも同じ）では、預貯金通帳の写しや残高証明書の写しは「イメージデータ・書面ともに、原則、提出していただく必要はありません」とされています。申告書を作る資料として手元に残します。' },
 ];
 
 const WAY_ICON = { jisan: Stamp, yuso: Mail, etax: Layers } as const;
@@ -57,11 +57,11 @@ export default function Page() {
           <div className="flex flex-col gap-3">
             <p className="text-[15px] leading-relaxed text-slate-800">{T.kotae}<span className="text-[11px] text-slate-500">（国税庁 No.4205・相続税の申告の際に提出していただく主な書類・申告書の税務署への送付について・収受日付印の押なつについて）</span></p>
             <TojikataCheck lpId={LP_ID} />
-            <SouzokuExit lpId={LP_ID} partner="souzokuAssist" position="hero" lead="並べる書類がそろわない・申告書づくりが重いなら、書類の準備から提出までまとめて任せる" />
+            <SouzokuExit lpId={LP_ID} partner="souzokuAssist" position="hero" lead="並べる書類がそろわない・申告書づくりが重いなら、頼める先に相談する" />
             <SouzokuDownload icon={Layers} h="綴じ方と提出のチェック表" s="印刷して、重ねたら印を付ける" files={SOUZOKU_FILES.tojikata} />
           </div>
         }
-        partner="souzokuAssist" exitLead="書類の準備から提出まで、まとめて任せる" faqs={FAQS} updated="2026年11月19日"
+        partner="souzokuAssist" exitLead="書類の準備から申告まで、頼める先を探す" faqs={FAQS} updated="2026年11月19日"
       >
         <section className={SECTION} aria-labelledby="junban">
           <h2 id="junban" className={H2}>相続税申告書と添付書類の綴じ方（並べる順番）</h2>

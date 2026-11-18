@@ -794,7 +794,7 @@ def make_danshin_xlsx():
     put(ws, 2, 1, "オレンジの欄に入れると、団信で減らせる死亡保障の目安が出ます（例の数字は入れ替えてください）。確かめたら「済」を選びます。", S, border=False)
     ws.merge_cells("A2:D2")
     ws.row_dimensions[2].height = 30
-    rows = [("死亡保障で見込んでいた住居費（月・円。家賃なら家賃＋共益費）", 100000), ("見込んでいた年数（年。ローンの残りの年数まで）", 25),
+    rows = [("死亡保障で見込んでいた住居費（月・円。家賃なら家賃＋共益費）", 100000), ("見込んでいた年数（年。配偶者が住み続ける年数など）", 25),
             ("ローンのあとも残る住まいのお金（月・円。管理費・修繕積立金・固定資産税÷12 など）", 25000), ("今の死亡保障の合計（円。分かれば）", 30000000)]
     for k, (h, v) in enumerate(rows):
         put(ws, 4 + k, 2, h, B, HEAD)
@@ -841,7 +841,7 @@ def make_danshin_pdf():
 
 
 # ---------- 子どもが独立したときの保険の見直し（2026-11-19） ----------
-DOKURITSU_KEYS = ["nenkinIzokuKisoR8", "nenkinIzoku", "jiliHitsuyo", "jiliShohenkou", "jiliShikumi", "jiliView", "mhlwKougaku", "jiliMinaoshi", "jiliKeizoku", "jiliKonnan"]
+DOKURITSU_KEYS = ["nenkinIzokuKisoR8", "nenkinIzoku", "mhlwIzokuMinaoshi", "jiliHitsuyo", "jiliShohenkou", "jiliShikumi", "jiliView", "mhlwKougaku", "jiliMinaoshi", "jiliKeizoku", "jiliKonnan"]
 
 
 def make_dokuritsu_xlsx():
@@ -883,10 +883,10 @@ def make_dokuritsu_xlsx():
         r += 1
     _foot(ws, r + 1, DOKURITSU_KEYS, ck, "/guide/shisan-kanri/hoken-minaoshi-dokuritsu")
 
-    w2 = wb.create_sheet("減らす方法")
+    w2 = wb.create_sheet("見直す方法")
     for i, w in enumerate([18, 50, 40], 1):
         w2.column_dimensions[get_column_letter(i)].width = w
-    put(w2, 1, 1, "死亡保障を減らす方法", H, border=False)
+    put(w2, 1, 1, "死亡保障と保険料を見直す方法", H, border=False)
     for i, t in enumerate(["方法", "中身", "気をつけること"], 1):
         put(w2, 3, i, t, B, HEAD)
     for k, x in enumerate(P["hoho"]):
@@ -913,7 +913,7 @@ def make_dokuritsu_pdf():
 <p class="note">例：2008年4月2日生まれ → 18歳になるのは2026年4月1日 → 2027年3月31日まで。2008年4月1日生まれ → 2026年3月31日まで。</p>
 <div class="box"><b>遺族年金で知っておくこと</b><ul>{notes}</ul></div>
 <h2>② 確かめる8つの点</h2><table><tr><th style="width:5mm"></th><th>確かめること</th><th style="width:40mm">メモ</th></tr>{ch}</table>
-<h2>③ 死亡保障を減らす方法</h2><table><tr><th style="width:24mm">方法</th><th>中身</th><th style="width:48mm">気をつけること</th></tr>{hh}</table>
+<h2>③ 死亡保障と保険料を見直す方法</h2><table><tr><th style="width:24mm">方法</th><th>中身</th><th style="width:48mm">気をつけること</th></tr>{hh}</table>
 <p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in DOKURITSU_KEYS))}（{ck} 確認）</p></body></html>"""
     _pdf_out(doc, "hoken-minaoshi-dokuritsu.pdf", "/guide/shisan-kanri/hoken-minaoshi-dokuritsu", ck)
 

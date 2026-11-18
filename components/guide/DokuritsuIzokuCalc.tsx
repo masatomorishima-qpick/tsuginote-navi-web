@@ -72,9 +72,9 @@ export default function DokuritsuIzokuCalc({ lpId }: { lpId: string }) {
         <div className="flex flex-col gap-2 rounded-xl bg-white p-3 ring-1 ring-slate-200" aria-live="polite">
           <p className="text-[13px] text-slate-600">末の子が対象から外れる日（遺族基礎年金が終わる）</p>
           <p className="text-[20px] font-black text-orange-700">{fmt(end18)}</p>
-          {gap > 0 && <p className="text-[13px] font-bold text-slate-800">独立（{fmt(endDoku)}）まで、遺族基礎年金のない期間が約{gap}年あります</p>}
+          {gap > 0 && endDoku >= today && <p className="text-[13px] font-bold text-slate-800">独立（{fmt(endDoku)}）まで、遺族基礎年金のない期間が約{gap}年あります</p>}
           {r.rows.length === 0 ? (
-            <p className="text-[14px] font-bold text-slate-800">対象になる子がもういないため、いま亡くなっても遺族基礎年金は出ません。死亡保障の計算の「収入の見込み」から外します。</p>
+            <p className="text-[14px] font-bold text-slate-800">来月以降に対象になる子がいないため、いま亡くなっても遺族基礎年金は出ません。死亡保障の計算の「収入の見込み」から外します。</p>
           ) : (
             <p className="text-[14px] font-bold text-slate-800">いま亡くなった場合に受け取れる遺族基礎年金の合計：約<span className="text-orange-700">{man(r.total)}</span>
               <span className="block text-[12px] font-normal text-slate-600">年額 {r.now.toLocaleString('ja-JP')}円（{Z.nendo}）から始まり、上の日で終わる</span>

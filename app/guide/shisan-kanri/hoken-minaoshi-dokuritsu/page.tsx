@@ -118,11 +118,11 @@ export default function Page() {
               </li>
             ))}
           </ul>
-          <p className={SRC}>出典：{src(['nenkinIzokuKisoR8', 'nenkinIzoku'])}（{checked} 確認）</p>
+          <p className={SRC}>出典：{src(['nenkinIzokuKisoR8', 'nenkinIzoku', 'mhlwIzokuMinaoshi'])}（{checked} 確認）</p>
         </section>
 
         <section className={SECTION} aria-labelledby="hoho">
-          <h2 id="hoho" className={H2}>死亡保障を減らす方法（減額・払済・延長）</h2>
+          <h2 id="hoho" className={H2}>死亡保障と保険料を見直す方法（減額・払済・延長）</h2>
           <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200">
             <table className="w-full text-[13px]">
               <thead className="bg-slate-50 text-[12px] text-slate-600"><tr><th className="w-[24%] px-3 py-2 text-left font-bold">方法</th><th className="px-3 py-2 text-left font-bold">中身</th><th className="w-[32%] px-3 py-2 text-left font-bold">気をつけること</th></tr></thead>

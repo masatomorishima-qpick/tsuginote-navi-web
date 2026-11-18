@@ -2103,6 +2103,11 @@ def make_tojikata_xlsx():
     ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
     ws.row_dimensions[r].height = 58
     r += 1
+    for t in T["etax"]:
+        put(ws, r, 1, "・e-Tax：" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+        ws.row_dimensions[r].height = 44
+        r += 1
     put(ws, r, 1, "・" + T["junbanNote"], N, border=False)
     ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
     ws.row_dimensions[r].height = 44
@@ -2124,11 +2129,12 @@ def make_tojikata_pdf():
     ds = "".join(f"<tr><td><b>{esc(t['h'])}</b></td><td>{esc(t['d'])}</td></tr>" for t in T["dashikata"])
     body = f"""<style>small{{color:#64748b;font-size:8pt}}</style>
 <div class="box"><b>期限</b>：知った日 <span class="line" style="min-width:28mm"></span> の翌日から10か月 → <span class="line" style="min-width:28mm"></span>（土日・祝日・年末年始なら次の日）<br>
-<b>提出先</b>：亡くなった人の住所地の税務署 <span class="line" style="min-width:40mm"></span></div>
+<b>提出先</b>：亡くなった人の、亡くなったときの住所地の税務署 <span class="line" style="min-width:40mm"></span></div>
 <h2>上から順に重ねる</h2><table><tr><th style="width:5mm"></th><th style="width:6mm">順</th><th>書類</th><th style="width:38mm">入れるとき</th></tr>{jb}</table>
 <p class="note">{esc(T['junbanNote'])}</p>
 <h2>留め方と控え</h2><ul style="margin:0;padding-left:5mm">{tm}</ul>
 <h2>出し方</h2><table><tr><th style="width:30mm">出し方</th><th>中身</th></tr>{ds}</table>
+<h2>e-Tax の添付書類</h2><ul style="margin:0;padding-left:5mm">{''.join(f"<li>{esc(t)}</li>" for t in T['etax'])}</ul>
 <h2>{esc(T['fuyo']['h'])}</h2><p style="margin:0">{esc('、'.join(T['fuyo']['items']))}</p>
 <p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in TOJI_KEYS))}（{ck} 確認）</p>"""
     doc = page("相続税申告書の綴じ方と提出のチェック表", "上から順に重ね、重ねたら☐に印を付けます。添付書類はのりづけせず、クリップで留めます。", body)

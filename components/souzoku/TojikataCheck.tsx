@@ -56,7 +56,7 @@ export default function TojikataCheck({ lpId }: { lpId: string }) {
           {T.dashikata.map((x) => (
             <button key={x.key} type="button" aria-pressed={way === x.key} onClick={() => { touch(); setWay(x.key as Way); }}
               className={`rounded-xl px-2 py-2.5 text-[13px] font-bold ring-1 ${way === x.key ? 'bg-sky-700 text-white ring-sky-700' : 'bg-white text-slate-800 ring-slate-300'}`}>
-              {x.h.replace('税務署に', '').replace('で送る', '')}
+              {x.key === 'jisan' ? '持参' : x.key === 'yuso' ? '郵便' : 'e-Tax'}
             </button>
           ))}
         </div>
@@ -94,7 +94,7 @@ export default function TojikataCheck({ lpId }: { lpId: string }) {
         <p className="flex items-start gap-2 rounded-xl bg-orange-50 p-3 text-[14px] font-bold text-orange-900 ring-1 ring-orange-200">
           <CalendarClock size={20} className="mt-0.5 shrink-0" aria-hidden="true" />
           <span>提出の期限：{fmt(ake)}
-            {ake.getTime() !== kigen.getTime() && <span className="block text-[11px] font-bold text-orange-700">10か月目の{fmt(kigen)}が土日・祝日・年末年始のため、次の日</span>}
+            {ake.getTime() !== kigen.getTime() && <span className="block text-[11px] font-bold text-orange-700">10か月目の{fmt(kigen)}が土日・祝日・年末年始のため、休みの明けた日</span>}
             {way === 'yuso' && <span className="block text-[11px] font-bold text-orange-700">郵便なら、この日までの通信日付印があれば間に合う</span>}
             {!shukuKnown(kigen) && <span className="block text-[11px] font-normal text-orange-700">この年の祝日は入っていません。祝日に当たるときは次の日です</span>}
           </span>

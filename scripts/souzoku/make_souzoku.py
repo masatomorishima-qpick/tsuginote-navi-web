@@ -23,7 +23,9 @@
   souzoku-souji-souzoku-kojo.xlsx / .pdf      相次相続控除の計算表（日付と金額から年数・割合・控除の額。2026-11-16）
   souzoku-niwari-kasan.xlsx / .pdf            2割加算の計算表（続柄で判定・相続税の総額から各人の税額と加算額。2026-11-17）
   souzoku-shibou-taishokukin-hikazei.xlsx / .pdf  死亡退職金の非課税の計算表（受け取った人ごとの按分・弔慰金の多すぎる分。2026-11-17）
-  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki・seizen・shokibo・miseinen・souji・niwari・taishoku も同じ）
+  souzoku-zero-en-shinkoku.xlsx / .pdf        相続税の0円申告のチェックリスト（判定・期限・作る表と書類。2026-11-17）
+  souzoku-shinkoku-okure.xlsx / .pdf          延滞税と無申告加算税の計算表（年ごとの割合・期限後の納期限。2026-11-17）
+  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki・seizen・shokibo・miseinen・souji・niwari・taishoku・zero・okure も同じ）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import json
@@ -1808,6 +1810,247 @@ def make_taishoku_pdf():
     _pdf(doc, "souzoku-shibou-taishokukin-hikazei.pdf", "/guide/souzoku/shibou-taishokukin-hikazei", ck)
 
 
+# ---------- 相続税の0円申告（2026-11-17） ----------
+YASUMI_F = 'WORKDAY({k}-1,1,休み!$A$2:$A$200)'
+
+
+def add_yasumi_sheet(wb):
+    """期限の繰り下げに使う休みの日の表（12/29〜1/3 と、内閣府の表にある祝日）。WORKDAY の3つ目の引数に渡す。"""
+    import datetime as _dt
+    ws = wb.create_sheet("休み")
+    days = set()
+    for y in range(2019, 2032):
+        for d in (29, 30, 31):
+            days.add(_dt.date(y, 12, d))
+        for d in (1, 2, 3):
+            days.add(_dt.date(y, 1, d))
+    for t in DATA["shukujitsu"]["days"]:
+        days.add(_dt.date.fromisoformat(t))
+    ws.cell(row=1, column=1, value="休みの日（12/29〜1/3 と祝日。" + DATA["shukujitsu"]["note"] + "）").font = B
+    for i, d in enumerate(sorted(days)):
+        c = ws.cell(row=2 + i, column=1, value=d)
+        c.number_format = "yyyy/m/d"
+    ws.column_dimensions["A"].width = 60
+    ws.sheet_state = "hidden"
+
+
+def make_zero_xlsx():
+    Zd = DATA["zero"]
+    Z = DATA["zei"]
+    ck = Zd["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "0円申告"
+    widths(ws, [4, 44, 40, 12])
+    put(ws, 1, 1, "相続税の0円申告のチェックリスト", H, border=False)
+    put(ws, 2, 1, "オレンジの欄に入れると、申告が要るかの判定と期限が出ます。当てはまる行に「○」を選ぶと、作る表と付ける書類に「要る」が出ます。", S, border=False)
+    ws.merge_cells("A2:D2")
+    ws.row_dimensions[2].height = 30
+    dv = DataValidation(type="list", formula1='"○"', allow_blank=True)
+    ws.add_data_validation(dv)
+    rows = [("正味の遺産額（円。特例を使う前。借金・葬式費用は引く）", 80000000, "#,##0"), ("法定相続人の数（人）", 2, None), ("亡くなったことを知った日（例：2026/1/6）", None, "yyyy/m/d")]
+    for k, (h, v, f) in enumerate(rows):
+        put(ws, 4 + k, 2, h, B, HEAD_FILL)
+        put(ws, 4 + k, 3, v, B, IN_FILL, fmt=f)
+    opts = [("haigusha", "配偶者の税額の軽減を使う", "○"), ("takuchi", "小規模宅地等の特例を使う", None), ("saimu", "借金や葬式費用を差し引く", None), ("mibunkatsu", "期限までに分け方が決まりそうにない", None)]
+    cell = {}
+    for k, (key, h, v) in enumerate(opts):
+        put(ws, 7 + k, 2, h, B, HEAD_FILL)
+        c = put(ws, 7 + k, 3, v, B, IN_FILL)
+        dv.add(c)
+        cell[key] = c.coordinate
+    put(ws, 12, 2, "基礎控除（自動）", B, HEAD_FILL)
+    put(ws, 12, 3, f"={Z['kiso']['base']}+{Z['kiso']['per']}*C5", B, OK_FILL, fmt="#,##0")
+    put(ws, 13, 2, "判定（自動）", B, HEAD_FILL)
+    put(ws, 13, 3, f'=IF(C4="","",IF(C4<=C12,"申告は要らない",IF(OR({cell["haigusha"]}="○",{cell["takuchi"]}="○"),"0円申告が要る（特例は申告書に書いて出すのが条件）","申告して納める")))', B, OK_FILL)
+    put(ws, 14, 2, "申告の期限（自動）", B, HEAD_FILL)
+    put(ws, 14, 3, '=IF(C6="","",' + kigen_f("C6", Zd["kigenN"]) + ')', B, OK_FILL, fmt="yyyy/m/d")
+    put(ws, 15, 2, "土日・祝日・年末年始に当たるときの期限（自動。祝日は2026・2027年の分）", B, HEAD_FILL)
+    put(ws, 15, 3, '=IF(C14="","",' + YASUMI_F.format(k="C14") + ')', B, OK_FILL, fmt="yyyy/m/d")
+    for r in range(4, 16):
+        ws.row_dimensions[r].height = 30
+    r = 17
+    for i, t in enumerate(["順", "作る表", "作るとき", "要るか"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    label = {"always": "必ず", "takuchi": "小規模宅地等の特例", "haigusha": "配偶者の税額の軽減", "saimu": "借金・葬式費用", "mibunkatsu": "分け方が決まらない"}
+    for k, x in enumerate(Zd["hyo"]):
+        rr = r + 1 + k
+        put(ws, rr, 1, k + 1)
+        put(ws, rr, 2, x["no"] + "\n" + x["h"], N)
+        put(ws, rr, 3, label[x["when"]], N)
+        put(ws, rr, 4, "要る" if x["when"] == "always" else f'=IF({cell[x["when"]]}="○","要る","－")', B, OK_FILL)
+        ws.row_dimensions[rr].height = 32
+    r = r + len(Zd["hyo"]) + 2
+    for i, t in enumerate(["", "付ける書類", "メモ", "要るか"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    for k, x in enumerate(Zd["shorui"]):
+        rr = r + 1 + k
+        put(ws, rr, 1, k + 1)
+        put(ws, rr, 2, x["h"], N)
+        put(ws, rr, 3, x["d"], N)
+        put(ws, rr, 4, "要る" if x["when"] == "always" else f'=IF({cell[x["when"]]}="○","要る","－")', B, OK_FILL)
+        ws.row_dimensions[rr].height = 40
+    r = r + len(Zd["shorui"]) + 2
+    notes = [Zd["kotae"], Zd["hyoNote"]] + [t["h"] + "：" + t["d"] for t in Zd["tsumazuki"]] + ["特例を使った後に税額が本当に0円になるかは、この表では計算しません。"]
+    for t in notes:
+        put(ws, r, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+        ws.row_dimensions[r].height = 44
+        r += 1
+    keys = ["nta4102r8", "nta4205r8", "nta4124", "nta4158r8", "ntaShoruiIchiran", "ntaShikataKisai", "ntaYohiShinkoku"]
+    put(ws, r, 1, "出典：" + "／".join(SRC[k]["name"] for k in keys) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+    ws.row_dimensions[r].height = 70
+    put(ws, r + 1, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/zero-en-shinkoku", S, border=False)
+    ws.page_setup.orientation = "portrait"
+    ws.page_setup.fitToWidth = 1
+    add_yasumi_sheet(wb)
+    wb.save(OUT / "souzoku-zero-en-shinkoku.xlsx")
+
+
+def make_zero_pdf():
+    Zd = DATA["zero"]
+    ck = Zd["checkedAt"].replace("-", "/")
+    label = {"always": "必ず", "takuchi": "小規模宅地等の特例", "haigusha": "配偶者の税額の軽減", "saimu": "借金・葬式費用", "mibunkatsu": "分け方が決まらない"}
+    ht = "".join(f"<tr><td>{esc(x['d'])}</td><td><b>{esc(x['h'])}</b></td></tr>" for x in Zd["hantei"])
+    hy = "".join(f"<tr><td>☐</td><td>{k + 1}</td><td><b>{esc(x['no'])}</b> <small>{esc(x['h'])}</small></td><td>{esc(label[x['when']])}</td></tr>" for k, x in enumerate(Zd["hyo"]))
+    sh = "".join(f"<tr><td>☐</td><td><b>{esc(x['h'])}</b><br><small>{esc(x['d'])}</small></td><td>{esc(label[x['when']])}</td></tr>" for x in Zd["shorui"])
+    tz = "".join(f"<li><b>{esc(t['h'])}</b>：{esc(t['d'])}</li>" for t in Zd["tsumazuki"])
+    keys = ["nta4102r8", "nta4205r8", "nta4124", "nta4158r8", "ntaShoruiIchiran", "ntaShikataKisai", "ntaYohiShinkoku"]
+    body = f"""<style>small{{color:#64748b;font-size:8pt}}</style>
+<div class="box"><b>判定</b>：特例を使う前の遺産 <span class="line" style="min-width:28mm"></span>円　基礎控除 3,000万円＋600万円×<span class="line" style="min-width:8mm"></span>人＝<span class="line" style="min-width:28mm"></span>円<br>
+<b>期限</b>：知った日 <span class="line" style="min-width:28mm"></span> の翌日から10か月 → <span class="line" style="min-width:28mm"></span>（土日・祝日・年末年始なら翌日）</div>
+<h2>申告が要るか</h2><table><tr><th>特例を使う前の遺産の額</th><th style="width:40mm">申告</th></tr>{ht}</table>
+<h2>作る表（上から順に）</h2><table><tr><th style="width:5mm"></th><th style="width:6mm">順</th><th>表</th><th style="width:40mm">作るとき</th></tr>{hy}</table>
+<p class="note">{esc(Zd['hyoNote'])}</p>
+<h2>付ける書類</h2><table><tr><th style="width:5mm"></th><th>書類</th><th style="width:40mm">要るとき</th></tr>{sh}</table>
+<h2>間違えやすい所</h2><ul style="margin:0;padding-left:5mm">{tz}</ul>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in keys))}（{ck} 確認）</p>"""
+    doc = page("相続税の0円申告のチェックリスト", "特例で税額が0円でも、基礎控除を超えるなら申告が要ります。作り終えた表とそろえた書類の☐に印を付けます。", body)
+    _pdf(doc, "souzoku-zero-en-shinkoku.pdf", "/guide/souzoku/zero-en-shinkoku", ck)
+
+
+# ---------- 相続税の申告期限を過ぎたときの延滞税・無申告加算税（2026-11-17） ----------
+def make_okure_xlsx():
+    Od = DATA["okure"]
+    ck = Od["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "延滞税と加算税"
+    widths(ws, [44, 18, 14, 12, 12, 14])
+    put(ws, 1, 1, "相続税の延滞税と無申告加算税の計算表", H, border=False)
+    put(ws, 2, 1, "オレンジの欄に入れると、延滞税（年ごとの割合）と無申告加算税が出ます。例は「1,000万円を90日遅れて納めた（期限内に申告、令和3年）」。", S, border=False)
+    ws.merge_cells("A2:F2")
+    ws.row_dimensions[2].height = 30
+    dv_k = DataValidation(type="list", formula1='"期限後,期限内"', allow_blank=False)
+    dv_c = DataValidation(type="list", formula1='"通知の前,通知の後,指摘の後"', allow_blank=False)
+    ws.add_data_validation(dv_k)
+    ws.add_data_validation(dv_c)
+    import datetime as _dt
+    rei = Od["rei"]
+    rows = [("亡くなったことを知った日", _dt.date.fromisoformat(rei["shitta"]), "yyyy/m/d"),
+            ("申告して納める日", _dt.date.fromisoformat(rei["pay"]), "yyyy/m/d"),
+            ("納める相続税（円）", rei["tax"], "#,##0"),
+            ("申告は（期限後・期限内＝納めるのだけ遅れた）", "期限内", None),
+            ("税務署の調査は（通知の前・通知の後・指摘の後）", "通知の前", None)]
+    for k, (h, v, f) in enumerate(rows):
+        put(ws, 4 + k, 1, h, B, HEAD_FILL)
+        c = put(ws, 4 + k, 2, v, B, IN_FILL, fmt=f)
+        if k == 3:
+            dv_k.add(c)
+        if k == 4:
+            dv_c.add(c)
+    calc = [("申告の期限（知った日の翌日から10か月）", "=" + kigen_f("B4", Od["kigenN"]), "yyyy/m/d"),
+            ("休みに当たるときの期限（土日・祝日・年末年始。祝日は2026・2027年の分）", "=" + YASUMI_F.format(k="B10"), "yyyy/m/d"),
+            ("納期限（期限後の申告は申告した日）", '=IF(B7="期限後",B5,B11)', "yyyy/m/d"),
+            ("低い割合の最後の日（納期限の翌日から2か月）", "=" + kigen_f("B12", 2), "yyyy/m/d"),
+            ("もとの税額（1万円未満切り捨て）", "=ROUNDDOWN(B6,-4)", "#,##0"),
+            ("遅れた日数", "=MAX(0,B5-B11)", "0")]
+    for k, (h, f, fm) in enumerate(calc):
+        put(ws, 10 + k, 1, h, B, HEAD_FILL)
+        put(ws, 10 + k, 2, f, B, OK_FILL, fmt=fm)
+    for r in range(4, 16):
+        ws.row_dimensions[r].height = 28
+    r = 17
+    for i, t in enumerate(["年", "2か月まで（年%）", "2か月の後（年%）", "2か月までの日数", "2か月の後の日数", "延滞税（1円未満切り捨て）"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    years = [(w["y"], w["lo"], w["hi"], False) for w in Od["wariai"]]
+    last = Od["wariai"][-1]
+    years.append((last["y"] + 1, last["lo"], last["hi"], True))
+    for k, (y, lo, hi, kari) in enumerate(years):
+        rr = r + 1 + k
+        ys = f"MAX($B$11+1,DATE({y},1,1))"
+        ye = f"MIN($B$5,DATE({y},12,31))"
+        put(ws, rr, 1, f"{y}年" + ("（未公表。前の年の割合で仮に）" if kari else ""), N)
+        put(ws, rr, 2, lo, B, IN_FILL if kari else None)
+        put(ws, rr, 3, hi, B, IN_FILL if kari else None)
+        put(ws, rr, 4, f"=MAX(0,MIN({ye},$B$13)-{ys}+1)", N, OK_FILL)
+        put(ws, rr, 5, f"=MAX(0,{ye}-MAX({ys},$B$13+1)+1)", N, OK_FILL)
+        put(ws, rr, 6, f"=ROUNDDOWN(ROUND($B$14*B{rr}*D{rr}/36500,6),0)+ROUNDDOWN(ROUND($B$14*C{rr}*E{rr}/36500,6),0)", N, OK_FILL, fmt="#,##0")
+    end = r + len(years)
+    r = end + 2
+    put(ws, r, 1, "延滞税（100円未満切り捨て、1,000円未満は0）", B, HEAD_FILL)
+    fy = Od["wariai"][0]["y"]
+    put(ws, r, 2, f'=IF(YEAR($B$11)<{fy},"{fy}年より前は計算しません",IF(ROUNDDOWN(SUM(F{18}:F{end}),-2)<1000,0,ROUNDDOWN(SUM(F{18}:F{end}),-2)))', B, OK_FILL, fmt="#,##0")
+    shin = "$B$11>=DATE(2024,1,1)"
+    b = "$B$14"
+    t2 = f"MIN({b},500000)*0.1+MAX(0,MIN({b},IF({shin},3000000,10^15))-500000)*0.15+IF({shin},MAX(0,{b}-3000000)*0.25,0)"
+    t3 = f"MIN({b},500000)*0.15+MAX(0,MIN({b},IF({shin},3000000,10^15))-500000)*0.2+IF({shin},MAX(0,{b}-3000000)*0.3,0)"
+    raw = f'IF(OR($B$7<>"期限後",$B$15=0),0,IF($B$8="通知の前",{b}*0.05,IF($B$8="通知の後",{t2},{t3})))'
+    put(ws, r + 1, 1, "無申告加算税（100円未満切り捨て、5,000円未満は0）", B, HEAD_FILL)
+    put(ws, r + 1, 2, f"=IF(ROUNDDOWN({raw},-2)<5000,0,ROUNDDOWN({raw},-2))", B, OK_FILL, fmt="#,##0")
+    put(ws, r + 2, 1, "相続税に足して納める額", B, HEAD_FILL)
+    put(ws, r + 2, 2, f"=IFERROR(B{r}+B{r + 1},\"\")", B, OK_FILL, fmt="#,##0")
+    for k in range(3):
+        ws.row_dimensions[r + k].height = 28
+    r += 4
+    notes = [Od["kotae"], "延滞税＝もとの税額×割合×日数÷365。" + Od["nissu"], Od["hasu"], Od["wariaiNote"], Od["kasanNote"], Od["menjo"]["h"] + "：" + Od["menjo"]["d"], DATA["shukujitsu"]["note"]] + [t["h"] + "：" + t["d"] for t in Od["tsumazuki"]] + ["期限後の申告は、申告した日に納める前提で計算します。重加算税は入れていません。"]
+    for t in notes:
+        put(ws, r, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=6)
+        ws.row_dimensions[r].height = 44
+        r += 1
+    keys = ["nta9205", "ntaEntaiWariai", "ntaEntaiKeisan", "nta2024", "tsusokuHo", "nta4205r8", "ntaKasanSouzoku"]
+    put(ws, r, 1, "出典：" + "／".join(SRC[k]["name"] for k in keys) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=6)
+    ws.row_dimensions[r].height = 70
+    put(ws, r + 1, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/shinkoku-okure", S, border=False)
+    ws.page_setup.orientation = "portrait"
+    ws.page_setup.fitToWidth = 1
+    add_yasumi_sheet(wb)
+    wb.save(OUT / "souzoku-shinkoku-okure.xlsx")
+
+
+def make_okure_pdf():
+    Od = DATA["okure"]
+    ck = Od["checkedAt"].replace("-", "/")
+    wr = "".join(f"<tr><td>{w['y']}年（令和{w['y'] - 2018}年）</td><td>年{w['lo']}%</td><td>年{w['hi']}%</td></tr>" for w in reversed(Od["wariai"]))
+    ks = ""
+    for k in Od["kasan"]:
+        if len(k["rates"]) == 1:
+            ks += f"<tr><td>{esc(k['h'])}</td><td colspan='3' style='text-align:center'><b>{k['rates'][0]['r']}%</b></td></tr>"
+        else:
+            ks += f"<tr><td>{esc(k['h'])}</td>" + "".join(f"<td><b>{x['r']}%</b></td>" for x in k["rates"]) + "</tr>"
+    tz = "".join(f"<li><b>{esc(t['h'])}</b>：{esc(t['d'])}</li>" for t in Od["tsumazuki"])
+    rei = Od["rei"]
+    keys = ["nta9205", "ntaEntaiWariai", "ntaEntaiKeisan", "nta2024", "tsusokuHo", "nta4205r8", "ntaKasanSouzoku"]
+    body = f"""<div class="box"><b>書き込み欄</b>：期限 <span class="line" style="min-width:26mm"></span>　納める日 <span class="line" style="min-width:26mm"></span>　遅れ <span class="line" style="min-width:12mm"></span>日　もとの税額（1万円未満切り捨て）<span class="line" style="min-width:26mm"></span>円</div>
+<h2>延滞税の割合</h2><table><tr><th>年</th><th>納期限の翌日から2か月まで</th><th>2か月の後</th></tr>{wr}</table>
+<p class="note">{esc(Od['wariaiNote'])}期限後の申告は、申告書を出した日が納期限です。</p>
+<h2>計算の式</h2>
+<p style="font-size:11pt;text-align:center;margin:1mm 0"><b>延滞税 ＝ もとの税額 × 割合 × 日数 ÷ 365</b></p>
+<p class="note">{esc(Od['nissu'])}{esc(Od['hasu'])}</p>
+<p class="note">例：{esc(rei['h'])}。期限 2021年3月15日。2.5%×61日＝{rei['lo']:,}円、8.8%×29日＝{rei['hi']:,}円、合計の100円未満を切り捨てて {rei['total']:,}円。</p>
+<h2>無申告加算税の割合</h2><table><tr><th>申告した時</th><th>50万円まで</th><th>300万円まで</th><th>300万円超</th></tr>{ks}</table>
+<p class="note">{esc(Od['kasanNote'])}</p>
+<div class="box"><b>{esc(Od['menjo']['h'])}</b><br>{esc(Od['menjo']['d'])}</div>
+<h2>損をしやすい所</h2><ul style="margin:0;padding-left:5mm">{tz}</ul>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in keys))}（{ck} 確認）</p>"""
+    doc = page("相続税の延滞税と無申告加算税の計算表", "申告の期限を過ぎたときに足して納める額を、年ごとの割合で計算します。", body)
+    _pdf(doc, "souzoku-shinkoku-okure.pdf", "/guide/souzoku/shinkoku-okure", ck)
+
+
+
 if __name__ == "__main__":
     import sys
     if sys.argv[1:] == ["shinkoku"]:
@@ -1818,7 +2061,7 @@ if __name__ == "__main__":
         make_hikazei_xlsx()
         make_hikazei_pdf()
         sys.exit(0)
-    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki", "jibun", "shinkokuTouki", "seizen", "shokibo", "miseinen", "souji", "niwari", "taishoku"):
+    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki", "jibun", "shinkokuTouki", "seizen", "shokibo", "miseinen", "souji", "niwari", "taishoku", "zero", "okure"):
         for name in sys.argv[1:]:
             globals()[f"make_{name}_xlsx"]()
             globals()[f"make_{name}_pdf"]()

@@ -42,6 +42,8 @@ const GROUPS = [
       { href: '/guide/souzoku/niwari-kasan', t: '相続税の2割加算', s: '対象かの判定と足す額' },
       { href: '/guide/souzoku/shinkoku-jibun', t: '相続税の申告を自分でする手順', s: '期限と、申告書の表を作る順' },
       { href: '/guide/souzoku/shinkoku-shorui-checklist', t: '相続税の申告の必要書類', s: '状況を選ぶと一覧に' },
+      { href: '/guide/souzoku/zero-en-shinkoku', t: '相続税の0円申告', s: '特例で0円でも申告が要るかの判定' },
+      { href: '/guide/souzoku/shinkoku-okure', t: '申告期限を過ぎたとき', s: '延滞税と無申告加算税を日付で計算' },
       { href: '/guide/souzoku/seizen-zouyo-kasan', t: '生前贈与加算の計算', s: '7年はいつからかと足す額' },
       { href: '/guide/souzoku/shokibo-takuchi-shorui', t: '小規模宅地等の特例の必要書類', s: '形を選ぶと書類と減る額' },
       { href: '/guide/souzoku/miseinen-shougaisha-kojo', t: '未成年者控除・障害者控除', s: '生年月日で額を計算' },

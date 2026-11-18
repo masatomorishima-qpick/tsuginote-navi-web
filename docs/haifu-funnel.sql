@@ -19,6 +19,8 @@ select
   count(distinct visit_id) filter (where event_name = 'partner_click')                                 as 紹介先の押下,
   -- AI の答えから来た閲覧（2026-11-11 から ref を記録。#95 の取り込み後）
   count(distinct visit_id) filter (where event_name = 'lp_view' and ref ~ '(chatgpt\.com|openai\.com|perplexity\.ai|gemini\.google\.com|copilot\.microsoft\.com|claude\.ai)') as AIから来た閲覧,
+  -- 検索から来た閲覧（2026-11-19 追加。ref が検索の画面のもの。自分の確認・巡回などを分母から分けるため）
+  count(distinct visit_id) filter (where event_name = 'lp_view' and ad = '' and ref ~ '(google\.|bing\.com|search\.yahoo\.co\.jp|duckduckgo\.com)') as 検索から来た閲覧,
   string_agg(distinct split_part(cta_id, '-', 1), ',') filter (where event_name = 'partner_click')     as 押された紹介先
 from e
 group by 1

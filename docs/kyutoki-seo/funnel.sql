@@ -3,7 +3,8 @@
 -- 自然流入＝広告の印（gclid・utm_source）がない閲覧。
 with e as (
   select lp_id, event_name, visit_id, cta_id, created_at at time zone 'Asia/Tokyo' as jst,
-         coalesce(metadata->>'gclid', metadata->>'utm_source', '') as ad
+         coalesce(metadata->>'gclid', metadata->>'utm_source', '') as ad,
+         coalesce(metadata->>'ref', '') as ref
   from public.lp_event_logs
   where lp_id like 'kyutoki-%'
     and lp_id not in ('kyutoki-mitsumori', 'kyutoki-shuri')
@@ -14,6 +15,8 @@ select
   lp_id as 記事,
   count(distinct visit_id) filter (where event_name = 'lp_view' and ad = '')                               as 自然流入の閲覧,
   count(distinct visit_id) filter (where event_name = 'lp_view' and ad <> '')                              as 広告からの閲覧,
+  -- 検索から来た閲覧（2026-11-20 追加。ref が検索の画面のもの。11/13〜19 の交換費用は閲覧32でも Search Console のクリック0だったため、押下率の分母を分ける）
+  count(distinct visit_id) filter (where event_name = 'lp_view' and ad = '' and ref ~ '(google\.|bing\.com|search\.yahoo\.co\.jp|duckduckgo\.com)') as 検索から来た閲覧,
   count(distinct visit_id) filter (where event_name = 'lp_internal_click' and cta_id like '/downloads/kyutoki-%') as 配布物の押下,
   count(distinct visit_id) filter (where event_name = 'lp_internal_click'
                                      and (cta_id = '/kyutoki/mitsumori' or cta_id like '/kyutoki/mitsumori?%' or cta_id like '/kyutoki/mitsumori#%')) as B_への押下,

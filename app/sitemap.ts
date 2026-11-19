@@ -564,6 +564,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    // 離婚したときの保険の見直し（2026-11-20 作成、docs/seisaku-queue.md の T35）。
+    {
+      url: `${baseUrl}/guide/shisan-kanri/hoken-minaoshi-rikon`,
+      lastModified: new Date("2026-11-20T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // 子どもが独立したときの保険の見直し（2026-11-19 作成、docs/seisaku-queue.md の T34）。
     {
       url: `${baseUrl}/guide/shisan-kanri/hoken-minaoshi-dokuritsu`,

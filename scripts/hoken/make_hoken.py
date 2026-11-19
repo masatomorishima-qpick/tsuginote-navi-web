@@ -11,7 +11,8 @@
   hoken-minaoshi-teinen.xlsx / .pdf   定年退職のときの見直しチェックリスト（退職日から健康保険の期限は自動・健康保険3つの表。2026-11-17）
   hoken-minaoshi-danshin.xlsx / .pdf   住宅ローンの団信と見直しのチェックリスト（減らせる死亡保障の目安は自動。2026-11-19）
   hoken-minaoshi-dokuritsu.xlsx / .pdf   子どもが独立したときの見直しチェックリスト（遺族基礎年金が終わる日は自動・減らす方法の表。2026-11-19）
-  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken・shussan・kekkon・teinen も同じ。kekkon・teinen・danshin・dokuritsu は名前を付けたときだけ作る）
+  hoken-minaoshi-rikon.xlsx / .pdf   離婚したときの見直しチェックリスト（必要な死亡保障の目安は自動。いまの決まりでは子に生計を同じくする父母がいると遺族基礎年金は0、2028年4月の見直し後も並べる。2026-11-20）
+  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken・shussan・kekkon・teinen も同じ。kekkon・teinen・danshin・dokuritsu・rikon は名前を付けたときだけ作る）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import html
@@ -918,6 +919,113 @@ def make_dokuritsu_pdf():
     _pdf_out(doc, "hoken-minaoshi-dokuritsu.pdf", "/guide/shisan-kanri/hoken-minaoshi-dokuritsu", ck)
 
 
+# ---------- 離婚したときの保険の見直し（2026-11-20） ----------
+RIKON_KEYS = ["jiliShohenkou", "nenkinIzokuKisoR8", "mhlwKaiseiGaiyo", "jiliIzokuMinaoshi", "jiliHitsuyo", "jiliView", "jiliMinaoshi", "mhlwKougaku", "nenkinBunkatsu", "nenkinBunkatsuKigen"]
+
+
+def make_rikon_xlsx():
+    from datetime import date
+    from openpyxl.worksheet.datavalidation import DataValidation
+    P = DATA["rikon"]
+    Z = P["izoku"]
+    ck = P["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "見直しチェック"
+    for i, w in enumerate([4, 46, 46, 8], 1):
+        ws.column_dimensions[get_column_letter(i)].width = w
+    put(ws, 1, 1, "離婚したときの 生命保険の見直しチェックリスト", H, border=False)
+    put(ws, 2, 1, "オレンジの欄に子の生年月日と生活費などを入れると、自分が亡くなったときに必要な死亡保障の目安が出ます（例の数字は入れ替えてください）。", S, border=False)
+    ws.merge_cells("A2:D2")
+    ws.row_dimensions[2].height = 30
+    END = 'IF(C{r}="","",DATE(YEAR(EDATE(C{r},216)-1)+IF(MONTH(EDATE(C{r},216)-1)>=4,1,0),3,31))'
+    rows = [
+        (4, "子1人目の生年月日", date(2018, 6, 15), "yyyy/m/d"),
+        (5, "子2人目の生年月日（いなければ空欄）", date(2015, 9, 1), "yyyy/m/d"),
+        (6, "子3人目の生年月日（いなければ空欄）", None, "yyyy/m/d"),
+        (7, "自分が亡くなったら子を育てるのは", "元配偶者", None),
+        (8, "自分の保険で残したい子の生活費（月・万円）", 15, None),
+        (9, "末の子が独立する年齢（歳。その年度の3月31日）", 22, None),
+        (10, "教育費・葬儀などのまとまったお金（万円）", 300, None),
+        (11, "預貯金・勤務先の死亡退職金など（万円）", 0, None),
+        (12, "計算する日（ふつうは今日）", "=TODAY()", "yyyy/m/d"),
+    ]
+    for r, label, v, fmt in rows:
+        put(ws, r, 2, label, B, HEAD)
+        put(ws, r, 3, v, B, IN, fmt=fmt)
+    dv = DataValidation(type="list", formula1='"元配偶者,祖父母など"', allow_blank=False)
+    ws.add_data_validation(dv)
+    dv.add(ws["C7"])
+    out = [
+        (13, "末の子が独立する日（自動）", '=IF(MAX(C4:C6)=0,"",DATE(YEAR(EDATE(MAX(C4:C6),C9*12)-1)+IF(MONTH(EDATE(MAX(C4:C6),C9*12)-1)>=4,1,0),3,31))', "yyyy/m/d"),
+        (14, "独立までの月数（来月から・自動）", '=IF(C13="","",MAX(0,(YEAR(C13)-YEAR(C12))*12+MONTH(C13)-MONTH(C12)))', None),
+        (15, "支出の見込み（円・自動）", '=IF(C14="","",C8*10000*C14+C10*10000)', "#,##0"),
+        (16, f"子の遺族基礎年金の合計（円・{Z['nendo']}の額・いまの決まり・自動）", "=IF(C7=\"元配偶者\",0,'遺族基礎年金の計算'!F34)", "#,##0"),
+        (17, "必要な死亡保障の目安（円・いまの決まり・自動）", '=IF(C15="","",MAX(0,C15-C16-C11*10000))', "#,##0"),
+        (18, "見直し後（2028年4月から予定）の決まりで数えた目安（円・自動）", "=IF(C15=\"\",\"\",MAX(0,C15-'遺族基礎年金の計算'!F34-C11*10000))", "#,##0"),
+    ]
+    for r, label, f, fmt in out:
+        put(ws, r, 2, label, B, HEAD)
+        put(ws, r, 3, f, B, OK, fmt=fmt)
+    for r in range(4, 19):
+        ws.row_dimensions[r].height = 28
+    put(ws, 19, 1, "いまの決まりでは、子に生計を同じくする父または母がいる間は、子に遺族基礎年金は支給されません。元配偶者が引き取って一緒に暮らすときは0円で数えます。2028年4月からは、父または母と一緒に暮らしていても子が受け取れるように見直される予定です（厚生労働省）。" + P["keisanNote"], S, border=False)
+    ws.merge_cells("A19:D19")
+    ws.row_dimensions[19].height = 70
+    r = _check_sheet(ws, 21, P)
+    for t in P["izokuNote"]:
+        put(ws, r, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+        ws.row_dimensions[r].height = 32
+        r += 1
+    _foot(ws, r + 1, RIKON_KEYS, ck, "/guide/shisan-kanri/hoken-minaoshi-rikon")
+
+    w2 = wb.create_sheet("遺族基礎年金の計算")
+    for i, w in enumerate([14, 14, 10, 10, 14, 16], 1):
+        w2.column_dimensions[get_column_letter(i)].width = w
+    put(w2, 1, 1, "子が受け取る遺族基礎年金（年度ごと・自動。祖父母などが育てるとき）", B, border=False)
+    for i, t in enumerate(["年度の始め", "年度の終わり", "対象の子", "月数", "年額", "その年度の額"], 1):
+        put(w2, 3, i, t, B, HEAD)
+    base, add2, add3 = Z["base"], Z["add2"], Z["add3"]
+    for k in range(30):
+        rr = 4 + k
+        a = "=DATE(YEAR('見直しチェック'!C12),MONTH('見直しチェック'!C12)+1,1)" if k == 0 else f"=B{rr - 1}+1"
+        put(w2, rr, 1, a, N, fmt="yyyy/m/d")
+        put(w2, rr, 2, f"=DATE(YEAR(A{rr})+IF(MONTH(A{rr})>=4,1,0),3,31)", N, fmt="yyyy/m/d")
+        ends = "+".join(f"IF('見直しチェック'!C{c}=\"\",0,IF({END.format(r=c).replace('C' + str(c), chr(39) + '見直しチェック' + chr(39) + '!C' + str(c))}>=B{rr},1,0))" for c in (4, 5, 6))
+        put(w2, rr, 3, "=" + ends, N)
+        put(w2, rr, 4, f"=(YEAR(B{rr})-YEAR(A{rr}))*12+MONTH(B{rr})-MONTH(A{rr})+1", N)
+        put(w2, rr, 5, f"=IF(C{rr}=0,0,{base}+IF(C{rr}>=2,{add2},0)+{add3}*MAX(0,C{rr}-2))", N, fmt="#,##0")
+        put(w2, rr, 6, f"=ROUND(E{rr}*D{rr}/12,0)", N, fmt="#,##0")
+    put(w2, 34, 5, "合計", B, HEAD)
+    put(w2, 34, 6, "=SUM(F4:F33)", B, OK, fmt="#,##0")
+    w2.page_setup.fitToWidth = 1
+    wb.save(OUT / "hoken-minaoshi-rikon.xlsx")
+
+
+def make_rikon_pdf():
+    P = DATA["rikon"]
+    Z = P["izoku"]
+    ck = P["checkedAt"].replace("-", "/")
+    ch = "".join(f"<tr><td style='width:5mm'>□</td><td><b>{esc(c['h'])}</b><br><small>{esc(c['g'])}｜{esc(c['d'])}</small></td><td style='width:40mm'></td></tr>" for c in P["check"])
+    notes = "".join(f"<li>{esc(t)}</li>" for t in P["izokuNote"])
+    doc = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>{PDF_CSS}</style></head><body>
+<h1>離婚したときの 生命保険の見直しチェックリスト</h1><p class="sub">書き込んで、確かめたら□に印を付けます。</p>
+<h2>① 必要な死亡保障の目安</h2><p class="note">{esc(P["hitsuyo"])}</p>
+<table><tr><th style="width:55%">項目</th><th>書く</th></tr>
+<tr><td>自分が亡くなったら子を育てるのは（元配偶者／祖父母など）</td><td class="w"></td></tr>
+<tr><td>A 残したい子の生活費（月の額 × 来月から末の子が独立する年度の3月までの月数）</td><td class="w"></td></tr>
+<tr><td>B 教育費・葬儀などのまとまったお金</td><td class="w"></td></tr>
+<tr><td>C 子の遺族基礎年金（年額 × 子が18歳になった年度の3月までの年数。子の数が減る年に注意。いまの決まりでは、元配偶者が引き取って一緒に暮らすなら0）</td><td class="w"></td></tr>
+<tr><td>D 預貯金・勤務先の死亡退職金など</td><td class="w"></td></tr>
+<tr><td><b>必要な死亡保障の目安 ＝ A ＋ B − C − D</b></td><td class="w"></td></tr></table>
+<p class="note">子が受け取る遺族基礎年金（{esc(Z['nendo'])}）：子1人 年{Z['base']:,}円、2人 年{Z['base'] + Z['add2']:,}円、3人 年{Z['base'] + Z['add2'] + Z['add3']:,}円を子の数で分ける。子は18歳になった年度の3月31日まで。</p>
+<div class="box"><b>離婚後の子の遺族年金で知っておくこと</b><ul>{notes}</ul></div>
+<h2>② 確かめる8つの点</h2><table><tr><th style="width:5mm"></th><th>確かめること</th><th style="width:40mm">メモ</th></tr>{ch}</table>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in RIKON_KEYS))}（{ck} 確認）</p></body></html>"""
+    _pdf_out(doc, "hoken-minaoshi-rikon.pdf", "/guide/shisan-kanri/hoken-minaoshi-rikon", ck)
+
+
 if __name__ == "__main__":
     import sys
     only = sys.argv[1] if len(sys.argv) > 1 else ""
@@ -945,5 +1053,8 @@ if __name__ == "__main__":
     if only == "dokuritsu":
         make_dokuritsu_xlsx()
         make_dokuritsu_pdf()
+    if only == "rikon":
+        make_rikon_xlsx()
+        make_rikon_pdf()
     for f in sorted(OUT.glob("hoken-*")):
         print(f.name, f.stat().st_size)

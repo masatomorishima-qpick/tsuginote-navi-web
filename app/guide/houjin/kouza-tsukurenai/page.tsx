@@ -4,7 +4,7 @@ import { ArrowRight, Building2, CalendarDays, CheckCircle2, Coins, FileSpreadshe
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
-import HenshuNote from '@/components/guide/HenshuNote';
+import { KakiteLine, KakiteNote, KAKITE_LD } from '@/components/houjin/Kakite';
 import HoujinExit from '@/components/houjin/HoujinExit';
 import KouzaCheck from '@/components/houjin/KouzaCheck';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
@@ -61,7 +61,7 @@ function src(keys: readonly SourceKey[]) {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', about: { '@type': 'Thing', name: '法人口座の審査' }, mentions: ['GMOあおぞらネット銀行', 'ドコモSMTBネット銀行', 'PayPay銀行'].map((name) => ({ '@type': 'BankOrCreditUnion', name })), datePublished: `${CHECKED_AT}T18:00:00+09:00`, dateModified: `${CHECKED_AT}T18:00:00+09:00`, mainEntityOfPage: `${SITE_URL}${PATH}` },
+    { '@type': 'Article', author: KAKITE_LD, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', about: { '@type': 'Thing', name: '法人口座の審査' }, mentions: ['GMOあおぞらネット銀行', 'ドコモSMTBネット銀行', 'PayPay銀行'].map((name) => ({ '@type': 'BankOrCreditUnion', name })), datePublished: `${CHECKED_AT}T18:00:00+09:00`, dateModified: `${CHECKED_AT}T18:00:00+09:00`, mainEntityOfPage: `${SITE_URL}${PATH}` },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: '法人成り', item: `${SITE_URL}/guide/houjin` },
@@ -98,6 +98,7 @@ export default function Page() {
             <p className="text-[13px] font-bold text-sky-700">運営会社の実例</p>
             <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">法人口座が作れない<br /><span className="text-[22px] text-orange-600">3行に申し込み、通ったのは1行</span></h1>
             <p className="text-[14px] text-slate-600">設立直後の合同会社で、法人口座を3つの銀行に申し込んだ結果です。</p>
+            <KakiteLine />
           </div>
           <ul className="grid gap-2" aria-label="申し込んだ3行の結果">
             {RESULTS.map((r) => (
@@ -274,7 +275,7 @@ export default function Page() {
           <ArrowRight size={18} className="text-sky-700" aria-hidden="true" />
         </Link>
 
-        <HenshuNote />
+        <KakiteNote />
         <p className="text-[11px] leading-relaxed text-slate-400">
           体験は運営会社（BlueAdventures合同会社）が2026年10〜11月に申し込んだときのものです。審査の基準は銀行ごとに違い、同じ結果になるとは限りません。最終更新：2026年11月16日
         </p>

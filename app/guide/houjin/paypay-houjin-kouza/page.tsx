@@ -4,7 +4,7 @@ import { ArrowRight, CheckCircle2, Coins, FileText, IdCard, Mail, Stamp, Briefca
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
-import HenshuNote from '@/components/guide/HenshuNote';
+import { KakiteLine, KakiteNote, KAKITE_LD } from '@/components/houjin/Kakite';
 import HoujinExit from '@/components/houjin/HoujinExit';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import { HOUJIN_PARTNERS } from '@/lib/houjin/partners';
@@ -81,7 +81,7 @@ const SRC = 'text-[11px] leading-relaxed text-slate-500';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', datePublished: '2026-11-16T19:30:00+09:00', dateModified: '2026-11-16T19:30:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}`, about: { '@type': 'Thing', name: 'PayPay銀行の法人口座' }, mentions: [{ '@type': 'BankOrCreditUnion', name: 'PayPay銀行' }] },
+    { '@type': 'Article', author: KAKITE_LD, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', datePublished: '2026-11-16T19:30:00+09:00', dateModified: '2026-11-16T19:30:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}`, about: { '@type': 'Thing', name: 'PayPay銀行の法人口座' }, mentions: [{ '@type': 'BankOrCreditUnion', name: 'PayPay銀行' }] },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: '法人成り', item: `${SITE_URL}/guide/houjin` },
@@ -117,6 +117,7 @@ export default function Page() {
             <p className="text-[13px] font-bold text-sky-700">運営会社の実例</p>
             <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">PayPay銀行の法人口座<br /><span className="text-[22px] text-orange-600">設立直後でも審査に通った</span></h1>
             <p className="text-[14px] text-slate-600">設立直後・本店がバーチャルオフィスの合同会社で申し込んだ実例です。</p>
+            <KakiteLine />
           </div>
           <div className="flex items-center gap-3 rounded-2xl bg-emerald-50 p-4 ring-1 ring-emerald-200">
             <CheckCircle2 size={30} className="shrink-0 text-emerald-600" aria-hidden="true" />
@@ -250,7 +251,7 @@ export default function Page() {
           <ArrowRight size={18} className="text-sky-700" aria-hidden="true" />
         </Link>
 
-        <HenshuNote />
+        <KakiteNote />
         <p className="text-[11px] leading-relaxed text-slate-400">
           体験は運営会社（BlueAdventures合同会社）が2026年11月に申し込んだときのものです。審査の基準は公表されておらず、同じ結果になるとは限りません。手数料・書類は公式の記載（2026年11月16日 確認）で、変わることがあります。最終更新：2026年11月16日
         </p>

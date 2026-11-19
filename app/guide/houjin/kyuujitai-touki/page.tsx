@@ -4,7 +4,7 @@ import { AlertTriangle, ArrowRight, CheckCircle2, FileText, Info, Keyboard, Sear
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
-import HenshuNote from '@/components/guide/HenshuNote';
+import { KakiteLine, KakiteNote, KAKITE_LD } from '@/components/houjin/Kakite';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 
 /**
@@ -69,7 +69,7 @@ const SRC = 'text-[11px] leading-relaxed text-slate-500';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', datePublished: '2026-11-16T20:00:00+09:00', dateModified: '2026-11-16T20:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}`, about: { '@type': 'Thing', name: '会社設立の電子申請で使える文字' } },
+    { '@type': 'Article', author: KAKITE_LD, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', datePublished: '2026-11-16T20:00:00+09:00', dateModified: '2026-11-16T20:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}`, about: { '@type': 'Thing', name: '会社設立の電子申請で使える文字' } },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: '法人成り', item: `${SITE_URL}/guide/houjin` },
@@ -97,6 +97,7 @@ export default function Page() {
             <p className="text-[13px] font-bold text-sky-700">運営会社の実例</p>
             <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">登記で旧字体がエラー<br /><span className="text-[22px] text-orange-600">印鑑証明書の「塚」が使えなかった</span></h1>
             <p className="text-[14px] text-slate-600">会社設立の登記を、電子申請で出したときの実例です。</p>
+            <KakiteLine />
           </div>
           <p className="rounded-2xl bg-white p-4 text-[14px] leading-relaxed text-slate-800 ring-1 ring-slate-200">
             <span className="mb-1 block text-[12px] font-black text-sky-700">結論</span>
@@ -187,7 +188,7 @@ export default function Page() {
           <ArrowRight size={18} className="text-sky-700" aria-hidden="true" />
         </Link>
 
-        <HenshuNote />
+        <KakiteNote />
         <p className="text-[11px] leading-relaxed text-slate-400">
           体験は運営会社（BlueAdventures合同会社）が2026年10月に設立の登記を電子申請したときのものです。扱いは申請の内容で変わることがあるため、迷うときは申請先の法務局に確かめてください。最終更新：2026年11月16日
         </p>

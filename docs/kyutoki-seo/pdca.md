@@ -588,3 +588,4 @@
 
 - 2026-11-20 07:38 #141 取り込み（離婚したときの生命保険の見直し）。公開ページ数 35。IndexNow はこの作業の場所から api.indexnow.org へつながらず送れなかった → 次に Chrome につながる回で /guide/shisan-kanri/hoken-minaoshi-rikon を送る。登録依頼は 7:20 の回の順番に足す。
 - 2026-11-20 07:45 #139・#140 取り込み済み（オーナー）。書き手を替えた法人成り7ページを IndexNow で通知（返り200）。blueadventures.jp のトップは WordPress の固定ページ 338（Cocoon）の p.ba-links にリンクが並ぶ。ログインが要るため、法人成りの入口のリンクはオーナーがスマホで足す（手順を渡した）。
+- 2026-11-20 08:20 登録の振り返り（オーナー「全然進んでいるように思えない」）：11/16〜11/20 に登録されたのは7本（raksulbank・/guide/houjin・niwari-kasan・kouza-tsukurenai〈ここまで依頼なしか 11/17 以前の依頼〉、kouza-hitsuyou-shorui・kouza-virtual-office・kouza-kaisetsu-kikan〈11/18 の依頼〉）。未登録は9本（paypay-houjin-kouza・shibou-taishokukin-hikazei・hoken-minaoshi-teinen・hoken-minaoshi-kekkon・zero-en-shinkoku・shinkoku-okure・shinkoku-tojikata・hoken-minaoshi-danshin・hoken-minaoshi-dokuritsu）。11/19 7:06・7:35、11/20 6:15 の依頼はすべて上限で0本。原因の見立て：朝に押していた（上限は日本時間17時に戻る見込み）うえ、8:44 の回も依頼のボタンを押せる決まりで、枠を取り合っていた。→ 依頼は 17:10 の1回に一本化。

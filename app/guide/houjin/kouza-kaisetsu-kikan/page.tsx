@@ -4,7 +4,7 @@ import { ArrowRight, CalendarDays, CheckCircle2, Clock, FileUp, Info, Landmark, 
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
-import HenshuNote from '@/components/guide/HenshuNote';
+import { KakiteLine, KakiteNote, KAKITE_LD } from '@/components/houjin/Kakite';
 import HoujinExit from '@/components/houjin/HoujinExit';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import { HOUJIN_PARTNERS } from '@/lib/houjin/partners';
@@ -100,7 +100,7 @@ function src(keys: readonly K[]) {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', about: { '@type': 'Thing', name: '法人口座の開設期間' }, mentions: ['PayPay銀行', 'ラクスルバンク', 'みずほ銀行', 'GMOあおぞらネット銀行', 'ドコモSMTBネット銀行'].map((name) => ({ '@type': 'BankOrCreditUnion', name })), datePublished: '2026-11-17T03:00:00+09:00', dateModified: '2026-11-17T03:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}` },
+    { '@type': 'Article', author: KAKITE_LD, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', about: { '@type': 'Thing', name: '法人口座の開設期間' }, mentions: ['PayPay銀行', 'ラクスルバンク', 'みずほ銀行', 'GMOあおぞらネット銀行', 'ドコモSMTBネット銀行'].map((name) => ({ '@type': 'BankOrCreditUnion', name })), datePublished: '2026-11-17T03:00:00+09:00', dateModified: '2026-11-17T03:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}` },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: '法人成り', item: `${SITE_URL}/guide/houjin` },
@@ -136,6 +136,7 @@ export default function Page() {
             <p className="text-[13px] font-bold text-sky-700">運営会社の実例</p>
             <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">法人口座の開設期間<br /><span className="text-[22px] text-orange-600">設立から審査通過まで19日</span></h1>
             <p className="text-[14px] text-slate-600">設立直後の合同会社で、法人口座の審査に通るまでにかかった日数です。</p>
+            <KakiteLine />
           </div>
           <div className="grid grid-cols-2 gap-2" aria-label="かかった日数">
             {[
@@ -301,7 +302,7 @@ export default function Page() {
         ))}
         </nav>
 
-        <HenshuNote />
+        <KakiteNote />
         <p className="text-[11px] leading-relaxed text-slate-400">
           体験は運営会社（BlueAdventures合同会社）が2026年10〜11月に申し込んだときのものです。日数は銀行・時期・申込の内容で変わり、同じ日数になるとは限りません。最終更新：2026年11月17日
         </p>

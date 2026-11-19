@@ -4,7 +4,7 @@ import { ArrowRight, Building2, CheckCircle2, FileText, Home, Info, Mail, XCircl
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
-import HenshuNote from '@/components/guide/HenshuNote';
+import { KakiteLine, KakiteNote, KAKITE_LD } from '@/components/houjin/Kakite';
 import HoujinExit from '@/components/houjin/HoujinExit';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import { HOUJIN_PARTNERS } from '@/lib/houjin/partners';
@@ -89,7 +89,7 @@ function src(keys: readonly K[]) {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', about: { '@type': 'Thing', name: 'バーチャルオフィスでの法人口座の開設' }, mentions: ['PayPay銀行', 'ラクスルバンク', '楽天銀行', 'みずほ銀行', 'GMOあおぞらネット銀行', 'ドコモSMTBネット銀行'].map((name) => ({ '@type': 'BankOrCreditUnion', name })), datePublished: '2026-11-17T19:00:00+09:00', dateModified: '2026-11-17T19:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}` },
+    { '@type': 'Article', author: KAKITE_LD, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', about: { '@type': 'Thing', name: 'バーチャルオフィスでの法人口座の開設' }, mentions: ['PayPay銀行', 'ラクスルバンク', '楽天銀行', 'みずほ銀行', 'GMOあおぞらネット銀行', 'ドコモSMTBネット銀行'].map((name) => ({ '@type': 'BankOrCreditUnion', name })), datePublished: '2026-11-17T19:00:00+09:00', dateModified: '2026-11-17T19:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}` },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: '法人成り', item: `${SITE_URL}/guide/houjin` },
@@ -124,6 +124,7 @@ export default function Page() {
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">運営会社の実例</p>
             <h1 id="top" className="text-[25px] font-black leading-tight text-slate-900">法人口座とバーチャルオフィス<br /><span className="text-[20px] text-orange-600">3行に申し込み、通ったのは1行</span></h1>
+            <KakiteLine />
           </div>
           <ul className="grid gap-2" aria-label="申し込んだ3行の結果">
             {RESULTS.map((r) => (
@@ -236,7 +237,7 @@ export default function Page() {
           ))}
         </nav>
 
-        <HenshuNote />
+        <KakiteNote />
         <p className="text-[11px] leading-relaxed text-slate-400">
           体験は運営会社（BlueAdventures合同会社）が2026年10〜11月に申し込んだときのものです。審査の基準は銀行ごとに違い、通ることを約束するものではありません。最終更新：2026年11月17日
         </p>

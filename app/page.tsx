@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  ArrowRight, FileSpreadsheet, Flame, HeartHandshake, KeyRound, Smartphone, Users,
+  ArrowRight, FileSpreadsheet, Flame, HeartHandshake, KeyRound, Landmark, Smartphone, Users,
 } from 'lucide-react';
 import GuideHeader from '@/components/GuideHeader';
 import SiteFooter from '@/components/SiteFooter';
@@ -95,6 +95,21 @@ const AREAS = [
       { label: 'デジタル遺品', href: '/guide/ihinseiri' },
     ],
   },
+  {
+    id: 'houjin',
+    icon: Landmark,
+    color: 'bg-emerald-50 text-emerald-700',
+    h: '会社を作る',
+    s: '法人口座の審査と必要書類',
+    // 2026-11-19：法人成りのページへ、サイトでいちばん読まれるトップからの道を作る。
+    // Google がページ本体を読むのは1日4ページほどで、登録依頼も上限に当たっているため、よく読まれるページからのリンクで見つけてもらう。
+    href: '/guide/houjin',
+    links: [
+      { label: 'ラクスルバンクの審査', href: '/guide/houjin/raksulbank' },
+      { label: '法人口座の必要書類', href: '/guide/houjin/kouza-hitsuyou-shorui' },
+      { label: 'PayPay銀行の法人口座', href: '/guide/houjin/paypay-houjin-kouza' },
+    ],
+  },
 ] as const;
 
 /** よく読まれている記事（Search Console 8/2〜11/1 のクリック上位。入れ替えたら日付も直す） */
@@ -144,7 +159,7 @@ export default function HomePage() {
         {/* 3つの入口 */}
         <section aria-labelledby="areas">
           <h2 id="areas" className="sr-only">カテゴリ</h2>
-          <ul className="grid gap-4 sm:grid-cols-3">
+          <ul className="grid gap-4 sm:grid-cols-2">
             {AREAS.map((a) => {
               const Icon = a.icon;
               return (

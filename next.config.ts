@@ -24,6 +24,7 @@ import type { NextConfig } from "next";
  * 検索の28日間（10/18〜11/14）で /downloads/souzoku-shinkoku-shorui.pdf が表示74・12.6位と、PDF そのものが検索に出ていた。
  * PDF から来た人は紹介先のあるページを通らないため、HTTP の Link ヘッダーで「このファイルの正規のページはここ」と伝え、評価をページへ寄せる。
  * 配布物を足したら、ここにも1行足す。
+ * 2026-11-20 11/16 以降に足した配布物8本（相続5・保険3）が抜けていたので足した。
  */
 const DOWNLOAD_CANONICAL: [string, string][] = [
   ['souzoku-isan-bunkatsu-kyogisho', '/guide/souzoku/isan-bunkatsu-kyogisho'],
@@ -44,12 +45,20 @@ const DOWNLOAD_CANONICAL: [string, string][] = [
   ['souzoku-shokibo-takuchi-shorui', '/guide/souzoku/shokibo-takuchi-shorui'],
   ['souzoku-miseinen-shougaisha-kojo', '/guide/souzoku/miseinen-shougaisha-kojo'],
   ['souzoku-souji-souzoku-kojo', '/guide/souzoku/souji-souzoku-kojo'],
+  ['souzoku-niwari-kasan', '/guide/souzoku/niwari-kasan'],
+  ['souzoku-shibou-taishokukin-hikazei', '/guide/souzoku/shibou-taishokukin-hikazei'],
+  ['souzoku-zero-en-shinkoku', '/guide/souzoku/zero-en-shinkoku'],
+  ['souzoku-shinkoku-okure', '/guide/souzoku/shinkoku-okure'],
+  ['souzoku-shinkoku-tojikata', '/guide/souzoku/shinkoku-tojikata'],
   ['hoken-keiyaku-ichiran', '/guide/shisan-kanri/hoken-ichiran-excel'],
   ['hoken-hikaku', '/guide/shisan-kanri/hoken-hikaku-excel'],
   ['hoken-minaoshi-checklist', '/guide/shisan-kanri/hoken-minaoshi-checklist'],
   ['hoken-minaoshi-kekkon', '/guide/shisan-kanri/hoken-minaoshi-kekkon'],
   ['hoken-minaoshi-shussan', '/guide/shisan-kanri/hoken-minaoshi-shussan'],
   ['hoken-shoken-kakiutsushi', '/guide/shisan-kanri/hoken-shoken-mikata'],
+  ['hoken-minaoshi-teinen', '/guide/shisan-kanri/hoken-minaoshi-teinen'],
+  ['hoken-minaoshi-danshin', '/guide/shisan-kanri/hoken-minaoshi-danshin'],
+  ['hoken-minaoshi-dokuritsu', '/guide/shisan-kanri/hoken-minaoshi-dokuritsu'],
   ['houjin-kouza-check', '/guide/houjin/kouza-tsukurenai'],
   ['kyutoki-hiyou-meyasu', '/kyutoki/kokan-hiyou'],
   ['kyutoki-mitsumori-check', '/kyutoki/mitsumori-mikata'],

@@ -25,8 +25,8 @@ import DATA from '@/lib/hoken/haifu-data.json';
 const LP_ID = 'guide-hoken-gan';
 const VERSION = 'v1-2026-11-21';
 const PAGE_PATH = '/guide/shisan-kanri/hoken-minaoshi-gan';
-const TITLE = 'がん保険の見直しチェックリスト｜証券で確かめる10の点（無料・エクセル/PDF）';
-const DESCRIPTION = 'がん保険の見直しで確かめる10の点を1枚にした無料のチェックリスト（エクセル・PDF）。証券を見て6つの問いに答えると見直す点が出ます。診断給付金の回数、通院・抗がん剤、先進医療の費用、乗り換えの待ち期間（一般に90日）の目安の計算も。';
+const TITLE = 'がん保険の見直しチェックリスト｜証券・約款で確かめる10の点（無料・エクセル/PDF）';
+const DESCRIPTION = 'がん保険の見直しで確かめる10の点をまとめた無料のチェックリスト（エクセル・PDF）。証券・約款を見て6つの問いに答えると見直す点が出ます。診断給付金の回数、通院・抗がん剤、先進医療の費用、乗り換えの待ち期間（一般に90日）の目安の計算も。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -39,8 +39,8 @@ export const metadata: Metadata = {
 const P = DATA.gan;
 const POINTS_BOX = ['相談は無料', 'このチェックリストと保険証券を見せると、話を進めやすい', '続けるか、足すか、乗り換えるかを専門の相談員と確かめる'];
 const FAQS = [
-  { q: 'がん保険は見直したほうがいいですか？', a: '入ってから年数がたったがん保険は、保険証券で中身を確かめる価値があります。診断給付金は1回だけのものと複数回受け取れるものがあり、通院の給付金には入院して退院したあとの通院だけが対象のものもあります（生命保険文化センター）。令和5年9月に退院した人のがんの平均在院日数は14.4日（厚生労働省 患者調査）で、入院の日数だけでなく通院や抗がん剤治療の保障を確かめます。' },
-  { q: 'がん保険を乗り換えるときの注意点は？', a: '新しいがん保険には、一般的に契約から90日の待ち期間があり、その間にがんと診断されても保障されません（生命保険文化センター）。また、解約した保険は元に戻せず、年齢が上がって保険料が割高になることや、健康状態によって新しく入れないことがあります。古い契約の解約は、新しい契約が成立してからにします。' },
+  { q: 'がん保険は見直したほうがいいですか？', a: '入ってから年数がたったがん保険は、保険証券で中身を確かめる価値があります。診断給付金は1回だけのものと複数回受け取れるものがあり、通院の給付金は、がんで入院し退院後に通院したときが対象と説明されています（生命保険文化センター）。令和5年9月に退院した人のがんの平均在院日数は14.4日（厚生労働省 患者調査）で、入院の日数だけでなく通院や抗がん剤治療の保障を確かめます。' },
+  { q: 'がん保険を乗り換えるときの注意点は？', a: '新しいがん保険には、一般的に契約から90日の待ち期間があり、その間にがんと診断されても保障されません（生命保険文化センター）。また、解約した保険は元に戻せず、年齢が上がって保険料が割高になることや、健康状態によって新しく入れないことがあります。古い契約の解約は新しい契約が成立してからにし、がん保険は待ち期間が明けて新しい契約の保障が始まる日を過ぎてからが安心です。' },
   { q: '先進医療の保障は必要ですか？', a: '先進医療の技術料は公的医療保険の対象外で、全額自己負担です。技術料の1件あたりの平均は、陽子線治療が約278万円、重粒子線治療が約319万円です（生命保険文化センター。令和7年6月30日時点）。いまの契約に先進医療の保障があるかを、保険証券で確かめます。' },
 ];
 
@@ -97,7 +97,7 @@ export default function Page() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">保険の見直し・がん保険</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">がん保険の<br />見直しチェックリスト<br /><span className="text-[20px] text-orange-600">証券で確かめる10の点</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">がん保険の<br />見直しチェックリスト<br /><span className="text-[20px] text-orange-600">証券・約款で確かめる10の点</span></h1>
           </div>
           <p className="text-[15px] leading-relaxed text-slate-800">{P.kotae}<span className="text-[11px] text-slate-500">（生命保険文化センター）</span></p>
           <GanMinaoshiCheck lpId={LP_ID} />
@@ -111,7 +111,7 @@ export default function Page() {
                 </a>
               ))}
             </div>
-            <p className="text-[11px] text-slate-500">登録やメールアドレスの入力は要りません。エクセルは新しい契約の契約日を入れると、待ち期間の終わりの目安が出ます</p>
+            <p className="text-[11px] text-slate-500">登録やメールアドレスの入力は要りません。エクセルは新しい契約の契約日を入れると、保障が始まる日の目安が出ます</p>
           </div>
         </section>
 
@@ -130,7 +130,7 @@ export default function Page() {
               </ul>
             </div>
           ))}
-          <p className={SRC}>出典：{src(P.check.map((c) => c.src))}（{checked} 確認）。保障の名前と条件は保険会社・商品によって違います</p>
+          <p className={SRC}>出典：{src([...P.check.map((c) => c.src), 'jiliSenshin'])}（{checked} 確認）。保障の名前と条件は保険会社・商品によって違います</p>
         </section>
 
         <section className={SECTION} aria-labelledby="senshin">

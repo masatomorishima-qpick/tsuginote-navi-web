@@ -1041,13 +1041,13 @@ def make_gan_xlsx():
     for i, w in enumerate([4, 46, 46, 8], 1):
         ws.column_dimensions[get_column_letter(i)].width = w
     put(ws, 1, 1, "がん保険の 見直しチェックリスト", H, border=False)
-    put(ws, 2, 1, "保険証券と約款を見ながら、確かめたら「済」を選びます。乗り換えるなら、オレンジの欄に新しい契約の契約日を入れると、待ち期間の終わりの目安が出ます（例の日付は入れ替えてください）。", S, border=False)
+    put(ws, 2, 1, "保険証券と約款を見ながら、確かめたら「済」を選びます。乗り換えるなら、オレンジの欄に新しい契約の契約日を入れると、保障が始まる日の目安が出ます（例の日付は入れ替えてください）。", S, border=False)
     ws.merge_cells("A2:D2")
     ws.row_dimensions[2].height = 30
     put(ws, 4, 2, "新しいがん保険の契約日", B, HEAD)
     put(ws, 4, 3, date(2026, 12, 1), B, IN, fmt="yyyy/m/d")
-    put(ws, 5, 2, f"待ち期間（{P['machi']}日）の終わりの目安（自動）＝契約日の{P['machi']}日後", B, HEAD)
-    put(ws, 5, 3, f'=IF(C4="","",C4+{P["machi"]})', B, OK, fmt="yyyy/m/d")
+    put(ws, 5, 2, f"保障が始まる日の目安（自動。早くても契約日の{P['machi']}日後）", B, HEAD)
+    put(ws, 5, 3, f'=IF(C4="","",IFERROR(C4+{P["machi"]},"日付で入れてください"))', B, OK, fmt="yyyy/m/d")
     for r in (4, 5):
         ws.row_dimensions[r].height = 32
     put(ws, 6, 1, P["keisanNote"] + "古い契約の解約は、新しい契約の保障が始まる日を過ぎてからにします。", S, border=False)
@@ -1080,7 +1080,7 @@ def make_gan_pdf():
 <h2>② 乗り換えるとき</h2>
 <table><tr><th style="width:55%">項目</th><th>書く</th></tr>
 <tr><td>新しいがん保険の契約日　A</td><td class="w"></td></tr>
-<tr><td>待ち期間（{P['machi']}日）の終わりの目安 ＝ A の{P['machi']}日後</td><td class="w"></td></tr>
+<tr><td>保障が始まる日の目安（早くても）＝ A の{P['machi']}日後</td><td class="w"></td></tr>
 <tr><td>新しい契約の保障が始まる日（証券で確かめる）</td><td class="w"></td></tr>
 <tr><td><b>古い契約を解約する日（保障が始まる日より後）</b></td><td class="w"></td></tr></table>
 <p class="note">{esc(P['keisanNote'])}</p>

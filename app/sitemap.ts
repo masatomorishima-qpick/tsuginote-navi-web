@@ -564,6 +564,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    // がん保険の見直しチェックリスト（2026-11-21 作成、docs/seisaku-queue.md の T37）。
+    {
+      url: `${baseUrl}/guide/shisan-kanri/hoken-minaoshi-gan`,
+      lastModified: new Date("2026-11-21T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // 離婚したときの保険の見直し（2026-11-20 作成、docs/seisaku-queue.md の T35）。
     {
       url: `${baseUrl}/guide/shisan-kanri/hoken-minaoshi-rikon`,

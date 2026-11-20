@@ -60,6 +60,7 @@ const DOWNLOAD_CANONICAL: [string, string][] = [
   ['hoken-minaoshi-danshin', '/guide/shisan-kanri/hoken-minaoshi-danshin'],
   ['hoken-minaoshi-dokuritsu', '/guide/shisan-kanri/hoken-minaoshi-dokuritsu'],
   ['hoken-minaoshi-rikon', '/guide/shisan-kanri/hoken-minaoshi-rikon'],
+  ['hoken-minaoshi-gan', '/guide/shisan-kanri/hoken-minaoshi-gan'],
   ['houjin-kouza-check', '/guide/houjin/kouza-tsukurenai'],
   ['kyutoki-hiyou-meyasu', '/kyutoki/kokan-hiyou'],
   ['kyutoki-mitsumori-check', '/kyutoki/mitsumori-mikata'],

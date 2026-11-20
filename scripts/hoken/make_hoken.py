@@ -12,7 +12,8 @@
   hoken-minaoshi-danshin.xlsx / .pdf   住宅ローンの団信と見直しのチェックリスト（減らせる死亡保障の目安は自動。2026-11-19）
   hoken-minaoshi-dokuritsu.xlsx / .pdf   子どもが独立したときの見直しチェックリスト（遺族基礎年金が終わる日は自動・減らす方法の表。2026-11-19）
   hoken-minaoshi-rikon.xlsx / .pdf   離婚したときの見直しチェックリスト（必要な死亡保障の目安は自動。いまの決まりでは子に生計を同じくする父母がいると遺族基礎年金は0、2028年4月の見直し後も並べる。2026-11-20）
-  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken・shussan・kekkon・teinen も同じ。kekkon・teinen・danshin・dokuritsu・rikon は名前を付けたときだけ作る）
+  hoken-minaoshi-gan.xlsx / .pdf   がん保険の見直しチェックリスト（新しい契約の契約日から待ち期間の終わりの目安は自動・先進医療の技術料の表。2026-11-21）
+  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken・shussan・kekkon・teinen も同じ。kekkon・teinen・danshin・dokuritsu・rikon・gan は名前を付けたときだけ作る）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import html
@@ -1026,6 +1027,70 @@ def make_rikon_pdf():
     _pdf_out(doc, "hoken-minaoshi-rikon.pdf", "/guide/shisan-kanri/hoken-minaoshi-rikon", ck)
 
 
+# ---------- がん保険の見直し（2026-11-21） ----------
+GAN_KEYS = ["jiliGan", "jiliSenshin", "mhlwSenshin", "mhlwKanjaHeikin", "jiliShikumi", "mhlwKougaku", "jiliMinaoshi"]
+
+
+def make_gan_xlsx():
+    from datetime import date
+    P = DATA["gan"]
+    ck = P["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "がん保険の見直し"
+    for i, w in enumerate([4, 46, 46, 8], 1):
+        ws.column_dimensions[get_column_letter(i)].width = w
+    put(ws, 1, 1, "がん保険の 見直しチェックリスト", H, border=False)
+    put(ws, 2, 1, "保険証券と約款を見ながら、確かめたら「済」を選びます。乗り換えるなら、オレンジの欄に新しい契約の契約日を入れると、保障が始まる日の目安が出ます（例の日付は入れ替えてください）。", S, border=False)
+    ws.merge_cells("A2:D2")
+    ws.row_dimensions[2].height = 30
+    put(ws, 4, 2, "新しいがん保険の契約日", B, HEAD)
+    put(ws, 4, 3, date(2026, 12, 1), B, IN, fmt="yyyy/m/d")
+    put(ws, 5, 2, f"保障が始まる日の目安（自動。早くても契約日の{P['machi']}日後）", B, HEAD)
+    put(ws, 5, 3, f'=IF(C4="","",IFERROR(C4+{P["machi"]},"日付で入れてください"))', B, OK, fmt="yyyy/m/d")
+    for r in (4, 5):
+        ws.row_dimensions[r].height = 32
+    put(ws, 6, 1, P["keisanNote"] + "古い契約の解約は、新しい契約の保障が始まる日を過ぎてからにします。", S, border=False)
+    ws.merge_cells("A6:D6")
+    ws.row_dimensions[6].height = 30
+    r = _check_sheet(ws, 8, P)
+    put(ws, r, 2, "先進医療", B, HEAD)
+    put(ws, r, 3, "技術料の平均（平均入院日数）", B, HEAD)
+    for k, x in enumerate(P["senshin"]):
+        put(ws, r + 1 + k, 2, x["h"])
+        put(ws, r + 1 + k, 3, f"{x['yen']:,}円（{x['days']:.1f}日）")
+    r += 1 + len(P["senshin"])
+    for t in [P["senshinNote"] + "。技術料は全額自己負担", f"がんの平均在院日数 {P['zaiin']['days']}日：{P['zaiin']['note']}"]:
+        put(ws, r, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+        ws.row_dimensions[r].height = 32
+        r += 1
+    _foot(ws, r + 1, GAN_KEYS, ck, "/guide/shisan-kanri/hoken-minaoshi-gan")
+    wb.save(OUT / "hoken-minaoshi-gan.xlsx")
+
+
+def make_gan_pdf():
+    P = DATA["gan"]
+    ck = P["checkedAt"].replace("-", "/")
+    ch = "".join(f"<tr><td style='width:5mm'>□</td><td><b>{esc(c['h'])}</b><br><small>{esc(c['g'])}｜{esc(c['d'])}</small></td><td style='width:40mm'></td></tr>" for c in P["check"])
+    sn = "".join(f"<tr><td>{esc(x['h'])}</td><td>{x['yen']:,}円</td><td>{x['days']:.1f}日</td></tr>" for x in P["senshin"])
+    doc = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>{PDF_CSS}</style></head><body>
+<h1>がん保険の 見直しチェックリスト</h1><p class="sub">保険証券と約款を見ながら、確かめたら□に印を付けます。</p>
+<h2>① 確かめる10の点</h2><table><tr><th style="width:5mm"></th><th>確かめること</th><th style="width:40mm">証券に書いてあること</th></tr>{ch}</table>
+<h2>② 乗り換えるとき</h2>
+<table><tr><th style="width:55%">項目</th><th>書く</th></tr>
+<tr><td>新しいがん保険の契約日　A</td><td class="w"></td></tr>
+<tr><td>保障が始まる日の目安（早くても）＝ A の{P['machi']}日後</td><td class="w"></td></tr>
+<tr><td>新しい契約の保障が始まる日（証券で確かめる）</td><td class="w"></td></tr>
+<tr><td><b>古い契約を解約する日（保障が始まる日より後）</b></td><td class="w"></td></tr></table>
+<p class="note">{esc(P['keisanNote'])}</p>
+<div class="box" style="break-inside:avoid"><b>先進医療の技術料は全額自己負担</b>
+<table style="margin-top:1mm"><tr><th>先進医療</th><th>技術料の平均</th><th>平均入院</th></tr>{sn}</table>
+<p class="note">{esc(P['senshinNote'])}。がんの平均在院日数 {P['zaiin']['days']}日（{esc(P['zaiin']['note'])}）。</p></div>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in GAN_KEYS))}（{ck} 確認）</p></body></html>"""
+    _pdf_out(doc, "hoken-minaoshi-gan.pdf", "/guide/shisan-kanri/hoken-minaoshi-gan", ck)
+
+
 if __name__ == "__main__":
     import sys
     only = sys.argv[1] if len(sys.argv) > 1 else ""
@@ -1056,5 +1121,8 @@ if __name__ == "__main__":
     if only == "rikon":
         make_rikon_xlsx()
         make_rikon_pdf()
+    if only == "gan":
+        make_gan_xlsx()
+        make_gan_pdf()
     for f in sorted(OUT.glob("hoken-*")):
         print(f.name, f.stat().st_size)

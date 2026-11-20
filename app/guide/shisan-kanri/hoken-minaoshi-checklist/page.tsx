@@ -176,6 +176,7 @@ export default function Page() {
           <Link href="/guide/shisan-kanri/hoken-minaoshi-dokuritsu" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">子どもが独立したときの見直し（遺族年金が終わる日の計算つき）<ArrowRight size={14} aria-hidden="true" /></Link>
           <Link href="/guide/shisan-kanri/hoken-minaoshi-teinen" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">定年退職のときの見直し（健康保険の期限の計算つき）<ArrowRight size={14} aria-hidden="true" /></Link>
           <Link href="/guide/shisan-kanri/hoken-minaoshi-kekkon" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">結婚したときの見直し（遺族年金が出るかの確認つき）<ArrowRight size={14} aria-hidden="true" /></Link>
+          <Link href="/guide/shisan-kanri/hoken-minaoshi-gan" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">がん保険の見直し（証券で答える6つの問いと、乗り換えの待ち期間の計算つき）<ArrowRight size={14} aria-hidden="true" /></Link>
           <Link href="/guide/shisan-kanri/hoken-minaoshi-rikon" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">離婚したときの見直し（受取人と必要な死亡保障の計算つき）<ArrowRight size={14} aria-hidden="true" /></Link>
           <Link href="/guide/shisan-kanri/hoken-minaoshi-shussan" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2">子どもが生まれたときの見直し（遺族年金の計算つき）<ArrowRight size={14} aria-hidden="true" /></Link>
         </section>

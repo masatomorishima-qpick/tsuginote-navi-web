@@ -13,7 +13,8 @@
   hoken-minaoshi-dokuritsu.xlsx / .pdf   子どもが独立したときの見直しチェックリスト（遺族基礎年金が終わる日は自動・減らす方法の表。2026-11-19）
   hoken-minaoshi-rikon.xlsx / .pdf   離婚したときの見直しチェックリスト（必要な死亡保障の目安は自動。いまの決まりでは子に生計を同じくする父母がいると遺族基礎年金は0、2028年4月の見直し後も並べる。2026-11-20）
   hoken-minaoshi-gan.xlsx / .pdf   がん保険の見直しチェックリスト（新しい契約の契約日から待ち期間の終わりの目安は自動・先進医療の技術料の表。2026-11-21）
-  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken・shussan・kekkon・teinen も同じ。kekkon・teinen・danshin・dokuritsu・rikon・gan は名前を付けたときだけ作る）
+  hoken-minaoshi-50dai.xlsx / .pdf   50代の医療保険の見直しチェックリスト（区分と医療費から2026年8月からの高額療養費の上限と入院給付金を自動で並べる。2026-11-22）
+  python3 scripts/hoken/make_hoken.py minaoshi   … 見直しチェックリストだけ作り直す（shoken・shussan・kekkon・teinen も同じ。kekkon・teinen・danshin・dokuritsu・rikon・gan・50dai は名前を付けたときだけ作る）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import html
@@ -1091,6 +1092,97 @@ def make_gan_pdf():
     _pdf_out(doc, "hoken-minaoshi-gan.pdf", "/guide/shisan-kanri/hoken-minaoshi-gan", ck)
 
 
+# ---------- 50代の医療保険の見直し（2026-11-22） ----------
+IRYO50_KEYS = ["kyoukaiKougaku", "mhlwKougaku", "mhlwKanjaHeikin", "jiliIryo", "jiliSenshin", "jiliMinaoshi"]
+
+
+def _shiki(k):
+    return f"{k['base']:,}円" if k["thr"] == 0 else f"{k['base']:,}円＋（医療費−{k['thr']:,}円）×1%"
+
+
+def make_iryo50_xlsx():
+    from openpyxl.worksheet.datavalidation import DataValidation
+    P = DATA["iryo50"]
+    ck = P["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "50代の医療保険の見直し"
+    for i, w in enumerate([4, 40, 40, 8, 3, 6, 12, 12, 12, 12], 1):
+        ws.column_dimensions[get_column_letter(i)].width = w
+    put(ws, 1, 1, "50代の医療保険の 見直しチェックリスト", H, border=False)
+    put(ws, 2, 1, "オレンジの欄に区分・1か月の医療費・入院の日数・保険証券の日額と日数の上限を入れると、窓口で払う医療費の目安（2026年8月診療分から）と入院給付金が出ます（例の数字は入れ替えてください）。", S, border=False)
+    ws.merge_cells("A2:D2")
+    ws.row_dimensions[2].height = 42
+    # 区分の表（右）
+    for i, t in enumerate(["区分", "金額", "境目の額", "多数回", "1年の上限"], 6):
+        put(ws, 3, i, t, B, HEAD)
+    for k, x in enumerate(P["kubun"]):
+        rr = 4 + k
+        for i, v in enumerate([x["h"], x["new"]["base"], x["new"]["thr"], x["tasu"], x["nen"]], 6):
+            put(ws, rr, i, v, N, fmt=None if i == 6 else "#,##0")
+    rows = [
+        ("区分（ア〜オ。69歳以下）", "ウ", None),
+        ("1か月の医療費（保険が使える分の総額・10割・円）", 1000000, "#,##0"),
+        ("入院の日数（日）", round(P["zaiin"]["days"]), "0"),
+        ("入院給付金の日額（円）", 5000, "#,##0"),
+        ("1回の入院で支払われる日数の上限（日）", 60, "0"),
+    ]
+    for k, (h, v, fm) in enumerate(rows):
+        put(ws, 4 + k, 2, h, B, HEAD)
+        put(ws, 4 + k, 3, v, B, IN, fmt=fm)
+        ws.row_dimensions[4 + k].height = 30
+    dv = DataValidation(type="list", formula1='"ア,イ,ウ,エ,オ"', allow_blank=False)
+    ws.add_data_validation(dv)
+    dv.add("C4")
+    V = lambda col: f"VLOOKUP($C$4,$F$4:$J$8,{col},FALSE)"
+    res = [
+        ("1か月の上限（自動）", f'=IFERROR(IF({V(3)}=0,{V(2)},{V(2)}+ROUND(MAX(0,C5-{V(3)})*1%,0)),"区分はア〜オで")'),
+        ("窓口で払う医療費の目安（自動。3割と上限の少ない方）", '=IFERROR(MIN(ROUND(C5*0.3,0),C9),"")'),
+        ("多数回（4か月目から）の上限（自動）", f'=IFERROR({V(4)},"")'),
+        ("1年（8月〜翌年7月）の上限（自動）", f'=IFERROR({V(5)},"")'),
+        ("入院給付金（自動。日額×日数、上限の日数まで）", '=C7*MIN(C6,IF(C8="",C6,C8))'),
+        ("入院給付金 − 窓口の医療費（自動）", '=IFERROR(C13-C10,"")'),
+    ]
+    for k, (h, fo) in enumerate(res):
+        put(ws, 9 + k, 2, h, B, HEAD)
+        put(ws, 9 + k, 3, fo, B, OK, fmt="#,##0")
+        ws.row_dimensions[9 + k].height = 30
+    put(ws, 15, 1, P["keisanNote"] + "食事代・差額ベッド代・先進医療の技術料は上限の外です。", S, border=False)
+    ws.merge_cells("A15:D15")
+    ws.row_dimensions[15].height = 42
+    r = _check_sheet(ws, 17, P)
+    for t in [f"{x['h']}（{x['who']}）：{_shiki(x['new'])}（7月まで {_shiki(x['old'])}）" for x in P["kubun"]] + P["kubunNote"] + [f"平均在院日数 {P['zaiin']['days']}日：{P['zaiin']['note']}"]:
+        put(ws, r, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+        ws.row_dimensions[r].height = 32
+        r += 1
+    _foot(ws, r + 1, IRYO50_KEYS, ck, "/guide/shisan-kanri/hoken-minaoshi-50dai")
+    wb.save(OUT / "hoken-minaoshi-50dai.xlsx")
+
+
+def make_iryo50_pdf():
+    P = DATA["iryo50"]
+    ck = P["checkedAt"].replace("-", "/")
+    ch = "".join(f"<tr><td style='width:5mm'>□</td><td><b>{esc(c['h'])}</b><br><small>{esc(c['g'])}｜{esc(c['d'])}</small></td><td style='width:40mm'></td></tr>" for c in P["check"])
+    kb = "".join(f"<tr><td><b>{esc(x['h'])}</b> <small>{esc(x['who'])}</small></td><td>{esc(_shiki(x['new']))}<br><small>7月まで {esc(_shiki(x['old']))}</small></td><td>{x['tasu']:,}円</td><td>{x['nen'] // 10000}万円</td></tr>" for x in P["kubun"])
+    nt = "".join(f"<li>{esc(t)}</li>" for t in P["kubunNote"])
+    doc = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>{PDF_CSS}</style></head><body>
+<h1>50代の医療保険の 見直しチェックリスト</h1><p class="sub">保険証券を見ながら書き込み、確かめたら□に印を付けます。</p>
+<h2>① 医療費の上限と入院給付金</h2>
+<table><tr><th style="width:55%">項目</th><th>書く</th></tr>
+<tr><td>自分の区分（下の表。加入している健康保険で確かめる）</td><td class="w"></td></tr>
+<tr><td>1か月の上限（下の表の式）　A</td><td class="w"></td></tr>
+<tr><td>入院給付金の日額 × 日数（支払われる日数の上限まで）　B</td><td class="w"></td></tr>
+<tr><td><b>B − A（上限の外の食事代・差額ベッド代・先進医療は別）</b></td><td class="w"></td></tr></table>
+<h2>② 確かめる9つの点</h2><table><tr><th style="width:5mm"></th><th>確かめること</th><th style="width:40mm">証券に書いてあること</th></tr>{ch}</table>
+<div class="box" style="break-inside:avoid"><b>高額療養費の上限（69歳以下・2026年8月診療分から）</b>
+<table style="margin-top:1mm"><tr><th>区分</th><th>1か月の上限</th><th>多数回</th><th>1年</th></tr>{kb}</table>
+<ul class="note">{nt}</ul>
+<p class="note">平均在院日数 {P['zaiin']['days']}日（{esc(P['zaiin']['note'])}）。</p></div>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in IRYO50_KEYS))}（{ck} 確認）</p></body></html>"""
+    _pdf_out(doc, "hoken-minaoshi-50dai.pdf", "/guide/shisan-kanri/hoken-minaoshi-50dai", ck)
+
+
 if __name__ == "__main__":
     import sys
     only = sys.argv[1] if len(sys.argv) > 1 else ""
@@ -1124,5 +1216,8 @@ if __name__ == "__main__":
     if only == "gan":
         make_gan_xlsx()
         make_gan_pdf()
+    if only == "50dai":
+        make_iryo50_xlsx()
+        make_iryo50_pdf()
     for f in sorted(OUT.glob("hoken-*")):
         print(f.name, f.stat().st_size)

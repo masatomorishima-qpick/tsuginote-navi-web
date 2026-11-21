@@ -19,8 +19,13 @@ import DATA from '@/lib/souzoku/haifu-data.json';
  */
 const LP_ID = 'guide-souzoku-shinkoku-jibun';
 const PATH = '/guide/souzoku/shinkoku-jibun';
-const TITLE = '相続税の申告を自分でする手順｜期限の計算と申告書を作る順（無料チェックリスト）';
-const DESCRIPTION = '相続税の申告を自分でする7つの手順を、国税庁の案内に合わせて1枚に。亡くなったことを知った日を入れると10か月の期限が日付で出て、当てはまるものを選ぶと作る申告書の表（第9表〜第15表・第1表など）が作る順に並びます。e-Tax の条件も。';
+// 2026-11-21 題名と説明文だけを直す（毎朝の回の打ち手。本文・見出し1は変えない）。
+// Search Console 11/13〜11/19：表示37・クリック0・平均12.7位。検索語は「相続税 申告」15（9.1位）・「相続税申告」11（4.6位）・「相続税申告 自分で」2（10.5位）で、
+// 4〜10位なのにクリック0。上位（国税庁・チェスター・ht-tax）の題名は「相続税申告」「やり方」「必要書類」で始まる。題名の頭を検索語と同じ「相続税申告」にし、
+// 説明文の最初で期限と出す先に答える（本文の答え J.kotae のとおり）。判定 12/5：クリック 週0 → 週3、表示 週37 → 週40以上を保つ。
+// 前の題名：相続税の申告を自分でする手順｜期限の計算と申告書を作る順（無料チェックリスト）
+const TITLE = '相続税申告を自分でする手順｜期限の日付と作る申告書がわかる無料チェックリスト';
+const DESCRIPTION = '相続税の申告は、亡くなったことを知った日の翌日から10か月以内に、亡くなった人の住所地の税務署へ出します。日付を入れると期限が出て、当てはまるものを選ぶと作る申告書の表（第9表〜第15表・第1表など）が作る順に並びます。e-Tax の条件も。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -50,7 +55,7 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
-        lpId={LP_ID} version="v1-2026-11-14" path={PATH} eyebrow="相続税の申告"
+        lpId={LP_ID} version="v2-2026-11-21" path={PATH} eyebrow="相続税の申告"
         title={<>相続税の申告を<br /><span className="text-orange-600">自分でする手順</span></>}
         download={
           <div className="flex flex-col gap-3">

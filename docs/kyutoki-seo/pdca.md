@@ -666,3 +666,4 @@
 - 見込みの売上：直近7日の紹介先の押下0 → 月0円。月5万円まで 50,000円。
 - 登録の検査：URL 検査を URL の引数で開くと 404 になり、この回は検査できず。依頼は 11/21 0:10 に済み（1日1回の決まり）。
 - 2026-11-22 00:15 登録の確認：11/21 0:10 に依頼した7本（paypay-houjin-kouza・shibou-taishokukin-hikazei・hoken-minaoshi-teinen・hoken-minaoshi-rikon・zero-en-shinkoku・hoken-minaoshi-dokuritsu・hoken-minaoshi-kekkon）はすべて登録済み（依頼から24時間以内）。相続・保険・法人成りで把握している未登録は0本。11/20 以降に取り込まれた変更依頼はなく、新しく依頼するページなし（#142・#143 は取り込み待ち）。判定 11/26（未登録0）は前倒しで達成。
+- 2026-11-22 06:27 #142 取り込み（がん保険の見直しチェックリスト）。公開ページ数 36。IndexNow はこの作業の場所から送れないため、Chrome につながる回で /guide/shisan-kanri/hoken-minaoshi-gan と hoken-minaoshi-rikon を送る。登録依頼は 0:10 の回の順番に足す。

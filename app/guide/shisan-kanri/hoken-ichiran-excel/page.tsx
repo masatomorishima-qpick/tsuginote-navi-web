@@ -172,7 +172,7 @@ export default function HokenIchiranExcelPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <GuideHeader />
-      <LpViewTracker lpId={HOKEN_LP_ID} version="v3-2026-11-11" />
+      <LpViewTracker lpId={HOKEN_LP_ID} version="v4-2026-11-22" />
 
       <div className="mx-auto max-w-3xl px-5 pb-20 pt-8 sm:px-8">
         <nav className="text-sm text-slate-500">
@@ -344,7 +344,7 @@ export default function HokenIchiranExcelPage() {
               ]}
             />
           </div>
-          <HokenSoudanBox position="review" lead="見直しを、無料でプロに相談する" beacon />
+          <HokenSoudanBox position="review" lead="重なりや入りすぎが1つでも見つかったら、無料で相談" beacon />
         </Section>
 
         <Section id="blindspot" title="その一覧表、家族は「在りか」を知っていますか？">
@@ -411,7 +411,7 @@ export default function HokenIchiranExcelPage() {
             </Link>
             もどうぞ。
           </p>
-          <HokenSoudanBox position="summary" lead="一覧表ができたら、無料で見直し相談" />
+          <HokenSoudanBox position="summary" lead="一覧表ができたら、その表を持って無料で相談" />
         </Section>
         <section className="mt-14">
           <h2 className="border-b border-slate-200 pb-3 text-xl font-semibold text-slate-900">

@@ -37,11 +37,11 @@ export const metadata: Metadata = {
 };
 
 const P = DATA.iryo50;
-const POINTS_BOX = ['相談は無料', 'この計算とチェックリスト、保険証券を見せると、話を進めやすい', '続けるか、減らすか、足すかを専門の相談員と確かめる'];
+const POINTS_BOX = ['相談は無料', 'この計算とチェックリスト、保険証券を見せると、話を進めやすい', '続けるか、減らすか、足すかを相談員と確かめる'];
 const FAQS = [
-  { q: '50代に医療保険は必要ですか？', a: '公的な健康保険には1か月の医療費の上限（高額療養費）があり、医療保険はその上で考えます。2026年8月診療分からは、標準報酬月額28万〜50万円の人で 85,800円＋（医療費−286,000円）×1% が上限です（協会けんぽ）。ただし食事代、差額ベッド代など保険外併用療養費の差額部分、先進医療の技術料は上限の外です。上限と上限の外の費用を、貯蓄でまかなえるかで考えます。' },
+  { q: '50代に医療保険は必要ですか？', a: '公的な健康保険には1か月の医療費の上限（高額療養費）があり、医療保険はその上で考えます。2026年8月診療分からは、標準報酬月額28万〜50万円の人で 85,800円＋（医療費−286,000円）×1% が1つの病院ごとの1か月の上限です（協会けんぽ。2027年7月診療分まで）。ただし食事代、差額ベッド代など保険外併用療養費の差額部分、先進医療の技術料は上限の外です。上限と上限の外の費用を、貯蓄でまかなえるかで考えます。' },
   { q: '医療保険の更新型と終身型の違いは？', a: '更新型は、一般的に80歳・90歳まで健康状態に関係なく更新できますが、更新のときに保険料を計算し直し、ふつうは更新前より高くなります。終身型は保障が一生涯続き、決まった年齢で払い終える払い方と、一生涯払う払い方があります（生命保険文化センター）。' },
-  { q: '高額療養費は2026年8月から何が変わりましたか？', a: '69歳以下の1か月の上限が区分ごとに上がり（例：区分ウは 80,100円＋（医療費−267,000円）×1% から 85,800円＋（医療費−286,000円）×1% へ）、8月から翌年7月までの1年の上限（年間上限）ができました。協会けんぽでは、年間上限の申請は2027年8月からです。2027年8月からは、所得の区分をさらに細かく分ける予定です（厚生労働省）。' },
+  { q: '高額療養費は2026年8月から何が変わりましたか？', a: '70歳未満の1か月の上限が区分ごとに上がり（例：区分ウは 80,100円＋（医療費−267,000円）×1% から 85,800円＋（医療費−286,000円）×1% へ）、8月から翌年7月までの1年の上限（年間上限）ができました（厚生労働省）。協会けんぽでは、年間上限の申請は2027年8月からです。2027年8月からは、所得の区分をさらに細かく分ける予定です（厚生労働省）。' },
 ];
 
 const jsonLd = {
@@ -131,7 +131,7 @@ export default function Page() {
         </section>
 
         <section className={SECTION} aria-labelledby="jogen">
-          <h2 id="jogen" className={H2}>高額療養費の上限（2026年8月診療分から）</h2>
+          <h2 id="jogen" className={H2}>高額療養費の上限（2026年8月〜2027年7月診療分）</h2>
           <div className="overflow-x-auto rounded-2xl bg-white ring-1 ring-slate-200">
             <table className="w-full text-[12px]">
               <thead className="bg-slate-50 text-[11px] text-slate-600"><tr><th className="px-2.5 py-2 text-left font-bold">区分</th><th className="px-2.5 py-2 text-left font-bold">1か月の上限</th><th className="px-2.5 py-2 text-right font-bold">多数回</th><th className="px-2.5 py-2 text-right font-bold">1年</th></tr></thead>
@@ -152,9 +152,9 @@ export default function Page() {
           </ul>
           <div className="flex items-center gap-4 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
             <p className="shrink-0 text-[32px] font-black leading-none text-sky-800">{P.zaiin.days}<span className="text-[15px]">日</span></p>
-            <p className="text-[13px] text-slate-700">{P.zaiin.note}。日額と、1回の入院で支払われる日数の上限を、この日数と見比べます</p>
+            <p className="text-[13px] text-slate-700">{P.zaiin.note}。日額と、1回の入院で支払われる日数の上限を、この日数を目安に見比べます</p>
           </div>
-          <p className={SRC}>出典：{src(['kyoukaiKougaku', 'mhlwKougaku', 'mhlwKanjaHeikin'])}（{checked} 確認）。70歳以上は区分と上限が違います</p>
+          <p className={SRC}>出典：{src(['kyoukaiKougaku', 'mhlwKougaku', 'mhlwKanjaHeikin'])}（{checked} 確認）。70歳以上の一般・低所得の人は区分と上限が違います</p>
         </section>
 
         <section className={SECTION} aria-labelledby="junban">

@@ -1110,7 +1110,7 @@ def make_iryo50_xlsx():
     for i, w in enumerate([4, 40, 40, 8, 3, 6, 12, 12, 12, 12], 1):
         ws.column_dimensions[get_column_letter(i)].width = w
     put(ws, 1, 1, "50代の医療保険の 見直しチェックリスト", H, border=False)
-    put(ws, 2, 1, "オレンジの欄に区分・1か月の医療費・入院の日数・保険証券の日額と日数の上限を入れると、窓口で払う医療費の目安（2026年8月診療分から）と入院給付金が出ます（例の数字は入れ替えてください）。", S, border=False)
+    put(ws, 2, 1, "オレンジの欄に区分・1か月の医療費・入院の日数・保険証券の日額と日数の上限を入れると、1か月・1つの病院の自己負担の目安（2026年8月〜2027年7月診療分）と入院給付金が出ます（例の数字は入れ替えてください）。", S, border=False)
     ws.merge_cells("A2:D2")
     ws.row_dimensions[2].height = 42
     # 区分の表（右）
@@ -1121,7 +1121,7 @@ def make_iryo50_xlsx():
         for i, v in enumerate([x["h"], x["new"]["base"], x["new"]["thr"], x["tasu"], x["nen"]], 6):
             put(ws, rr, i, v, N, fmt=None if i == 6 else "#,##0")
     rows = [
-        ("区分（ア〜オ。69歳以下）", "ウ", None),
+        ("区分（ア〜オ。70歳未満）", "ウ", None),
         ("1か月の医療費（保険が使える分の総額・10割・円）", 1000000, "#,##0"),
         ("入院の日数（日）", round(P["zaiin"]["days"]), "0"),
         ("入院給付金の日額（円）", 5000, "#,##0"),
@@ -1137,17 +1137,17 @@ def make_iryo50_xlsx():
     V = lambda col: f"VLOOKUP($C$4,$F$4:$J$8,{col},FALSE)"
     res = [
         ("1か月の上限（自動）", f'=IFERROR(IF({V(3)}=0,{V(2)},{V(2)}+ROUND(MAX(0,C5-{V(3)})*1%,0)),"区分はア〜オで")'),
-        ("窓口で払う医療費の目安（自動。3割と上限の少ない方）", '=IFERROR(MIN(ROUND(C5*0.3,0),C9),"")'),
+        ("1か月・1つの病院の自己負担の目安（自動。3割と上限の少ない方）", '=IF(ISNUMBER(C9),MIN(ROUND(C5*0.3,0),C9),"")'),
         ("多数回（4か月目から）の上限（自動）", f'=IFERROR({V(4)},"")'),
         ("1年（8月〜翌年7月）の上限（自動）", f'=IFERROR({V(5)},"")'),
-        ("入院給付金（自動。日額×日数、上限の日数まで）", '=C7*MIN(C6,IF(C8="",C6,C8))'),
-        ("入院給付金 − 窓口の医療費（自動）", '=IFERROR(C13-C10,"")'),
+        ("入院給付金（自動。日額×日数、上限の日数まで。上限が空か0なら上限なし）", '=IF(C6="",0,C7*MIN(C6,IF(OR(C8="",C8=0),C6,C8)))'),
+        ("入院給付金 − 自己負担（自動）", '=IF(ISNUMBER(C10),C13-C10,"")'),
     ]
     for k, (h, fo) in enumerate(res):
         put(ws, 9 + k, 2, h, B, HEAD)
         put(ws, 9 + k, 3, fo, B, OK, fmt="#,##0")
         ws.row_dimensions[9 + k].height = 30
-    put(ws, 15, 1, P["keisanNote"] + "食事代・差額ベッド代・先進医療の技術料は上限の外です。", S, border=False)
+    put(ws, 15, 1, P["keisanNote"] + "月をまたぐ入院は月ごとに上限がかかります。食事代・差額ベッド代・先進医療の技術料は上限の外です。", S, border=False)
     ws.merge_cells("A15:D15")
     ws.row_dimensions[15].height = 42
     r = _check_sheet(ws, 17, P)
@@ -1171,11 +1171,11 @@ def make_iryo50_pdf():
 <h2>① 医療費の上限と入院給付金</h2>
 <table><tr><th style="width:55%">項目</th><th>書く</th></tr>
 <tr><td>自分の区分（下の表。加入している健康保険で確かめる）</td><td class="w"></td></tr>
-<tr><td>1か月の上限（下の表の式）　A</td><td class="w"></td></tr>
+<tr><td>1か月の自己負担（医療費の3割と、下の表の上限の少ない方）　A</td><td class="w"></td></tr>
 <tr><td>入院給付金の日額 × 日数（支払われる日数の上限まで）　B</td><td class="w"></td></tr>
 <tr><td><b>B − A（上限の外の食事代・差額ベッド代・先進医療は別）</b></td><td class="w"></td></tr></table>
 <h2>② 確かめる9つの点</h2><table><tr><th style="width:5mm"></th><th>確かめること</th><th style="width:40mm">証券に書いてあること</th></tr>{ch}</table>
-<div class="box" style="break-inside:avoid"><b>高額療養費の上限（69歳以下・2026年8月診療分から）</b>
+<div class="box" style="break-inside:avoid"><b>高額療養費の上限（70歳未満・2026年8月〜2027年7月診療分）</b>
 <table style="margin-top:1mm"><tr><th>区分</th><th>1か月の上限</th><th>多数回</th><th>1年</th></tr>{kb}</table>
 <ul class="note">{nt}</ul>
 <p class="note">平均在院日数 {P['zaiin']['days']}日（{esc(P['zaiin']['note'])}）。</p></div>

@@ -20,8 +20,8 @@ import DATA from '@/lib/souzoku/haifu-data.json';
  */
 const LP_ID = 'guide-souzoku-niwari-kasan';
 const PATH = '/guide/souzoku/niwari-kasan';
-const TITLE = '相続税の2割加算の計算｜孫・兄弟は対象か判定して自動計算（無料・エクセル）';
-const DESCRIPTION = '相続税の2割加算は、配偶者と子・父母以外が受け取ったとき、その人の相続税額に20%を足す制度。続柄を選ぶと対象か分かり、遺産額と相続人から加算額まで出ます。代襲相続人の孫は対象外、孫養子は対象。国税庁の誤りやすい例も。';
+const TITLE = '相続税の2割加算の対象者と計算｜孫・兄弟・甥姪は対象か判定して加算額を自動計算（無料）';
+const DESCRIPTION = '相続税の2割加算の対象者は、配偶者・子・父母以外（兄弟姉妹・甥姪・孫養子・遺贈を受けた孫など）。その人の相続税額に20%を足します。続柄を選ぶと対象か分かり、遺産額と相続人から加算額まで出ます。代襲相続人の孫は対象外、孫養子は対象。国税庁の誤りやすい例も。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -50,7 +50,7 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
-        lpId={LP_ID} version="v1-2026-11-17" path={PATH} eyebrow="相続税の計算"
+        lpId={LP_ID} version="v2-2026-11-22" path={PATH} eyebrow="相続税の計算"
         title={<>相続税の2割加算の計算<br /><span className="text-orange-600">配偶者・子・父母以外は税額に20%を足す</span></>}
         download={
           <div className="flex flex-col gap-3">

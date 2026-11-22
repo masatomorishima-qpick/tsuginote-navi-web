@@ -49,6 +49,7 @@ const DOWNLOAD_CANONICAL: [string, string][] = [
   ['souzoku-shibou-taishokukin-hikazei', '/guide/souzoku/shibou-taishokukin-hikazei'],
   ['souzoku-zero-en-shinkoku', '/guide/souzoku/zero-en-shinkoku'],
   ['souzoku-shinkoku-okure', '/guide/souzoku/shinkoku-okure'],
+  ['souzoku-shinkoku-kigen-irai', '/guide/souzoku/shinkoku-kigen-irai'],
   ['souzoku-shinkoku-tojikata', '/guide/souzoku/shinkoku-tojikata'],
   ['hoken-keiyaku-ichiran', '/guide/shisan-kanri/hoken-ichiran-excel'],
   ['hoken-hikaku', '/guide/shisan-kanri/hoken-hikaku-excel'],

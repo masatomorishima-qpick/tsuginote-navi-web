@@ -171,6 +171,7 @@ export default function Page() {
           <ol className="grid gap-2">
             {[
               { h: '相続税がいくらかの目安を出す', s: '延滞税のもとになる税額', href: '/guide/souzoku/souzokuzei-keisan' },
+              { h: 'ほかの相続人の期限を確かめる', s: '知った日ごとの期限と、頼む目安の日', href: '/guide/souzoku/shinkoku-kigen-irai' },
               { h: '特例で0円になる人か確かめる', s: '0円でも申告が要るかの判定', href: '/guide/souzoku/zero-en-shinkoku' },
               { h: '申告書を作る順を確かめる', s: '第9表から第1表まで', href: '/guide/souzoku/shinkoku-jibun' },
               { h: '要る書類をそろえる', s: '状況を選ぶと一覧に', href: '/guide/souzoku/shinkoku-shorui-checklist' },

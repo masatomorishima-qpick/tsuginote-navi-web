@@ -25,7 +25,8 @@
   souzoku-shibou-taishokukin-hikazei.xlsx / .pdf  死亡退職金の非課税の計算表（受け取った人ごとの按分・弔慰金の多すぎる分。2026-11-17）
   souzoku-zero-en-shinkoku.xlsx / .pdf        相続税の0円申告のチェックリスト（判定・期限・作る表と書類。2026-11-17）
   souzoku-shinkoku-okure.xlsx / .pdf          延滞税と無申告加算税の計算表（年ごとの割合・期限後の納期限。2026-11-17）
-  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki・seizen・shokibo・miseinen・souji・niwari・taishoku・zero・okure・tojikata も同じ）
+  souzoku-shinkoku-kigen-irai.xlsx / .pdf     相続税の申告期限と税理士に頼む目安の計算表（休みの繰り下げ・相続人ごと。2026-11-23）
+  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（kigenIrai・shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki・seizen・shokibo・miseinen・souji・niwari・taishoku・zero・okure・tojikata も同じ）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import json
@@ -2078,7 +2079,7 @@ def make_tojikata_xlsx():
     put(ws, 4, 2, "亡くなったことを知った日（例の日付は入れ替えてください）", B, HEAD_FILL)
     import datetime as _dt
     put(ws, 4, 3, _dt.date(2026, 4, 30), B, IN_FILL, fmt="yyyy/m/d")
-    put(ws, 5, 2, "10か月目の日（自動）", B, HEAD_FILL)
+    put(ws, 5, 2, "10か月後の同じ日付の日（自動）", B, HEAD_FILL)
     put(ws, 5, 3, '=IF(C4="","",' + kigen_f("C4", T["kigenN"]) + ')', B, OK_FILL, fmt="yyyy/m/d(aaa)")
     put(ws, 6, 2, "提出の期限（土日・祝日・年末年始なら次の日。祝日は2026・2027年の分）", B, HEAD_FILL)
     put(ws, 6, 3, '=IF(C5="","",' + YASUMI_F.format(k="C5") + ')', B, OK_FILL, fmt="yyyy/m/d(aaa)")
@@ -2146,6 +2147,103 @@ def make_tojikata_pdf():
     _pdf(doc, "souzoku-shinkoku-tojikata.pdf", "/guide/souzoku/shinkoku-tojikata", ck)
 
 
+# ---------- 相続税の申告期限の計算と、税理士に頼む目安の日（2026-11-23） ----------
+KIGEN_KEYS = ["nta4205r8", "ntaShikata03", "tsusokuHo10", "caoShukujitsu", "nta2022", "courtHouki", "nta4202", "nta9205", "nta2024"]
+
+
+def edate_f(d, n):
+    """知った日 d の翌日から数えて n か月以内の最後の日（応当日の前の日。応当日がない月は末日）。"""
+    return f"IF(DAY(EDATE({d}+1,{n}))<DAY({d}+1),EDATE({d}+1,{n}),EDATE({d}+1,{n})-1)"
+
+
+def make_kigenIrai_xlsx():
+    import datetime as _dt
+    Kd = DATA["kigenIrai"]
+    ck = Kd["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "申告期限と頼む目安"
+    widths(ws, [4, 40, 20, 40])
+    put(ws, 1, 1, "相続税の申告期限と、税理士に頼む目安の計算表", H, border=False)
+    put(ws, 2, 1, "オレンジの欄に、亡くなったことを知った日を入れます（例の日付は入れ替えてください）。期限が土日・祝日・年末年始なら、休みの明けた日が出ます。", S, border=False)
+    ws.merge_cells("A2:D2")
+    ws.row_dimensions[2].height = 30
+    put(ws, 4, 2, "亡くなったことを知った日（ふつうは亡くなった日）", B, HEAD_FILL)
+    put(ws, 4, 3, _dt.date(2026, 6, 10), B, IN_FILL, fmt="yyyy/m/d(aaa)")
+    put(ws, 5, 2, "10か月後の同じ日付の日（自動）", B, HEAD_FILL)
+    put(ws, 5, 3, '=IF(C4="","",' + edate_f("C4", Kd["kigenN"]) + ')', B, OK_FILL, fmt="yyyy/m/d(aaa)")
+    put(ws, 6, 2, "相続税の申告と納税の期限（自動。休みなら明けた日）", B, HEAD_FILL)
+    put(ws, 6, 3, '=IF(C5="","",' + YASUMI_F.format(k="C5") + ')', B, OK_FILL, fmt="yyyy/m/d(aaa)")
+    put(ws, 7, 2, "今日から期限までの日数（自動）", B, HEAD_FILL)
+    put(ws, 7, 3, '=IF(C6="","",C6-TODAY())', B, OK_FILL, fmt='0"日"')
+    for r in range(4, 8):
+        ws.row_dimensions[r].height = 30
+    r = 9
+    for i, t in enumerate(["", "目安の日", "日付（自動）", "中身"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    hayame = next(x for x in Kd["irai"] if x["key"] == "hayame")
+    rows = [
+        ("相続放棄・限定承認の期限の目安", edate_f("C4", 3), "家庭裁判所。相続人になったと知った時から3か月（先の順位の人が放棄して相続人になったときは、その時から数えます）。休みの日でもずらしていないので、早めに"),
+        ("準確定申告の期限（早めに頼む目安）", YASUMI_F.format(k=edate_f("C4", 4)), "亡くなった人の所得税（申告が要る場合）。知った日の翌日から4か月。" + hayame["d"]),
+    ] + [(x["h"], edate_f("C4", x["ato"]), x["d"]) for x in Kd["irai"] if x["key"] != "hayame"] + [
+        ("相続税の申告と納税の期限", "C6", Kd["teishutsu"]),
+    ]
+    for k, (h, f, d) in enumerate(rows):
+        rr = r + 1 + k
+        put(ws, rr, 1, k + 1)
+        put(ws, rr, 2, h, B)
+        put(ws, rr, 3, f'=IF(C4="","",{f})', B, OK_FILL, fmt="yyyy/m/d(aaa)")
+        put(ws, rr, 4, d, N)
+        ws.row_dimensions[rr].height = 58
+    r = r + len(rows) + 2
+    put(ws, r, 1, "相続人ごとの期限（知った日が違う人がいるとき）", B, border=False)
+    r += 1
+    for i, t in enumerate(["", "相続人（名前）", "知った日", "その人の期限（自動）"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    for k in range(4):
+        rr = r + 1 + k
+        put(ws, rr, 1, k + 1)
+        put(ws, rr, 2, None, B, IN_FILL)
+        c = put(ws, rr, 3, None, B, IN_FILL, fmt="yyyy/m/d(aaa)").coordinate
+        put(ws, rr, 4, f'=IF({c}="","",' + YASUMI_F.format(k=edate_f(c, Kd["kigenN"])) + ')', B, OK_FILL, fmt="yyyy/m/d(aaa)")
+        ws.row_dimensions[rr].height = 26
+    r = r + 6
+    notes = [Kd["kotae"]] + [x["h"] + "：" + x["d"] for x in Kd["kazoekata"]] + [Kd["nenmatsu"], Kd["hito"], Kd["iraiNote"]] + [x["h"] + "：" + x["d"] for x in Kd["maniawanai"]] + [DATA["shukujitsu"]["note"] + "それ以外の年は祝日が入っていないので、期限が祝日に当たるときは、休みの明けた日が期限です。頼む目安の日と相続放棄の日付は、休みの日でもずらしていません。"]
+    for t in notes:
+        put(ws, r, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+        ws.row_dimensions[r].height = 44
+        r += 1
+    put(ws, r, 1, "出典：" + "／".join(SRC[k]["name"] for k in KIGEN_KEYS) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+    ws.row_dimensions[r].height = 90
+    put(ws, r + 1, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/shinkoku-kigen-irai", S, border=False)
+    ws.page_setup.fitToWidth = 1
+    add_yasumi_sheet(wb)
+    wb.save(OUT / "souzoku-shinkoku-kigen-irai.xlsx")
+
+
+def make_kigenIrai_pdf():
+    Kd = DATA["kigenIrai"]
+    ck = Kd["checkedAt"].replace("-", "/")
+    kz = "".join(f"<li><b>{esc(x['h'])}</b>：{esc(x['d'])}</li>" for x in Kd["kazoekata"])
+    rei = "".join(f"<tr><td>{esc(x['h'])}</td><td><b>{esc(x['k'])}</b><br><small>{esc(x['memo'])}</small></td></tr>" for x in Kd["rei"])
+    ir = "".join(f"<tr><td><b>{esc(x['h'])}</b><br><small>知った日の{x['ato']}か月後</small></td><td><span class=\"line\" style=\"min-width:30mm\"></span></td><td>{esc(x['d'])}</td></tr>" for x in Kd["irai"])
+    mw = "".join(f"<li><b>{esc(x['h'])}</b>：{esc(x['d'])}</li>" for x in Kd["maniawanai"])
+    body = f"""<style>small{{color:#64748b;font-size:8pt}}</style>
+<div class="box"><b>知った日</b> <span class="line" style="min-width:30mm"></span>　→　<b>10か月後の同じ日付</b> <span class="line" style="min-width:30mm"></span>　→　<b>期限</b>（休みなら明けた日）<span class="line" style="min-width:30mm"></span><br>
+<b>出す先</b>：亡くなった人の、亡くなったときの住所地の税務署 <span class="line" style="min-width:40mm"></span></div>
+<h2>数え方</h2><ul style="margin:0;padding-left:5mm">{kz}</ul>
+<p class="note">{esc(Kd['nenmatsuPdf'])}{esc(Kd['hito'])}</p>
+<h2>亡くなった日と申告期限の例</h2><table><tr><th style="width:50mm">亡くなった日</th><th>申告期限</th></tr>{rei}</table>
+<h2>税理士に頼む目安の日</h2><table><tr><th style="width:38mm">目安</th><th style="width:34mm">日付を書く</th><th>中身</th></tr>{ir}</table>
+<p class="note">{esc(Kd['iraiNote'])}</p>
+<h2>間に合わないとき</h2><ul style="margin:0;padding-left:5mm">{mw}</ul>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in KIGEN_KEYS))}（{ck} 確認）</p>"""
+    doc = page("相続税の申告期限と、税理士に頼む目安の日", "知った日から期限を数え、頼む目安の日を書き込みます。日付の自動計算はエクセルかページの道具で。", body)
+    _pdf(doc, "souzoku-shinkoku-kigen-irai.pdf", "/guide/souzoku/shinkoku-kigen-irai", ck)
+
+
 if __name__ == "__main__":
     import sys
     if sys.argv[1:] == ["shinkoku"]:
@@ -2156,7 +2254,7 @@ if __name__ == "__main__":
         make_hikazei_xlsx()
         make_hikazei_pdf()
         sys.exit(0)
-    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki", "jibun", "shinkokuTouki", "seizen", "shokibo", "miseinen", "souji", "niwari", "taishoku", "zero", "okure", "tojikata"):
+    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki", "jibun", "shinkokuTouki", "seizen", "shokibo", "miseinen", "souji", "niwari", "taishoku", "zero", "okure", "tojikata", "kigenIrai"):
         for name in sys.argv[1:]:
             globals()[f"make_{name}_xlsx"]()
             globals()[f"make_{name}_pdf"]()

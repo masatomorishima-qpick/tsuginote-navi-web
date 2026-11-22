@@ -368,6 +368,14 @@
     "ntaHasshin": {
       "name": "国税庁「発信主義の適用範囲を定める告示の制定」（国税通則法22条）",
       "url": "https://www.nta.go.jp/taxes/tetsuzuki/shinsei/teishutsujiki/policy.htm"
+    },
+    "ntaYoshikiR07": {
+      "name": "国税庁「相続税の申告書等の様式一覧（令和7年分用）」",
+      "url": "https://www.nta.go.jp/taxes/tetsuzuki/shinsei/annai/sozoku-zoyo/annai/r07.htm"
+    },
+    "ntaKisaireiR08": {
+      "name": "国税庁「相続税の申告のしかた（令和8年分用）」相続税の申告書の記載例等",
+      "url": "https://www.nta.go.jp/publication/pamph/sozoku/shikata-sozoku2026/pdf/shikata06.pdf"
     }
   },
   "kyogisho": {
@@ -850,7 +858,126 @@
       "保険会社からの支払いの通知",
       "借金の残高や葬式の領収書"
     ],
-    "note": "書類の名前と要る場合は、国税庁の「相続税の申告の際に提出していただく主な書類」（R8.7）に合わせています。農地・山林・非上場株式などの納税猶予、延納・物納は、この表に入れていません。"
+    "note": "書類の名前と要る場合は、国税庁の「相続税の申告の際に提出していただく主な書類」（R8.7）に合わせています。農地・山林・非上場株式などの納税猶予、延納・物納は、この表に入れていません。",
+    "yoshiki": {
+      "checkedAt": "2026-11-23",
+      "nendo": [
+        {
+          "h": "令和8年分用",
+          "period": "2026年1月1日〜12月31日に亡くなった人",
+          "url": "https://www.nta.go.jp/taxes/tetsuzuki/shinsei/annai/sozoku-zoyo/annai/r08.htm",
+          "note": "令和8年分用から様式が変わっています"
+        },
+        {
+          "h": "令和7年分用",
+          "period": "2025年1月1日〜12月31日に亡くなった人",
+          "url": "https://www.nta.go.jp/taxes/tetsuzuki/shinsei/annai/sozoku-zoyo/annai/r07.htm",
+          "note": ""
+        }
+      ],
+      "setPdf": {
+        "h": "一般用の様式をまとめて印刷（令和8年分用・PDF 15.5MB）",
+        "url": "https://www.nta.go.jp/taxes/tetsuzuki/shinsei/annai/sozoku-zoyo/annai/r08pdf/R8set.pdf"
+      },
+      "ippanNote": "国税庁の様式一覧で「一般用」に〇が付いた表（必ず使う、またはよく使う表）。分け方はこのページで整理したもの。",
+      "groups": [
+        {
+          "h": "申告書の本体",
+          "items": [
+            {
+              "hyo": "第1表",
+              "name": "相続税の申告書（続も）"
+            },
+            {
+              "hyo": "第2表",
+              "name": "相続税の総額の計算書"
+            },
+            {
+              "hyo": "第15表",
+              "name": "相続財産の種類別価額表（続も）"
+            }
+          ]
+        },
+        {
+          "h": "財産と借金",
+          "items": [
+            {
+              "hyo": "第9表",
+              "name": "生命保険金などの明細書",
+              "href": "/guide/souzoku/shibou-hokenkin-hikazei"
+            },
+            {
+              "hyo": "第10表",
+              "name": "退職手当金などの明細書",
+              "href": "/guide/souzoku/shibou-taishokukin-hikazei"
+            },
+            {
+              "hyo": "第11表",
+              "name": "相続税がかかる財産の合計表"
+            },
+            {
+              "hyo": "第11表の付表1〜4",
+              "name": "相続税がかかる財産の明細書（土地・家屋等／有価証券／現金・預貯金等／その他）"
+            },
+            {
+              "hyo": "第13表",
+              "name": "債務及び葬式費用の明細書"
+            },
+            {
+              "hyo": "第14表",
+              "name": "純資産価額に加算される暦年課税分の贈与財産価額などの明細書",
+              "href": "/guide/souzoku/seizen-zouyo-kasan"
+            }
+          ]
+        },
+        {
+          "h": "税額の加算と控除",
+          "items": [
+            {
+              "hyo": "第4表",
+              "name": "相続税額の加算金額の計算書（2割加算）",
+              "href": "/guide/souzoku/niwari-kasan"
+            },
+            {
+              "hyo": "第4表の2",
+              "name": "暦年課税分の贈与税額控除額の計算書"
+            },
+            {
+              "hyo": "第5表",
+              "name": "配偶者の税額軽減額の計算書"
+            },
+            {
+              "hyo": "第6表",
+              "name": "未成年者控除額・障害者控除額の計算書",
+              "href": "/guide/souzoku/miseinen-shougaisha-kojo"
+            },
+            {
+              "hyo": "第7表",
+              "name": "相次相続控除額の計算書",
+              "href": "/guide/souzoku/souji-souzoku-kojo"
+            },
+            {
+              "hyo": "第8の8表",
+              "name": "税額控除額及び納税猶予税額の内訳書"
+            }
+          ]
+        },
+        {
+          "h": "特例",
+          "items": [
+            {
+              "hyo": "第11の2表",
+              "name": "相続時精算課税適用財産の明細書・相続時精算課税分の贈与税額控除額の計算書"
+            },
+            {
+              "hyo": "第11・11の2表の付表1",
+              "name": "小規模宅地等についての課税価格の計算明細書（続・別表1も）",
+              "href": "/guide/souzoku/shokibo-takuchi-shorui"
+            }
+          ]
+        }
+      ]
+    }
   },
   "hikazei": {
     "checkedAt": "2026-11-11",

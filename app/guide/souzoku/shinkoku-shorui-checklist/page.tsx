@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, CalendarClock, ClipboardList, FolderOpen } from 'lucide-react';
+import { ArrowRight, CalendarClock, ClipboardList, ExternalLink, FileText, FolderOpen, Printer } from 'lucide-react';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
 import SouzokuArticle, { A, H2, SECTION, SOUZOKU_FILES, SRC, SouzokuDownload, jsonLdFor } from '@/components/souzoku/SouzokuArticle';
 import SouzokuExit from '@/components/souzoku/SouzokuExit';
@@ -16,11 +16,14 @@ import DATA from '@/lib/souzoku/haifu-data.json';
  *   ④国税庁の最新の一覧（R8.7）に合わせた確認日がない。
  * 出口：相続アシスト（戸籍集めから申告まで代行）。
  * 書類の元：国税庁「相続税の申告の際に提出していただく主な書類」（R8.7）、「相続税の申告書等の様式一覧（令和8年分用）」。
+ * 2026-11-23 v2（オーナー了承「これで良い」の B）：Search Console 11/14〜11/20 で「相続税 申告書」34表示・3.1位・0クリック、
+ *   「相続税申告 添付書類」2.0位・「相続税納付書」3.6位など、申告書の様式を探す人に資料の PDF が出ていた（1・2位は国税庁の様式一覧）。
+ *   最初に「申告書の様式（どの年の様式か・一般用の表・まとめて印刷）」の節を置き、題名と見出しに「申告書」を入れた。判定 12/7：クリック 週0→8。
  */
 const LP_ID = 'guide-souzoku-shinkoku-shorui';
 const PATH = '/guide/souzoku/shinkoku-shorui-checklist';
-const TITLE = '相続税の申告の必要書類チェックリスト｜状況を選ぶだけで一覧に（無料・エクセル）';
-const DESCRIPTION = '相続税の申告で出す書類を、国税庁の一覧（R8.7）に合わせて1枚にした無料のチェックリスト（エクセル・PDF）。配偶者の軽減・自宅の土地の特例など、当てはまるものを選ぶと要る書類だけが出ます。財産ごとに書く表も分かります。';
+const TITLE = '相続税の申告書と必要書類｜国税庁の様式の入手先・書く表・添付書類のチェックリスト（無料・エクセル）';
+const DESCRIPTION = '相続税の申告書は、亡くなった年の国税庁の様式（令和8年分用・7年分用）を使います。よく使う表の一覧とまとめて印刷する場所、添付書類の無料チェックリスト（エクセル・PDF）。当てはまる特例を選ぶと要る書類だけが出ます。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -32,6 +35,7 @@ export const metadata: Metadata = {
 
 const D = DATA.shorui;
 const FAQS = [
+  { q: '相続税の申告書はどこで手に入りますか？', a: '国税庁のホームページの「相続税の申告書等の様式一覧」から印刷できます。亡くなった年の分を使います（2026年に亡くなった人は令和8年分用）。よく使う表は「一般用」としてまとめて印刷できます。' },
   { q: '戸籍は、いつ取ったものが使えますか？', a: '国税庁の一覧では、亡くなってから10日を過ぎて作られた戸籍の謄本とされています。法務局で交付される図の形の「法定相続情報一覧図」の写しでも構いません（実子・養子の別が分かるもの）。' },
   { q: 'マイナンバーの書類は、何を出しますか？', a: '番号の確認（マイナンバーカードの裏など）と、本人の確認（カードの表・運転免許証など）の2つです。カードは表と裏の両方の写しが要ります（国税庁）。' },
   { q: '申告の期限はいつですか？', a: `${DATA.zei.kigen}です（国税庁）。書類集めには時間がかかるので、早めにそろえ始めるのが安心です。` },
@@ -40,7 +44,9 @@ const FAQS = [
 export default function Page() {
   const S = DATA.sources as Record<string, { name: string; url: string }>;
   const checked = D.checkedAt.split('-').join('/');
-  const jsonLd = jsonLdFor({ url: `${SITE_URL}${PATH}`, title: TITLE, description: DESCRIPTION, crumb: '相続税の申告の必要書類', faqs: FAQS, date: D.checkedAt });
+  const Y = D.yoshiki;
+  const yChecked = Y.checkedAt.split('-').join('/');
+  const jsonLd = jsonLdFor({ url: `${SITE_URL}${PATH}`, title: TITLE, description: DESCRIPTION, crumb: '相続税の申告書と必要書類', faqs: FAQS, date: D.checkedAt });
   const src = (keys: string[]) => keys.map((k, i) => (
     <span key={k}>{i > 0 && '・'}<a href={S[k].url} target="_blank" rel="noopener noreferrer" className={A}>{S[k].name}</a></span>
   ));
@@ -48,17 +54,48 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
-        lpId={LP_ID} version="v1-2026-11-11" path={PATH} eyebrow="相続税の申告"
-        title={<>相続税の申告<br /><span className="text-orange-600">必要書類チェックリスト</span></>}
+        lpId={LP_ID} version="v2-2026-11-23" path={PATH} eyebrow="相続税の申告"
+        title={<>相続税の申告書と<br /><span className="text-orange-600">必要書類チェックリスト</span></>}
         download={
           <div className="flex flex-col gap-3">
             <ShinkokuShoruiCheck lpId={LP_ID} />
             <SouzokuDownload icon={ClipboardList} h="必要書類チェックリスト" s="印刷して、そろえたら印を付ける" files={SOUZOKU_FILES.shinkoku} />
           </div>
         }
-        partner="souzokuAssist" exitLead="書類集めから申告まで、まとめて任せる" faqs={FAQS} updated="2026年11月11日"
+        partner="souzokuAssist" exitLead="書類集めから申告まで、まとめて任せる" faqs={FAQS} updated="2026年11月23日"
       >
         <SouzokuExit lpId={LP_ID} partner="souzokuAssist" position="hero" lead="書類集めが大変なら、まとめて任せる" />
+
+        <section className={SECTION} aria-labelledby="yoshiki">
+          <h2 id="yoshiki" className={H2}>相続税の申告書の様式</h2>
+          <p className="text-[14px] font-bold text-slate-900">亡くなった年の様式を、国税庁のページから印刷します。</p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {Y.nendo.map((n) => (
+              <a key={n.h} href={n.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200 hover:ring-slate-300">
+                <FileText size={20} className="shrink-0 text-sky-700" aria-hidden="true" />
+                <span className="flex flex-1 flex-col"><span className="text-[15px] font-black text-slate-900">{n.h}</span><span className="text-[12px] text-slate-600">{n.period}</span>{n.note && <span className="text-[11px] text-orange-700">{n.note}</span>}</span>
+                <ExternalLink size={16} className="text-sky-700" aria-hidden="true" />
+              </a>
+            ))}
+          </div>
+          <a href={Y.setPdf.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[13px] font-bold text-sky-700 underline underline-offset-2"><Printer size={16} aria-hidden="true" />{Y.setPdf.h}</a>
+          <p className="text-[13px] font-black text-slate-900">よく使う表（一般用）</p>
+          <div className="grid gap-2">
+            {Y.groups.map((g) => (
+              <div key={g.h} className="flex flex-col gap-1.5 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
+                <p className="text-[13px] font-black text-slate-900">{g.h}</p>
+                <ul className="flex flex-col gap-1">
+                  {g.items.map((it) => (
+                    <li key={it.hyo} className="text-[13px] text-slate-700">
+                      <span className="font-bold">{it.hyo}</span>　{'href' in it && it.href ? <Link href={it.href} className={A}>{it.name}</Link> : it.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p className={SRC}>{Y.ippanNote} 書き方は{src(['ntaKisaireiR08'])}。出典：{src(['ntaYoshikiR08', 'ntaYoshikiR07'])}（{yChecked} 確認）</p>
+        </section>
 
         <section className={SECTION} aria-labelledby="kyotsu">
           <h2 id="kyotsu" className={H2}>誰でも出す書類</h2>

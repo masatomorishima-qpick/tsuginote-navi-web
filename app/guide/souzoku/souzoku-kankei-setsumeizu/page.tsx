@@ -8,7 +8,7 @@ import DATA from '@/lib/souzoku/haifu-data.json';
 /**
  * 相続関係説明図のひな形（2026-11-05 新設）。
  * 受ける言葉：相続関係説明図 テンプレート（1,000回/月、前年比+48%）・書き方・エクセル。
- * 出口：いい相続（申請中。承認までボタンは出ない）。文言の元：法務局の記載例。
+ * 出口：相続アシスト（2026-11-24 v2。いい相続は申請中でボタンが出ず、出口のないページだったため替えた）。文言の元：法務局の記載例。
  */
 const LP_ID = 'guide-souzoku-setsumeizu';
 const PATH = '/guide/souzoku/souzoku-kankei-setsumeizu';
@@ -36,10 +36,10 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
-        lpId={LP_ID} version="v1-2026-11-05" path={PATH} eyebrow="相続の手続き"
+        lpId={LP_ID} version="v2-2026-11-24" path={PATH} eyebrow="相続の手続き"
         title={<>相続関係説明図<br />のひな形</>}
         download={<SouzokuDownload icon={Network} h="相続関係説明図のひな形" s="配偶者と子3人まで。行を足して使える" files={SOUZOKU_FILES.setsumeizu} />}
-        partner="iisouzoku" exitLead="戸籍集めや登記に迷ったら、相続の専門家に無料で相談" faqs={FAQS} updated="2026年11月5日"
+        partner="souzokuAssist" exitLead="戸籍集めから相続税の申告まで、まとめて頼む" faqs={FAQS} updated="2026年11月5日"
       >
         <section className={SECTION} aria-labelledby="zu">
           <h2 id="zu" className={H2}>図の形</h2>

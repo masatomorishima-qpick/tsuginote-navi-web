@@ -20,7 +20,9 @@ select
   -- AI の答えから来た閲覧（2026-11-11 から ref を記録。#95 の取り込み後）
   count(distinct visit_id) filter (where event_name = 'lp_view' and ref ~ '(chatgpt\.com|openai\.com|perplexity\.ai|gemini\.google\.com|copilot\.microsoft\.com|claude\.ai)') as AIから来た閲覧,
   -- 検索から来た閲覧（2026-11-19 追加。ref が検索の画面のもの。自分の確認・巡回などを分母から分けるため）
-  count(distinct visit_id) filter (where event_name = 'lp_view' and ad = '' and ref ~ '(google\.|bing\.com|search\.yahoo\.co\.jp|duckduckgo\.com)') as 検索から来た閲覧,
+  count(distinct visit_id) filter (where event_name = 'lp_view' and ad = '' and ref ~ '(google\.|bing\.com|search\.yahoo\.co\.jp|duckduckgo\.com|search\.smt\.docomo\.ne\.jp|service\.smt\.docomo\.ne\.jp)') as 検索から来た閲覧,
+  -- 参照元なしの閲覧（2026-11-24 追加。ref は参照元の家の名前だけを記録する〈LpViewTracker〉。11/17〜11/23 は閲覧221のうち186〈84%〉が空。直接・アプリ内の閲覧・機械など。押下率とお金の関門は検索から来た閲覧で見る）
+  count(distinct visit_id) filter (where event_name = 'lp_view' and ad = '' and ref = '') as 参照元なしの閲覧,
   string_agg(distinct split_part(cta_id, '-', 1), ',') filter (where event_name = 'partner_click')     as 押された紹介先
 from e
 group by 1

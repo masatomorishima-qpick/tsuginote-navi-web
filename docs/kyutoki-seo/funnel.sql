@@ -16,7 +16,9 @@ select
   count(distinct visit_id) filter (where event_name = 'lp_view' and ad = '')                               as 自然流入の閲覧,
   count(distinct visit_id) filter (where event_name = 'lp_view' and ad <> '')                              as 広告からの閲覧,
   -- 検索から来た閲覧（2026-11-20 追加。ref が検索の画面のもの。11/13〜19 の交換費用は閲覧32でも Search Console のクリック0だったため、押下率の分母を分ける）
-  count(distinct visit_id) filter (where event_name = 'lp_view' and ad = '' and ref ~ '(google\.|bing\.com|search\.yahoo\.co\.jp|duckduckgo\.com)') as 検索から来た閲覧,
+  count(distinct visit_id) filter (where event_name = 'lp_view' and ad = '' and ref ~ '(google\.|bing\.com|search\.yahoo\.co\.jp|duckduckgo\.com|search\.smt\.docomo\.ne\.jp|service\.smt\.docomo\.ne\.jp)') as 検索から来た閲覧,
+  -- 参照元なしの閲覧（2026-11-24 追加。ref は参照元の家の名前だけを記録する〈LpViewTracker〉。11/17〜11/23 は閲覧221のうち186〈84%〉が空。直接・アプリ内の閲覧・機械など。押下率とお金の関門は検索から来た閲覧で見る）
+  count(distinct visit_id) filter (where event_name = 'lp_view' and ad = '' and ref = '') as 参照元なしの閲覧,
   count(distinct visit_id) filter (where event_name = 'lp_internal_click' and cta_id like '/downloads/kyutoki-%') as 配布物の押下,
   count(distinct visit_id) filter (where event_name = 'lp_internal_click'
                                      and (cta_id = '/kyutoki/mitsumori' or cta_id like '/kyutoki/mitsumori?%' or cta_id like '/kyutoki/mitsumori#%')) as B_への押下,

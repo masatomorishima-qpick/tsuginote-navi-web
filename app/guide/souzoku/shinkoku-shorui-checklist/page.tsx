@@ -162,6 +162,7 @@ export default function Page() {
               { h: '相続税がかかるか計算する', s: '基礎控除を超えるか', href: '/guide/souzoku/souzokuzei-keisan' },
               { h: '分け方を決めて協議書にする', s: '特例を使うなら印鑑証明書も', href: '/guide/souzoku/isan-bunkatsu-kyogisho' },
               { h: '自宅の土地の特例の書類を確かめる', s: '小規模宅地等の特例：形ごとの書類と減る額', href: '/guide/souzoku/shokibo-takuchi-shorui' },
+              { h: '税理士に頼むなら、面談の持ち物を確かめる', s: '状況を選ぶと一覧に。家族で決めること', href: '/guide/souzoku/irai-junbi' },
             ].map((f, i) => (
               <li key={f.h}>
                 <Link href={f.href} className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200 hover:ring-slate-300">

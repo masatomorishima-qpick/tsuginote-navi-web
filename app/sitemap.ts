@@ -138,6 +138,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 相続税を税理士に依頼する前の準備（2026-11-24 作成、docs/seisaku-queue.md の T43）。
+    {
+      url: `${baseUrl}/guide/souzoku/irai-junbi`,
+      lastModified: new Date("2026-11-24T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 相続税の申告期限を過ぎたときの延滞税・無申告加算税（2026-11-17 作成、docs/seisaku-queue.md の T31）。
     {
       url: `${baseUrl}/guide/souzoku/shinkoku-okure`,

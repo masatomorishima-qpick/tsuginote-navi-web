@@ -111,6 +111,10 @@ export const SOUZOKU_FILES = {
     { label: 'エクセル', href: '/downloads/souzoku-shinkoku-kigen-irai.xlsx', icon: FileSpreadsheet },
     { label: 'PDF', href: '/downloads/souzoku-shinkoku-kigen-irai.pdf', icon: FileText },
   ],
+  iraiJunbi: [
+    { label: 'エクセル', href: '/downloads/souzoku-irai-junbi.xlsx', icon: FileSpreadsheet },
+    { label: 'PDF', href: '/downloads/souzoku-irai-junbi.pdf', icon: FileText },
+  ],
 } as const;
 
 export const SOUZOKU_PAGES = [
@@ -120,6 +124,7 @@ export const SOUZOKU_PAGES = [
   { href: '/guide/souzoku/shinkoku-shorui-checklist', h: '相続税の申告書と必要書類' },
   { href: '/guide/souzoku/zero-en-shinkoku', h: '相続税の0円申告' },
   { href: '/guide/souzoku/shinkoku-kigen-irai', h: '相続税の申告期限の計算' },
+  { href: '/guide/souzoku/irai-junbi', h: '税理士に依頼する前の準備' },
   { href: '/guide/souzoku/shinkoku-okure', h: '申告期限を過ぎたときの延滞税' },
   { href: '/guide/souzoku/shinkoku-tojikata', h: '相続税申告書の綴じ方と提出' },
   { href: '/guide/souzoku/shibou-hokenkin-hikazei', h: '死亡保険金の非課税の計算' },

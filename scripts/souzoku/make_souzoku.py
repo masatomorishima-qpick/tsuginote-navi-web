@@ -26,7 +26,8 @@
   souzoku-zero-en-shinkoku.xlsx / .pdf        相続税の0円申告のチェックリスト（判定・期限・作る表と書類。2026-11-17）
   souzoku-shinkoku-okure.xlsx / .pdf          延滞税と無申告加算税の計算表（年ごとの割合・期限後の納期限。2026-11-17）
   souzoku-shinkoku-kigen-irai.xlsx / .pdf     相続税の申告期限と税理士に頼む目安の計算表（休みの繰り下げ・相続人ごと。2026-11-23）
-  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（kigenIrai・shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki・seizen・shokibo・miseinen・souji・niwari・taishoku・zero・okure・tojikata も同じ）
+  souzoku-irai-junbi.xlsx / .pdf              相続税を税理士に依頼する前の準備チェックリスト（面談の持ち物・家族で決めること。2026-11-24）
+  python3 scripts/souzoku/make_souzoku.py tetsuzuki  で、このファイルだけ作り直す（kigenIrai・shinkoku・hikazei・houtei・touki・junkakutei・shirabe・koseki・jibun・shinkokuTouki・seizen・shokibo・miseinen・souji・niwari・taishoku・zero・okure・tojikata・iraiJunbi も同じ）
 PDF は Playwright（Chromium）で HTML を印刷して作る。書体は Noto Sans CJK JP。
 """
 import json
@@ -2244,6 +2245,127 @@ def make_kigenIrai_pdf():
     _pdf(doc, "souzoku-shinkoku-kigen-irai.pdf", "/guide/souzoku/shinkoku-kigen-irai", ck)
 
 
+# ---------- 相続税を税理士に依頼する前の準備チェックリスト（2026-11-24） ----------
+def _irai_keys():
+    Jd = DATA["iraiJunbi"]
+    keys = ["nta4202", "ntaShoruiIchiran"] + [k["src"] for k in Jd["kyotsu"]] + [x for j in Jd["jokyo"] for x in j["src"]] + [k["src"] for k in Jd["kimeru"]] + ["nta4161"]
+    return [k for k in dict.fromkeys(keys) if k]
+
+
+def make_iraiJunbi_xlsx():
+    Jd = DATA["iraiJunbi"]
+    ck = Jd["checkedAt"].replace("-", "/")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "依頼前の準備"
+    widths(ws, [4, 30, 34, 44, 8])
+    put(ws, 1, 1, "相続税を税理士に依頼する前の準備チェックリスト", H, border=False)
+    put(ws, 2, 1, "当てはまるものの行に、そろったら「済」を選びます。面談の日には「持っていく物」を、証明書は面談で要るものを確かめてから取ります。", S, border=False)
+    ws.merge_cells("A2:E2")
+    ws.row_dimensions[2].height = 30
+    dv = DataValidation(type="list", formula1='"済"', allow_blank=True, showErrorMessage=True, errorTitle="入力", error="「済」を選んでください")
+    ws.add_data_validation(dv)
+    r = 4
+    put(ws, r, 1, "1. 面談の日に持っていく物", B, border=False)
+    r += 1
+    for i, t in enumerate(["", "当てはまるとき", "持っていく物", "メモ", "済"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    n = 0
+    rows = [("だれでも", k["h"], k["d"]) for k in Jd["kyotsu"]] + [(j["h"], m["h"], m["d"]) for j in Jd["jokyo"] for m in j["motsu"]]
+    for k, (when, h, d) in enumerate(rows):
+        r += 1
+        n += 1
+        put(ws, r, 1, n)
+        put(ws, r, 2, when, N)
+        put(ws, r, 3, h, B)
+        put(ws, r, 4, d, N)
+        dv.add(put(ws, r, 5, None, B, IN_FILL))
+        ws.row_dimensions[r].height = 44
+    r += 2
+    put(ws, r, 1, "2. 面談のあとに取る証明書（要ると言われたら）", B, border=False)
+    r += 1
+    for i, t in enumerate(["", "当てはまるとき", "証明書", "請求先", "済"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    n = 0
+    for j in Jd["jokyo"]:
+        for a in j["ato"]:
+            r += 1
+            n += 1
+            put(ws, r, 1, n)
+            put(ws, r, 2, j["h"], N)
+            put(ws, r, 3, a["h"], B)
+            put(ws, r, 4, a["saki"], N)
+            dv.add(put(ws, r, 5, None, B, IN_FILL))
+            ws.row_dimensions[r].height = 18 * max(2, -(-len(a["h"]) // 17))
+    r += 2
+    put(ws, r, 1, "3. 依頼の前に家族で決めておくこと", B, border=False)
+    r += 1
+    for i, t in enumerate(["", "決めること", "中身", "決めたこと（書き込む）", "済"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    for k, x in enumerate(Jd["kimeru"]):
+        r += 1
+        put(ws, r, 1, k + 1)
+        put(ws, r, 2, x["h"], B)
+        put(ws, r, 3, x["d"], N)
+        put(ws, r, 4, None, N, IN_FILL)
+        dv.add(put(ws, r, 5, None, B, IN_FILL))
+        ws.row_dimensions[r].height = 40
+    r += 2
+    put(ws, r, 1, "4. 相続財産に足す贈与の期間（通帳を見返す目安）", B, border=False)
+    r += 1
+    for i, t in enumerate(["", "亡くなった日", "足す贈与の期間", "100万円の扱い"], 1):
+        put(ws, r, i, t, B, HEAD_FILL)
+    for k, x in enumerate(DATA["seizen"]["kikan"]):
+        r += 1
+        put(ws, r, 1, k + 1)
+        put(ws, r, 2, x["h"], B)
+        put(ws, r, 3, x["kikan"], N)
+        put(ws, r, 4, x["hyaku"], N)
+        ws.row_dimensions[r].height = 44
+    r += 2
+    for t in [Jd["kotae"], Jd["tsuchou"], Jd["kikanNote"], Jd["note"], "家族で決めることのうち、窓口と費用の出し方は、つぎの手ナビの目安です。"]:
+        put(ws, r, 1, "・" + t, N, border=False)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=5)
+        ws.row_dimensions[r].height = 15 * max(2, -(-len(t) // 55))
+        r += 1
+    put(ws, r, 1, "出典：" + "／".join(SRC[k]["name"] for k in _irai_keys()) + f"（{ck} 確認）", S, border=False)
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=5)
+    ws.row_dimensions[r].height = 13 * max(2, -(-len("／".join(SRC[k]["name"] for k in _irai_keys())) // 60))
+    put(ws, r + 1, 1, f"つぎの手ナビ　{SITE}/guide/souzoku/irai-junbi", S, border=False)
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+    ws.page_setup.fitToWidth = 1
+    ws.page_setup.fitToHeight = 0
+    ws.page_setup.orientation = "portrait"
+    ws.page_setup.paperSize = ws.PAPERSIZE_A4
+    wb.save(OUT / "souzoku-irai-junbi.xlsx")
+
+
+def make_iraiJunbi_pdf():
+    Jd = DATA["iraiJunbi"]
+    ck = Jd["checkedAt"].replace("-", "/")
+    url = f"{SITE}/guide/souzoku/irai-junbi"
+    rows = "".join(f"<tr><td>☐</td><td>だれでも</td><td><b>{esc(k['h'])}</b><br><small>{esc(k['d'])}</small></td></tr>" for k in Jd["kyotsu"])
+    for j in Jd["jokyo"]:
+        for i, m in enumerate(j["motsu"]):
+            head = f"<td rowspan='{len(j['motsu'])}'>{esc(j['h'])}</td>" if i == 0 else ""
+            rows += f"<tr><td>☐</td>{head}<td><b>{esc(m['h'])}</b><br><small>{esc(m['d'])}</small></td></tr>"
+    ato = "".join(f"<tr><td>☐</td><td>{esc(j['h'])}</td><td><b>{esc(a['h'])}</b></td><td>{esc(a['saki'])}</td></tr>" for j in Jd["jokyo"] for a in j["ato"])
+    kk = "".join(f"<tr><td>{esc(x['h'])}</td><td>{esc(x['kikan'])}</td></tr>" for x in DATA["seizen"]["kikan"])
+    km = "".join(f"<tr><td>☐</td><td><b>{esc(x['h'])}</b><br><small>{esc(x['d'])}</small></td><td></td></tr>" for x in Jd["kimeru"])
+    body = f"""<style>small{{color:#64748b;font-size:8pt}} .ck td:first-child{{width:5mm;text-align:center}} h2{{break-after:avoid}} tr{{break-inside:avoid}}</style>
+<div class="go">当てはまるものを選ぶだけで、面談の持ち物が一覧になるチェック表（無料）は、つぎの手ナビのページで使えます。<br><a href="{esc(url)}">{esc(url)}</a></div>
+<div class="box">{esc(Jd['kotae'])}</div>
+<h2>1. 面談の日に持っていく物</h2><table class="ck"><tr><th></th><th style="width:44mm">当てはまるとき</th><th>持っていく物</th></tr>{rows}</table>
+<div class="sec"><h2>2. 面談のあとに取る証明書（要ると言われたら）</h2><table class="ck"><tr><th></th><th style="width:36mm">当てはまるとき</th><th>証明書</th><th style="width:40mm">請求先</th></tr>{ato}</table></div>
+<div class="sec"><h2>3. 依頼の前に家族で決めておくこと</h2><table class="ck"><tr><th></th><th>決めること</th><th style="width:60mm">決めたこと</th></tr>{km}</table></div>
+<div class="sec"><h2>4. 相続財産に足す贈与の期間（通帳を見返す目安）</h2><table><tr><th style="width:60mm">亡くなった日</th><th>足す贈与の期間</th></tr>{kk}</table>
+<p class="note">{esc(Jd['kikanNote'])}{esc(Jd['tsuchou'])}</p></div>
+<p class="note">{esc(Jd['note'])}窓口と費用の出し方は、つぎの手ナビの目安です。</p>
+<p class="note">出典：{esc('／'.join(SRC[k]['name'] for k in _irai_keys()))}（{ck} 確認）</p>"""
+    doc = page("相続税を税理士に依頼する前の準備チェックリスト", "面談の日の持ち物と、家族で決めておくことに印を付けます。", body)
+    _pdf(doc, "souzoku-irai-junbi.pdf", "/guide/souzoku/irai-junbi", ck)
+
+
 if __name__ == "__main__":
     import sys
     if sys.argv[1:] == ["shinkoku"]:
@@ -2254,7 +2376,7 @@ if __name__ == "__main__":
         make_hikazei_xlsx()
         make_hikazei_pdf()
         sys.exit(0)
-    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki", "jibun", "shinkokuTouki", "seizen", "shokibo", "miseinen", "souji", "niwari", "taishoku", "zero", "okure", "tojikata", "kigenIrai"):
+    if sys.argv[1:] and sys.argv[1] in ("houtei", "touki", "junkakutei", "shirabe", "koseki", "jibun", "shinkokuTouki", "seizen", "shokibo", "miseinen", "souji", "niwari", "taishoku", "zero", "okure", "tojikata", "kigenIrai", "iraiJunbi"):
         for name in sys.argv[1:]:
             globals()[f"make_{name}_xlsx"]()
             globals()[f"make_{name}_pdf"]()

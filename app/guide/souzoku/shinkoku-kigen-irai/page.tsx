@@ -157,7 +157,8 @@ export default function Page() {
           <ol className="grid gap-2">
             {[
               { h: '相続税がかかるかの目安を出す', s: '基礎控除を超えるかと税額', href: '/guide/souzoku/souzokuzei-keisan' },
-              { h: '頼む前に要る書類をそろえる', s: '状況を選ぶと一覧に', href: '/guide/souzoku/shinkoku-shorui-checklist' },
+              { h: '頼む前の準備と面談の持ち物', s: '状況を選ぶと一覧に。家族で決めること', href: '/guide/souzoku/irai-junbi' },
+              { h: '申告書に付ける書類の一覧', s: '状況を選ぶと一覧に', href: '/guide/souzoku/shinkoku-shorui-checklist' },
               { h: '自分で申告するときの手順', s: '作る表と目安の日', href: '/guide/souzoku/shinkoku-jibun' },
               { h: '期限を過ぎたときの延滞税', s: '日付と税額で計算', href: '/guide/souzoku/shinkoku-okure' },
             ].map((f, i) => (

@@ -761,3 +761,4 @@
 - 見込みの売上：直近7日の紹介先の押下0 → 月0円。月5万円まで 50,000円。
 - 道具：Supabase の SQL の画面のタブが「保存していない変更」の確認で閉じられず開いたまま（保存はしていない）。
 - 2026-11-23 18:45 #148 取り込み（相続税の申告期限の計算と、税理士に頼む目安の日 /guide/souzoku/shinkoku-kigen-irai）。本番の Vercel は success（09:46 UTC）。公開ページ数 38。IndexNow はこの作業の場所から送れないため、Chrome につながる回で送る。登録依頼は 11/24 0:10 の回の順番に足す。判定 12/7：表示 週5以上。
+- 2026-11-24 00:15 登録依頼の回：Chrome の Google アカウントがログアウトしていて（myaccount.google.com がログイン画面）、Search Console を開けず依頼できなかった。IndexNow は新しい /guide/souzoku/shinkoku-kigen-irai（#148）を通知（200）。持ち越し：kigen-irai（新しい）・shinkoku-shorui-checklist（#147 題名）の依頼と、11/23 の4本の確認。オーナーにログインを依頼（パスワードは入れない）。Search Console・アナリティクスを使うほかの回（8:44 など）も同じく止まる見込み。

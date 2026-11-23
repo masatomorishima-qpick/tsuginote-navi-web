@@ -44,6 +44,7 @@ const GROUPS = [
       { href: '/guide/souzoku/shinkoku-shorui-checklist', t: '相続税の申告書と必要書類', s: '様式の入手先と、状況を選ぶと一覧に' },
       { href: '/guide/souzoku/zero-en-shinkoku', t: '相続税の0円申告', s: '特例で0円でも申告が要るかの判定' },
       { href: '/guide/souzoku/shinkoku-tojikata', t: '相続税申告書の綴じ方と提出', s: '添付書類の並べ方・提出先・郵送' },
+      { href: '/guide/souzoku/shinkoku-kigen-irai', t: '相続税の申告期限の計算', s: '土日祝の繰り下げと、税理士に頼む目安の日' },
       { href: '/guide/souzoku/shinkoku-okure', t: '申告期限を過ぎたとき', s: '延滞税と無申告加算税を日付で計算' },
       { href: '/guide/souzoku/seizen-zouyo-kasan', t: '生前贈与加算の計算', s: '7年はいつからかと足す額' },
       { href: '/guide/souzoku/shokibo-takuchi-shorui', t: '小規模宅地等の特例の必要書類', s: '形を選ぶと書類と減る額' },

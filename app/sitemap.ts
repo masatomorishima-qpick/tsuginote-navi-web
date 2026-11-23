@@ -131,6 +131,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    // 相続税の申告期限の計算と、税理士に頼む目安の日（2026-11-23 作成、docs/seisaku-queue.md の T42）。
+    {
+      url: `${baseUrl}/guide/souzoku/shinkoku-kigen-irai`,
+      lastModified: new Date("2026-11-23T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // 相続税の申告期限を過ぎたときの延滞税・無申告加算税（2026-11-17 作成、docs/seisaku-queue.md の T31）。
     {
       url: `${baseUrl}/guide/souzoku/shinkoku-okure`,

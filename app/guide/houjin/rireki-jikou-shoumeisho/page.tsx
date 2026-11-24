@@ -26,8 +26,8 @@ import { HOUJIN_PARTNERS } from '@/lib/houjin/partners';
 const LP_ID = 'guide-houjin-rireki';
 const PATH = '/guide/houjin/rireki-jikou-shoumeisho';
 const CHECKED = '2026/11/25';
-const TITLE = '履歴事項全部証明書の取り方｜2026年4月からの手数料と、法人口座の申込で要る銀行・要らない銀行';
-const DESCRIPTION = '会社の履歴事項全部証明書（登記事項証明書）の取り方を、窓口・郵送・オンラインで比べました。2026年4月1日からの手数料は600円・520円・490円。設立直後の会社が法人口座の申込で使うか、銀行ごとの違いと、印鑑証明書を一緒に取るときの注意。';
+const TITLE = '履歴事項全部証明書の取得方法｜2026年4月からの手数料と、法人口座の申込で必要な銀行';
+const DESCRIPTION = '会社の履歴事項全部証明書（登記事項証明書の一つ）の取り方を、窓口・郵送・オンラインで比べました。2026年4月1日からの手数料は600円・520円・490円。設立直後の会社が法人口座の申込で使うか、銀行ごとの違いと、印鑑証明書を一緒に取るときの注意。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -52,18 +52,17 @@ type K = keyof typeof S;
 
 /** 取り方3つ（2026年4月1日からの手数料。1通） */
 const TORIKATA = [
-  { icon: Globe, h: 'オンラインで請求して、登記所で受け取る', yen: '490円', d: 'パソコンのブラウザから請求。手数料はネットバンキングかペイジー対応のATMで納める', best: true },
-  { icon: Mail, h: 'オンラインで請求して、郵送で受け取る', yen: '520円', d: '家や会社にいながら請求して、郵便で受け取る', best: false },
-  { icon: Building2, h: '窓口か郵送で請求する', yen: '600円', d: '申請書に収入印紙を貼って、登記所の窓口に出すか郵送する', best: false },
+  { icon: Globe, h: 'オンライン請求・登記所で受取', yen: '490円', d: 'インターネットで請求。手数料はネットバンキングかペイジー対応のATMで納める', best: true },
+  { icon: Mail, h: 'オンライン請求・郵送で受取', yen: '520円', d: '家や会社にいながら請求して、郵便で受け取る', best: false },
+  { icon: Building2, h: '窓口・郵送で請求', yen: '600円', d: '申請書に収入印紙を貼って、登記所の窓口に出すか郵送する', best: false },
 ];
 
 /** 法人口座の申込などで要るか（公式の記載だけ） */
 const IRU = [
   { who: '楽天銀行', need: true, d: '履歴事項全部証明書の原本。印鑑証明書の原本も', src: ['rakuten'] as K[] },
   { who: 'みずほ銀行', need: true, d: '登記事項証明書。店舗では発行から6か月以内の原本', src: ['mizuho'] as K[] },
-  { who: 'PayPay銀行', need: false, d: '必要書類にない。法人の印鑑証明書（発行から6か月以内の原本）は要る', src: ['paypay'] as K[] },
-  { who: 'ラクスルバンク', need: false, d: '必要書類にない。提出は本人確認書類と事業内容の資料の2種類', src: ['raksul'] as K[] },
-  { who: '年金事務所（社会保険の新規適用届）', need: true, d: '登記簿謄本。提出日から90日以内に発行されたもの', src: ['nenkin'] as K[] },
+  { who: 'PayPay銀行', need: false, d: '履歴事項全部証明書は必要書類にない。法人の印鑑証明書（発行から6か月以内の原本）は要る', src: ['paypay'] as K[] },
+  { who: 'ラクスルバンク', need: false, d: '履歴事項全部証明書は必要書類にない。提出は本人確認書類と事業内容の資料の2種類', src: ['raksul'] as K[] },
 ];
 
 const FAQS = [
@@ -121,12 +120,12 @@ export default function Page() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">2026年4月1日からの手数料</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">履歴事項全部証明書の<br />取り方<br /><span className="text-[20px] text-orange-600">手数料と、口座の申込で要るか</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">履歴事項全部証明書の<br />取り方（取得方法）<br /><span className="text-[20px] text-orange-600">2026年4月からの手数料</span></h1>
             <KakiteLine />
           </div>
           <ul className="grid grid-cols-3 gap-2" aria-label="1通の手数料">
             {[
-              { big: '490円', s: 'オンライン請求・窓口で受取' },
+              { big: '490円', s: 'オンライン請求・登記所で受取' },
               { big: '520円', s: 'オンライン請求・郵送で受取' },
               { big: '600円', s: '窓口・郵送で請求' },
             ].map((k, i) => (
@@ -138,7 +137,7 @@ export default function Page() {
           </ul>
           <p className="rounded-2xl bg-white p-4 text-[14px] leading-relaxed text-slate-800 ring-1 ring-slate-200">
             <span className="mb-1 block text-[12px] font-black text-sky-700">結論</span>
-            いちばん安いのは、オンラインで請求して登記所で受け取る490円です。法人口座の申込で要るかは銀行しだいで、比べた4行のうち2行は必要書類に入っていませんでした。取る前に、出す先の案内を確かめます。
+            いちばん安いのは、オンラインで請求して登記所で受け取る490円です。法人口座の申込で要るかは銀行しだいで、比べた4つの銀行のうち2つは必要書類に入っていませんでした。取る前に、出す先の案内を確かめてください。
           </p>
           <p className={SRC}>出典：{src(['tesuryo'])}（{CHECKED} 確認）</p>
         </section>
@@ -158,7 +157,7 @@ export default function Page() {
             ))}
           </ul>
           <ul className="grid gap-2 text-[13px] leading-relaxed text-slate-700">
-            <li className="flex items-start gap-2"><Clock size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />オンラインは平日8時30分〜23時、休日8時30分〜18時。17時15分より後の請求は、次の業務日の受け付け</li>
+            <li className="flex items-start gap-2"><Clock size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />オンラインは平日8時30分〜23時、休日8時30分〜18時。17時15分以降の請求は、次の業務日の受け付け</li>
             <li className="flex items-start gap-2"><Landmark size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />最寄りの登記所で、ほかの登記所が担当する会社の証明書も取れる</li>
             <li className="flex items-start gap-2"><Users size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />代表者でなくても、誰でも請求できる</li>
           </ul>
@@ -173,8 +172,8 @@ export default function Page() {
               <span className="text-[15px] font-black text-slate-900">会社の印鑑証明書</span>
               <dl className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 text-[13px] leading-relaxed">
                 <dt className="text-slate-500">窓口・郵送で請求</dt><dd className="text-right font-bold text-slate-800">500円</dd>
-                <dt className="text-slate-500">オンライン・郵送で受取</dt><dd className="text-right font-bold text-slate-800">450円</dd>
-                <dt className="text-slate-500">オンライン・窓口で受取</dt><dd className="text-right font-bold text-slate-800">420円</dd>
+                <dt className="text-slate-500">オンライン請求・郵送で受取</dt><dd className="text-right font-bold text-slate-800">450円</dd>
+                <dt className="text-slate-500">オンライン請求・登記所で受取</dt><dd className="text-right font-bold text-slate-800">420円</dd>
               </dl>
               <span className="text-[13px] leading-relaxed text-slate-600">窓口や郵送で請求するときは、印鑑カードが要ります。オンラインで請求するときは、電子証明書が要ります。</span>
             </span>
@@ -193,7 +192,7 @@ export default function Page() {
                 <span className="flex flex-1 flex-col gap-0.5">
                   <span className="flex flex-wrap items-center gap-2">
                     <span className="text-[15px] font-black text-slate-900">{r.who}</span>
-                    <span className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${r.need ? 'bg-orange-100 text-orange-800' : 'bg-slate-100 text-slate-600'}`}>{r.need ? '要る' : '求められていない'}</span>
+                    <span className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${r.need ? 'bg-orange-100 text-orange-800' : 'bg-slate-100 text-slate-600'}`}>{r.need ? '要る' : '必要書類にない'}</span>
                   </span>
                   <span className="text-[13px] leading-relaxed text-slate-600">{r.d}</span>
                 </span>
@@ -201,10 +200,18 @@ export default function Page() {
             ))}
           </ul>
           <p className="flex items-start gap-2 text-[13px] text-slate-700"><Info size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />会社の状況によって、追加で求められることがあります。</p>
+          <div className="flex items-start gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
+            <CheckCircle2 size={22} className="mt-0.5 shrink-0 text-orange-600" aria-hidden="true" />
+            <span className="flex flex-1 flex-col gap-0.5">
+              <span className="text-[12px] font-bold text-slate-500">ほかに要る場面</span>
+              <span className="text-[15px] font-black text-slate-900">年金事務所（社会保険の新規適用届）</span>
+              <span className="text-[13px] leading-relaxed text-slate-600">登記簿謄本。提出日から90日以内に発行されたもの</span>
+            </span>
+          </div>
           <p className={SRC}>出典：{src(['rakuten', 'mizuho', 'paypay', 'raksul'])}（2026/11/17 確認）・{src(['nenkin'])}（{CHECKED} 確認）</p>
           {hasExit && (
             <HoujinExit
-              lpId={LP_ID} partner="raksulBank" position="iru" lead="提出する書類が2種類の申込先"
+              lpId={LP_ID} partner="raksulBank" position="iru" lead="出す書類が2種類で済む申込先"
               note="ラクスルバンクの提出書類は、本人確認書類と事業内容の資料（設立直後は代表者の署名・捺印のある事業計画書も可）です。審査はGMOあおぞらネット銀行で、私たちは設立直後にGMOあおぞらネット銀行に直接申し込んで通りませんでした。それを知ったうえで、申込先の一つとして載せています。"
             />
           )}

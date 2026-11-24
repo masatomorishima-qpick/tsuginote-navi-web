@@ -52,21 +52,21 @@ type K = keyof typeof S;
 /** 欄ごとの書き方（記載要領と様式の記載だけ）。ex は運営会社の例（書いてよい事実の範囲） */
 const RAN: { code: string; h: string; d: string; ex?: string; tag?: 'kara' | 'mayou' }[] = [
   { code: 'F02', h: '法人番号', d: '13桁の法人番号。出す日にまだ指定を受けていなければ、書かなくてよい' },
-  { code: 'E01', h: '本店又は主たる事務所の所在地', d: '登記してある本店の所在地', ex: 'バーチャルオフィスなら、登記した住所' },
+  { code: 'E01', h: '本店又は主たる事務所の所在地', d: '登記してある本店の所在地', ex: '登記した本店（私たちはバーチャルオフィス）' },
   { code: 'E03', h: '法人名', d: '登記どおりの社名', ex: 'BlueAdventures合同会社' },
   { code: 'G03', h: '組織区分（位置）', d: '「合同会社」が社名の前なら1、後なら2', ex: '2（社名の後ろに「合同会社」）' },
   { code: 'G04', h: '組織区分（名称）', d: '様式の下にある番号から選ぶ', ex: '28（合同会社）' },
   { code: 'G01', h: '設立時の資本金又は出資金の額', d: '設立のときに登記した資本金の額', ex: '500,000円' },
-  { code: 'H07', h: '代表者氏名・住所', d: '会社を代表する人の氏名と住所' },
+  { code: 'H07・H08', h: '代表者氏名・住所', d: '会社を代表する人の氏名と住所' },
   { code: 'N01', h: '設立年月日', d: '登記簿に書かれている登記の年月日', ex: '令和8年10月28日' },
   { code: 'U01', h: '事業年度', d: '定款などで決めた会計期間', ex: '10月1日〜9月30日' },
   { code: 'N02', h: '消費税の新設法人に該当することとなった事業年度開始の日', d: '設立時の資本金が1,000万円以上のときだけ書く', ex: '資本金50万円なので書かない', tag: 'kara' },
-  { code: 'E04', h: '事業の目的', d: '定款の目的のうち主なものと、今している・する予定の事業' },
-  { code: '', h: '支店・出張所・工場等', d: '登記の有無にかかわらず、支店・営業所・事務所などを全部書く。なければ空欄', tag: 'kara' },
+  { code: 'E04・E05', h: '事業の目的', d: '定款の目的のうち主なものと、今している・する予定の事業' },
+  { code: '', h: '支店・出張所・工場等', d: '登記の有無にかかわらず、支店・出張所・営業所・事務所・工場などを全部書く' },
   { code: 'G02', h: '設立の形態（区分1）', d: '1 個人企業を法人組織にした／2 合併／3 新設分割／4 現物出資／5 その他（内容を区分4の欄に書く）', tag: 'mayou' },
   { code: '', h: '事業開始（見込み）年月日', d: '設立後に事業を始めた日か、始める見込みの日' },
   { code: '', h: '「給与支払事務所等の開設届出書」提出の有無', d: '出したなら1、出していなければ2。給与の支払事務を扱う事務所を設けたら、1か月以内にこの届出書が要る', tag: 'mayou' },
-  { code: '', h: '添付書類', d: '1（定款等の写し）に印をつける' },
+  { code: '', h: '添付書類', d: '添付したものの番号を書く（定款等の写しは1）' },
 ];
 
 const DASHIKATA = [
@@ -162,7 +162,7 @@ export default function Page() {
                 <span className="flex flex-wrap items-center gap-2">
                   {r.code && <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] font-bold text-slate-600">{r.code}</span>}
                   <span className="text-[15px] font-black leading-snug text-slate-900">{r.h}</span>
-                  {r.tag === 'kara' && <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[11px] font-bold text-emerald-800">空欄のことが多い</span>}
+                  {r.tag === 'kara' && <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[11px] font-bold text-emerald-800">条件つき</span>}
                   {r.tag === 'mayou' && <span className="rounded bg-amber-200 px-1.5 py-0.5 text-[11px] font-bold text-amber-900">迷いやすい</span>}
                 </span>
                 <span className="text-[13px] leading-relaxed text-slate-700">{r.d}</span>

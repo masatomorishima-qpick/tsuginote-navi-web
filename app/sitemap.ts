@@ -578,6 +578,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/guide/houjin/kyuyo-shiharai-jimusho-kaisetsu`,
+      lastModified: new Date("2026-11-25T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/guide/houjin/kyuujitai-touki`,
       lastModified: new Date("2026-11-16T20:00:00+09:00"),
       changeFrequency: "monthly",

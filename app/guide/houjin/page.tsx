@@ -76,6 +76,7 @@ const HOUJIN_PAGES = [
   { href: '/guide/houjin/kouza-virtual-office', t: '法人口座とバーチャルオフィス', s: '郵便と書類の注意', icon: Building2 },
   { href: '/guide/houjin/houjin-setsuritsu-todokedesho', t: '法人設立届出書の書き方', s: '合同会社の欄ごとの記入と期限・添付書類', icon: FileText },
   { href: '/guide/houjin/paypay-houjin-kouza', t: 'PayPay銀行の法人口座', s: '設立直後でも審査に通った実例', icon: Landmark },
+  { href: '/guide/houjin/aoiro-shinsei-houjin', t: '青色申告の承認申請書（法人）', s: '設立1期目の期限を日付で計算', icon: CalendarDays },
   { href: '/guide/houjin/raksulbank', t: 'ラクスルバンク', s: '審査はGMOあおぞら。手数料と申し込める会社', icon: Coins },
   { href: '/guide/houjin/kyuujitai-touki', t: '登記で旧字体がエラー', s: '印鑑証明書の「塚」が使えなかった実例', icon: Stamp },
 ];

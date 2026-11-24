@@ -50,27 +50,27 @@ type K = keyof typeof S;
 const KIGEN = [
   { h: '1期目から青色にする', d: '設立の日以後3か月を経過した日と、1期目の終わりの日の、早いほうの前日まで' },
   { h: '1期目が3か月より短く、2期目から青色にする', d: '設立の日以後3か月を経過した日と、2期目の終わりの日の、早いほうの前日まで' },
-  { h: '2期目以降に青色にする', d: '青色にしたい事業年度が始まる日の前日まで' },
+  { h: '上の2つに当たらないとき', d: '青色にしたい事業年度が始まる日の前日まで' },
 ];
 
 const KAKIKATA = [
   { h: '帳簿組織の状況', d: '伝票から総勘定元帳までの帳簿の種類・形・記帳の時期を書く。形は「3枚複写伝票」「ルーズリーフ」など、時期は「毎日」「1週間ごと」など' },
   { h: '特別な記帳方法の採用の有無', d: '当てはまる番号（1か2）を書く' },
   { h: '税理士が関与している場合の関与度合', d: '「総勘定元帳の記帳から一切の事務」のように具体的に書く' },
-  { h: '2026年10月1日以後に出すとき', d: '「承認を受けようとする事業年度終了の日」の欄など、書かなくてよい欄がある' },
+  { h: '2026年10月1日以後に出すとき', d: '「承認を受けようとする事業年度終了の日」の欄（N02）と、「1」の項番1〜6の欄は書かなくてよい' },
 ];
 
 const DASHIKATA = [
   { icon: Laptop, h: 'e-Tax（電子申告）', d: '作った申請書をネットで出せる。初めてなら利用者識別番号の取得が要る' },
-  { icon: Send, h: '書面', d: '申請書を1部、納税地を受け持つ税務署に持っていくか送る' },
+  { icon: Send, h: '書面', d: '申請書を1部、会社の所在地を管轄する税務署に持っていくか送る' },
   { icon: Smartphone, h: '法人設立ワンストップサービス', d: 'マイナポータルで、法人設立届出などとまとめて出せる。代表者のマイナンバーカードが要る' },
 ];
 
 const FAQS = [
   { q: '法人の青色申告の承認申請書の期限はいつですか？', a: '設立1期目から青色にするなら、設立の日以後3か月を経過した日と、1期目の終わりの日のうち、早いほうの前日までです。2期目以降は、青色にしたい事業年度が始まる日の前日までです。' },
   { q: '承認の通知が来ません。', a: '国税庁の記載要領では、申請書を出したあと、青色にしたい事業年度の終わりの日までに承認または却下の処分がなかったときは、その日に承認があったものとみなされるとしています（中間申告書を出すべき法人は、事業年度開始の日以後6か月を経過する日まで）。' },
-  { q: '青色申告にすると何が変わりますか？', a: '国税庁のタックスアンサーでは、青色申告書を出した事業年度に生じた欠損金額（赤字）は、その後10年以内に始まる事業年度の所得から差し引けるとしています。ほかにも条件があるため、くわしくは税理士か税務署に確かめてください。' },
-  { q: '期限が土日に当たるときは？', a: '国税の申請などの期限が土日祝などに当たるときは、その翌日が期限になる取り扱いがあります（国税通則法第10条第2項）。ただ、早めに出すのが安全です。' },
+  { q: '青色申告にすると何が変わりますか？', a: '国税庁のタックスアンサーでは、青色申告書を出した事業年度に生じた欠損金額（赤字）は、その後10年以内に始まる事業年度の所得から差し引けるとしています。その後も続けて確定申告書を出し、帳簿書類を保存することなどが条件です。' },
+  { q: '期限が土日に当たるときは？', a: '国税の申請などの期限が土日祝などに当たるときは、休み明けの日が期限になります（国税通則法第10条第2項）。ただ、早めに出すのが安全です。' },
 ];
 
 const SECTION = 'flex flex-col gap-5';
@@ -127,7 +127,7 @@ export default function Page() {
           <AoiroKigen lpId={LP_ID} />
           <p className="rounded-2xl bg-white p-4 text-[14px] leading-relaxed text-slate-800 ring-1 ring-slate-200">
             <span className="mb-1 block text-[12px] font-black text-sky-700">結論</span>
-            設立1期目から青色にするなら、「設立の日以後3か月を経過した日」と「1期目の終わりの日」の早いほうの前日までに、納税地を受け持つ税務署に出します。1期目が3か月より短い会社は、2期目から青色にすることもできます。
+            設立1期目から青色にするなら、「設立の日以後3か月を経過した日」と「1期目の終わりの日」の早いほうの前日までに、会社の所在地を管轄する税務署に出します。1期目が3か月より短い会社が2期目から青色にする場合も、期限は設立から3か月が目安です。
           </p>
           <p className={SRC}>出典：{src(['c119', 'no5100'])}（{CHECKED} 確認）</p>
         </section>
@@ -148,8 +148,8 @@ export default function Page() {
           <div className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
             <BadgeCheck size={22} className="mt-0.5 shrink-0 text-emerald-600" aria-hidden="true" />
             <span className="flex flex-1 flex-col gap-1">
-              <span className="text-[15px] font-black text-slate-900">通知がなくても承認とみなされる</span>
-              <span className="text-[13px] leading-relaxed text-slate-600">青色にしたい事業年度の終わりの日までに承認も却下もなければ、その日に承認があったものとみなされます。</span>
+              <span className="text-[15px] font-black text-slate-900">みなし承認</span>
+              <span className="text-[13px] leading-relaxed text-slate-600">青色にしたい事業年度の終わりの日（中間申告書を出すべき法人は、事業年度開始の日以後6か月を経過する日）までに承認も却下もなければ、その日に承認があったものとみなされます。</span>
             </span>
           </div>
           <p className={SRC}>出典：{src(['c119', 'yoryo'])}（{CHECKED} 確認）</p>
@@ -171,7 +171,7 @@ export default function Page() {
         </section>
 
         <section className={SECTION} aria-labelledby="kakikata">
-          <h2 id="kakikata" className={H2}>書き方（参考事項の欄）</h2>
+          <h2 id="kakikata" className={H2}>書き方</h2>
           <ul className="grid gap-2">
             {KAKIKATA.map((k) => (
               <li key={k.h} className="flex items-start gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
@@ -238,7 +238,7 @@ export default function Page() {
           {[
             { href: '/guide/houjin/kouza-hitsuyou-shorui', t: '法人口座の必要書類', s: '銀行4つの比較と、設立直後の事業内容の資料' },
             { href: '/guide/houjin/kouza-kaisetsu-kikan', t: '法人口座の開設期間', s: '設立から審査通過まで19日の実例' },
-            { href: '/guide/houjin', t: '法人成りのページ', s: '設立直後の法人口座の開設と、ページの一覧' },
+            { href: '/guide/houjin', t: '法人口座の開設（まとめ）', s: '設立直後の法人口座の開設と、法人成りのページの一覧' },
           ].map((l) => (
             <Link key={l.href} href={l.href} className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200 hover:ring-slate-300">
               <span className="flex flex-1 flex-col"><span className="text-[15px] font-black text-slate-900">{l.t}</span><span className="text-[12px] text-slate-600">{l.s}</span></span>
@@ -249,7 +249,7 @@ export default function Page() {
 
         <KakiteNote />
         <p className="text-[11px] leading-relaxed text-slate-400">
-          期限と書き方は国税庁の案内・記載要領（{CHECKED} 確認）です。期限の計算は目安で、祝日は見ていません。会社の状況で扱いが変わることがあるため、迷うときは税務署か税理士に確かめてください。最終更新：2026年11月25日
+          期限と書き方は、国税庁の案内と記載要領（{CHECKED} 確認）をもとにしています。期限の計算は目安で、祝日は見ていません。会社の状況で扱いが変わることがあるため、迷うときは税務署か税理士に確かめてください。最終更新：2026年11月25日
         </p>
       </main>
       <LpFooter />

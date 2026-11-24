@@ -148,6 +148,7 @@ const categories = [
     description: '設立直後の法人口座の開設を、運営会社がネット銀行3つに申し込んだ記録で。流れ・準備・銀行の違い。',
     articles: [
       { href: '/guide/houjin/kouza-tsukurenai', title: '法人口座が作れない？3行に申し込み、通ったのは1行' },
+      { href: '/guide/houjin/aoiro-shinsei-houjin', title: '青色申告の承認申請書（法人）の期限と書き方｜設立1期目の日付の計算' },
       { href: '/guide/houjin/kouza-virtual-office', title: '法人口座とバーチャルオフィス｜3行に申し込み、通ったのは1行の実例' },
       { href: '/guide/houjin/kouza-hitsuyou-shorui', title: '法人口座の必要書類｜銀行4つの比較と、設立直後の事業内容の資料' },
       { href: '/guide/houjin/kouza-kaisetsu-kikan', title: '法人口座の開設期間は？設立から審査通過まで19日の実例' },

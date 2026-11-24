@@ -6,11 +6,15 @@ import SiteFooter from '@/components/SiteFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import HokenSoudanBox, { HOKEN_LP_ID } from '@/components/guide/HokenSoudanBox';
 import HokenIchiranDownload from '@/components/guide/HokenIchiranDownload';
+import HokenIchiranSogaku from '@/components/guide/HokenIchiranSogaku';
 
 /*
  * 2026-11-05 v2：出口を1つ置いた（保険見直し本舗の無料相談、レントラックス 7502）。
  * 検索からの流入がすでにある唯一のページ（Search Console 3か月で158クリック）。docs/haifu-plan.md の「優先の順番」1。
  * 置き場所：「年1回の見直し」の直後と、まとめの直後（同じ紹介先の同じボタン）。広告であることの表示は最初の画面。
+ * 2026-11-24 v5（オーナー「今から動いて」）：来る人の課題は「整理」で相談とは距離がある（検索語に見直し・相談が0。
+ *   検索から49人・エクセル取得30・押下0）。整理した「月額の合計」を「これから払う総額」に置き換える計算を見直しの節に置き、
+ *   その直下の出口へつなぐ。判定 12/8：計算の利用が検索から来た人の15%以上、紹介先の押下1以上。
  */
 
 const SITE_URL = 'https://www.tsuginotenavi.jp';
@@ -172,7 +176,7 @@ export default function HokenIchiranExcelPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <GuideHeader />
-      <LpViewTracker lpId={HOKEN_LP_ID} version="v4-2026-11-22" />
+      <LpViewTracker lpId={HOKEN_LP_ID} version="v5-2026-11-24" />
 
       <div className="mx-auto max-w-3xl px-5 pb-20 pt-8 sm:px-8">
         <nav className="text-sm text-slate-500">
@@ -344,7 +348,8 @@ export default function HokenIchiranExcelPage() {
               ]}
             />
           </div>
-          <HokenSoudanBox position="review" lead="重なりや入りすぎが1つでも見つかったら、無料で相談" beacon />
+          <HokenIchiranSogaku lpId={HOKEN_LP_ID} />
+          <HokenSoudanBox position="review" lead="この総額が多いと感じたら、減らせるか無料で相談" beacon />
         </Section>
 
         <Section id="blindspot" title="その一覧表、家族は「在りか」を知っていますか？">

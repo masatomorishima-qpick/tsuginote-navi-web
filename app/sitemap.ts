@@ -524,6 +524,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/guide/houjin/setsuritsu-go-yarukoto`,
+      lastModified: new Date("2026-11-25T03:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/guide/houjin/kouza-tsukurenai`,
       lastModified: new Date("2026-11-16T18:00:00+09:00"),
       changeFrequency: "monthly",

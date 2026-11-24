@@ -27,8 +27,8 @@ import { HOUJIN_PARTNERS } from '@/lib/houjin/partners';
 const LP_ID = 'guide-houjin-setsuritsugo';
 const PATH = '/guide/houjin/setsuritsu-go-yarukoto';
 const CHECKED = '2026/11/25';
-const TITLE = '会社設立後にやること｜1人・役員報酬0円の合同会社の届出と期限、法人口座までの順番';
-const DESCRIPTION = '会社を設立したあとにやることを、期限の早い順に並べました。税務署・都道府県・市町村・年金事務所の届出のうち、役員報酬0円・従業員なしの会社がすぐ出すものと、払い始めたときに出すもの。設立直後の合同会社が法人口座を開くまでの実例つき。';
+const TITLE = '会社設立後にやること｜役員報酬0円の合同会社の届出と期限・法人口座';
+const DESCRIPTION = '会社を設立したあとにやることを、届出の期限で並べました。税務署・都道府県・市町村・年金事務所の届出のうち、どの会社も出すものと、役員報酬0円・従業員なしの会社が税務署・年金事務所に確かめるもの。設立直後の合同会社が法人口座を開くまでの実例つき。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -45,23 +45,28 @@ const S = {
   no5100: { name: '国税庁 タックスアンサー No.5100「新設法人の届出書類」', url: 'https://www.nta.go.jp/taxes/shiraberu/taxanswer/hojin/5100.htm' },
   shinki: { name: '日本年金機構「新規適用の手続き」', url: 'https://www.nenkin.go.jp/service/kounen/tekiyo/jigyosho/20150311.html' },
   hihoken: { name: '日本年金機構「適用事業所と被保険者」', url: 'https://www.nenkin.go.jp/service/kounen/tekiyo/jigyosho/20150518.html' },
+  niijo: { name: '日本年金機構 年金Q&A（新たに設立した法人事業所の社会保険の加入手続き）', url: 'https://www.nenkin.go.jp/section/faq/kounen/jigyonushi/niijokinmu.html' },
+  raksul1293: { name: 'ラクスルバンク よくあるご質問（口座開設の必要書類）', url: 'https://support.raksulbank.com/faq/show/1293?site_domain=default' },
+  raksul33: { name: 'ラクスルバンク よくあるご質問（審査にかかる時間）', url: 'https://support.raksulbank.com/faq/show/33?site_domain=default' },
 } as const;
 type K = keyof typeof S;
 
-type Who = 'all' | 'pay' | 'choice';
-/** 期限の早い順（公式の記載だけ） */
+type Who = 'all' | 'pay' | 'check' | 'choice' | 'none';
+/** 届出と期限（公式の記載だけ）。期限のないもの・自治体で違うものは先頭と最後に */
 const JUN: { when: string; h: string; to: string; who: Who; note: string; src: K[] }[] = [
-  { when: '登記のあと', h: '法人口座の申込', to: '銀行', who: 'all', note: '期限はない。審査に日数がかかるので早めに', src: [] },
-  { when: 'すぐ確かめる', h: '法人設立の届出', to: '都道府県・市町村', who: 'all', note: '期限と書き方は自治体ごとに違う。本店のある都道府県・市町村の案内で確かめる', src: [] },
-  { when: '5日以内', h: '健康保険・厚生年金保険 新規適用届', to: '年金事務所', who: 'pay', note: '加入すべき要件を満たした日から', src: ['shinki'] },
+  { when: '期限なし', h: '法人口座の申込', to: '銀行', who: 'none', note: '期限はない。審査に日数がかかるので早めに', src: [] },
+  { when: '5日以内', h: '健康保険・厚生年金保険 新規適用届', to: '年金事務所', who: 'check', note: '事実発生（加入すべき事業所になった日など）から', src: ['shinki'] },
   { when: '1か月以内', h: '給与支払事務所等の開設届出書', to: '税務署', who: 'pay', note: '給与を払う事務所を開いた日から', src: ['kyuyo'] },
   { when: '2か月以内', h: '法人設立届出書（定款の写しをつける）', to: '税務署', who: 'all', note: '設立の日（設立登記の日）から', src: ['setsuritsu', 'no5100'] },
-  { when: '3か月以内', h: '青色申告の承認申請書', to: '税務署', who: 'choice', note: '設立から3か月たつ日と、1期目の終わりの日の早いほうの前日まで', src: ['aoiro'] },
+  { when: '3か月たつ日の前日まで', h: '青色申告の承認申請書', to: '税務署', who: 'choice', note: '設立から3か月たつ日と、1期目の終わりの日の早いほうの前日まで', src: ['aoiro'] },
+  { when: '自治体ごと', h: '法人設立の届出', to: '都道府県・市町村', who: 'all', note: '期限と書き方は自治体ごとに違う。設立したらすぐ、本店のある都道府県・市町村の案内で確かめる', src: [] },
 ];
 
 const WHO: Record<Who, { label: string; cls: string }> = {
   all: { label: 'どの会社も', cls: 'bg-orange-100 text-orange-800' },
-  pay: { label: '報酬・給与を払うとき', cls: 'bg-sky-100 text-sky-800' },
+  pay: { label: '給与を払うとき', cls: 'bg-sky-100 text-sky-800' },
+  check: { label: '年金事務所に確かめる', cls: 'bg-sky-100 text-sky-800' },
+  none: { label: '期限なし・早めに', cls: 'bg-emerald-100 text-emerald-800' },
   choice: { label: '青色にするなら', cls: 'bg-slate-100 text-slate-700' },
 };
 
@@ -74,9 +79,10 @@ const WATASHI = [
 ];
 
 const FAQS = [
-  { q: '会社を設立したら、まず何をしますか？', a: '期限がいちばん長いのは税務署への法人設立届出書（設立から2か月以内）ですが、法人口座は審査に日数がかかります。私たちは設立から19日で口座の審査に通りました。届出の準備と並行して、口座の申込を先に進めるのがおすすめです。' },
+  { q: '会社を設立したら、まず何をしますか？', a: 'どの会社も出す届出のうち、税務署の法人設立届出書は設立から2か月以内です。法人口座には期限がありませんが、審査に日数がかかります。私たちは設立から19日で口座の審査に通りました。届出の準備と並行して、口座の申込を先に進めるのがおすすめです。' },
   { q: '役員報酬0円でも、社会保険の手続きは要りますか？', a: '日本年金機構は、法人の事業所（事業主だけの場合も含む）を加入が義務づけられた事業所とし、被保険者は働いた対価として給与などを受ける人としています。役員報酬0円で従業員もいないと、報酬を受ける人がいない状態です。手続きの要否と時期は、年金事務所に確かめてください。' },
-  { q: '法人設立届出書の期限はいつですか？', a: '国税庁は、設立の日（設立登記の日）以後2か月以内に、定款などの写しをつけて税務署に出すとしています。e-Taxでも書面でも出せます。' },
+  { q: '本業の会社で社会保険に入っています。自分の会社で役員報酬を受けるとどうなりますか？', a: '日本年金機構の年金Q&Aでは、すでにほかの会社で加入している人が、新しく設立した会社で役員報酬を受けるようになると、新しい会社の新規適用届と資格取得届に加え、2つの会社で加入するための届出（被保険者所属選択・二以上事業所勤務届）が要るとしています。' },
+  { q: '法人設立届出書の期限はいつですか？', a: '国税庁は、設立の日（設立登記の日）以後2か月以内に、定款などの写しをつけて税務署に出すとしています。電子申告（e-Tax）でも書面でも出せます。' },
 ];
 
 const SECTION = 'flex flex-col gap-5';
@@ -126,7 +132,7 @@ export default function Page() {
 
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
-            <p className="text-[13px] font-bold text-sky-700">期限の早い順</p>
+            <p className="text-[13px] font-bold text-sky-700">届出と期限</p>
             <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">会社設立後に<br />やること<br /><span className="text-[20px] text-orange-600">1人・役員報酬0円の合同会社</span></h1>
             <KakiteLine />
           </div>
@@ -134,9 +140,9 @@ export default function Page() {
             {[
               { big: '2か月', s: '法人設立届出書' },
               { big: '3か月', s: '青色申告の申請' },
-              { big: '19日', s: '私たちの口座の審査通過' },
-            ].map((k) => (
-              <li key={k.s} className="flex flex-col items-center gap-0.5 rounded-2xl bg-white px-2 py-3.5 text-center ring-1 ring-slate-200">
+              { big: '19日', s: '実例：設立から口座の審査通過まで' },
+            ].map((k, i) => (
+              <li key={k.s} className={`flex flex-col items-center gap-0.5 rounded-2xl px-2 py-3.5 text-center ring-1 ${i === 2 ? 'bg-emerald-50 ring-emerald-200' : 'bg-white ring-slate-200'}`}>
                 <span className="text-[24px] font-black leading-none text-orange-600">{k.big}</span>
                 <span className="text-[11px] leading-snug text-slate-600">{k.s}</span>
               </li>
@@ -144,17 +150,17 @@ export default function Page() {
           </ul>
           <p className="rounded-2xl bg-white p-4 text-[14px] leading-relaxed text-slate-800 ring-1 ring-slate-200">
             <span className="mb-1 block text-[12px] font-black text-sky-700">結論</span>
-            どの会社も出すのは、税務署の法人設立届出書（2か月以内）と、都道府県・市町村の届出です。役員報酬0円・従業員なしなら、給与と社会保険の届出は、払い始めるときに確かめます。審査に日数がかかる法人口座は、届出と並行して先に申し込みます。
+            どの会社も出すのは、税務署の法人設立届出書（2か月以内）と、都道府県・市町村の届出です。役員報酬0円・従業員なしなら、給与と社会保険の届出は、払い始める前に税務署と年金事務所に確かめます。審査に日数がかかる法人口座は、届出と並行して先に申し込みます。
           </p>
         </section>
 
         <section className={SECTION} aria-labelledby="jun">
-          <h2 id="jun" className={H2}>期限の早い順</h2>
+          <h2 id="jun" className={H2}>届出と期限</h2>
           <ol className="flex flex-col">
             {JUN.map((j, i) => (
               <li key={j.h} className="relative flex items-start gap-3 pb-4 last:pb-0">
                 {i < JUN.length - 1 && <span className="absolute left-[35px] top-11 h-[calc(100%-2.75rem)] w-px bg-sky-200" aria-hidden="true" />}
-                <span className="relative flex h-11 w-[72px] shrink-0 items-center justify-center rounded-xl bg-sky-50 text-center text-[12px] font-black leading-tight text-sky-800">{j.when}</span>
+                <span className="relative flex min-h-11 w-[72px] shrink-0 items-center justify-center rounded-xl bg-sky-50 px-1 py-1.5 text-center text-[12px] font-black leading-tight text-sky-800">{j.when}</span>
                 <span className="flex flex-1 flex-col gap-1 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
                   <span className="flex flex-wrap items-center gap-2">
                     <span className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${WHO[j.who].cls}`}>{WHO[j.who].label}</span>
@@ -171,11 +177,11 @@ export default function Page() {
         </section>
 
         <section className={SECTION} aria-labelledby="zero">
-          <h2 id="zero" className={H2}>役員報酬0円・従業員なしで変わる所</h2>
+          <h2 id="zero" className={H2}>役員報酬0円・従業員なしの場合</h2>
           <ul className="grid gap-2.5">
             {[
-              { icon: Receipt, h: '給与支払事務所等の開設届出書', d: '給与の支払いをする事務所を開いた人が、1か月以内に出す届出です。給与を払う人がいないうちは、払い始めるときに出すものとして考えます。', src: ['kyuyo'] as K[] },
-              { icon: ShieldCheck, h: '社会保険（健康保険・厚生年金保険）', d: '法人は事業主だけでも加入が義務づけられた事業所です。ただ、被保険者は働いた対価として給与などを受ける人です。報酬0円で従業員もいないと、報酬を受ける人がいません。手続きの時期は年金事務所に確かめてください。', src: ['hihoken', 'shinki'] as K[] },
+              { icon: Receipt, h: '給与支払事務所等の開設届出書', d: '対象は、給与の支払事務を扱う事務所を開いた人です。報酬0円の間の扱いは税務署に確かめ、給与を払うなら、事務所を開いた日から1か月以内に出します。', src: ['kyuyo'] as K[] },
+              { icon: ShieldCheck, h: '社会保険（健康保険・厚生年金保険）', d: '法人は事業主だけでも加入が義務づけられた事業所です。ただ、被保険者は働いた対価として給与などを受ける人です。報酬0円で従業員もいないと、報酬を受ける人がいません。手続きの要否と時期は、報酬を払う前に年金事務所に確かめてください。本業の会社で加入している代表が役員報酬を受けると、2つの会社で加入する届出も加わります。', src: ['hihoken', 'shinki', 'niijo'] as K[] },
             ].map(({ icon: I, h, d, src: s }) => (
               <li key={h} className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700"><I size={20} aria-hidden="true" /></span>
@@ -210,8 +216,8 @@ export default function Page() {
           <h2 id="kouza" className={H2}>法人口座の申込</h2>
           <ul className="grid gap-2">
             {[
-              { d: '11月上旬', t: '1行目（GMOあおぞらネット銀行）は通らず' },
-              { d: '11/12', t: '2行に同時に申込' },
+              { d: '11月上旬', t: '1つ目の銀行（GMOあおぞらネット銀行）は通らず' },
+              { d: '11/12', t: 'ほかの2つの銀行に同時に申込' },
               { d: '11/16', t: 'PayPay銀行の審査に通過（設立から19日）' },
             ].map((k) => (
               <li key={k.d} className="flex items-start gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
@@ -223,7 +229,7 @@ export default function Page() {
           <p className="text-[13px] leading-relaxed text-slate-700">止まりやすいのは「事業が分かる資料」です。設立直後は、請求書や契約書がまだありません。</p>
           <Link href="/guide/houjin" className="flex items-center gap-3 rounded-2xl border-2 border-sky-200 bg-sky-50/60 p-3.5 hover:border-sky-300">
             <Landmark size={22} className="shrink-0 text-sky-700" aria-hidden="true" />
-            <span className="flex flex-1 flex-col"><span className="text-[15px] font-black text-slate-900">設立直後の法人口座の開設</span><span className="text-[12px] text-slate-600">開設までの流れと、申し込む前に整える7つ</span></span>
+            <span className="flex flex-1 flex-col"><span className="text-[15px] font-black text-slate-900">法人口座の開設（まとめ）</span><span className="text-[12px] text-slate-600">開設までの流れと、申し込む前に整える7つ</span></span>
             <ArrowRight size={18} className="text-sky-700" aria-hidden="true" />
           </Link>
           {hasExit && (
@@ -232,6 +238,7 @@ export default function Page() {
               note="ラクスルバンクは、設立直後の会社は事業計画書（代表者の署名・捺印）を事業内容の資料として出せるとしています。審査はGMOあおぞらネット銀行で、私たちは設立直後にGMOあおぞらネット銀行に直接申し込んで通りませんでした。それを知ったうえで、申込先の一つとして載せています。"
             />
           )}
+          {hasExit && <p className={SRC}>出典：{src(['raksul1293', 'raksul33'])}（2026/11/17 確認）</p>}
         </section>
 
         <section className="flex flex-col gap-2" aria-labelledby="faq">
@@ -245,7 +252,7 @@ export default function Page() {
               <p className="mt-3 text-[14px] leading-relaxed text-slate-600">{f.a}</p>
             </details>
           ))}
-          <p className={`${SRC} mt-1`}>出典：{src(['hihoken', 'setsuritsu', 'no5100'])}（{CHECKED} 確認）</p>
+          <p className={`${SRC} mt-1`}>出典：{src(['hihoken', 'niijo', 'setsuritsu', 'no5100'])}（{CHECKED} 確認）</p>
         </section>
 
         <nav aria-label="あわせて読む" className="flex flex-col gap-2">

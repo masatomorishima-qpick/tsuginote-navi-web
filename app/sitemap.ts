@@ -519,9 +519,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // 法人成り（2026-11-16 新設）。運営会社の法人口座の審査の実例。
     {
       url: `${baseUrl}/guide/houjin`,
-      lastModified: new Date("2026-11-16T18:00:00+09:00"),
+      lastModified: new Date("2026-11-25T01:00:00+09:00"),
       changeFrequency: "monthly",
-      priority: 0.7,
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/guide/houjin/kouza-tsukurenai`,

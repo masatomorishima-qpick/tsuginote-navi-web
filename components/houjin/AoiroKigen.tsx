@@ -77,7 +77,7 @@ export default function AoiroKigen({ lpId }: { lpId: string }) {
         {ok && <p className="mt-1 text-[12px] text-slate-600">{short ? '1期目の終わりの前日のほうが早い' : '設立から3か月の終わりのほうが早い'}</p>}
       </div>
       {s !== null && e !== null && !ok && <p className="text-[12px] font-bold text-orange-700">{tooLong ? '1期目の終わりが設立から1年を超えています。日付を確かめてください。' : '1期目の終わりの日は、設立の日より後の日を入れてください。'}</p>}
-      {short && <p className="text-[12px] leading-relaxed text-slate-700">1期目が3か月より短い会社は、2期目から青色にすることもできます。その期限は {fmt(a)} です。</p>}
+      {short && <p className="text-[12px] leading-relaxed text-slate-700">1期目が3か月より短いため、2期目から青色にする場合の期限は {fmt(a)} です。</p>}
       {weekend && <p className="text-[12px] leading-relaxed text-slate-700">この日は土日です。期限が土日祝などに当たるときは、休み明けの日が期限になります（国税通則法第10条第2項）。早めに出すのが安全です。</p>}
       <p className="text-[11px] leading-relaxed text-slate-500">設立の日を含めて3か月を数えた目安です。設立の日を数えない読み方より遅く出ることはありません。祝日は見ていません。</p>
     </div>

@@ -7,7 +7,7 @@ import DATA from '@/lib/souzoku/haifu-data.json';
 /**
  * 遺産分割協議書のひな形（2026-11-05 新設）。docs/haifu-plan.md の「相続の書類のひな形」。
  * 受ける言葉：遺産分割協議書 テンプレート（1,900回/月）・書き方・ひな形・ワード。
- * 出口：いい相続（レントラックス 14647、申請中。承認までボタンは出ない）。
+ * 出口：相続アシスト（2026-11-24 v2。いい相続は申請中でボタンが出ず、出口のないページだったため替えた）。
  * 文言の元：法務局「登記申請書の記載例（相続による所有権移転登記・遺産分割）」。ひな形は scripts/souzoku/make_souzoku.py。
  */
 const LP_ID = 'guide-souzoku-kyogisho';
@@ -37,10 +37,10 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
-        lpId={LP_ID} version="v1-2026-11-05" path={PATH} eyebrow="相続の手続き"
+        lpId={LP_ID} version="v2-2026-11-24" path={PATH} eyebrow="相続の手続き"
         title={<>遺産分割協議書<br />のひな形</>}
         download={<SouzokuDownload icon={FileSignature} h="遺産分割協議書のひな形" s="法務局の記載例と同じ形" files={SOUZOKU_FILES.kyogisho} />}
-        partner="iisouzoku" exitLead="書き方に迷ったら、相続の専門家に無料で相談" faqs={FAQS} updated="2026年11月5日"
+        partner="souzokuAssist" exitLead="協議書ができたら、相続税の申告までまとめて頼む" faqs={FAQS} updated="2026年11月5日"
       >
         <section className={SECTION} aria-labelledby="kaku">
           <h2 id="kaku" className={H2}>書く6つのこと</h2>

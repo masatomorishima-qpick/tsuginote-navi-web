@@ -21,10 +21,10 @@ import DATA from '@/lib/hoken/haifu-data.json';
  * 文言の元：生命保険文化センター（保険商品の見方・用語辞典・諸変更と届出・税金のQ&A）、生命保険協会（契約照会制度）、国税庁 No.1750。
  */
 const LP_ID = 'guide-hoken-shoken';
-const VERSION = 'v1-2026-11-11';
+const VERSION = 'v2-2026-11-25';
 const PAGE_PATH = '/guide/shisan-kanri/hoken-shoken-mikata';
-const TITLE = '保険証券の見方｜欄ごとの意味と書き写し表（無料・エクセル）、税の種類も分かる';
-const DESCRIPTION = '保険証券の見方を欄ごとに1行で。契約者・被保険者・受取人、主契約と特約、保険期間と払込期間、更新。書き写すだけで一覧になる無料のエクセル・PDF付き。3人の組み合わせで死亡保険金の税（相続税・所得税・贈与税）も分かります。';
+const TITLE = '保険証券の見方｜契約者・被保険者・受取人と特約の確かめ方、見直し前の書き写し表（無料・エクセル）';
+const DESCRIPTION = '保険証券は、まず契約者（保険料を払う人）・被保険者（保障される人）・受取人（保険金を受け取る人）の3つの欄を見ます。次に主契約と特約、保険期間と払込期間、更新の有無。欄ごとの意味を1行で説明し、見直しの前に書き写すだけで一覧になる無料のエクセル・PDF付き。3人の組み合わせで死亡保険金にかかる税（相続税・所得税・贈与税）も分かります。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,

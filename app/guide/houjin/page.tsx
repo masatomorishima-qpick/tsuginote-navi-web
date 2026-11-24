@@ -70,6 +70,7 @@ const CHIGAI = [
 const HOUJIN_PAGES = [
   { href: '/guide/houjin/kouza-tsukurenai', t: '法人口座が作れない', s: '3行に申し込み、通ったのは1行', icon: XCircle },
   { href: '/guide/houjin/kouza-hitsuyou-shorui', t: '法人口座の必要書類', s: '銀行4つの比較と、設立直後の事業内容の資料', icon: FileText },
+  { href: '/guide/houjin/rireki-jikou-shoumeisho', t: '履歴事項全部証明書の取り方', s: '2026年4月からの手数料と、法人口座の申込で必要な銀行', icon: Stamp },
   { href: '/guide/houjin/kouza-kaisetsu-kikan', t: '法人口座の開設期間', s: '設立から審査通過まで19日。最短当日が延びる理由', icon: CalendarDays },
   { href: '/guide/houjin/kouza-virtual-office', t: '法人口座とバーチャルオフィス', s: '郵便と書類の注意', icon: Building2 },
   { href: '/guide/houjin/paypay-houjin-kouza', t: 'PayPay銀行の法人口座', s: '設立直後でも審査に通った実例', icon: Landmark },

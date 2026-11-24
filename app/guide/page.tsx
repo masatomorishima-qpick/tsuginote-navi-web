@@ -151,6 +151,7 @@ const categories = [
       { href: '/guide/houjin/kouza-virtual-office', title: '法人口座とバーチャルオフィス｜3行に申し込み、通ったのは1行の実例' },
       { href: '/guide/houjin/kouza-hitsuyou-shorui', title: '法人口座の必要書類｜銀行4つの比較と、設立直後の事業内容の資料' },
       { href: '/guide/houjin/kouza-kaisetsu-kikan', title: '法人口座の開設期間は？設立から審査通過まで19日の実例' },
+      { href: '/guide/houjin/rireki-jikou-shoumeisho', title: '履歴事項全部証明書の取得方法｜2026年4月からの手数料と、法人口座の申込で必要な銀行' },
     ],
   },
   {

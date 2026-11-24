@@ -149,6 +149,7 @@ const categories = [
     articles: [
       { href: '/guide/houjin/kouza-tsukurenai', title: '法人口座が作れない？3行に申し込み、通ったのは1行' },
       { href: '/guide/houjin/kouza-virtual-office', title: '法人口座とバーチャルオフィス｜3行に申し込み、通ったのは1行の実例' },
+      { href: '/guide/houjin/houjin-setsuritsu-todokedesho', title: '法人設立届出書の書き方｜合同会社の欄ごとの記入と期限・添付書類' },
       { href: '/guide/houjin/kouza-hitsuyou-shorui', title: '法人口座の必要書類｜銀行4つの比較と、設立直後の事業内容の資料' },
       { href: '/guide/houjin/kouza-kaisetsu-kikan', title: '法人口座の開設期間は？設立から審査通過まで19日の実例' },
     ],

@@ -24,8 +24,8 @@ import { HOUJIN_PARTNERS } from '@/lib/houjin/partners';
 const LP_ID = 'guide-houjin-kouza-shorui';
 const PATH = '/guide/houjin/kouza-hitsuyou-shorui';
 const CHECKED = '2026/11/17';
-const TITLE = '法人口座の必要書類｜銀行4つを比べた一覧と、設立直後に困る「事業内容の確認資料」';
-const DESCRIPTION = '法人口座の必要書類を、PayPay銀行・ラクスルバンク・楽天銀行・みずほ銀行の公式の記載で比べました。設立直後で請求書や契約書がまだない会社が、事業内容の確認資料に何を出せるか。申込で止まった実例つき。';
+const TITLE = '法人口座の開設に必要な書類｜銀行4つの一覧と、設立直後に困る「事業内容の確認資料」';
+const DESCRIPTION = '法人口座の開設に必要な書類を、PayPay銀行・ラクスルバンク・楽天銀行・みずほ銀行の公式の記載で比べました。設立直後で請求書や契約書がまだない会社が、事業内容の確認資料に何を出せるか。申込で止まった実例つき。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -131,7 +131,7 @@ export default function Page() {
     <div className="flex min-h-screen flex-col bg-[#f6f8fa]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <LpHeader />
-      <LpViewTracker lpId={LP_ID} version="v1-2026-11-17" />
+      <LpViewTracker lpId={LP_ID} version="v2-2026-11-24" />
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-16">
         {hasExit && (
           <p className="-mb-10 flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">
@@ -149,7 +149,7 @@ export default function Page() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">銀行4つの公式の記載で比較</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">法人口座の必要書類<br /><span className="text-[20px] text-orange-600">設立直後に困るのは、事業内容の資料</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">法人口座の開設に<br />必要な書類<br /><span className="text-[20px] text-orange-600">設立直後に困るのは、事業内容の資料</span></h1>
             <KakiteLine />
           </div>
           <ul className="grid grid-cols-2 gap-2" aria-label="必要書類の早見">

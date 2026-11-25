@@ -24,8 +24,8 @@ import { HOUJIN_PARTNERS } from '@/lib/houjin/partners';
 const LP_ID = 'guide-houjin-shinsa-ochita';
 const PATH = '/guide/houjin/shinsa-ochita-tsugi';
 const CHECKED = '2026/11/25';
-const TITLE = '法人口座の審査に落ちたら次は？3つの銀行に申し込み、通ったのは1つの実例';
-const DESCRIPTION = '法人口座の審査に落ちたら、次は何をするか。設立直後の合同会社が3つの銀行に申し込み、2つで落ちて1つで通った日付つきの記録。落ちた理由は銀行が開示しないこと（公式）、申込の入力を登記と照らすこと、事業の中身が分かる書類、別の銀行に同時に申し込むこと。';
+const TITLE = '法人口座の審査に落ちたら次は？3つの銀行に申し込んで1つ通った実例';
+const DESCRIPTION = '法人口座の審査に落ちたら、次は何をするか。設立直後の合同会社が3つの銀行に申し込み、2つで落ちて1つで通った日付つきの記録。落ちた理由は銀行が開示しないこと（3つの銀行の公式の記載）、申込の入力を登記と照らすこと、事業の中身が分かる書類、別の銀行に同時に申し込むこと。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 const S = {
   gmo1219: { name: 'GMOあおぞらネット銀行 よくある質問「法人口座を開設したいのですが、開設できない場合はありますか？」', url: 'https://help.gmo-aozora.com/faqs/1219' },
   gmoShorui: { name: 'GMOあおぞらネット銀行「事業内容確認書類について」', url: 'https://gmo-aozora.com/business/account/identification-companyprofile.html' },
-  docomo2426: { name: 'ドコモSMTBネット銀行 よくあるご質問「開設ができない場合は理由を教えてもらえるのでしょうか。」', url: 'https://help.netbk.co.jp/faq_detail.html?id=2426' },
+  docomo2426: { name: 'ドコモSMTBネット銀行 よくあるご質問「法人口座開設審査の結果、開設ができない場合は理由を教えてもらえるのでしょうか。」', url: 'https://help.netbk.co.jp/faq_detail.html?id=2426' },
   docomo5927: { name: 'ドコモSMTBネット銀行 よくあるご質問「口座開設のよくある不備を教えてください。」', url: 'https://help.netbk.co.jp/faq_detail.html?id=5927' },
   raksul54: { name: 'ラクスルバンク よくあるご質問「口座開設の審査基準や、申込が却下される主な理由は何ですか？」', url: 'https://support.raksulbank.com/faq/show/54?site_domain=default' },
   raksul1293: { name: 'ラクスルバンク よくあるご質問「口座開設の際、必要書類は何を提出すればいいですか。」', url: 'https://support.raksulbank.com/faq/show/1293?site_domain=default' },
@@ -49,9 +49,9 @@ type K = keyof typeof S;
 
 /** 申し込んだ3つの銀行（運営会社の実例） */
 const GINKO = [
-  { href: '/guide/houjin/gmo-aozora-shinsa', bank: 'GMOあおぞらネット銀行', when: '11/7 申込 → 11/10 メール', ok: false, s: '出した書類と公式の案内' },
-  { href: '/guide/houjin/docomo-smtb-shinsa', bank: 'ドコモSMTBネット銀行（旧住信SBI）', when: '11/12 申込 → 11/16 メール', ok: false, s: '社名の英字が1文字抜けていた' },
-  { href: '/guide/houjin/paypay-houjin-kouza', bank: 'PayPay銀行', when: '11/12 申込 → 11/16 通過', ok: true, s: '住所の違いで止まり、申し込み直した' },
+  { href: '/guide/houjin/gmo-aozora-shinsa', bank: 'GMOあおぞらネット銀行', when: '11/7 申込 → 11/10 見合わせのメール', ok: false, s: '理由の説明なし（出した書類は記事に）' },
+  { href: '/guide/houjin/docomo-smtb-shinsa', bank: 'ドコモSMTBネット銀行（旧 住信SBIネット銀行）', when: '11/12 申込 → 11/16 見合わせのメール', ok: false, s: '理由の説明なし（申込の社名の英字が1文字抜けていた）' },
+  { href: '/guide/houjin/paypay-houjin-kouza', bank: 'PayPay銀行', when: '11/12 申込 → 11/13 止まる → 11/16 通過', ok: true, s: '住所が登記と違って止まり、申し込み直した' },
 ] as const;
 
 /** 落ちた理由を教えてくれるか（公式） */
@@ -62,9 +62,9 @@ const KAIJI = [
 ];
 
 const FAQS = [
-  { q: '法人口座の審査に落ちた理由は、教えてもらえますか？', a: '教えてもらえません。GMOあおぞらネット銀行・ドコモSMTBネット銀行・ラクスルバンクは、どれも公式のよくある質問で、審査結果の詳細は開示していないとしています。私たちに届いた2つの結果のメールにも、理由は書かれていませんでした。' },
-  { q: '法人口座の審査に落ちたら、次は何をすればいいですか？', a: '私たちは、1つ目の銀行で落ちた2日後に、別の2つの銀行へ同じ日に申し込み、1つが通りました。申し込む前に、社名・住所・設立年月日などの入力を登記と照らし合わせ、事業の中身が分かる書類をそろえておきます。' },
-  { q: '同じ銀行に、もう一度申し込めますか？', a: '申し込める時期や条件は、銀行に確かめてください。私たちは、落ちた銀行にもう一度は申し込まず、別の銀行に申し込みました。' },
+  { q: '法人口座の審査に落ちた理由は、教えてもらえますか？', a: '確かめた3つの銀行は、教えないとしています。GMOあおぞらネット銀行・ドコモSMTBネット銀行・ラクスルバンクは、どれも公式のよくある質問で、口座開設の審査結果の詳細は開示していないとしています。私たちに届いた2通の見合わせのメールにも、理由は書かれていませんでした。' },
+  { q: '法人口座の審査に落ちたら、次は何をすればいいですか？', a: '私たちは、1つ目の銀行で落ちた2日後に、別の2つの銀行へ同じ日に申し込み、1つが通りました。申し込む前に、社名・住所・設立年月日などの入力を登記と照らし合わせ、事業の中身が分かる書類をそろえておくのがおすすめです。' },
+  { q: '同じ銀行に、もう一度申し込めますか？', a: '申し込める時期や条件は、銀行に確かめてください。私たちは、落ちた銀行にもう一度申し込まず、別の銀行に申し込みました。' },
 ];
 
 const SECTION = 'flex flex-col gap-5';
@@ -81,7 +81,7 @@ function src(keys: readonly K[]) {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', author: KAKITE_LD, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', about: { '@type': 'Thing', name: '法人口座の審査に落ちたとき' }, mentions: ['GMOあおぞらネット銀行', 'ドコモSMTBネット銀行', 'PayPay銀行'].map((name) => ({ '@type': 'BankOrCreditUnion', name })), datePublished: '2026-11-25T23:30:00+09:00', dateModified: '2026-11-25T23:30:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}` },
+    { '@type': 'Article', author: KAKITE_LD, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', about: { '@type': 'Thing', name: '法人口座の審査に落ちたとき' }, mentions: ['GMOあおぞらネット銀行', 'ドコモSMTBネット銀行', 'PayPay銀行'].map((name) => ({ '@type': 'BankOrCreditUnion', name })), datePublished: '2026-11-25T20:00:00+09:00', dateModified: '2026-11-25T20:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}` },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: '法人成り', item: `${SITE_URL}/guide/houjin` },
@@ -132,7 +132,7 @@ export default function Page() {
           </ul>
           <p className="rounded-2xl bg-white p-4 text-[14px] leading-relaxed text-slate-800 ring-1 ring-slate-200">
             <span className="mb-1 block text-[12px] font-black text-sky-700">結論</span>
-            落ちた理由は、銀行が教えません。待っても分からないので、入力と書類を見直して、別の銀行に申し込みます。私たちは1つ目で落ちた2日後に、2つの銀行へ同じ日に申し込み、1つが通りました。
+            落ちた理由は、銀行は教えてくれません（確かめた3つの銀行とも公式に明記）。待っても理由は分からないので、入力と書類を見直して、別の銀行に申し込みます。私たちは1つ目で落ちた2日後に、2つの銀行へ同じ日に申し込み、1つが通りました。
           </p>
         </section>
 
@@ -165,7 +165,7 @@ export default function Page() {
               </li>
             ))}
           </ul>
-          <p className="text-[13px] leading-relaxed text-slate-700">どれも公式のよくある質問で「審査結果の詳細は開示しない」としています。理由を推し量るより、銀行が公式に挙げている確認の点に照らすほうが確かです。</p>
+          <p className="text-[13px] leading-relaxed text-slate-700">どれも公式のよくある質問で「口座開設の審査結果の詳細は、開示しておりません。」としています。理由を推し量るより、銀行が公式に挙げている「よくある不備」に照らすほうが確かです。</p>
           <p className={SRC}>出典：{src(['gmo1219', 'docomo2426', 'raksul54'])}（{CHECKED} 確認）</p>
         </section>
 
@@ -176,39 +176,39 @@ export default function Page() {
               <SearchCheck size={22} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />
               <span className="flex flex-col gap-1">
                 <span className="text-[15px] font-black text-slate-900">1. 申込の入力を登記と照らす</span>
-                <span className="text-[13px] leading-relaxed text-slate-600">ドコモSMTBネット銀行は、法人名称・住所・設立年月日などが登記と違うことを、よくある不備に挙げています。私たちも、ドコモSMTBネット銀行の申込で社名の英字が1文字抜け、PayPay銀行の申込で住所に自宅を入れていました。</span>
+                <span className="text-[13px] leading-relaxed text-slate-600">ドコモSMTBネット銀行は、入力した住所と登記上の本店所在地の違いや、法人名称・設立年月日の記載の違いを、よくある不備に挙げています。私たちは、ドコモSMTBネット銀行の申込で社名の英字が1文字抜けていました（落ちた理由かどうかは分かりません）。PayPay銀行では法人の住所に自宅を入れて手続きが止まり、登記どおりに入れ直して通りました。</span>
               </span>
             </li>
             <li className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
               <FileText size={22} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />
               <span className="flex flex-col gap-1">
                 <span className="text-[15px] font-black text-slate-900">2. 事業の中身が分かる書類をそろえる</span>
-                <span className="text-[13px] leading-relaxed text-slate-600">GMOあおぞらネット銀行は、履歴事項全部証明書や定款を、事業内容の書類としては受け付けないとしています。ラクスルバンクは、取引の書類がない設立直後の会社に、代表者が署名・捺印した事業計画書を挙げています。</span>
+                <span className="text-[13px] leading-relaxed text-slate-600">GMOあおぞらネット銀行は、履歴事項全部証明書や定款を、事業内容の書類としては受け付けないとしています。ラクスルバンクは、設立直後の補う書類として、代表者の署名・捺印がある事業計画書を挙げています。</span>
               </span>
             </li>
             <li className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
               <Layers size={22} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />
               <span className="flex flex-col gap-1">
                 <span className="text-[15px] font-black text-slate-900">3. 別の銀行に、同じ日に申し込む</span>
-                <span className="text-[13px] leading-relaxed text-slate-600">私たちは、1つ目の結果の2日後に、2つの銀行へ同じ日に申し込みました。1つは落ち、1つは通りました。設立から19日です。</span>
+                <span className="text-[13px] leading-relaxed text-slate-600">私たちは、1つ目の結果の2日後に、2つの銀行へ同じ日に申し込みました。1つは落ち、1つは通りました。通ったのは11月16日、設立から19日後です。</span>
               </span>
             </li>
             <li className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
               <HelpCircle size={22} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />
               <span className="flex flex-col gap-1">
-                <span className="text-[15px] font-black text-slate-900">4. 同じ銀行への申し直しは、銀行に確かめる</span>
-                <span className="text-[13px] leading-relaxed text-slate-600">申し込める時期や条件は、銀行ごとに違います。私たちは、落ちた銀行にはもう一度申し込んでいません。</span>
+                <span className="text-[15px] font-black text-slate-900">4. 同じ銀行にもう一度申し込むとき</span>
+                <span className="text-[13px] leading-relaxed text-slate-600">申し込める時期や条件は、申し込む銀行に確かめてください。私たちは、落ちた銀行にもう一度は申し込んでいません。</span>
               </span>
             </li>
           </ol>
           <p className={SRC}>出典：{src(['docomo5927', 'gmoShorui', 'raksul1293'])}（{CHECKED} 確認）</p>
           {hasExit && (
             <HoujinExit
-              lpId={LP_ID} partner="raksulBank" position="tsugi" lead="まだ申し込んでいない銀行の一つに"
+              lpId={LP_ID} partner="raksulBank" position="tsugi" lead="GMOあおぞらネット銀行にまだ申し込んでいないなら"
               note="ラクスルバンクの口座はGMOあおぞらネット銀行のラクスルバンク支店で、審査もGMOあおぞらネット銀行が行います。私たちはGMOあおぞらネット銀行に直接申し込んで落ちています。GMOあおぞらネット銀行で落ちたことがある会社は、同じ銀行の審査になると知ったうえで選んでください。"
             />
           )}
-          {hasExit && <p className={SRC}>出典：{src(['raksul33', 'gmoTokuyaku'])}</p>}
+          {hasExit && <p className={SRC}>出典：{src(['raksul33', 'gmoTokuyaku'])}（{CHECKED} 確認）</p>}
         </section>
 
         <section className="flex flex-col gap-2" aria-labelledby="faq">

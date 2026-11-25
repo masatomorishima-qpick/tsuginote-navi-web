@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Ban, CalendarDays, CheckCircle2, Clock, FileText, Globe, Info, Landmark, Mail, MessageSquare, XCircle } from 'lucide-react';
+import { ArrowRight, CalendarDays, CheckCircle2, Clock, FileText, Info, Landmark, Mail, MessageSquare, XCircle } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
@@ -15,18 +15,21 @@ import { HOUJIN_PARTNERS } from '@/lib/houjin/partners';
  *   GMOあおぞらネット銀行 法人口座 審査 落ち 110（主）・審査期間 40・法人口座 審査 20・口座開設 審査 20・法人審査 20。
  * 上位（11/25 19:00、Google「GMOあおぞらネット銀行 法人口座 審査 落ちた」）：GMO 自身のコラム2つ・口コミの媒体・X・税理士事務所・
  *   知恵袋・会計事務所・GMO のよくある質問・バーチャルオフィスの会社。実際に落ちた日付と出した書類を書いた記事はない。
- *   上位に欠けている点：①申込から結果までの日付と通知の文面 ②出した書類と、公式の「受付できない書類の例」との照らし合わせ
+ *   上位に欠けている点：①申込から結果までの日付と通知の文面 ②実際に出した書類（アフィリエイトの明細2つ・公開1年以上のホームページ）と公式の案内の照らし合わせ
  *   ③設立直後（準備段階）の書類の出し方を公式の案内どおりに並べたもの
+ * 11/25 18:35 オーナー訂正：GMOに出したのは Google アドセンスの明細とアクセストレードの明細。ホームページは公開1年以上。
+ *   （履歴事項全部証明書・法人設立届出書は GMO 以外の申込の話。GMO の記事には書かない）
  * 一次情報：GMOあおぞらネット銀行「事業内容確認書類について」・よくある質問 1219・874・1316・1514（11/25 確認）。
  * 実体験：houjin-plan.md「実体験の事実」（11/7 申込・11/10 結果のメール・出した書類。オーナー 11/25）。
- *   落ちた理由は銀行が開示しないので決めつけない。「公式の受付できない書類の例に、出した2つが入っていた」という事実だけ書く。
- * 出口：ラクスルバンク（審査は GMOあおぞらネット銀行。同じ審査であることを枠の注記で正直に書き、書類をそろえ直してからと添える）。
+ *   落ちた理由は銀行が開示しないので決めつけない。出したものは公式の書類の例に当てはまっていたが落ちた、という事実だけ書く。
+ *   明細の名義（個人か法人か）はオーナーに確認中。分かるまで名義には触れない。
+ * 出口：ラクスルバンク（審査は GMOあおぞらネット銀行。同じ審査で、GMO で落ちたあと通るかは分からないと注記。まだ申し込んでいない会社向けの紹介とする）。
  */
 const LP_ID = 'guide-houjin-gmo-shinsa';
 const PATH = '/guide/houjin/gmo-aozora-shinsa';
 const CHECKED = '2026/11/25';
-const TITLE = 'GMOあおぞらネット銀行の法人口座、審査に落ちた｜設立直後の実例と、受け付けない書類';
-const DESCRIPTION = 'GMOあおぞらネット銀行の法人口座の審査に、設立から10日後に申し込んだ合同会社が落ちた実例。申込から結果のメールまで3日。出した書類（履歴事項全部証明書・法人設立届出書）は、公式の「受付できない書類の例」に入っていました。設立直後の書類の出し方、審査の日数、次にしたこと。';
+const TITLE = 'GMOあおぞらネット銀行の法人口座、審査に落ちた｜設立直後に出した書類と結果';
+const DESCRIPTION = 'GMOあおぞらネット銀行の法人口座の審査に、設立から10日後に申し込んだ合同会社が落ちた実例。申込から結果のメールまで3日。出したのはアフィリエイトの明細2つと、公開1年以上のホームページで、どれも公式の書類の例に当てはまるものでした。公式が挙げる書類、設立直後の出し方、審査の日数、次にしたこと。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -40,6 +43,7 @@ const S = {
   shorui: { name: 'GMOあおぞらネット銀行「事業内容確認書類について」', url: 'https://gmo-aozora.com/business/account/identification-companyprofile.html' },
   faq1219: { name: 'GMOあおぞらネット銀行 よくある質問「法人口座を開設したいのですが、開設できない場合はありますか？」', url: 'https://help.gmo-aozora.com/faqs/1219' },
   faq1316: { name: 'GMOあおぞらネット銀行 よくある質問（提出書類に不備があると連絡が届いた場合）', url: 'https://help.gmo-aozora.com/faqs/1316' },
+  faq1317: { name: 'GMOあおぞらネット銀行 よくある質問（法人口座開設の必要書類の確認方法と提出先）', url: 'https://help.gmo-aozora.com/faqs/1317' },
   faq1514: { name: 'GMOあおぞらネット銀行 よくある質問「口座開設の審査は、どのくらい時間がかかりますか。」', url: 'https://help.gmo-aozora.com/faqs/1514' },
   raksul33: { name: 'ラクスルバンク よくあるご質問（審査にかかる時間）', url: 'https://support.raksulbank.com/faq/show/33?site_domain=default' },
 } as const;
@@ -56,9 +60,9 @@ const KIROKU = [
 
 /** 私たちが出したもの × 公式の案内（「事業内容確認書類について」） */
 const DASHITA = [
-  { h: '履歴事項全部証明書', kekka: '受付できない書類の例', ng: true },
-  { h: '法人設立届出書', kekka: '受付できない書類の例', ng: true },
-  { h: 'ホームページのアドレス', kekka: '確認書類の一つ（条件つき）', ng: false },
+  { h: 'Google アドセンスの明細', kekka: '公式の例「売上・仕入・活動状況が客観的に確認できる書類」（アフィリエイト広告などの管理画面の画像）', ng: false },
+  { h: 'アクセストレードの明細', kekka: '同じく「売上・仕入・活動状況が客観的に確認できる書類」', ng: false },
+  { h: 'ホームページ（公開1年以上）', kekka: '公式の例「ホームページなど」。条件の「集客目的での運営実績3カ月以上」を満たす', ng: false },
   { h: '請求書・発注書', kekka: '法人として出したことも受け取ったこともなく、出していない', ng: null },
 ];
 
@@ -79,6 +83,7 @@ const FAQS = [
   { q: 'GMOあおぞらネット銀行は、審査に落ちた理由を教えてくれますか？', a: '教えてもらえません。公式のよくある質問で、口座開設の審査結果の詳細は開示していないとしています。私たちに届いた結果のメールにも、審査内容には答えられないと書かれていました。' },
   { q: '法人口座の審査には何日かかりますか？', a: '公式では、本人確認をマイナンバーカードの読み取りか自撮りの動画で行うと最短当日、書類のアップロードか郵送だと1週間ほどとしています。私たちは11月7日に申し込み、11月10日にメールで結果が届きました。' },
   { q: '履歴事項全部証明書は、事業内容の書類になりますか？', a: 'なりません。公式の「事業内容確認書類について」では、履歴事項全部証明書・定款・法人設立届出書などを「事業の売上に直接関係しない書類」として、「受付できない書類の例」に挙げています。' },
+  { q: 'アフィリエイトの明細は、事業内容の書類になりますか？', a: '公式の案内では、「売上・仕入・活動状況が客観的に確認できる書類」の例に、アフィリエイト広告などの管理画面の画像を挙げています。私たちは Google アドセンスとアクセストレードの明細を出しましたが、審査には通りませんでした。' },
 ];
 
 const SECTION = 'flex flex-col gap-5';
@@ -136,7 +141,7 @@ export default function Page() {
             {[
               { big: '10日後', s: '設立から申込まで' },
               { big: '3日', s: '申込から結果まで' },
-              { big: '2つ', s: '公式の「受付できない書類の例」に入っていた書類' },
+              { big: '1年以上', s: 'ホームページの公開から' },
             ].map((k) => (
               <li key={k.s} className="flex flex-col items-center gap-0.5 rounded-2xl bg-white px-2 py-3.5 text-center ring-1 ring-slate-200">
                 <span className="text-[24px] font-black leading-none text-orange-600">{k.big}</span>
@@ -146,7 +151,7 @@ export default function Page() {
           </ul>
           <p className="rounded-2xl bg-white p-4 text-[14px] leading-relaxed text-slate-800 ring-1 ring-slate-200">
             <span className="mb-1 block text-[12px] font-black text-sky-700">結論</span>
-            落ちた理由は、銀行が教えないので分かりません。ただ、事業の中身を示すつもりで出した履歴事項全部証明書と法人設立届出書は、公式の「受付できない書類の例」に入っています。設立直後の会社は、事業の中身が分かる書類を2点以上そろえてから申し込むのが、公式の案内に沿った出し方です。
+            落ちた理由は、銀行が教えないので分かりません。出したのは、アフィリエイトの明細2つと公開1年以上のホームページで、どれも公式が挙げる書類の例に当てはまるものでした。それでも3日で見合わせの結果です。設立直後は1行だけに頼らず、ほかの銀行にも同時に申し込める用意をしておくのが、私たちの学びです。
           </p>
         </section>
 
@@ -177,17 +182,17 @@ export default function Page() {
           <p className="text-[13px] leading-relaxed text-slate-700">銀行の案内では、書類で「登記上の会社名・所在地」「事業や商品の具体的な内容」「今、実際に事業をしていること」を確かめます。書類の不備の主な原因は、「現在、実際にどのような事業活動を行われているのかが分からない」ことだとしています。</p>
           <ul className="grid gap-2">
             {DASHITA.map((d) => (
-              <li key={d.h} className={`flex items-start gap-3 rounded-2xl p-3.5 ring-1 ${d.ng ? 'bg-rose-50 ring-rose-200' : 'bg-white ring-slate-200'}`}>
-                {d.ng ? <Ban size={20} className="mt-0.5 shrink-0 text-rose-600" aria-hidden="true" /> : d.ng === false ? <Globe size={20} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" /> : <FileText size={20} className="mt-0.5 shrink-0 text-slate-400" aria-hidden="true" />}
+              <li key={d.h} className="flex items-start gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
+                {d.ng === false ? <CheckCircle2 size={20} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" /> : <FileText size={20} className="mt-0.5 shrink-0 text-slate-400" aria-hidden="true" />}
                 <span className="flex flex-1 flex-col gap-0.5">
                   <span className="text-[15px] font-black text-slate-900">{d.h}</span>
-                  <span className={`text-[13px] leading-relaxed ${d.ng ? 'font-bold text-rose-700' : 'text-slate-600'}`}>{d.kekka}</span>
+                  <span className="text-[13px] leading-relaxed text-slate-600">{d.kekka}</span>
                 </span>
               </li>
             ))}
           </ul>
-          <p className="flex items-start gap-2 text-[13px] leading-relaxed text-slate-700"><Info size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />ホームページは、公式では「集客目的での運営実績が3カ月以上」あることなどが条件です。無料のサービスで作ったもの、名刺代わりのもの、中身が少ないものは、追加の書類が要るとしています。</p>
-          <p className={SRC}>出典：{src(['shorui', 'faq1316'])}（{CHECKED} 確認）</p>
+          <p className="flex items-start gap-2 text-[13px] leading-relaxed text-slate-700"><Info size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />銀行の案内では、確認書類は口座を開く法人の名前が書かれたものに限り、代表者個人の名前の書類は受け付けないとしています。一方で、設立間もない会社が、個人事業主のころから同じ事業をしていた場合は、そのころの書類に準ずるものを出すよう案内しています。</p>
+          <p className={SRC}>出典：{src(['shorui', 'faq1316', 'faq1317'])}（{CHECKED} 確認）</p>
         </section>
 
         <section className={SECTION} aria-labelledby="osusume">
@@ -231,7 +236,7 @@ export default function Page() {
         <section className={SECTION} aria-labelledby="tsugi">
           <h2 id="tsugi" className={H2}>落ちたあとにしたこと</h2>
           <p className="text-[13px] leading-relaxed text-slate-700">結果の2日後に、ドコモSMTBネット銀行と PayPay銀行に同時に申し込みました。ドコモSMTBネット銀行は通りませんでした。PayPay銀行は、申込の住所が登記と違って一度止まりましたが、申し込み直して設立から19日で審査に通りました。</p>
-          <p className="text-[13px] leading-relaxed text-slate-700">書類をそろえ直して、GMOあおぞらネット銀行にもう一度申し込めるかは、銀行に確かめてください。</p>
+          <p className="text-[13px] leading-relaxed text-slate-700">GMOあおぞらネット銀行にもう一度申し込めるかは、銀行に確かめてください。</p>
           <div className="grid gap-2">
             <Link href="/guide/houjin/paypay-houjin-kouza" className="flex items-center gap-3 rounded-2xl border-2 border-sky-200 bg-sky-50/60 p-3.5 hover:border-sky-300">
               <Landmark size={22} className="shrink-0 text-sky-700" aria-hidden="true" />
@@ -246,8 +251,8 @@ export default function Page() {
           </div>
           {hasExit && (
             <HoujinExit
-              lpId={LP_ID} partner="raksulBank" position="tsugi" lead="書類をそろえ直して申し込むなら"
-              note="ラクスルバンクの審査は、GMOあおぞらネット銀行が行います。GMOあおぞらネット銀行で落ちたあとに、ラクスルバンクで通るかは分かりません。申し込むなら、事業の中身が分かる書類をそろえてからにしてください。"
+              lpId={LP_ID} partner="raksulBank" position="tsugi" lead="これから申し込む会社の申込先に"
+              note="ラクスルバンクの審査は、GMOあおぞらネット銀行が行います。GMOあおぞらネット銀行で落ちたあとに、ラクスルバンクで通るかは分かりません。まだどこにも申し込んでいない会社が、申込先の一つとして考えるための紹介です。"
             />
           )}
           {hasExit && <p className={SRC}>出典：{src(['raksul33'])}</p>}

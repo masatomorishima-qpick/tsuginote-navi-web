@@ -75,6 +75,7 @@ const HOUJIN_PAGES = [
   { href: '/guide/houjin/kouza-kaisetsu-kikan', t: '法人口座の開設期間', s: '設立から審査通過まで19日。最短当日が延びる理由', icon: CalendarDays },
   { href: '/guide/houjin/kouza-virtual-office', t: '法人口座とバーチャルオフィス', s: '郵便と書類の注意', icon: Building2 },
   { href: '/guide/houjin/houjin-setsuritsu-todokedesho', t: '法人設立届出書の書き方', s: '合同会社の欄ごとの記入と期限・添付書類', icon: FileText },
+  { href: '/guide/houjin/kyuyo-shiharai-jimusho-kaisetsu', t: '給与支払事務所等の開設届出書', s: '役員報酬0円の会社と、納期の特例の計算', icon: FileText },
   { href: '/guide/houjin/paypay-houjin-kouza', t: 'PayPay銀行の法人口座', s: '設立直後でも審査に通った実例', icon: Landmark },
   { href: '/guide/houjin/aoiro-shinsei-houjin', t: '青色申告の承認申請書（法人）', s: '設立1期目の期限を日付で計算', icon: CalendarDays },
   { href: '/guide/houjin/raksulbank', t: 'ラクスルバンク', s: '審査はGMOあおぞら。手数料と申し込める会社', icon: Coins },

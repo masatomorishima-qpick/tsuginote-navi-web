@@ -70,6 +70,7 @@ const CHIGAI = [
 const HOUJIN_PAGES = [
   { href: '/guide/houjin/setsuritsu-go-yarukoto', t: '会社設立後にやること', s: '届出の期限の早い順。役員報酬0円で変わる所', icon: CalendarDays },
   { href: '/guide/houjin/kouza-tsukurenai', t: '法人口座が作れない', s: '3行に申し込み、通ったのは1行', icon: XCircle },
+  { href: '/guide/houjin/gmo-aozora-shinsa', t: 'GMOあおぞらネット銀行の審査に落ちた', s: '申込から3日で結果。受け付けない書類', icon: XCircle },
   { href: '/guide/houjin/kouza-hitsuyou-shorui', t: '法人口座の必要書類', s: '銀行4つの比較と、設立直後の事業内容の資料', icon: FileText },
   { href: '/guide/houjin/rireki-jikou-shoumeisho', t: '履歴事項全部証明書の取り方', s: '2026年4月からの手数料と、法人口座の申込で必要な銀行', icon: Stamp },
   { href: '/guide/houjin/kouza-kaisetsu-kikan', t: '法人口座の開設期間', s: '設立から審査通過まで19日。最短当日が延びる理由', icon: CalendarDays },

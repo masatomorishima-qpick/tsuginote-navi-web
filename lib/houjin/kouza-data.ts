@@ -16,7 +16,7 @@ export type SourceKey = keyof typeof SOURCES;
 
 /** 申し込んだ3行の結果（運営会社の実例） */
 export const RESULTS = [
-  { bank: 'GMOあおぞらネット銀行', ok: false, when: '11月上旬に申込', result: '通らず' },
+  { bank: 'GMOあおぞらネット銀行', ok: false, when: '11/7 申込 → 11/10 メール', result: '通らず' },
   { bank: 'ドコモSMTBネット銀行', ok: false, when: '11/12 申込 → 11/16 メール', result: '通らず' },
   { bank: 'PayPay銀行', ok: true, when: '11/12 申込 → 11/16 通過', result: '開設' },
 ] as const;
@@ -34,7 +34,7 @@ export const JOUKEN = [
 /** 日付ごとの経過（2026年） */
 export const KEIKA = [
   { d: '10/28', t: '会社を設立（登記）' },
-  { d: '11月上旬', t: 'GMOあおぞらネット銀行に申込 → 通らず' },
+  { d: '11/7', t: 'GMOあおぞらネット銀行に申込 → 11/10 に通らず' },
   { d: '11/12', t: 'ドコモSMTBネット銀行とPayPay銀行に申込' },
   { d: '11/13', t: 'PayPay銀行：法人の住所に自宅を入れていて、登記の本店（バーチャルオフィス）と違い手続きが止まる → 登記どおりに入れて申し込み直し' },
   { d: '11/16', t: 'ドコモSMTBネット銀行：「口座開設を見合わせ」のメール。理由の説明なし' },

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, Clock, FileText, Info, Landmark, SearchCheck, Video, XCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Clock, FileText, IdCard, Info, SearchCheck, Video, XCircle } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
@@ -23,8 +23,8 @@ import { HOUJIN_PARTNERS } from '@/lib/houjin/partners';
 const LP_ID = 'guide-houjin-smbc-shinsa';
 const PATH = '/guide/houjin/smbc-shinsa';
 const CHECKED = '2026/11/25';
-const TITLE = '三井住友銀行の法人口座の審査に落ちたら｜Trunkの必要書類と見直す所';
-const DESCRIPTION = '三井住友銀行の法人口座（Trunk）の審査に落ちたときに見直す所。公式の必要書類は事業内容を確かめる書類1点と本人確認書類で、事業計画書は他の書類が出せない設立間もない会社に限られます。Web面談で事業内容を聞かれること、店頭で申し込む場合の書類も公式の記載から。設立直後に3つの銀行へ申し込んだ実例つき。';
+const TITLE = '三井住友銀行の法人口座の審査に落ちたら｜Trunkの必要書類と見直す点';
+const DESCRIPTION = '三井住友銀行の法人口座を Web（Trunk）で申し込み、審査に落ちたときに見直す点。公式の必要書類は事業内容を確かめる書類1点と本人確認書類で、事業計画書は他の書類が出せない設立間もない会社に限られます。Web面談で事業内容を聞かれること、店頭で申し込む場合の書類も公式の記載から。三井住友銀行以外の3つの銀行に申し込んだ運営会社の実例つき。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -48,26 +48,26 @@ const SHORUI = [
   '他社が発行した請求書・発注書・納品書など',
   '自社で発行した請求書・納品書など',
   '売上・仕入・活動状況が客観的に確認できる書類',
-  '事業計画書（設立間もなく、上の4つが出せない場合に限る）',
+  '事業計画書や会社紹介資料（設立間もなく、上の4つが出せない場合に限る）',
 ];
 
 /** 落ちたあとに見直す所 */
 const MINAOSHI = [
-  { icon: FileText, h: '書類の名義と社名・所在地', s: '公式は、売上などが分かる書類の例に「登記上の社名・所在地が明記されている事業案内」などを挙げています。私たちは別の銀行に、個人の名義のままの明細を出して落ちました。' },
-  { icon: SearchCheck, h: '申込の入力と登記', s: '社名・住所・設立年月日を、登記と1文字ずつ照らします。私たちは別の銀行の申込で、社名の英字が1文字抜け、住所に自宅を入れていました。' },
+  { icon: FileText, h: '書類の名義と社名・所在地', s: '公式は、売上などが分かる書類の例に「登記上の社名・所在地が明記されている事業案内」などを挙げています。私たちは GMOあおぞらネット銀行に、個人の名義の Google アドセンスとアクセストレードの明細を出し、見合わせになりました（理由は知らされていません）。三井住友銀行の公式に明細の名義の条件は見当たりませんが、私たちが次の申込から気をつけた点です。' },
+  { icon: SearchCheck, h: '申込の入力と登記', s: '社名（英字の表記も）・住所・設立年月日が、登記と1文字も違わないかを照らし合わせます。私たちは、ドコモSMTBネット銀行の申込で社名の英字が1文字抜けていました。PayPay銀行の申込では住所に自宅を入れて登記と違い、手続きが止まったので申し込み直しました。' },
   { icon: Video, h: 'Web面談での事業の説明', s: '公式では、Web面談で担当者が事業内容などを聞くとしています。何を売り、だれから入金があるかを、短く言えるようにしておきます。' },
 ];
 
 const GINKO = [
   { href: '/guide/houjin/gmo-aozora-shinsa', bank: 'GMOあおぞらネット銀行', when: '11/7 申込 → 11/10 見合わせのメール', ok: false },
   { href: '/guide/houjin/docomo-smtb-shinsa', bank: 'ドコモSMTBネット銀行（旧 住信SBIネット銀行）', when: '11/12 申込 → 11/16 見合わせのメール', ok: false },
-  { href: '/guide/houjin/paypay-houjin-kouza', bank: 'PayPay銀行', when: '11/12 申込 → 11/16 通過', ok: true },
+  { href: '/guide/houjin/paypay-houjin-kouza', bank: 'PayPay銀行', when: '11/12 申込 → 11/13 住所の違いで止まり申し込み直し → 11/16 通過', ok: true },
 ] as const;
 
 const FAQS = [
   { q: '設立したばかりの会社でも、三井住友銀行の法人口座は作れますか？', a: '公式のよくあるご質問では、新設法人も口座を開設している実績が多数あり、これまでの実績にかかわらず現在の事業計画などをもとに検討するとしています。作れるかどうかは審査しだいです。' },
-  { q: '三井住友銀行の法人口座は、申し込んでから何日で開けますか？', a: 'Web の Trunk は、公式で最短即日としています。審査の状況によって時間がかかる場合があるとも書いています。店頭で申し込む場合は、申込から開設まで1か月ほどかかる場合があるとしています。' },
-  { q: '三井住友銀行の審査に落ちたら、次は何をすればいいですか？', a: '書類の名義と社名・所在地、申込の入力が登記と合っているかを見直します。私たちは3つの銀行に申し込み、1つ目で落ちた2日後に、別の2つの銀行へ同じ日に申し込んで、1つが通りました。' },
+  { q: '三井住友銀行の法人口座は、申し込んでから何日で開けますか？', a: 'Web の Trunk は、公式では最短即日としています。審査の状況によって時間がかかる場合があるとも書いています。店頭で申し込む場合は、申込から開設まで1か月ほどかかる場合があるとしています。' },
+  { q: '三井住友銀行の審査に落ちたら、次は何をすればいいですか？', a: '書類の名義と社名・所在地、申込の入力が登記と合っているかを見直します。私たちは三井住友銀行ではなく、GMOあおぞらネット銀行・ドコモSMTBネット銀行・PayPay銀行に申し込みました。1つ目で落ちた2日後に残りの2つへ同じ日に申し込み、PayPay銀行が通りました。' },
 ];
 
 const SECTION = 'flex flex-col gap-5';
@@ -118,7 +118,7 @@ export default function Page() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">公式の案内と、運営会社の実例</p>
-            <h1 id="top" className="text-[26px] font-black leading-tight text-slate-900">三井住友銀行の<br />法人口座の審査に<br />落ちたら<br /><span className="text-[19px] text-orange-600">必要書類と見直す所</span></h1>
+            <h1 id="top" className="text-[26px] font-black leading-tight text-slate-900">三井住友銀行の<br />法人口座の審査に<br />落ちたら<br /><span className="text-[19px] text-orange-600">必要書類と見直す点</span></h1>
             <KakiteLine />
           </div>
           <ul className="grid grid-cols-3 gap-2" aria-label="公式の数字">
@@ -135,7 +135,7 @@ export default function Page() {
           </ul>
           <p className="rounded-2xl bg-white p-4 text-[14px] leading-relaxed text-slate-800 ring-1 ring-slate-200">
             <span className="mb-1 block text-[12px] font-black text-sky-700">結論</span>
-            三井住友銀行の法人口座は、Web の Trunk で、事業内容を確かめる書類1点と面談で審査されます。落ちたら、書類の名義と社名・所在地、申込の入力、面談での事業の説明を見直します。あわせて、ほかの銀行への申込も同時に進めます。
+            三井住友銀行の法人口座は、Web で申し込む「Trunk（トランク）」なら、事業内容が分かる書類1点を出し、Web面談で事業内容や申込の内容を確かめられます（申込の内容や審査の結果で、書類が追加になる場合があります）。落ちたら、書類の名義と社名・所在地、申込の入力、面談での事業の説明を見直します。ほかの銀行への申込も同時に進めます。
           </p>
           <p className="flex items-start gap-2 text-[12px] leading-relaxed text-slate-600"><Info size={16} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" /><span>私たちは三井住友銀行には申し込んでいません。このページの三井住友銀行の案内は、公式の記載だけをもとにしています。</span></p>
         </section>
@@ -149,7 +149,7 @@ export default function Page() {
               <span className="text-[11px] text-slate-600">下の5つから1点</span>
             </div>
             <div className="flex flex-col items-center gap-1 rounded-2xl bg-white p-3.5 text-center ring-1 ring-slate-200">
-              <Landmark size={22} className="text-sky-700" aria-hidden="true" />
+              <IdCard size={22} className="text-sky-700" aria-hidden="true" />
               <span className="text-[13px] font-black text-slate-900">本人確認書類</span>
               <span className="text-[11px] text-slate-600">マイナンバーカードか運転免許証など</span>
             </div>
@@ -162,7 +162,7 @@ export default function Page() {
               </li>
             ))}
           </ol>
-          <p className="text-[13px] leading-relaxed text-slate-700">4つ目の例として、公式は登記上の社名・所在地が明記された事業案内や商品カタログ、法人名義の許認可証、収益や売上が分かる管理画面の画像を挙げています。</p>
+          <p className="text-[13px] leading-relaxed text-slate-700">4の「売上・仕入・活動状況が客観的に確認できる書類」の例として、公式は登記上の社名・所在地が明記された事業案内や商品カタログ、法人名義の許認可証、収益や売上が分かる管理画面の画像を挙げています。</p>
           <p className={SRC}>出典：{src(['trunk', 'onegai'])}（{CHECKED} 確認）</p>
         </section>
 
@@ -172,7 +172,7 @@ export default function Page() {
             {[
               { icon: FileText, h: '入力と書類のアップロード', s: '法人口座の申込の画面に入力し、書類を出す' },
               { icon: Video, h: 'Web面談', s: '担当者が事業内容や申込の内容を確かめる。本人確認書類を手元に用意' },
-              { icon: CheckCircle2, h: '口座の開設', s: '最短即日。審査の状況で時間がかかる場合あり' },
+              { icon: CheckCircle2, h: '口座の開設', s: '最短即日。審査の状況で時間がかかる場合あり。申込の内容や審査の結果で、書類が追加になる場合あり' },
             ].map((n, i) => (
               <li key={n.h} className="flex items-start gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
                 <n.icon size={20} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />
@@ -182,13 +182,13 @@ export default function Page() {
           </ol>
           <div className="flex items-start gap-3 rounded-2xl bg-slate-100 p-4">
             <Clock size={20} className="mt-0.5 shrink-0 text-slate-500" aria-hidden="true" />
-            <span className="text-[13px] leading-relaxed text-slate-700">Trunk で申し込めない会社は店頭で申し込みます。その場合は、法人の印鑑登録証明書・履歴事項全部証明書（どちらも発行から6か月以内）・手続きする人の本人確認書類・許認可証（要る事業だけ）が要り、開設まで1か月ほどかかる場合があります。</span>
+            <span className="text-[13px] leading-relaxed text-slate-700">Trunk で申し込めない会社は、主たる事務所の最寄りの店舗で申し込みます。その場合は、法人の印鑑登録証明書・履歴事項全部証明書（どちらも発行から6か月以内）・手続きする人の本人確認書類・事業の許認可証（期限内のもの。許認可が要らない事業は不要）が要り、開設まで1か月ほどかかる場合があります。</span>
           </div>
           <p className={SRC}>出典：{src(['trunk', 'onegai'])}（{CHECKED} 確認）</p>
         </section>
 
         <section className={SECTION} aria-labelledby="minaoshi">
-          <h2 id="minaoshi" className={H2}>落ちたら見直す所</h2>
+          <h2 id="minaoshi" className={H2}>落ちたら見直す点</h2>
           <ul className="grid gap-2.5">
             {MINAOSHI.map((m) => (
               <li key={m.h} className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
@@ -216,7 +216,7 @@ export default function Page() {
           <p className={SRC}>運営会社（BlueAdventures合同会社、2026年10月28日設立・本店はバーチャルオフィス）の2026年11月の記録</p>
           {hasExit && (
             <HoujinExit
-              lpId={LP_ID} partner="raksulBank" position="jitsurei" lead="三井住友銀行のほかに申し込む先の一つに"
+              lpId={LP_ID} partner="raksulBank" position="jitsurei" lead="三井住友銀行と並行して申し込む先の候補"
               note="ラクスルバンクの口座はGMOあおぞらネット銀行のラクスルバンク支店で、審査もGMOあおぞらネット銀行が行います。私たちはGMOあおぞらネット銀行に直接申し込んで落ちています。GMOあおぞらネット銀行で落ちたことがある会社は、同じ銀行の審査になると知ったうえで選んでください。"
             />
           )}

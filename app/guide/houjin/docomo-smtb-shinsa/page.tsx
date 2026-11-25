@@ -28,7 +28,7 @@ const LP_ID = 'guide-houjin-docomo-shinsa';
 const PATH = '/guide/houjin/docomo-smtb-shinsa';
 const CHECKED = '2026/11/25';
 const TITLE = 'ドコモSMTBネット銀行（旧住信SBIネット銀行）の法人口座、審査に落ちた｜申込から4日の実例';
-const DESCRIPTION = 'ドコモSMTBネット銀行（旧住信SBIネット銀行）の法人口座の審査に、設立15日後の合同会社が落ちた実例。申込から4日で「口座開設を見合わせ」のメール。申込の社名は英字が1文字抜けていました。同じ日に申し込んだPayPay銀行には通過。公式のよくある不備、申込の条件、審査の日数。';
+const DESCRIPTION = 'ドコモSMTBネット銀行（旧住信SBIネット銀行）の法人口座の審査に、設立15日後に申し込んだ合同会社が落ちた実例。申込から4日で「口座開設を見合わせ」のメール。申込の社名は英字が1文字抜けていました。同じ日に申し込んだPayPay銀行は、住所を登記どおりに直して申し込み直し、通過。公式のよくある不備、申込の条件、審査の日数。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -47,27 +47,33 @@ const S = {
   dekinai: { name: 'ドコモSMTBネット銀行 よくあるご質問「開設できない会社や団体はありますか？」', url: FAQ_URL(776) },
   meisho: { name: 'ドコモSMTBネット銀行 よくあるご質問（社名の変更）', url: FAQ_URL(7605) },
   hojin: { name: 'ドコモSMTBネット銀行「法人のお客さま」', url: 'https://www.netbk.co.jp/contents/hojin/' },
-  raksul33: { name: 'ラクスルバンク よくあるご質問（審査にかかる時間）', url: 'https://support.raksulbank.com/faq/show/33?site_domain=default' },
+  raksul33: { name: 'ラクスルバンク よくあるご質問「口座開設の審査にはどれくらいの時間がかかりますか？」', url: 'https://support.raksulbank.com/faq/show/33?site_domain=default' },
+  gmoTokuyaku: { name: 'GMOあおぞらネット銀行「ラクスルバンク支店に関する特約」', url: 'https://gmo-aozora.com/provision/pdf/raksul_260816.pdf' },
 } as const;
 type K = keyof typeof S;
 
 const KIROKU = [
   { d: '10/28', t: '合同会社を設立（本店はバーチャルオフィス）', ok: null },
   { d: '11/7', t: 'GMOあおぞらネット銀行に申込 → 11/10 に通らず', ok: false },
-  { d: '11/12', t: 'ドコモSMTBネット銀行と PayPay銀行に同時に申込', ok: null },
+  { d: '11/12', t: 'ドコモSMTBネット銀行と PayPay銀行に、同じ日に申込', ok: null },
+  { d: '11/13', t: 'PayPay銀行は、入力した住所が登記の本店と違い手続きが止まる → 登記どおりに申し込み直し', ok: null },
   { d: '11/16', t: 'ドコモSMTBネット銀行から「口座開設を見合わせ」のメール。理由の説明なし', ok: false },
-  { d: '11/16', t: 'PayPay銀行の審査に通過（住所を登記どおりに入れ直したあと）', ok: true },
+  { d: '11/16', t: 'PayPay銀行の審査に通過（設立から19日）', ok: true },
 ] as const;
 
 /** 公式の「よくある不備」（5927）。mine は私たちの申込で当てはまったもの */
 const FUBI = [
-  { h: '法人名称の記載内容の違い', mine: '社名の英字が1文字抜けていた' },
+  { h: '法人名称の記載の違い', mine: '社名の英字が1文字抜けていた' },
   { h: '入力した住所と、登記の本店の所在地が違う', mine: '' },
   { h: '名前・法人名・住所の漢字とカナが合わない', mine: '' },
   { h: '法人番号の違い', mine: '' },
   { h: '設立年月日の違い', mine: '' },
-  { h: '運転免許証の情報と、入力した内容が合わない', mine: '' },
-  { h: '運転免許証の有効期限切れ', mine: '' },
+  { h: '（オンライン）運転免許証の情報と、入力した内容が合わない', mine: '' },
+  { h: '（オンライン）運転免許証の有効期限切れ', mine: '' },
+  { h: '（郵送）必要書類の同封漏れ', mine: '' },
+  { h: '（郵送）書類の期限切れ', mine: '' },
+  { h: '（郵送）本人確認書類のコピーが不鮮明', mine: '' },
+  { h: '（郵送）運転免許証の裏面のコピーの同封漏れ', mine: '' },
 ];
 
 /** 申込の条件（2523）。online / yuso に当てはまるか */
@@ -75,20 +81,20 @@ const JOKEN = [
   { h: '日本国内で登記している', online: true, yuso: true },
   { h: '法人の居住地国（税を納める国）が日本', online: true, yuso: true },
   { h: '代表者が有効な運転免許証を持っている', online: true, yuso: false },
-  { h: '担当者の届出がいらない', online: true, yuso: false },
+  { h: '担当者の届出が不要な申込である', online: true, yuso: false },
   { h: '実質的支配者が5人以下で、居住地国は日本だけ', online: true, yuso: false },
   { h: 'アプリで初期設定とスマート認証NEOの登録をする', online: true, yuso: false },
   { h: '口座開設に必要な書面を用意する', online: false, yuso: true },
   { h: '審査の結果、銀行が口座開設を認める', online: true, yuso: true },
 ];
 
-const DEKINAI = ['登記していない団体の名義', '屋号などを使った名義', '外国法人', '有限責任事業組合・マンション管理組合などの任意団体'];
+const DEKINAI = ['登記していない団体の名義', '屋号などを使った名義', '外国法人', '有限責任事業組合・マンション管理組合などの任意団体（登記していても不可）'];
 
 const FAQS = [
   { q: 'ドコモSMTBネット銀行は、審査に落ちた理由を教えてくれますか？', a: '教えてもらえません。公式のよくあるご質問で、口座開設の審査結果の詳細は開示していないとしています。私たちに届いたメールも「口座開設を見合わせ」というもので、理由の説明はありませんでした。' },
-  { q: '法人口座の審査には何日かかりますか？', a: '公式では、オンラインの申込は本人確認書類などのアップロードが終わってから最短翌日、郵送の申込は書類が届いてから2〜3週間ほどとしています。私たちは11月12日（木）に申し込み、土日を挟んで11月16日（月）に結果のメールが届きました。' },
+  { q: 'ドコモSMTBネット銀行の法人口座の審査は、何日かかりますか？', a: '公式では、オンラインの申込は本人確認書類などのアップロードが終わってから最短翌日、郵送の申込は書類が届いてから2〜3週間ほどとしています。私たちは11月12日（木）に申し込み、土日を挟んで11月16日（月）に結果のメールが届きました。' },
   { q: '住信SBIネット銀行とドコモSMTBネット銀行は同じ銀行ですか？', a: '同じ銀行です。公式のよくあるご質問で、2026年8月3日（月）に株式会社ドコモSMTBネット銀行になったとしています。' },
-  { q: '本店がバーチャルオフィスだと、審査に落ちますか？', a: '分かりません。私たちの本店はバーチャルオフィスで、ドコモSMTBネット銀行には通りませんでしたが、同じ日に申し込んだ PayPay銀行には通りました。銀行は審査の理由を開示しないため、バーチャルオフィスが理由だったかは確かめられません。' },
+  { q: '本店がバーチャルオフィスだと、審査に落ちますか？', a: '分かりません。私たちの本店はバーチャルオフィスで、ドコモSMTBネット銀行には通りませんでした。同じ日に申し込んだ PayPay銀行は、住所を直して申し込み直したあと、通りました。銀行は審査の理由を開示しないため、バーチャルオフィスが理由だったかは確かめられません。' },
 ];
 
 const SECTION = 'flex flex-col gap-5';
@@ -162,7 +168,7 @@ export default function Page() {
           </ul>
           <p className="rounded-2xl bg-white p-4 text-[14px] leading-relaxed text-slate-800 ring-1 ring-slate-200">
             <span className="mb-1 block text-[12px] font-black text-sky-700">結論</span>
-            落ちた理由は、銀行が開示しないので分かりません。分かっているのは、申込の社名の英字が1文字抜けていたことです。公式は「法人名称の記載内容の違い」を、よくある不備に挙げています。同じ日に申し込んだ PayPay銀行には通りました。申し込む前に、社名と住所を登記と1文字ずつ照らすのが、私たちの学びです。
+            落ちた理由は、銀行が開示しないので分かりません。分かっているのは、申込の社名の英字が1文字抜けていたことです。公式は、法人名称の記載の違いを、よくある不備に挙げています。同じ日に申し込んだ PayPay銀行は、住所を直して申し込み直したあと、通りました。申し込む前に、社名と住所を登記と1文字ずつ照らし合わせてください。私たちが学んだことです。
           </p>
           <p className="flex items-start gap-2 text-[12px] leading-relaxed text-slate-600"><Info size={16} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" /><span>住信SBIネット銀行は、2026年8月3日（月）にドコモSMTBネット銀行になりました（{src(['meisho'])}）。</span></p>
         </section>
@@ -189,12 +195,12 @@ export default function Page() {
         </section>
 
         <section className={SECTION} aria-labelledby="fubi">
-          <h2 id="fubi" className={H2}>公式のよくある不備と、私たちの申込</h2>
-          <p className="text-[13px] leading-relaxed text-slate-700">公式が「不備が多い」と挙げているものです。私たちの申込では、社名に誤りがありました。</p>
+          <h2 id="fubi" className={H2}>よくある不備と私たちの申込</h2>
+          <p className="text-[13px] leading-relaxed text-slate-700">公式が「よくある不備」として挙げているものです。私たちの申込では、社名に誤りがありました。ほかの項目が登記どおりだったかは、記録に残っていません。</p>
           <ul className="grid gap-1.5">
             {FUBI.map((f) => (
               <li key={f.h} className={`flex items-start gap-3 rounded-xl px-3.5 py-2.5 ring-1 ${f.mine ? 'bg-rose-50 ring-rose-200' : 'bg-white ring-slate-200'}`}>
-                {f.mine ? <AlertTriangle size={18} className="mt-0.5 shrink-0 text-rose-600" aria-hidden="true" /> : <Check size={18} className="mt-0.5 shrink-0 text-slate-300" aria-hidden="true" />}
+                {f.mine ? <AlertTriangle size={18} className="mt-0.5 shrink-0 text-rose-600" aria-hidden="true" /> : <span className="mt-0.5 w-[18px] shrink-0 text-center text-slate-400" aria-hidden="true">・</span>}
                 <span className="flex flex-col gap-0.5">
                   <span className="text-[13px] leading-relaxed text-slate-800">{f.h}</span>
                   {f.mine && <span className="text-[12px] font-bold text-rose-700">私たち：{f.mine}</span>}
@@ -249,7 +255,7 @@ export default function Page() {
               </li>
             ))}
           </ul>
-          <p className={SRC}>出典：{src(['jikan', 'riyu'])}（{CHECKED} 確認）。審査結果の詳細は開示しないとしています</p>
+          <p className={SRC}>出典：{src(['jikan'])}（{CHECKED} 確認）</p>
         </section>
 
         <section className={SECTION} aria-labelledby="tsugi">
@@ -270,10 +276,10 @@ export default function Page() {
           {hasExit && (
             <HoujinExit
               lpId={LP_ID} partner="raksulBank" position="tsugi" lead="次の申込先の一つに"
-              note="ラクスルバンクの審査は、GMOあおぞらネット銀行が行います。私たちはGMOあおぞらネット銀行でも落ちています。社名と住所を登記どおりに入れ、事業の中身が分かる書類をそろえてから申し込んでください。"
+              note="ラクスルバンクの口座はGMOあおぞらネット銀行のラクスルバンク支店で、審査もGMOあおぞらネット銀行が行います。私たちはGMOあおぞらネット銀行に直接申し込んで落ちています。GMOあおぞらネット銀行で落ちたことがある会社は、同じ銀行の審査になると知ったうえで選んでください。"
             />
           )}
-          {hasExit && <p className={SRC}>出典：{src(['raksul33'])}</p>}
+          {hasExit && <p className={SRC}>出典：{src(['raksul33', 'gmoTokuyaku'])}</p>}
         </section>
 
         <section className="flex flex-col gap-2" aria-labelledby="faq">
@@ -293,8 +299,8 @@ export default function Page() {
         <nav aria-label="あわせて読む" className="flex flex-col gap-2">
           {[
             { href: '/guide/houjin', t: '法人口座の開設（まとめ）', s: '設立直後にネット銀行3つに申し込んだ記録' },
-            { href: '/guide/houjin/kouza-tsukurenai', t: '法人口座が作れない', s: '3行に申し込んだ記録と、申込前のチェック表' },
-            { href: '/guide/houjin/kouza-virtual-office', t: '法人口座とバーチャルオフィス', s: '3行に申し込み、通ったのは1行' },
+            { href: '/guide/houjin/kouza-tsukurenai', t: '法人口座が作れない', s: '3つの銀行に申し込んだ記録と、申込前のチェック表' },
+            { href: '/guide/houjin/kouza-virtual-office', t: '法人口座とバーチャルオフィス', s: '3つの銀行に申し込み、通ったのは1つ' },
           ].map((l) => (
             <Link key={l.href} href={l.href} className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200 hover:ring-slate-300">
               <span className="flex flex-1 flex-col"><span className="text-[15px] font-black text-slate-900">{l.t}</span><span className="text-[12px] text-slate-600">{l.s}</span></span>

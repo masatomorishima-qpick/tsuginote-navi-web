@@ -153,6 +153,7 @@ const categories = [
       { href: '/guide/houjin/docomo-smtb-shinsa', title: 'ドコモSMTBネット銀行（旧住信SBIネット銀行）の法人口座、審査に落ちた｜申込から4日の実例' },
       { href: '/guide/houjin/yucho-shinsa', title: 'ゆうちょ銀行の法人口座の審査に落ちたら｜公式の必要書類11項目と見直す点' },
       { href: '/guide/houjin/shinsa-ochita-tsugi', title: '法人口座の審査に落ちたら次は？3つの銀行に申し込んで1つ通った実例' },
+      { href: '/guide/houjin/goudou-kouza-meigi', title: '合同会社の口座名義の書き方｜カナは「ド）」、申込は登記どおり' },
       { href: '/guide/houjin/smbc-shinsa', title: '三井住友銀行の法人口座の審査に落ちたら｜Trunkの必要書類と見直す点' },
       { href: '/guide/houjin/aoiro-shinsei-houjin', title: '青色申告の承認申請書（法人）の期限と書き方｜設立1期目の日付の計算' },
       { href: '/guide/houjin/kouza-virtual-office', title: '法人口座とバーチャルオフィス｜3行に申し込み、通ったのは1行の実例' },

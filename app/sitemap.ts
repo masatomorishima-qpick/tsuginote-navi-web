@@ -549,7 +549,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/guide/houjin/yucho-shinsa`,
-      lastModified: new Date("2026-11-26T00:00:00+09:00"),
+      lastModified: new Date("2026-11-25T23:50:00+09:00"),
       changeFrequency: "monthly",
       priority: 0.8,
     },

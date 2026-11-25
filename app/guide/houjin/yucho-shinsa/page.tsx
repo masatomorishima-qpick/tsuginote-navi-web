@@ -24,7 +24,7 @@ const LP_ID = 'guide-houjin-yucho-shinsa';
 const PATH = '/guide/houjin/yucho-shinsa';
 const CHECKED = '2026/11/25';
 const TITLE = 'ゆうちょ銀行の法人口座の審査に落ちたら｜公式の必要書類11項目と見直す点';
-const DESCRIPTION = 'ゆうちょ銀行の法人口座の審査に落ちたときに見直す点。公式の必要書類は11項目で、出せないと申込を受け付けないとしています。設立1年以下の合同会社に当てはまる書類、審査は1か月程度（3〜6月は2か月程度）のことも公式の記載から。ゆうちょ銀行以外の3つの銀行に申し込んだ運営会社の実例つき。';
+const DESCRIPTION = 'ゆうちょ銀行の法人口座の審査に落ちたときに見直す点。公式の必要書類は11項目で、出せないと申込を受け付けないとしています。設立1年以下の合同会社に当てはまる書類、審査は1か月程度（3〜6月は2か月程度かかる場合も）のことも公式の記載から。ゆうちょ銀行以外の3つの銀行に申し込んだ運営会社の実例つき。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -46,20 +46,20 @@ const SHORUI = [
   { h: '履歴事項全部証明書（原本・発行から6か月以内）', godo: '' },
   { h: '来店する人の顔写真つきの本人確認書類', godo: '' },
   { h: '来店する人と法人の関係が分かる書類（委任状など）', godo: '' },
-  { h: '許認可などが要る業種なら、その写し', godo: '建設・飲食・不動産・古物・中古車販売・介護など、公式が挙げる業種だけ' },
+  { h: '公式が挙げる業種（建設・飲食・不動産・古物・中古車販売・介護など）なら、許認可証の写しなど', godo: '' },
   { h: '法人番号が分かる書類（法人番号通知書など）', godo: '' },
   { h: '法人の印鑑証明書（原本・発行から6か月以内）', godo: '' },
   { h: '実質的支配者が分かる書類', godo: '合同会社は出資者名簿など（出資金額や出資割合が分かるもの）' },
   { h: '財務状況が分かる書類', godo: '設立1年以下で決算書類がなければ、合計残高試算表（または直近1か月分の総勘定元帳）と事業計画書の両方' },
-  { h: '設立6か月以内なら、次のどれか', godo: '税務署あての法人設立届出書（控）・青色申告承認申請書（控）・事務所の建物の登記簿か賃貸借契約書（法人が契約しているもの）' },
+  { h: '設立6か月以内なら、次のどれか', godo: '税務署あての法人設立届出書（控）・青色申告承認申請書（控）・本店の建物の登記簿（原本）・本店の賃貸借契約書（原本、法人が契約したものだけ）のどれか1つ' },
   { h: '代表者などが外国籍なら、在留カードの写し', godo: '' },
   { h: '事業内容が分かる書類', godo: '会社案内・商品のパンフレット・印刷したホームページ・契約書・請求書など' },
 ];
 
 const MINAOSHI = [
-  { icon: FileText, h: '当てはまる書類の抜け', s: '公式は、書類が出せない場合は申込を受け付けないとしています。設立1年以下の合同会社は、出資者名簿・試算表と事業計画書・設立届出書の控などがそろっているかを確かめます。' },
-  { icon: SearchCheck, h: '申込の内容と登記', s: '社名（英字の表記も）・住所・設立年月日が、登記と1文字も違わないかを照らし合わせます。私たちは、ドコモSMTBネット銀行の申込で社名の英字が1文字抜けていました。PayPay銀行の申込では住所に自宅を入れて登記と違い、手続きが止まったので申し込み直しました。' },
-  { icon: CalendarClock, h: '待つ時間', s: '審査は1か月程度で、3〜6月は2か月程度かかる場合があると公式は書いています。ゆうちょ銀行だけを待たず、ほかの銀行への申込も同時に進めます。' },
+  { icon: FileText, h: '書類の中身', s: '書類が抜けていれば、申込の時点で受け付けられません。審査で見られるのは中身です。事業計画書と、事業内容が分かる書類（会社案内・印刷したホームページ・請求書など）で、何で稼ぐ会社かが伝わるかを見直します。' },
+  { icon: SearchCheck, h: '申込書の内容と登記', s: '社名・住所・設立年月日が、登記と1文字も違わないかを照らし合わせます。ネット銀行での私たちの例では、ドコモSMTBネット銀行の申込で社名の英字が1文字抜けていました（落ちた理由かどうかは分かりません）。PayPay銀行の申込では住所に自宅を入れて登記と違い、手続きが止まったので申し込み直しました。' },
+  { icon: CalendarClock, h: '待つ時間', s: '審査は1か月程度で、3〜6月は2か月程度かかる場合があると、ゆうちょ銀行は書いています。ゆうちょ銀行だけを待たず、ほかの銀行への申込も同時に進めます。' },
 ];
 
 const GINKO = [
@@ -70,8 +70,8 @@ const GINKO = [
 
 const FAQS = [
   { q: 'ゆうちょ銀行の法人口座の審査には、何日かかりますか？', a: '公式では、審査に1か月程度かかるとしています。休日を挟む時期や申込が集中したときは1か月を超えることがあり、例年3月から6月は2か月程度かかる場合があるとしています。' },
-  { q: '設立したばかりの合同会社は、決算書がなくても申し込めますか？', a: '公式では、設立後1年以下で決算書類を用意できない合同会社などは、合計残高試算表（または直近1か月分の総勘定元帳）と事業計画書の両方を出すとしています。設立6か月以内なら、法人設立届出書の控などもいります。' },
-  { q: 'ゆうちょ銀行の審査に落ちたら、次は何をすればいいですか？', a: '当てはまる書類の抜けと、申込の内容が登記と合っているかを見直します。私たちはゆうちょ銀行ではなく、GMOあおぞらネット銀行・ドコモSMTBネット銀行・PayPay銀行に申し込みました。1つ目で落ちた2日後に残りの2つへ同じ日に申し込み、PayPay銀行が通りました。' },
+  { q: '設立したばかりの合同会社は、決算書がなくても申し込めますか？', a: '申し込めます。ゆうちょ銀行は、設立後1年以下で決算書類を用意できない合同会社などは、決算書の代わりに合計残高試算表（または直近1か月分の総勘定元帳）と事業計画書の両方を出すとしています。設立6か月以内なら、法人設立届出書の控など3つのうち1つも要ります。' },
+  { q: 'ゆうちょ銀行の審査に落ちたら、次は何をすればいいですか？', a: '書類の中身と、申込書の内容が登記と合っているかを見直します。私たちはゆうちょ銀行ではなく、GMOあおぞらネット銀行・ドコモSMTBネット銀行・PayPay銀行に申し込みました。1つ目で落ちた2日後に残りの2つへ同じ日に申し込み、PayPay銀行が通りました。' },
 ];
 
 const SECTION = 'flex flex-col gap-5';
@@ -88,7 +88,7 @@ function src(keys: readonly K[]) {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', author: KAKITE_LD, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', about: { '@type': 'Thing', name: 'ゆうちょ銀行の法人口座の審査' }, mentions: [{ '@type': 'BankOrCreditUnion', name: 'ゆうちょ銀行' }], datePublished: '2026-11-26T00:00:00+09:00', dateModified: '2026-11-26T00:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}` },
+    { '@type': 'Article', author: KAKITE_LD, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', about: { '@type': 'Thing', name: 'ゆうちょ銀行の法人口座の審査' }, mentions: [{ '@type': 'BankOrCreditUnion', name: 'ゆうちょ銀行' }], datePublished: '2026-11-25T23:50:00+09:00', dateModified: '2026-11-25T23:50:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}` },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: '法人成り', item: `${SITE_URL}/guide/houjin` },
@@ -121,7 +121,7 @@ export default function Page() {
 
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
-            <p className="text-[13px] font-bold text-sky-700">公式の案内と、運営会社の実例</p>
+            <p className="text-[13px] font-bold text-sky-700">公式の案内と、ほかの銀行での私たちの実例</p>
             <h1 id="top" className="text-[26px] font-black leading-tight text-slate-900">ゆうちょ銀行の<br />法人口座の審査に<br />落ちたら<br /><span className="text-[19px] text-orange-600">必要書類11項目と見直す点</span></h1>
             <KakiteLine />
           </div>
@@ -129,7 +129,7 @@ export default function Page() {
             {[
               { big: '11項目', s: '公式の必要書類' },
               { big: '1か月', s: '審査の目安' },
-              { big: '2か月', s: '3〜6月の目安' },
+              { big: '2か月', s: '3〜6月はかかる場合も' },
             ].map((k) => (
               <li key={k.s} className="flex flex-col items-center gap-0.5 rounded-2xl bg-white px-2 py-3.5 text-center ring-1 ring-slate-200">
                 <span className="text-[22px] font-black leading-none text-orange-600">{k.big}</span>
@@ -139,14 +139,14 @@ export default function Page() {
           </ul>
           <p className="rounded-2xl bg-white p-4 text-[14px] leading-relaxed text-slate-800 ring-1 ring-slate-200">
             <span className="mb-1 block text-[12px] font-black text-sky-700">結論</span>
-            ゆうちょ銀行の法人口座は、公式が挙げる書類（当てはまるもの）を窓口に持っていき、審査に1か月程度かかります。書類が出せないと申込を受け付けないとしています。落ちたら、当てはまる書類の抜けと、申込の内容が登記と合っているかを見直します。ほかの銀行への申込も同時に進めます。
+            ゆうちょ銀行の法人口座は、印章と公式が挙げる書類を持って来店して申し込みます。審査は1か月程度です。書類がそろわないと申込を受け付けません。落ちたら、書類の中身と、申込書の内容が登記と合っているかを見直します。ほかの銀行への申込も同時に進めます。
           </p>
           <p className="flex items-start gap-2 text-[12px] leading-relaxed text-slate-600"><Info size={16} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" /><span>私たちはゆうちょ銀行には申し込んでいません。このページのゆうちょ銀行の案内は、公式の記載だけをもとにしています。</span></p>
         </section>
 
         <section className={SECTION} aria-labelledby="shorui">
           <h2 id="shorui" className={H2}>公式の必要書類</h2>
-          <p className="flex items-start gap-2 text-[13px] leading-relaxed text-slate-700"><Store size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" /><span>印章と、次の書類（当てはまるもの）を窓口に持っていきます。下の小さな字は、設立1年以下の合同会社に当てはまる所です。</span></p>
+          <p className="flex items-start gap-2 text-[13px] leading-relaxed text-slate-700"><Store size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" /><span>印章と、次の書類（当てはまるもの）を持って来店して出します。黄色の枠は補足で、設立1年以下の合同会社が何を出すかも書いています。</span></p>
           <ol className="grid gap-1.5">
             {SHORUI.map((d, i) => (
               <li key={d.h} className={`flex items-start gap-3 rounded-xl px-3.5 py-2.5 ring-1 ${d.godo ? 'bg-amber-50 ring-amber-200' : 'bg-white ring-slate-200'}`}>
@@ -158,7 +158,7 @@ export default function Page() {
               </li>
             ))}
           </ol>
-          <p className="text-[13px] leading-relaxed text-slate-700">公式は、これらの書類を出せない場合は申込を受け付けないとしています。財務の書類に加えて、勘定科目内訳表などがあれば審査の参考にするとも書いています。</p>
+          <p className="text-[13px] leading-relaxed text-slate-700">ゆうちょ銀行は、これらの書類を出せない場合は申込を受け付けないとしています。財務の書類に加えて、勘定科目内訳表などがあれば審査の参考にするとも書いています。</p>
           <p className={SRC}>出典：{src(['yucho'])}（{CHECKED} 確認）。書類の名前は要点にまとめています。細かい条件は公式のページで確かめてください</p>
         </section>
 
@@ -228,7 +228,7 @@ export default function Page() {
 
         <KakiteNote />
         <p className="text-[11px] leading-relaxed text-slate-400">
-          ゆうちょ銀行の案内は、公式の記載（{CHECKED} 確認）をもとにしています。運営会社はゆうちょ銀行には申し込んでいません。銀行は案内を変えることがあり、審査の結果は会社ごとに違います。実例は運営会社（BlueAdventures合同会社）の2026年11月の申込です。最終更新：2026年11月26日
+          ゆうちょ銀行の案内は、公式の記載（{CHECKED} 確認）をもとにしています。運営会社はゆうちょ銀行には申し込んでいません。銀行は案内を変えることがあり、審査の結果は会社ごとに違います。実例は運営会社（BlueAdventures合同会社）の2026年11月の申込です。最終更新：2026年11月25日
         </p>
       </main>
       <LpFooter />

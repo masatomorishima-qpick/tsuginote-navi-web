@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  ArrowRight, Building2, CalendarDays, CheckCircle2, Clock, Coins, FileText, Globe, Landmark, Send, Stamp, XCircle,
+  ArrowRight, Building2, CalendarDays, CheckCircle2, Clock, Coins, FileText, Globe, Landmark, Layers, Send, Stamp, XCircle,
 } from 'lucide-react';
 import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
@@ -72,6 +72,7 @@ const HOUJIN_PAGES = [
   { href: '/guide/houjin/kouza-tsukurenai', t: '法人口座が作れない', s: '3行に申し込み、通ったのは1行', icon: XCircle },
   { href: '/guide/houjin/gmo-aozora-shinsa', t: 'GMOあおぞらネット銀行の審査に落ちた', s: '申込から3日で結果。出した書類と公式の案内', icon: XCircle },
   { href: '/guide/houjin/docomo-smtb-shinsa', t: 'ドコモSMTBネット銀行（旧住信SBI）の審査に落ちた', s: '申込から4日で見合わせ。公式のよくある不備と照らす', icon: XCircle },
+  { href: '/guide/houjin/shinsa-ochita-tsugi', t: '法人口座の審査に落ちたら次は', s: '落ちたあとにすること4つと、3つの銀行の結果', icon: Layers },
   { href: '/guide/houjin/kouza-hitsuyou-shorui', t: '法人口座の必要書類', s: '銀行4つの比較と、設立直後の事業内容の資料', icon: FileText },
   { href: '/guide/houjin/rireki-jikou-shoumeisho', t: '履歴事項全部証明書の取り方', s: '2026年4月からの手数料と、法人口座の申込で必要な銀行', icon: Stamp },
   { href: '/guide/houjin/kouza-kaisetsu-kikan', t: '法人口座の開設期間', s: '設立から審査通過まで19日。最短当日が延びる理由', icon: CalendarDays },

@@ -26,7 +26,7 @@ const LP_ID = 'guide-houjin-gmo-shinsa';
 const PATH = '/guide/houjin/gmo-aozora-shinsa';
 const CHECKED = '2026/11/25';
 const TITLE = 'GMOあおぞらネット銀行の法人口座、審査に落ちた｜設立直後の実例と、受け付けない書類';
-const DESCRIPTION = 'GMOあおぞらネット銀行の法人口座の審査に、設立から10日後に申し込んだ合同会社で落ちた実例。申込から結果のメールまで3日。出した書類（履歴事項全部証明書・法人設立届出書）は、公式の「受付できない書類の例」に入っていました。設立直後の書類の出し方、審査の日数、次にしたこと。';
+const DESCRIPTION = 'GMOあおぞらネット銀行の法人口座の審査に、設立から10日後に申し込んだ合同会社が落ちた実例。申込から結果のメールまで3日。出した書類（履歴事項全部証明書・法人設立届出書）は、公式の「受付できない書類の例」に入っていました。設立直後の書類の出し方、審査の日数、次にしたこと。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -41,7 +41,6 @@ const S = {
   faq1219: { name: 'GMOあおぞらネット銀行 よくある質問「法人口座を開設したいのですが、開設できない場合はありますか？」', url: 'https://help.gmo-aozora.com/faqs/1219' },
   faq1316: { name: 'GMOあおぞらネット銀行 よくある質問（提出書類に不備があると連絡が届いた場合）', url: 'https://help.gmo-aozora.com/faqs/1316' },
   faq1514: { name: 'GMOあおぞらネット銀行 よくある質問「口座開設の審査は、どのくらい時間がかかりますか。」', url: 'https://help.gmo-aozora.com/faqs/1514' },
-  raksul1293: { name: 'ラクスルバンク よくあるご質問（口座開設の必要書類）', url: 'https://support.raksulbank.com/faq/show/1293?site_domain=default' },
   raksul33: { name: 'ラクスルバンク よくあるご質問（審査にかかる時間）', url: 'https://support.raksulbank.com/faq/show/33?site_domain=default' },
 } as const;
 type K = keyof typeof S;
@@ -50,16 +49,17 @@ const KIROKU = [
   { d: '10/28', t: '合同会社を設立（資本金50万円・本店はバーチャルオフィス）', ok: null },
   { d: '11/7', t: 'GMOあおぞらネット銀行に法人口座を申込', ok: null },
   { d: '11/10', t: 'メールで結果。口座の開設は見合わせ', ok: false },
-  { d: '11/12', t: 'ほかの2行に申込', ok: null },
-  { d: '11/16', t: 'PayPay銀行の審査に通過', ok: true },
+  { d: '11/12', t: 'ドコモSMTBネット銀行と PayPay銀行に申込', ok: null },
+  { d: '11/16', t: 'ドコモSMTBネット銀行は通らず', ok: false },
+  { d: '11/16', t: 'PayPay銀行の審査に通過（設立から19日）', ok: true },
 ] as const;
 
 /** 私たちが出したもの × 公式の案内（「事業内容確認書類について」） */
 const DASHITA = [
   { h: '履歴事項全部証明書', kekka: '受付できない書類の例', ng: true },
   { h: '法人設立届出書', kekka: '受付できない書類の例', ng: true },
-  { h: 'ホームページの URL', kekka: '確認書類の一つ（条件つき）', ng: false },
-  { h: '請求書・発注書', kekka: '法人として出したことも受け取ったこともなく、出せず', ng: null },
+  { h: 'ホームページのアドレス', kekka: '確認書類の一つ（条件つき）', ng: false },
+  { h: '請求書・発注書', kekka: '法人として出したことも受け取ったこともなく、出していない', ng: null },
 ];
 
 /** 公式が挙げる確認書類（審査が進みやすい順。公式の並びのまま） */
@@ -78,7 +78,7 @@ const OSUSUME = [
 const FAQS = [
   { q: 'GMOあおぞらネット銀行は、審査に落ちた理由を教えてくれますか？', a: '教えてもらえません。公式のよくある質問で、口座開設の審査結果の詳細は開示していないとしています。私たちに届いた結果のメールにも、審査内容には答えられないと書かれていました。' },
   { q: '法人口座の審査には何日かかりますか？', a: '公式では、本人確認をマイナンバーカードの読み取りか自撮りの動画で行うと最短当日、書類のアップロードか郵送だと1週間ほどとしています。私たちは11月7日に申し込み、11月10日にメールで結果が届きました。' },
-  { q: '履歴事項全部証明書は、事業内容の書類になりますか？', a: 'なりません。公式の「事業内容確認書類について」では、履歴事項全部証明書・定款・法人設立届出書などを「受付できない書類の例」に挙げています。会社があることは分かっても、今どんな事業をしているかが分からないためです。' },
+  { q: '履歴事項全部証明書は、事業内容の書類になりますか？', a: 'なりません。公式の「事業内容確認書類について」では、履歴事項全部証明書・定款・法人設立届出書などを「事業の売上に直接関係しない書類」として、「受付できない書類の例」に挙げています。' },
 ];
 
 const SECTION = 'flex flex-col gap-5';
@@ -136,7 +136,7 @@ export default function Page() {
             {[
               { big: '10日後', s: '設立から申込まで' },
               { big: '3日', s: '申込から結果まで' },
-              { big: '2つ', s: '出した書類のうち、受け付けない書類' },
+              { big: '2つ', s: '公式の「受付できない書類の例」に入っていた書類' },
             ].map((k) => (
               <li key={k.s} className="flex flex-col items-center gap-0.5 rounded-2xl bg-white px-2 py-3.5 text-center ring-1 ring-slate-200">
                 <span className="text-[24px] font-black leading-none text-orange-600">{k.big}</span>
@@ -146,7 +146,7 @@ export default function Page() {
           </ul>
           <p className="rounded-2xl bg-white p-4 text-[14px] leading-relaxed text-slate-800 ring-1 ring-slate-200">
             <span className="mb-1 block text-[12px] font-black text-sky-700">結論</span>
-            落ちた理由は、銀行が教えないので分かりません。ただ、事業の中身を示すつもりで出した履歴事項全部証明書と法人設立届出書は、あとで見ると、公式の「受付できない書類の例」に入っていました。設立直後の会社は、事業の中身が分かる書類を2点以上そろえてから申し込むのが、公式の案内に沿った出し方です。
+            落ちた理由は、銀行が教えないので分かりません。ただ、事業の中身を示すつもりで出した履歴事項全部証明書と法人設立届出書は、公式の「受付できない書類の例」に入っています。設立直後の会社は、事業の中身が分かる書類を2点以上そろえてから申し込むのが、公式の案内に沿った出し方です。
           </p>
         </section>
 
@@ -154,7 +154,7 @@ export default function Page() {
           <h2 id="kiroku" className={H2}>申込から結果まで</h2>
           <ol className="flex flex-col gap-2">
             {KIROKU.map((k) => (
-              <li key={k.d} className={`flex items-start gap-3 rounded-2xl p-3.5 ring-1 ${k.ok === false ? 'bg-rose-50 ring-rose-200' : k.ok ? 'bg-emerald-50 ring-emerald-200' : 'bg-white ring-slate-200'}`}>
+              <li key={`${k.d}-${k.t}`} className={`flex items-start gap-3 rounded-2xl p-3.5 ring-1 ${k.ok === false ? 'bg-rose-50 ring-rose-200' : k.ok ? 'bg-emerald-50 ring-emerald-200' : 'bg-white ring-slate-200'}`}>
                 <span className="w-[48px] shrink-0 text-[14px] font-black text-sky-700">{k.d}</span>
                 {k.ok === false ? <XCircle size={18} className="mt-0.5 shrink-0 text-rose-600" aria-hidden="true" /> : k.ok ? <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-emerald-600" aria-hidden="true" /> : <CalendarDays size={18} className="mt-0.5 shrink-0 text-slate-400" aria-hidden="true" />}
                 <span className="text-[13px] leading-relaxed text-slate-700">{k.t}</span>
@@ -169,12 +169,12 @@ export default function Page() {
               <span className="text-[13px] leading-relaxed text-slate-700">「審査内容についてはお答えすることができません」</span>
             </span>
           </div>
-          <p className={SRC}>2026年。運営会社（BlueAdventures合同会社）の記録</p>
+          <p className={SRC}>運営会社（BlueAdventures合同会社）の2026年11月の記録</p>
         </section>
 
         <section className={SECTION} aria-labelledby="dashita">
           <h2 id="dashita" className={H2}>出した書類と公式の案内</h2>
-          <p className="text-[13px] leading-relaxed text-slate-700">公式は、書類で「登記上の会社名・所在地」「事業や商品の具体的な内容」「今、実際に事業をしていること」を確かめるとしています。</p>
+          <p className="text-[13px] leading-relaxed text-slate-700">銀行の案内では、書類で「登記上の会社名・所在地」「事業や商品の具体的な内容」「今、実際に事業をしていること」を確かめます。書類の不備の主な原因は、「現在、実際にどのような事業活動を行われているのかが分からない」ことだとしています。</p>
           <ul className="grid gap-2">
             {DASHITA.map((d) => (
               <li key={d.h} className={`flex items-start gap-3 rounded-2xl p-3.5 ring-1 ${d.ng ? 'bg-rose-50 ring-rose-200' : 'bg-white ring-slate-200'}`}>
@@ -192,7 +192,7 @@ export default function Page() {
 
         <section className={SECTION} aria-labelledby="osusume">
           <h2 id="osusume" className={H2}>公式が挙げる事業内容の書類</h2>
-          <p className="text-[13px] leading-relaxed text-slate-700">審査が進みやすい順に並んでいます。いくつか持っているなら、上から2〜3点を出すようにと案内しています。</p>
+          <p className="text-[13px] leading-relaxed text-slate-700">審査が進みやすい順に並んでいます。いくつか持っているなら、上から2〜3点を出すよう勧めています。</p>
           <ol className="grid gap-1.5">
             {OSUSUME.map((o, i) => (
               <li key={o} className="flex items-start gap-3 rounded-xl bg-white px-3.5 py-2.5 ring-1 ring-slate-200">
@@ -203,9 +203,9 @@ export default function Page() {
           </ol>
           <div className="flex flex-col gap-2 rounded-2xl bg-sky-50 p-4 ring-1 ring-sky-200">
             <span className="text-[15px] font-black text-slate-900">設立直後で、まだ準備の段階なら</span>
-            <span className="text-[13px] leading-relaxed text-slate-700">公式は、2点以上を同時に出すと要件を満たしやすいとしています。</span>
+            <span className="text-[13px] leading-relaxed text-slate-700">銀行の案内では、2点以上を同時に出すと要件を満たしやすいとしています。</span>
             <span className="flex items-start gap-2 text-[13px] leading-relaxed text-slate-700"><FileText size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" /><span><b>1点目</b>：会社案内・商品企画書・事業計画書、これから使う契約書や請求書のひな型など</span></span>
-            <span className="flex items-start gap-2 text-[13px] leading-relaxed text-slate-700"><MessageSquare size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" /><span><b>2点目</b>：事業に関するメールや LINE のやり取りの画面の写しなど</span></span>
+            <span className="flex items-start gap-2 text-[13px] leading-relaxed text-slate-700"><MessageSquare size={18} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" /><span><b>2点目</b>：事業に関するメールや LINE のやり取りの画面を撮った画像など</span></span>
           </div>
           <p className={SRC}>出典：{src(['shorui'])}（{CHECKED} 確認）</p>
         </section>
@@ -216,7 +216,7 @@ export default function Page() {
             {[
               { h: 'マイナンバーカードの読み取り・自撮りの動画', s: '最短当日' },
               { h: '書類のアップロード・郵送', s: '1週間ほど' },
-              { h: '私たちの場合', s: '申込から3日でメール' },
+              { h: '私たちの場合（11/7 土曜に申込）', s: '土日を挟んで3日' },
             ].map((n) => (
               <li key={n.h} className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
                 <Clock size={20} className="shrink-0 text-sky-700" aria-hidden="true" />
@@ -230,7 +230,8 @@ export default function Page() {
 
         <section className={SECTION} aria-labelledby="tsugi">
           <h2 id="tsugi" className={H2}>落ちたあとにしたこと</h2>
-          <p className="text-[13px] leading-relaxed text-slate-700">結果の2日後に、ほかの2行に同時に申し込みました。PayPay銀行は、申込の住所が登記と違って一度止まりましたが、申し込み直して設立から19日で審査に通りました。</p>
+          <p className="text-[13px] leading-relaxed text-slate-700">結果の2日後に、ドコモSMTBネット銀行と PayPay銀行に同時に申し込みました。ドコモSMTBネット銀行は通りませんでした。PayPay銀行は、申込の住所が登記と違って一度止まりましたが、申し込み直して設立から19日で審査に通りました。</p>
+          <p className="text-[13px] leading-relaxed text-slate-700">書類をそろえ直して、GMOあおぞらネット銀行にもう一度申し込めるかは、銀行に確かめてください。</p>
           <div className="grid gap-2">
             <Link href="/guide/houjin/paypay-houjin-kouza" className="flex items-center gap-3 rounded-2xl border-2 border-sky-200 bg-sky-50/60 p-3.5 hover:border-sky-300">
               <Landmark size={22} className="shrink-0 text-sky-700" aria-hidden="true" />
@@ -246,10 +247,10 @@ export default function Page() {
           {hasExit && (
             <HoujinExit
               lpId={LP_ID} partner="raksulBank" position="tsugi" lead="書類をそろえ直して申し込むなら"
-              note="ラクスルバンクの審査は、GMOあおぞらネット銀行が行います。同じ審査なので、GMOあおぞらネット銀行で落ちた場合は、事業の中身が分かる書類をそろえ直してから申し込んでください。ラクスルバンクは、設立直後の会社は事業計画書（代表者の署名・捺印）も出せるとしています。"
+              note="ラクスルバンクの審査は、GMOあおぞらネット銀行が行います。GMOあおぞらネット銀行で落ちたあとに、ラクスルバンクで通るかは分かりません。申し込むなら、事業の中身が分かる書類をそろえてからにしてください。"
             />
           )}
-          {hasExit && <p className={SRC}>出典：{src(['raksul1293', 'raksul33'])}（2026/11/17 確認）</p>}
+          {hasExit && <p className={SRC}>出典：{src(['raksul33'])}</p>}
         </section>
 
         <section className="flex flex-col gap-2" aria-labelledby="faq">

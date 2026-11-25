@@ -16,7 +16,7 @@ export type SourceKey = keyof typeof SOURCES;
 
 /** 申し込んだ3行の結果（運営会社の実例） */
 export const RESULTS = [
-  { bank: 'GMOあおぞらネット銀行', ok: false, when: '11/7に申込', result: '11/10に通らず' },
+  { bank: 'GMOあおぞらネット銀行', ok: false, when: '11/7 申込 → 11/10 メール', result: '通らず' },
   { bank: 'ドコモSMTBネット銀行', ok: false, when: '11/12 申込 → 11/16 メール', result: '通らず' },
   { bank: 'PayPay銀行', ok: true, when: '11/12 申込 → 11/16 通過', result: '開設' },
 ] as const;

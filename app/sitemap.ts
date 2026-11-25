@@ -531,7 +531,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/guide/houjin/kouza-tsukurenai`,
-      lastModified: new Date("2026-11-16T18:00:00+09:00"),
+      lastModified: new Date("2026-11-25T23:30:00+09:00"),
       changeFrequency: "monthly",
       priority: 0.8,
     },
@@ -573,7 +573,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/guide/houjin/paypay-houjin-kouza`,
-      lastModified: new Date("2026-11-16T19:30:00+09:00"),
+      lastModified: new Date("2026-11-25T23:30:00+09:00"),
       changeFrequency: "monthly",
       priority: 0.8,
     },

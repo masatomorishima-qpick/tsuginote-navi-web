@@ -148,7 +148,7 @@ const categories = [
     description: '設立直後の法人口座の開設を、運営会社がネット銀行3つに申し込んだ記録で。流れ・準備・銀行の違い。',
     articles: [
       { href: '/guide/houjin/setsuritsu-go-yarukoto', title: '会社設立後にやること｜役員報酬0円の合同会社の届出と期限' },
-      { href: '/guide/houjin/kouza-tsukurenai', title: '法人口座が作れない？3行に申し込み、通ったのは1行' },
+      { href: '/guide/houjin/kouza-tsukurenai', title: '法人口座が作れない・審査に落ちた｜3行に申し込み、通ったのは1行' },
       { href: '/guide/houjin/gmo-aozora-shinsa', title: 'GMOあおぞらネット銀行の法人口座、審査に落ちた｜設立直後に出した書類と結果' },
       { href: '/guide/houjin/aoiro-shinsei-houjin', title: '青色申告の承認申請書（法人）の期限と書き方｜設立1期目の日付の計算' },
       { href: '/guide/houjin/kouza-virtual-office', title: '法人口座とバーチャルオフィス｜3行に申し込み、通ったのは1行の実例' },

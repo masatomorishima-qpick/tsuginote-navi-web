@@ -24,7 +24,7 @@ import { CHECKED_AT, SOURCES, RESULTS, JOUKEN, KEIKA, MITATE, ATO, type SourceKe
  */
 const LP_ID = 'guide-houjin-kouza-tsukurenai';
 const PATH = '/guide/houjin/kouza-tsukurenai';
-const TITLE = '法人口座が作れない？審査に2行落ち、通ったのは1行｜設立直後の合同会社・バーチャルオフィスの実例';
+const TITLE = '法人口座が作れない・審査に落ちた｜3行に申し込み2行落ち、通ったのは1行の実例';
 const DESCRIPTION = '設立直後・資本金50万円・本店がバーチャルオフィスの合同会社で、法人口座を3つの銀行に申し込んだ結果と日付。審査に落ちた理由の見立て、落ちたあとにしたこと、申し込む前に整える7つ。無料の申込前チェック表（エクセル・PDF）つき。';
 
 export const metadata: Metadata = {
@@ -61,7 +61,7 @@ function src(keys: readonly SourceKey[]) {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', author: KAKITE_LD, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', about: { '@type': 'Thing', name: '法人口座の審査' }, mentions: ['GMOあおぞらネット銀行', 'ドコモSMTBネット銀行', 'PayPay銀行'].map((name) => ({ '@type': 'BankOrCreditUnion', name })), datePublished: `${CHECKED_AT}T18:00:00+09:00`, dateModified: `${CHECKED_AT}T18:00:00+09:00`, mainEntityOfPage: `${SITE_URL}${PATH}` },
+    { '@type': 'Article', author: KAKITE_LD, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', about: { '@type': 'Thing', name: '法人口座の審査' }, mentions: ['GMOあおぞらネット銀行', 'ドコモSMTBネット銀行', 'PayPay銀行'].map((name) => ({ '@type': 'BankOrCreditUnion', name })), datePublished: `${CHECKED_AT}T18:00:00+09:00`, dateModified: '2026-11-25T23:30:00+09:00', mainEntityOfPage: `${SITE_URL}${PATH}` },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: '法人成り', item: `${SITE_URL}/guide/houjin` },
@@ -96,7 +96,7 @@ export default function Page() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">運営会社の実例</p>
-            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">法人口座が作れない<br /><span className="text-[22px] text-orange-600">3行に申し込み、通ったのは1行</span></h1>
+            <h1 id="top" className="text-[28px] font-black leading-tight text-slate-900">法人口座が作れない<br />審査に落ちた<br /><span className="text-[22px] text-orange-600">3行に申し込み、通ったのは1行</span></h1>
             <p className="text-[14px] text-slate-600">設立直後の合同会社で、法人口座を3つの銀行に申し込んだ結果です。</p>
             <KakiteLine />
           </div>
@@ -217,6 +217,17 @@ export default function Page() {
               </li>
             ))}
           </ol>
+          <div className="grid gap-2">
+            {[
+              { href: '/guide/houjin/gmo-aozora-shinsa', t: 'GMOあおぞらネット銀行の審査に落ちた', s: '申込から3日で結果。出した書類と公式の案内' },
+              { href: '/guide/houjin/docomo-smtb-shinsa', t: 'ドコモSMTBネット銀行（旧住信SBI）の審査に落ちた', s: '申込から4日で見合わせ。公式のよくある不備と照らす' },
+            ].map((l) => (
+              <Link key={l.href} href={l.href} className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200 hover:ring-slate-300">
+                <span className="flex flex-1 flex-col"><span className="text-[15px] font-black text-slate-900">{l.t}</span><span className="text-[12px] text-slate-600">{l.s}</span></span>
+                <ArrowRight size={18} className="text-sky-700" aria-hidden="true" />
+              </Link>
+            ))}
+          </div>
         </section>
 
         <section className={SECTION} aria-labelledby="check">
@@ -277,7 +288,7 @@ export default function Page() {
 
         <KakiteNote />
         <p className="text-[11px] leading-relaxed text-slate-400">
-          体験は運営会社（BlueAdventures合同会社）が2026年10〜11月に申し込んだときのものです。審査の基準は銀行ごとに違い、同じ結果になるとは限りません。最終更新：2026年11月16日
+          体験は運営会社（BlueAdventures合同会社）が2026年10〜11月に申し込んだときのものです。審査の基準は銀行ごとに違い、同じ結果になるとは限りません。最終更新：2026年11月25日
         </p>
       </main>
       <LpFooter />

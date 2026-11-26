@@ -19,8 +19,8 @@ import DATA from '@/lib/souzoku/haifu-data.json';
  */
 const LP_ID = 'guide-souzoku-koseki-atsumekata';
 const PATH = '/guide/souzoku/koseki-atsumekata';
-const TITLE = '相続の戸籍の集め方チェックリスト｜要る戸籍・広域交付・手数料が分かる';
-const DESCRIPTION = '相続の戸籍の集め方を1枚に。相続人（子・親・兄弟姉妹）と集める人を選ぶと、要る戸籍と、広域交付で最寄りの窓口で取れるかが出ます。手数料（横浜市の例：450円・750円）も通数から計算。無料のエクセル・PDF付き。';
+const TITLE = '相続の戸籍の集め方｜出生から死亡まで、どこまで要るかと広域交付・手数料のチェックリスト（無料）';
+const DESCRIPTION = '相続では、亡くなった人の出生から死亡までの戸籍と、相続人全員の今の戸籍が要ります。相続人（子・親・兄弟姉妹）と集める人を選ぶと、どこまで要るかと、広域交付で最寄りの窓口で取れるかが出ます。手数料（横浜市の例：450円・750円）も通数から計算。無料のエクセル・PDF付き。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -50,7 +50,7 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
-        lpId={LP_ID} version="v1-2026-11-13" path={PATH} eyebrow="相続の戸籍集め"
+        lpId={LP_ID} version="v2-2026-11-27" path={PATH} eyebrow="相続の戸籍集め"
         title={<>相続の戸籍の<br /><span className="text-orange-600">集め方チェックリスト</span></>}
         download={
           <div className="flex flex-col gap-3">

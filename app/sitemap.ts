@@ -554,6 +554,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/guide/houjin/goudou-kouza-meigi`,
+      lastModified: new Date("2026-11-26T09:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/guide/houjin/shinsa-ochita-tsugi`,
       lastModified: new Date("2026-11-25T20:00:00+09:00"),
       changeFrequency: "monthly",

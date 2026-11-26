@@ -274,6 +274,7 @@ export default function Page() {
           {[
             { href: '/guide/houjin/smbc-shinsa', t: '三井住友銀行の審査に落ちたら', s: 'Trunk の必要書類と見直す点' },
             { href: '/guide/houjin/yucho-shinsa', t: 'ゆうちょ銀行の審査に落ちたら', s: '公式の必要書類11項目' },
+            { href: '/guide/houjin/rakuten-shinsa', t: '楽天銀行の審査に落ちたら', s: '設立6か月以内はホームページだけでは不足' },
             { href: '/guide/houjin/docomo-smtb-shinsa', t: 'ドコモSMTBネット銀行（旧 住信SBIネット銀行）の審査に落ちた', s: '申込から4日で見合わせ' },
             { href: '/guide/houjin/gmo-aozora-shinsa', t: 'GMOあおぞらネット銀行の審査に落ちた', s: '出した書類と、名義のこと' },
             { href: '/guide/houjin/paypay-houjin-kouza', t: 'PayPay銀行の法人口座の審査', s: '住所の違いで止まり、4日で通った' },

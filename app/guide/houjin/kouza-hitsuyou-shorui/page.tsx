@@ -269,11 +269,29 @@ export default function Page() {
           <p className={`${SRC} mt-1`}>出典：{src(['raksul1293', 'rakuten', 'mizuho'])}（{CHECKED} 確認）</p>
         </section>
 
+        <nav aria-label="銀行ごとの審査" className="flex flex-col gap-2">
+          <h2 className="mb-1 text-[18px] font-black text-slate-900">銀行ごとの審査</h2>
+          {[
+            { href: '/guide/houjin/smbc-shinsa', t: '三井住友銀行の審査に落ちたら', s: 'Trunk の必要書類と見直す点' },
+            { href: '/guide/houjin/yucho-shinsa', t: 'ゆうちょ銀行の審査に落ちたら', s: '公式の必要書類11項目' },
+            { href: '/guide/houjin/docomo-smtb-shinsa', t: 'ドコモSMTBネット銀行（旧 住信SBIネット銀行）の審査に落ちた', s: '申込から4日で見合わせ' },
+            { href: '/guide/houjin/gmo-aozora-shinsa', t: 'GMOあおぞらネット銀行の審査に落ちた', s: '出した書類と、名義のこと' },
+            { href: '/guide/houjin/paypay-houjin-kouza', t: 'PayPay銀行の法人口座の審査', s: '住所の違いで止まり、4日で通った' },
+            { href: '/guide/houjin/goudou-kouza-meigi', t: '合同会社の口座名義の書き方', s: 'カナの略し方と、申込の入力' },
+            { href: '/guide/houjin/shinsa-ochita-tsugi', t: '法人口座の審査に落ちたら次は', s: '落ちたあとにすること4つ' },
+          ].map((l) => (
+            <Link key={l.href} href={l.href} className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200 hover:ring-slate-300">
+              <span className="flex flex-1 flex-col"><span className="text-[15px] font-black text-slate-900">{l.t}</span><span className="text-[12px] text-slate-600">{l.s}</span></span>
+              <ArrowRight size={18} className="text-sky-700" aria-hidden="true" />
+            </Link>
+          ))}
+        </nav>
+
         <nav aria-label="あわせて読む" className="flex flex-col gap-2">
           {[
             { href: '/guide/houjin/kouza-virtual-office', t: '法人口座とバーチャルオフィス', s: '本店がバーチャルオフィスだと増える書類と郵便の注意' },
             { href: '/guide/houjin/kouza-kaisetsu-kikan', t: '法人口座の開設期間', s: '設立から審査通過まで19日の実例' },
-            { href: '/guide/houjin/kouza-tsukurenai', t: '法人口座が作れない', s: '3行に申し込み、通ったのは1行' },
+            { href: '/guide/houjin/kouza-tsukurenai', t: '法人口座が作れない', s: '3つの銀行に申し込み、通ったのは1つ' },
             { href: '/guide/houjin', t: '法人成りのページ一覧', s: '設立から口座まで、つまずいた所' },
           ].map((l) => (
             <Link key={l.href} href={l.href} className="flex items-center gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200 hover:ring-slate-300">

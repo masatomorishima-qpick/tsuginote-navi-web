@@ -26,8 +26,8 @@ import { HOUJIN_PARTNERS } from '@/lib/houjin/partners';
 const LP_ID = 'guide-houjin-rakuten-shinsa';
 const PATH = '/guide/houjin/rakuten-shinsa';
 const CHECKED = '2026/11/27';
-const TITLE = '楽天銀行の法人口座の審査に落ちたら｜設立6か月以内に要る書類と見直す点';
-const DESCRIPTION = '楽天銀行の法人口座の審査に落ちたときに見直す点。設立6か月以内の会社は、ホームページだけでは事業の確認にならず、法人名の入った請求書や契約書が要ると公式は書いています。受け付けない書類（設立届出書・定款など）、届く郵便が簡易書留（転送不要）であることも公式の記載から。楽天銀行以外の3つの銀行に申し込んだ運営会社の実例つき。';
+const TITLE = '楽天銀行の法人口座の審査に落ちたら｜設立6か月以内はホームページだけでは足りない';
+const DESCRIPTION = '楽天銀行の法人口座の審査に落ちたら見直す点。設立6か月以内の会社は、ホームページがあっても別に事業実態を確認できる資料が要ると公式は書いています。受け付けない書類（法人設立届出書・定款など）も公式の記載から。楽天銀行以外の3つの銀行に申し込んだ実例つき。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -42,39 +42,38 @@ const S = {
   notes: { name: '楽天銀行「法人ビジネス口座開設に関する注意事項」', url: 'https://www.rakuten-bank.co.jp/business/account/notes.html' },
   flow: { name: '楽天銀行「法人ビジネス口座開設の流れ」', url: 'https://www.rakuten-bank.co.jp/business/account/flow.html' },
   raksul1293: { name: 'ラクスルバンク よくあるご質問「口座開設の際、必要書類は何を提出すればいいですか。」', url: 'https://support.raksulbank.com/faq/show/1293?site_domain=default' },
-  raksul33: { name: 'ラクスルバンク よくあるご質問「口座開設の審査にはどれくらいの時間がかかりますか？」', url: 'https://support.raksulbank.com/faq/show/33?site_domain=default' },
   gmoTokuyaku: { name: 'GMOあおぞらネット銀行「ラクスルバンク支店に関する特約」', url: 'https://gmo-aozora.com/provision/pdf/raksul_260816.pdf' },
 } as const;
 type K = keyof typeof S;
 
 /** 必ず出す書類（公式の1〜6） */
 const HISSU = [
-  '申込書兼申込委任状（実印と届出印を押す）',
+  '申込書兼申込委任状（実印と届出印を押す。実印を届出印にしてもよい）',
   '実質的支配者に関する届出書',
   '法人の印鑑証明書（原本・発行から3か月以内）',
   '履歴事項全部証明書（原本・発行から6か月以内）',
-  '口座管理者の本人確認書類',
-  '事業実態の確認できる資料（下の表）',
+  '口座管理者の本人確認書類（写し1点）',
+  '事業実態を確認できる資料（下の表）',
 ];
 
 /** 事業実態の資料（公式のグループA。1点）。shinsetsu は設立6か月以内の扱い */
 const JITTAI = [
-  { h: 'ホームページのアドレス', s: '取扱商品・事業内容・法人名・住所が分かるもの', shinsetsu: '設立6か月以内は、これだけでは足りない' },
-  { h: '発注書・納品書・請求書の写し', s: '日付・法人名・具体的な取引内容が分かるもの。発行から6か月以内', shinsetsu: '' },
-  { h: '各種契約書の写し', s: '双方の署名・押印済みで、契約期間内のもの。ひな形は不可', shinsetsu: '' },
+  { h: 'ホームページのアドレス', s: '取扱商品・事業内容・法人名（合同会社などの法人格も含む）・住所が分かるもの', shinsetsu: '設立6か月以内は、ホームページがあっても別に資料が要る' },
+  { h: '発注書・納品書・請求書の写し', s: '日付・法人名（法人格も含む）・具体的な取引内容が分かるもの。発行から6か月以内', shinsetsu: '' },
+  { h: '各種契約書の写し', s: '双方の署名・押印済み（電子契約は電磁的記録の部分も）で、今も契約期間内のもの。ひな形は不可', shinsetsu: '' },
 ];
 
-const UKETSUKENAI = ['設立時の司法書士・行政書士などの請求書', '法人設立届出書', '定款', '顧問税理士との契約書', '事務用品や備品の請求書・納品書', '公共料金・固定資産税などの請求書'];
+const UKETSUKENAI = ['法人設立時の司法書士・行政書士などからの請求書', '法人設立届出書', '定款', '顧問税理士との契約書', '事務用品や備品購入の請求書・納品書', 'PC保守契約などの請求書', '固定資産税・公共料金などの請求書・領収証'];
 
 const GINKO = [
   { href: '/guide/houjin/gmo-aozora-shinsa', bank: 'GMOあおぞらネット銀行', when: '11/7 申込 → 11/10 見合わせのメール', ok: false },
   { href: '/guide/houjin/docomo-smtb-shinsa', bank: 'ドコモSMTBネット銀行（旧 住信SBIネット銀行）', when: '11/12 申込 → 11/16 見合わせのメール', ok: false },
-  { href: '/guide/houjin/paypay-houjin-kouza', bank: 'PayPay銀行', when: '11/12 申込 → 11/13 住所の違いで止まり申し込み直し → 11/16 通過', ok: true },
+  { href: '/guide/houjin/paypay-houjin-kouza', bank: 'PayPay銀行', when: '11/12 申込 → 11/13 登記と違う自宅の住所を入れて止まり申し込み直し → 11/16 通過', ok: true },
 ] as const;
 
 const FAQS = [
-  { q: '楽天銀行は、法人口座の審査に落ちた理由を教えてくれますか？', a: '楽天銀行は、口座開設の審査には楽天銀行で定めた審査基準があるが、詳細は公開していないとしています。受け付けできない例の1つ目に「事業実態の確認が取れない場合」を挙げています。' },
-  { q: '設立したばかりで、請求書や契約書がありません。楽天銀行に申し込めますか？', a: '楽天銀行の必要書類の案内では、設立6か月以内の会社は、ホームページがあっても事業実態の確認できる資料を別に出すとしています。挙げられているのは、法人名の入った発注書・納品書・請求書（発行から6か月以内）か、双方が署名・押印した契約書です。法人設立届出書や定款は受け付けない書類の例に入っています。' },
+  { q: '楽天銀行の法人口座の審査基準は、公開されていますか？', a: '楽天銀行は、審査基準を定めているが、詳細は公開していないとしています。「受付ができない例」の1つ目には「事業実態の確認が取れない場合」を挙げています。落ちた理由を知らせるかどうかは、公式の案内に記載がありません。' },
+  { q: '設立したばかりで、請求書や契約書がありません。楽天銀行に申し込めますか？', a: '申込はできますが、楽天銀行は「受付ができない例」に「事業実態の確認が取れない場合」を挙げています。設立6か月以内の会社は、ホームページがあっても別に事業実態を確認できる資料が要るとしています。ホームページ以外では、発注書・納品書・請求書（発行から6か月以内）か、契約書（双方の署名・押印済み、契約期間内）が挙がっています。法人設立届出書や定款は、受け付けない書類の例に入っています。' },
   { q: '楽天銀行の審査に落ちたら、次は何をすればいいですか？', a: '事業実態の資料と、申込の内容が登記と合っているかを見直します。私たちは楽天銀行ではなく、GMOあおぞらネット銀行・ドコモSMTBネット銀行・PayPay銀行に申し込みました。1つ目で落ちた2日後に残りの2つへ同じ日に申し込み、PayPay銀行が通りました。' },
 ];
 
@@ -126,14 +125,14 @@ export default function Page() {
         <section className="flex flex-col gap-5" aria-labelledby="top">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] font-bold text-sky-700">公式の案内と、ほかの銀行での私たちの実例</p>
-            <h1 id="top" className="text-[26px] font-black leading-tight text-slate-900">楽天銀行の<br />法人口座の審査に<br />落ちたら<br /><span className="text-[19px] text-orange-600">設立6か月以内に要る書類</span></h1>
+            <h1 id="top" className="text-[26px] font-black leading-tight text-slate-900">楽天銀行の<br />法人口座の審査に<br />落ちたら<br /><span className="text-[19px] text-orange-600">設立6か月以内はホームページだけでは足りない</span></h1>
             <KakiteLine />
           </div>
-          <ul className="grid grid-cols-3 gap-2" aria-label="公式の数字">
+          <ul className="grid grid-cols-3 gap-2" aria-label="公式の要点">
             {[
               { big: '6点', s: '必ず出す書類' },
-              { big: '6か月', s: '以内はホームページだけでは不可' },
-              { big: '郵送', s: '書類は郵便で送る' },
+              { big: '6か月', s: '設立から6か月以内はホームページだけでは不足' },
+              { big: '180日', s: '以内に書類を郵送' },
             ].map((k) => (
               <li key={k.s} className="flex flex-col items-center gap-0.5 rounded-2xl bg-white px-2 py-3.5 text-center ring-1 ring-slate-200">
                 <span className="text-[22px] font-black leading-none text-orange-600">{k.big}</span>
@@ -143,7 +142,7 @@ export default function Page() {
           </ul>
           <p className="rounded-2xl bg-white p-4 text-[14px] leading-relaxed text-slate-800 ring-1 ring-slate-200">
             <span className="mb-1 block text-[12px] font-black text-sky-700">結論</span>
-            楽天銀行は、設立6か月以内の会社には、ホームページとは別に、法人名の入った請求書・発注書・納品書か、双方が署名した契約書を求めています。設立届出書や定款は、事業の確認の書類として受け付けません。落ちたら、まずこの書類を見直し、ほかの銀行への申込も同時に進めます。
+            楽天銀行は、設立6か月以内の会社は、ホームページがあっても別に事業実態を確認できる資料が要るとしています。ほかに挙がっているのは、法人名の入った発注書・納品書・請求書か、双方が署名・押印した契約書です。法人設立届出書や定款は受け付けません。審査基準の詳細は公開されていないので、「受付ができない例」に挙がっている事業実態の資料から見直し、ほかの銀行への申込も同時に進めます。
           </p>
           <p className="flex items-start gap-2 text-[12px] leading-relaxed text-slate-600"><Info size={16} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" /><span>私たちは楽天銀行には申し込んでいません。このページの楽天銀行の案内は、公式の記載だけをもとにしています。</span></p>
         </section>
@@ -158,13 +157,13 @@ export default function Page() {
               </li>
             ))}
           </ol>
-          <p className="text-[13px] leading-relaxed text-slate-700">書類は、楽天銀行に届いた時点で有効期限内である必要があります。許認可が要る事業は、許認可証の写しも出します。</p>
+          <p className="text-[13px] leading-relaxed text-slate-700">書類は、楽天銀行に届いた時点で有効期限内である必要があります。登記と違う住所を連絡先にするときは連絡先確認資料、代表者が外国籍のときや海外送金を使うときは、それぞれの書類も出します。</p>
           <p className={SRC}>出典：{src(['shorui'])}（{CHECKED} 確認）</p>
         </section>
 
         <section className={SECTION} aria-labelledby="jittai">
-          <h2 id="jittai" className={H2}>事業実態の資料</h2>
-          <p className="text-[13px] leading-relaxed text-slate-700">次のうち1点を出します。</p>
+          <h2 id="jittai" className={H2}>事業実態を確認できる資料</h2>
+          <p className="text-[13px] leading-relaxed text-slate-700">次のうち1点を出します。許認可が要る事業は許認可証の写し（申請中は不可）、貿易事業は輸出入許可通知書か B/L の写し（6か月以内）も出します。</p>
           <ul className="grid gap-2">
             {JITTAI.map((j) => (
               <li key={j.h} className={`flex items-start gap-3 rounded-2xl p-3.5 ring-1 ${j.shinsetsu ? 'bg-amber-50 ring-amber-200' : 'bg-white ring-slate-200'}`}>
@@ -194,7 +193,7 @@ export default function Page() {
               { icon: Monitor, h: 'パソコンで入力', s: 'スマートフォンからは申し込めない' },
               { icon: Mail, h: '申込書と書類を郵送', s: '申込から180日以内に届かないと取り消し' },
               { icon: SearchCheck, h: '楽天銀行が確認と審査', s: '追加の書類や電話での確認を求める場合あり' },
-              { icon: CheckCircle2, h: '開設できる場合は、簡易書留（転送不要）が2通届く', s: '連絡先の住所あてと、口座管理者の自宅あて' },
+              { icon: CheckCircle2, h: '開設できる場合は郵便2通とメール', s: '簡易書留（転送不要）で、連絡先の住所あてと口座管理担当者の自宅あてに1通ずつ。郵便を受け取ってから初期設定' },
             ].map((n, i) => (
               <li key={n.h} className="flex items-start gap-3 rounded-2xl bg-white p-3.5 ring-1 ring-slate-200">
                 <n.icon size={20} className="mt-0.5 shrink-0 text-sky-700" aria-hidden="true" />
@@ -202,7 +201,7 @@ export default function Page() {
               </li>
             ))}
           </ol>
-          <p className="text-[13px] leading-relaxed text-slate-700">楽天銀行は、審査基準の詳細は公開していないとしています。受け付けできない例の1つ目は「事業実態の確認が取れない場合」です。</p>
+          <p className="text-[13px] leading-relaxed text-slate-700">楽天銀行は、審査基準の詳細は公開していないとしています。「受付ができない例」の1つ目は「事業実態の確認が取れない場合」です。</p>
           <p className={SRC}>出典：{src(['flow', 'notes', 'shorui'])}（{CHECKED} 確認）</p>
         </section>
 
@@ -217,15 +216,15 @@ export default function Page() {
               </Link>
             ))}
           </div>
-          <p className="text-[13px] leading-relaxed text-slate-700">1つ目で落ちた2日後に、2つの銀行へ同じ日に申し込みました。通ったのは11月16日、設立から19日後です。</p>
+          <p className="text-[13px] leading-relaxed text-slate-700">1つ目で落ちた2日後に、2つの銀行へ同じ日に申し込みました。通ったのは PayPay銀行で、11月16日、設立から19日後です。</p>
           <p className={SRC}>運営会社（BlueAdventures合同会社、2026年10月28日設立・本店はバーチャルオフィス）の2026年11月の記録</p>
           {hasExit && (
             <HoujinExit
               lpId={LP_ID} partner="raksulBank" position="jitsurei" lead="取引の書類がまだない会社の申込先の候補"
-              note="ラクスルバンクは、設立直後の会社が補う書類として、代表者が署名・捺印した事業計画書を挙げています。口座はGMOあおぞらネット銀行のラクスルバンク支店で、審査もGMOあおぞらネット銀行が行います。私たちはGMOあおぞらネット銀行に直接申し込んで落ちています。GMOあおぞらネット銀行で落ちたことがある会社は、同じ銀行の審査になると知ったうえで選んでください。"
+              note="ラクスルバンクは、設立直後の会社が補う書類として、代表者が署名・捺印した事業計画書を挙げています（補う書類なので、これで通るとは限りません）。口座はGMOあおぞらネット銀行のラクスルバンク支店で、審査もGMOあおぞらネット銀行が行います。私たちはGMOあおぞらネット銀行に直接申し込んで落ちています。GMOあおぞらネット銀行で落ちたことがある会社は、同じ銀行の審査になると知ったうえで選んでください。"
             />
           )}
-          {hasExit && <p className={SRC}>出典：{src(['raksul1293', 'raksul33', 'gmoTokuyaku'])}（{CHECKED} 確認）</p>}
+          {hasExit && <p className={SRC}>出典：{src(['raksul1293', 'gmoTokuyaku'])}（{CHECKED} 確認）</p>}
         </section>
 
         <section className="flex flex-col gap-2" aria-labelledby="faq">

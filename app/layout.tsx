@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_JP, Geist } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import ClarityScript from "@/components/ClarityScript";
@@ -8,17 +8,11 @@ import { cn } from "@/lib/utils";
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 /**
- * 日本語フォント：Noto Sans JP
- * Figma 提案に合わせて、見出しから本文まで一貫して読みやすい和文に。
+ * 日本語フォント（2026-11-26）：Noto Sans JP の読み込みをやめた。
+ * 定義だけあって、どのページにも使われていなかった（--font-noto-sans-jp を付ける所がなく、
+ * 文字は globals.css の Hiragino Sans などで表示されていた）。一方で組み立てのたびに
+ * Google から文字の部品を落としに行き、11/26 に本番の公開が2回、その読み込みの失敗で止まった。
  */
-const notoSansJP = Noto_Sans_JP({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-noto-sans-jp",
-  display: "swap",
-  preload: true,
-  fallback: ["Hiragino Sans", "Yu Gothic", "system-ui", "sans-serif"],
-});
 
 const SITE_URL = "https://www.tsuginotenavi.jp";
 

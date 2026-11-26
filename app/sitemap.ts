@@ -572,6 +572,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/guide/houjin/rakuten-shinsa`,
+      lastModified: new Date("2026-11-27T08:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/guide/houjin/kouza-virtual-office`,
       lastModified: new Date("2026-11-17T19:00:00+09:00"),
       changeFrequency: "monthly",

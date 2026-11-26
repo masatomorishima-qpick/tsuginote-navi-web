@@ -20,8 +20,8 @@ import DATA from '@/lib/souzoku/haifu-data.json';
  */
 const LP_ID = 'guide-souzoku-shinkoku-okure';
 const PATH = '/guide/souzoku/shinkoku-okure';
-const TITLE = '相続税の申告期限を過ぎたら｜延滞税と無申告加算税を日付で自動計算（無料）';
-const DESCRIPTION = '相続税の申告期限（知った日の翌日から10か月）を過ぎると延滞税と無申告加算税がかかります。知った日・申告する日・税額を入れると、令和8年の割合（年2.8%・9.1%）で延滞税を、調査の前か後かで加算税（5〜30%）を計算します。';
+const TITLE = '相続税の延滞税はいくら？申告期限を過ぎたときの延滞税と無申告加算税を日付で自動計算（無料）';
+const DESCRIPTION = '相続税の延滞税は、もとの税額×割合×日数÷365。令和8年の割合は年2.8%（2か月を過ぎた分は年9.1%）です。知った日・申告する日・税額を入れると、延滞税と、調査の前か後かで変わる無申告加算税（5〜30%）を自動で計算します。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -50,7 +50,7 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
-        lpId={LP_ID} version="v1-2026-11-17" path={PATH} eyebrow="相続税の申告"
+        lpId={LP_ID} version="v2-2026-11-26" path={PATH} eyebrow="相続税の申告"
         title={<>相続税の申告期限を<br />過ぎたら<br /><span className="text-orange-600">延滞税と無申告加算税を日付で計算</span></>}
         download={
           <div className="flex flex-col gap-3">

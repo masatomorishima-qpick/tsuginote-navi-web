@@ -572,6 +572,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/guide/houjin/resona-shinsa`,
+      lastModified: new Date("2026-11-27T11:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/guide/houjin/mizuho-shinsa`,
       lastModified: new Date("2026-11-27T10:00:00+09:00"),
       changeFrequency: "monthly",

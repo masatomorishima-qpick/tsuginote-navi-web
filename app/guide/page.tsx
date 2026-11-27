@@ -155,6 +155,7 @@ const categories = [
       { href: '/guide/houjin/shinsa-ochita-tsugi', title: '法人口座の審査に落ちたら次は？3つの銀行に申し込んで1つ通った実例' },
       { href: '/guide/houjin/goudou-kouza-meigi', title: '合同会社の口座名義の書き方｜カナは「ド）」、申込は登記どおり' },
       { href: '/guide/houjin/smbc-shinsa', title: '三井住友銀行の法人口座の審査に落ちたら｜Trunkの必要書類と見直す点' },
+      { href: '/guide/houjin/shinsa-yurui', title: '法人口座の審査がゆるい銀行はある？作りやすいと言われる銀行で2つ落ちた実例' },
       { href: '/guide/houjin/mufg-shinsa', title: '三菱UFJ銀行の法人口座の開設は難しい？審査で聞かれる3つと開設までの期間' },
       { href: '/guide/houjin/resona-shinsa', title: 'りそな銀行の法人口座の審査に落ちたら｜ネットの再申込はできず店頭へ' },
       { href: '/guide/houjin/mizuho-shinsa', title: 'みずほ銀行の法人口座の審査に落ちたら｜公式が挙げる4つの確認点と申込の流れ' },

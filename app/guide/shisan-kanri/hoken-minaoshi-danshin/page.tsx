@@ -22,10 +22,12 @@ import DATA from '@/lib/hoken/haifu-data.json';
  * 出口：保険見直し本舗（レントラックス 7502、新規の無料面談の完了）。
  */
 const LP_ID = 'guide-hoken-danshin';
-const VERSION = 'v1-2026-11-19';
+const VERSION = 'v2-2026-11-28';
 const PAGE_PATH = '/guide/shisan-kanri/hoken-minaoshi-danshin';
-const TITLE = '住宅ローンの団信で生命保険を見直す｜減らせる死亡保障の計算（無料・エクセル）';
-const DESCRIPTION = '住宅ローンの団信（団体信用生命保険）に入ったら、生命保険の死亡保障はいくら減らせるか。見込んでいた住居費と年数を入れると減らせる額の目安が出ます。団信の保障の範囲、夫婦で借りたときの注意、確かめる8つの点を1枚にした無料のチェックリスト（エクセル・PDF）。';
+// v2-2026-11-28：題名と説明文を、表示の出た言葉（住宅購入 保険 見直し 8.0位・住宅ローン 保険 見直し 6.7位・住宅ローン 死亡保険 9.0位。Search Console 11/19〜11/25、表示23・クリック0）と、
+//   上位の題名（「住宅ローンを組んだときの保険の見直し」「マイホームを購入したら死亡保険の見直し」）に合わせた。判定 12/12：クリック 週0 → 週2。
+const TITLE = '住宅ローンを組んだら保険の見直し｜団信で減らせる死亡保険の計算（無料・エクセル）';
+const DESCRIPTION = '家を買って住宅ローンを組んだら、生命保険はどう見直す？団信（団体信用生命保険）に入ったら、死亡保険はいくら減らせるか。見込んでいた住居費と年数を入れると減らせる額の目安が出ます。団信の保障の範囲、夫婦で借りたときの注意、確かめる8つの点を1枚にした無料のチェックリスト（エクセル・PDF）。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -46,7 +48,7 @@ const FAQS = [
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', datePublished: '2026-11-19T09:00:00+09:00', dateModified: '2026-11-19T09:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PAGE_PATH}` },
+    { '@type': 'Article', author: { '@type': 'Organization', name: 'つぎの手ナビ 編集部', url: 'https://www.tsuginotenavi.jp/policy#ayamari' }, publisher: { '@id': 'https://www.tsuginotenavi.jp/#organization' }, headline: TITLE, description: DESCRIPTION, inLanguage: 'ja', datePublished: '2026-11-19T09:00:00+09:00', dateModified: '2026-11-28T09:00:00+09:00', mainEntityOfPage: `${SITE_URL}${PAGE_PATH}` },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: '保険・お金の管理', item: `${SITE_URL}/guide/shisan-kanri` },

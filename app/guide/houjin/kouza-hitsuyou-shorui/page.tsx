@@ -274,6 +274,7 @@ export default function Page() {
           {[
             { href: '/guide/houjin/smbc-shinsa', t: '三井住友銀行の審査に落ちたら', s: 'Trunk の必要書類と見直す点' },
             { href: '/guide/houjin/yucho-shinsa', t: 'ゆうちょ銀行の審査に落ちたら', s: '公式の必要書類11項目' },
+            { href: '/guide/houjin/mufg-shinsa', t: '三菱UFJ銀行の開設は難しい？', s: '審査で聞かれる3つと開設までの期間' },
             { href: '/guide/houjin/resona-shinsa', t: 'りそな銀行の審査に落ちたら', s: 'ネットの再申込はできず店頭へ' },
             { href: '/guide/houjin/mizuho-shinsa', t: 'みずほ銀行の審査に落ちたら', s: '公式が挙げる4つの確認点と申込の流れ' },
             { href: '/guide/houjin/rakuten-shinsa', t: '楽天銀行の審査に落ちたら', s: '設立6か月以内はホームページだけでは不足' },

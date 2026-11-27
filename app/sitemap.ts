@@ -572,6 +572,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/guide/houjin/mizuho-shinsa`,
+      lastModified: new Date("2026-11-27T10:00:00+09:00"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/guide/houjin/rakuten-shinsa`,
       lastModified: new Date("2026-11-27T08:00:00+09:00"),
       changeFrequency: "monthly",

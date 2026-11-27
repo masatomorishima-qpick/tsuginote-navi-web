@@ -5,7 +5,9 @@ import LpHeader from '@/components/lp/LpHeader';
 import LpFooter from '@/components/lp/LpFooter';
 import LpViewTracker from '@/components/lp/LpViewTracker';
 import { KakiteLine, KakiteNote, KAKITE_LD } from '@/components/houjin/Kakite';
+import HoujinExit from '@/components/houjin/HoujinExit';
 import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
+import { HOUJIN_PARTNERS } from '@/lib/houjin/partners';
 
 /**
  * 会社設立の電子申請で、旧字体（外字）がエラーになった実例（2026-11-16 作成）。
@@ -15,7 +17,8 @@ import { SITE_URL, SITE_NAME, ogImageUrl } from '@/components/loan/LoanArticle';
  * 体験（オーナー、11/16）：代表者の印鑑証明書の住所の「塚」が旧字体。電子申請で入れられず、提出書類と一致しない問題になった。
  *   普通の「塚」で出し直して登記は完了。法務局は電子のことは分からず紙を勧めた。会社設立のサービスは「行政に聞いて」。
  * 住所の地名は書かない（オーナーの住所が分かるため。「塚」の字だけにとどめる）。
- * 紹介料の出口はない。登記の次にする法人口座のページへの入口。
+ * 出口：ラクスルバンク（2026-11-28 追加。法人成りのページで検索からの訪問が最も多く〈11/21〜27 で2〉、平均5位。
+ *   登記を終えた読者の次の一歩は法人口座なので、「登記が終わったら、法人口座」の節に1つだけ置く。審査は GMOあおぞらネット銀行と正直に書く）。
  */
 const LP_ID = 'guide-houjin-kyuujitai-touki';
 const PATH = '/guide/houjin/kyuujitai-touki';
@@ -80,12 +83,20 @@ const jsonLd = {
 };
 
 export default function Page() {
+  const hasExit = !!HOUJIN_PARTNERS.raksulBank.href;
   return (
     <div className="flex min-h-screen flex-col bg-[#f6f8fa]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <LpHeader />
-      <LpViewTracker lpId={LP_ID} version="v1-2026-11-16" />
+      <LpViewTracker lpId={LP_ID} version="v2-2026-11-28" />
       <main className="mx-auto flex w-full max-w-[520px] flex-1 flex-col gap-14 px-4 pt-4 pb-16">
+        {hasExit && (
+          <p className="-mb-10 flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">
+            <span className="rounded border border-slate-300 px-1.5 tracking-widest">PR</span>
+            <span>当サイトは紹介料を受け取っています</span>
+            <Link href="/policy" className="text-sky-800 underline underline-offset-2">中立性ポリシー</Link>
+          </p>
+        )}
         <nav aria-label="現在の位置" className="-mb-10 text-[12px] text-slate-500">
           <Link href="/" className="underline underline-offset-2">ホーム</Link><span className="mx-1.5">/</span>
           <Link href="/guide/houjin" className="underline underline-offset-2">法人成り</Link><span className="mx-1.5">/</span>
@@ -167,6 +178,15 @@ export default function Page() {
               </li>
             ))}
           </ul>
+          {hasExit && (
+            <HoujinExit
+              lpId={LP_ID} partner="raksulBank" position="tsugi" lead="登記が終わった会社の申込先の候補"
+              note="ラクスルバンクは、設立したばかりで取引の書類がまだない会社が出せる書類として、代表者が署名・捺印した事業計画書を挙げています（これを出せば通るとは限りません）。口座はGMOあおぞらネット銀行のラクスルバンク支店で、審査もGMOあおぞらネット銀行が行います。私たちはGMOあおぞらネット銀行に直接申し込んで落ちています。"
+            />
+          )}
+          {hasExit && (
+            <p className={SRC}>出典：<a href="https://support.raksulbank.com/faq/show/1293?site_domain=default" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">ラクスルバンク よくあるご質問「口座開設の際、必要書類は何を提出すればいいですか。」</a>・<a href="https://gmo-aozora.com/provision/pdf/raksul_260816.pdf" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">GMOあおぞらネット銀行「ラクスルバンク支店に関する特約」</a>（2026/11/27 確認）</p>
+          )}
         </section>
 
         <section className="flex flex-col gap-2" aria-labelledby="faq">

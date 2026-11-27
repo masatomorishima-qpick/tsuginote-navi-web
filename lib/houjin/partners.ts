@@ -9,8 +9,12 @@
  *   口座は GMOあおぞらネット銀行のラクスルバンク支店（GMOあおぞらの特約 2026/6/24 現在）。
  *   運営会社は GMOあおぞらネット銀行に直接申し込んで通らなかった。書き方は案1（正直に書いて申込先の一つとして出す、11/16 オーナー決定）。
  *   11/16 提携申請、11/17 承認（提携日 2026/11/17）。リンクは A8 の「広告リンク作成」で、サイト「つぎの手ナビ」を選んで発行したテキストリンク。書き換えない。
+ * - フィンサーバンク（A8 s00000027295001、オーナーの画面写し 11/27）：新規口座開設 4,000円、確定率 10.52%。
+ *   口座は北國銀行フィンサー支店。運営の株式会社f9k は金融サービス仲介業者で、契約は金融機関が申込を承諾したときに成立（f9k の明示事項）。
+ *   つまり審査は GMOあおぞらネット銀行ではない。「GMOあおぞらで落ちた」のページの出口に使う（ラクスルバンクは同じ審査のため）。
+ *   11/27 オーナーが提携申請。承認されたら A8 で発行したリンクを href と beacon に入れる（それまでは空で、ボタンは出ない）。
  */
-export type HoujinPartnerKey = 'raksulBank';
+export type HoujinPartnerKey = 'raksulBank' | 'finswerBank';
 
 export type HoujinPartner = {
   key: HoujinPartnerKey;
@@ -36,5 +40,14 @@ export const HOUJIN_PARTNERS: Record<HoujinPartnerKey, HoujinPartner> = {
     href: 'https://px.a8.net/svt/ejp?a8mat=4BGMKC+4W8CM2+5VV8+5YRHE',
     beacon: 'https://www16.a8.net/0.gif?a8mat=4BGMKC+4W8CM2+5VV8+5YRHE',
     asp: 'a8', programId: 's00000027458001', reward: 10000,
+  },
+  finswerBank: {
+    key: 'finswerBank', name: 'フィンサーバンク', cta: 'フィンサーバンクに申し込む',
+    // フィンサーバンク公式「口座開設について」「料金テーブル」、f9k「金融サービス仲介業・電子決済等代行業に係る明示事項」。2026-11-27 確認。
+    points: ['口座は北國銀行（フィンサー支店）の口座', '申込に履歴事項全部証明書と定款は不要', '他の銀行あての振込は1件110円（無料の料金プラン）'],
+    checkedAt: '2026年11月27日',
+    href: '',
+    beacon: '',
+    asp: 'a8', programId: 's00000027295001', reward: 4000,
   },
 };

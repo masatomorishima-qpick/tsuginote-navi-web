@@ -111,7 +111,9 @@ const jsonLd = {
 };
 
 export default function Page() {
-  const hasExit = !!HOUJIN_PARTNERS.raksulBank.href;
+  // 出口：フィンサーバンク（北國銀行の口座で、GMOあおぞらとは別の審査）を優先。提携の承認前（href が空）はラクスルバンク。
+  const useFinswer = !!HOUJIN_PARTNERS.finswerBank.href;
+  const hasExit = useFinswer || !!HOUJIN_PARTNERS.raksulBank.href;
   return (
     <div className="flex min-h-screen flex-col bg-[#f6f8fa]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -249,13 +251,20 @@ export default function Page() {
               <ArrowRight size={18} className="text-sky-700" aria-hidden="true" />
             </Link>
           </div>
-          {hasExit && (
+          {useFinswer && (
+            <HoujinExit
+              lpId={LP_ID} partner="finswerBank" position="tsugi" lead="GMOあおぞらネット銀行とは別の銀行の申込先"
+              note="フィンサーバンクで開く口座は、北國銀行フィンサー支店の口座です。運営する会社は銀行ではなく、口座の契約は北國銀行が申込を承諾したときに成り立ちます。私たちはフィンサーバンクには申し込んでいないので、審査に通るかは分かりません。月額の料金プランでは、他の銀行あての振込は1件90円です。"
+            />
+          )}
+          {useFinswer && <p className={SRC}>出典：<a href="https://finswer-bank.finswer.jp/feature/opening-account" target="_blank" rel="noopener noreferrer" className={A}>フィンサーバンク「口座開設について」</a>・<a href="https://finswer-bank.finswer.jp/price-list" target="_blank" rel="noopener noreferrer" className={A}>フィンサーバンク「料金テーブル」</a>・<a href="https://finswer.jp/terms/intermediary" target="_blank" rel="noopener noreferrer" className={A}>株式会社f9k「金融サービス仲介業・電子決済等代行業に係る明示事項」</a>（2026/11/27 確認）</p>}
+          {hasExit && !useFinswer && (
             <HoujinExit
               lpId={LP_ID} partner="raksulBank" position="tsugi" lead="これから申し込む会社の申込先に"
               note="ラクスルバンクの審査は、GMOあおぞらネット銀行が行います。GMOあおぞらネット銀行で落ちたあとに、ラクスルバンクで通るかは分かりません。まだどこにも申し込んでいない会社が、申込先の一つとして考えるための紹介です。"
             />
           )}
-          {hasExit && <p className={SRC}>出典：{src(['raksul33'])}</p>}
+          {hasExit && !useFinswer && <p className={SRC}>出典：{src(['raksul33'])}</p>}
         </section>
 
         <section className="flex flex-col gap-2" aria-labelledby="faq">

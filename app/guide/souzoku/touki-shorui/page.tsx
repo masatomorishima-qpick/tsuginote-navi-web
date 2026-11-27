@@ -18,8 +18,8 @@ import DATA from '@/lib/souzoku/haifu-data.json';
  */
 const LP_ID = 'guide-souzoku-touki-shorui';
 const PATH = '/guide/souzoku/touki-shorui';
-const TITLE = '相続登記の必要書類チェックリスト｜分け方を選ぶだけ・期限と登録免許税も計算';
-const DESCRIPTION = '相続登記の必要書類を、法務局の一覧に合わせて1枚にした無料のチェックリスト（エクセル・PDF）。遺産分割・法定相続分・遺言から選ぶと要る書類と取る場所が出ます。期限（3年以内）と登録免許税（1,000分の4）も自動で計算。';
+const TITLE = '相続登記の必要書類一覧｜自分で申請する人のチェックリスト（遺産分割・法定相続分・遺言の3つ、登録免許税も計算）';
+const DESCRIPTION = '相続登記を自分で申請する人向けに、必要書類を法務局の一覧に合わせて1枚にした無料のチェックリスト（エクセル・PDF）。遺産分割・法定相続分・遺言から選ぶと要る書類と取る場所が出ます。期限（3年以内）と登録免許税（1,000分の4）も自動で計算。';
 
 export const metadata: Metadata = {
   title: `${TITLE} | ${SITE_NAME}`,
@@ -48,7 +48,7 @@ export default function Page() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SouzokuArticle
-        lpId={LP_ID} version="v1-2026-11-12" path={PATH} eyebrow="相続登記（不動産の名義変更）"
+        lpId={LP_ID} version="v2-2026-11-27" path={PATH} eyebrow="相続登記（不動産の名義変更）"
         title={<>相続登記の<br /><span className="text-orange-600">必要書類チェックリスト</span></>}
         download={
           <div className="flex flex-col gap-3">
